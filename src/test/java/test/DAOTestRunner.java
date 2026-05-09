@@ -1,7 +1,7 @@
 package test;
 
-import dao.*;
-import model.*;
+import br.com.tdbresponde.dao.*;
+import br.com.tdbresponde.model.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;

@@ -1,7 +1,7 @@
 package test;
 
-import model.Especialidade;
-import model.Voluntario;
+import br.com.tdbresponde.model.Especialidade;
+import br.com.tdbresponde.model.Voluntario;
 
 public class TesteVoluntario {
     public static void main(String[] args) {

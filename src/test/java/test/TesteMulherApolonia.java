@@ -1,7 +1,7 @@
 package test;
 
-import model.MulherApolonia;
-import model.PessoaAtendida;
+import br.com.tdbresponde.model.MulherApolonia;
+import br.com.tdbresponde.model.PessoaAtendida;
 
 import java.time.LocalDate;
 

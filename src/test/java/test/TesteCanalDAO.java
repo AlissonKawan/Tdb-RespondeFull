@@ -1,7 +1,7 @@
 package test;
 
-import dao.CanalComunicacaoDAO;
-import model.CanalComunicacao;
+import br.com.tdbresponde.dao.CanalComunicacaoDAO;
+import br.com.tdbresponde.model.CanalComunicacao;
 
 public class TesteCanalDAO {
     public static void main(String[] args) {

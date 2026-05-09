@@ -1,6 +1,6 @@
 package test;
 
-import model.*;
+import br.com.tdbresponde.model.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

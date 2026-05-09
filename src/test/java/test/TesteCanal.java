@@ -1,6 +1,6 @@
 package test;
 
-import model.CanalComunicacao;
+import br.com.tdbresponde.model.CanalComunicacao;
 
 public class TesteCanal {
     public static void main(String[] args) {

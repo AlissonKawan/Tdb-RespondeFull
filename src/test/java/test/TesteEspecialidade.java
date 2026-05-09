@@ -1,6 +1,6 @@
 package test;
 
-import model.Especialidade;
+import br.com.tdbresponde.model.Especialidade;
 
 public class TesteEspecialidade {
     public static void main(String[] args) {

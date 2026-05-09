@@ -1,7 +1,7 @@
 package test;
 
-import model.CriancaAdolescente;
-import model.PessoaAtendida;
+import br.com.tdbresponde.model.CriancaAdolescente;
+import br.com.tdbresponde.model.PessoaAtendida;
 
 import java.time.LocalDate;
 

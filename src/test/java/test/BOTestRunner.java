@@ -1,8 +1,8 @@
 package test;
 
-import bo.AtendimentoBO;
-import dao.*;
-import model.*;
+import br.com.tdbresponde.bo.AtendimentoBO;
+import br.com.tdbresponde.dao.*;
+import br.com.tdbresponde.model.*;
 import java.time.LocalDate;
 
 
