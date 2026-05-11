@@ -1,12 +1,16 @@
 package br.com.tdbresponde.dao;
 
-import br.com.tdbresponde.model.Voluntario;
-import br.com.tdbresponde.model.Especialidade;
 import br.com.tdbresponde.exception.DatabaseException;
+import br.com.tdbresponde.model.Especialidade;
+import br.com.tdbresponde.model.Voluntario;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+
 import javax.sql.DataSource;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,80 +23,68 @@ public class VoluntarioDAO {
     @Inject
     EspecialidadeDAO especialidadeDAO;
 
-    // CREATE
-    // CREATE - VoluntarioDAO (versão corrigida para Oracle)
     public void inserir(Voluntario voluntario) {
-        String sql = "INSERT INTO voluntario (nome, usuario, senha, acesso_sigilo, disponivel, especialidade_id) " +
-                "VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO VOLUNTARIO (NOME, USUARIO, SENHA, ACESSO_SIGILO, DISPONIVEL) " +
+                "VALUES (?, ?, ?, ?, ?)";
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, new String[] { "id" })) {   // ← ESSA É A LINHA QUE RESOLVE
+        Connection conn = null;
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
 
-            stmt.setString(1, voluntario.getNome());
-            stmt.setString(2, voluntario.getUsuario());
-            stmt.setString(3, voluntario.getSenha());
-            stmt.setBoolean(4, voluntario.getAcessoSigilo() != null && voluntario.getAcessoSigilo());
-            stmt.setBoolean(5, voluntario.isDisponivel());
-            // Cuidado: se especialidade_id pode ser null
-            if (voluntario.getEspecialidade() != null && voluntario.getEspecialidade().getId() > 0) {
-                stmt.setInt(6, voluntario.getEspecialidade().getId());
-            } else {
-                stmt.setNull(6, java.sql.Types.INTEGER);
-            }
+            try (PreparedStatement stmt = conn.prepareStatement(sql, new String[] { "ID" })) {
+                stmt.setString(1, voluntario.getNome());
+                stmt.setString(2, voluntario.getUsuario());
+                stmt.setString(3, voluntario.getSenha());
+                stmt.setBoolean(4, voluntario.getAcessoSigilo() != null && voluntario.getAcessoSigilo());
+                stmt.setBoolean(5, voluntario.isDisponivel());
+                stmt.executeUpdate();
 
-            stmt.executeUpdate();
-
-            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    voluntario.setId(generatedKeys.getInt(1));
-                    System.out.println("ID gerado para Voluntário: " + voluntario.getId()); // debug temporário
-                } else {
-                    throw new SQLException("Nenhuma chave gerada após insert de voluntário");
+                try (ResultSet rs = stmt.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        voluntario.setId(rs.getInt(1));
+                    } else {
+                        throw new SQLException("Nenhuma chave gerada apos insert de voluntario");
+                    }
                 }
             }
 
+            inserirEspecialidade(conn, voluntario);
+            conn.commit();
+
         } catch (SQLException e) {
-            throw new DatabaseException("Erro ao inserir voluntário: " + e.getMessage(), e);
+            rollback(conn);
+            throw new DatabaseException("Erro ao inserir voluntario: " + e.getMessage(), e);
+        } finally {
+            fechar(conn);
         }
     }
 
-    // READ por ID
     public Voluntario buscarPorId(int id) {
-        String sql = "SELECT * FROM voluntario WHERE id = ?";
+        String sql = "SELECT ID, NOME, USUARIO, SENHA, ACESSO_SIGILO, DISPONIVEL " +
+                "FROM VOLUNTARIO WHERE ID = ?";
         Voluntario voluntario = null;
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                voluntario = new Voluntario();
-                voluntario.setId(rs.getInt("id"));
-                voluntario.setNome(rs.getString("nome"));
-                voluntario.setUsuario(rs.getString("usuario"));
-                voluntario.setSenha(rs.getString("senha"));
-                voluntario.setAcessoSigilo(rs.getBoolean("acesso_sigilo"));
-                voluntario.setDisponivel(rs.getBoolean("disponivel"));
-
-                int espId = rs.getInt("especialidade_id");
-                if (!rs.wasNull()) {
-                    Especialidade esp = especialidadeDAO.buscarPorId(espId);
-                    voluntario.setEspecialidade(esp);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    voluntario = mapearVoluntario(rs);
+                    carregarEspecialidade(voluntario);
                 }
             }
 
         } catch (SQLException e) {
-            throw new DatabaseException("Erro ao buscar voluntário: " + e.getMessage(), e);
+            throw new DatabaseException("Erro ao buscar voluntario: " + e.getMessage(), e);
         }
 
         return voluntario;
     }
 
-    // READ todos (simplificado – sem carregar especialidade em todos para performance)
     public List<Voluntario> buscarTodos() {
-        String sql = "SELECT * FROM voluntario";
+        String sql = "SELECT ID, NOME, USUARIO, SENHA, ACESSO_SIGILO, DISPONIVEL FROM VOLUNTARIO";
         List<Voluntario> voluntarios = new ArrayList<>();
 
         try (Connection conn = dataSource.getConnection();
@@ -100,59 +92,140 @@ public class VoluntarioDAO {
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                Voluntario v = new Voluntario();
-                v.setId(rs.getInt("id"));
-                v.setNome(rs.getString("nome"));
-                v.setUsuario(rs.getString("usuario"));
-                v.setSenha(rs.getString("senha"));
-                v.setAcessoSigilo(rs.getBoolean("acesso_sigilo"));
-                v.setDisponivel(rs.getBoolean("disponivel"));
-                // especialidade carregada lazy – só se precisar
-                voluntarios.add(v);
+                Voluntario voluntario = mapearVoluntario(rs);
+                carregarEspecialidade(voluntario);
+                voluntarios.add(voluntario);
             }
 
         } catch (SQLException e) {
-            throw new DatabaseException("Erro ao listar voluntários: " + e.getMessage(), e);
+            throw new DatabaseException("Erro ao listar voluntarios: " + e.getMessage(), e);
         }
 
         return voluntarios;
     }
 
-    // UPDATE
     public void atualizar(Voluntario voluntario) {
-        String sql = "UPDATE voluntario SET nome = ?, usuario = ?, senha = ?, " +
-                "acesso_sigilo = ?, disponivel = ?, especialidade_id = ? WHERE id = ?";
+        String sql = "UPDATE VOLUNTARIO SET NOME = ?, USUARIO = ?, SENHA = ?, " +
+                "ACESSO_SIGILO = ?, DISPONIVEL = ? WHERE ID = ?";
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
 
-            stmt.setString(1, voluntario.getNome());
-            stmt.setString(2, voluntario.getUsuario());
-            stmt.setString(3, voluntario.getSenha());
-            stmt.setBoolean(4, voluntario.getAcessoSigilo() != null && voluntario.getAcessoSigilo());
-            stmt.setBoolean(5, voluntario.isDisponivel());
-            stmt.setObject(6, voluntario.getEspecialidade() != null ? voluntario.getEspecialidade().getId() : null, Types.INTEGER);
-            stmt.setInt(7, voluntario.getId());
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setString(1, voluntario.getNome());
+                stmt.setString(2, voluntario.getUsuario());
+                stmt.setString(3, voluntario.getSenha());
+                stmt.setBoolean(4, voluntario.getAcessoSigilo() != null && voluntario.getAcessoSigilo());
+                stmt.setBoolean(5, voluntario.isDisponivel());
+                stmt.setInt(6, voluntario.getId());
+                stmt.executeUpdate();
+            }
 
-            stmt.executeUpdate();
+            excluirEspecialidades(conn, voluntario.getId());
+            inserirEspecialidade(conn, voluntario);
+            conn.commit();
 
         } catch (SQLException e) {
-            throw new DatabaseException("Erro ao atualizar voluntário: " + e.getMessage(), e);
+            rollback(conn);
+            throw new DatabaseException("Erro ao atualizar voluntario: " + e.getMessage(), e);
+        } finally {
+            fechar(conn);
         }
     }
 
-    // DELETE
     public void excluir(int id) {
-        String sql = "DELETE FROM voluntario WHERE id = ?";
+        String sql = "DELETE FROM VOLUNTARIO WHERE ID = ?";
+
+        Connection conn = null;
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
+
+            excluirEspecialidades(conn, id);
+
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setInt(1, id);
+                stmt.executeUpdate();
+            }
+
+            conn.commit();
+
+        } catch (SQLException e) {
+            rollback(conn);
+            throw new DatabaseException("Erro ao excluir voluntario: " + e.getMessage(), e);
+        } finally {
+            fechar(conn);
+        }
+    }
+
+    private Voluntario mapearVoluntario(ResultSet rs) throws SQLException {
+        Voluntario voluntario = new Voluntario();
+        voluntario.setId(rs.getInt("ID"));
+        voluntario.setNome(rs.getString("NOME"));
+        voluntario.setUsuario(rs.getString("USUARIO"));
+        voluntario.setSenha(rs.getString("SENHA"));
+        voluntario.setAcessoSigilo(rs.getBoolean("ACESSO_SIGILO"));
+        voluntario.setDisponivel(rs.getBoolean("DISPONIVEL"));
+        return voluntario;
+    }
+
+    private void carregarEspecialidade(Voluntario voluntario) throws SQLException {
+        String sql = "SELECT ESPECIALIDADE_ID FROM VOLUNTARIO_ESPECIALIDADE WHERE VOLUNTARIO_ID = ?";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, id);
-            stmt.executeUpdate();
+            stmt.setInt(1, voluntario.getId());
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    Especialidade especialidade = especialidadeDAO.buscarPorId(rs.getInt("ESPECIALIDADE_ID"));
+                    voluntario.setEspecialidade(especialidade);
+                }
+            }
+        }
+    }
 
-        } catch (SQLException e) {
-            throw new DatabaseException("Erro ao excluir voluntário: " + e.getMessage(), e);
+    private void inserirEspecialidade(Connection conn, Voluntario voluntario) throws SQLException {
+        if (voluntario.getEspecialidade() == null || voluntario.getEspecialidade().getId() <= 0) {
+            return;
+        }
+
+        String sql = "INSERT INTO VOLUNTARIO_ESPECIALIDADE (VOLUNTARIO_ID, ESPECIALIDADE_ID) VALUES (?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, voluntario.getId());
+            stmt.setInt(2, voluntario.getEspecialidade().getId());
+            stmt.executeUpdate();
+        }
+    }
+
+    private void excluirEspecialidades(Connection conn, int voluntarioId) throws SQLException {
+        String sql = "DELETE FROM VOLUNTARIO_ESPECIALIDADE WHERE VOLUNTARIO_ID = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, voluntarioId);
+            stmt.executeUpdate();
+        }
+    }
+
+    private void rollback(Connection conn) {
+        if (conn != null) {
+            try {
+                conn.rollback();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void fechar(Connection conn) {
+        if (conn != null) {
+            try {
+                conn.setAutoCommit(true);
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

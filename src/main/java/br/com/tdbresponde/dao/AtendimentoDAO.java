@@ -26,13 +26,13 @@ public class AtendimentoDAO {
 
     // CREATE
     public void inserir(Atendimento atendimento) {
-        String sql = "INSERT INTO atendimento " +
-                "(prioridade, status, data_abertura, data_encerramento, " +
-                "pessoa_atendida_id, voluntario_id, canal_comunicacao_id) " +
+        String sql = "INSERT INTO ATENDIMENTO " +
+                "(PRIORIDADE, STATUS, DATA_ABERTURA, DATA_ENCERRAMENTO, " +
+                "PESSOA_ATENDIDA_ID, VOLUNTARIO_ID, CANAL_COMUNICACAO_ID) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, new String[]{"id"})) {
+             PreparedStatement stmt = conn.prepareStatement(sql, new String[]{"ID"})) {
 
             stmt.setInt(1, atendimento.getPrioridade());
             stmt.setString(2, atendimento.getStatus());
@@ -64,9 +64,9 @@ public class AtendimentoDAO {
 
     // READ por ID
     public Atendimento buscarPorId(int id) {
-        String sql = "SELECT id, prioridade, status, data_abertura, data_encerramento, " +
-                "pessoa_atendida_id, voluntario_id, canal_comunicacao_id " +
-                "FROM atendimento WHERE id = ?";
+        String sql = "SELECT ID, PRIORIDADE, STATUS, DATA_ABERTURA, DATA_ENCERRAMENTO, " +
+                "PESSOA_ATENDIDA_ID, VOLUNTARIO_ID, CANAL_COMUNICACAO_ID " +
+                "FROM ATENDIMENTO WHERE ID = ?";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -86,9 +86,9 @@ public class AtendimentoDAO {
 
     // READ todos
     public List<Atendimento> buscarTodos() {
-        String sql = "SELECT id, prioridade, status, data_abertura, data_encerramento, " +
-                "pessoa_atendida_id, voluntario_id, canal_comunicacao_id " +
-                "FROM atendimento";
+        String sql = "SELECT ID, PRIORIDADE, STATUS, DATA_ABERTURA, DATA_ENCERRAMENTO, " +
+                "PESSOA_ATENDIDA_ID, VOLUNTARIO_ID, CANAL_COMUNICACAO_ID " +
+                "FROM ATENDIMENTO";
 
         List<Atendimento> lista = new ArrayList<>();
 
@@ -108,10 +108,10 @@ public class AtendimentoDAO {
 
     // UPDATE
     public void atualizar(Atendimento atendimento) {
-        String sql = "UPDATE atendimento SET " +
-                "prioridade = ?, status = ?, data_abertura = ?, data_encerramento = ?, " +
-                "pessoa_atendida_id = ?, voluntario_id = ?, canal_comunicacao_id = ? " +
-                "WHERE id = ?";
+        String sql = "UPDATE ATENDIMENTO SET " +
+                "PRIORIDADE = ?, STATUS = ?, DATA_ABERTURA = ?, DATA_ENCERRAMENTO = ?, " +
+                "PESSOA_ATENDIDA_ID = ?, VOLUNTARIO_ID = ?, CANAL_COMUNICACAO_ID = ? " +
+                "WHERE ID = ?";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -138,7 +138,7 @@ public class AtendimentoDAO {
 
     // DELETE
     public void excluir(int id) {
-        String sql = "DELETE FROM atendimento WHERE id = ?";
+        String sql = "DELETE FROM ATENDIMENTO WHERE ID = ?";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -154,28 +154,28 @@ public class AtendimentoDAO {
     // MAPEAMENTO
     private Atendimento mapearResultSet(ResultSet rs) throws SQLException {
         Atendimento a = new Atendimento();
-        a.setId(rs.getInt("id"));
-        a.setPrioridade(rs.getInt("prioridade"));
-        a.setStatus(rs.getString("status"));
-        a.setDataAbertura(rs.getObject("data_abertura", LocalDate.class));
-        a.setDataEncerramento(rs.getObject("data_encerramento", LocalDate.class));
+        a.setId(rs.getInt("ID"));
+        a.setPrioridade(rs.getInt("PRIORIDADE"));
+        a.setStatus(rs.getString("STATUS"));
+        a.setDataAbertura(rs.getObject("DATA_ABERTURA", LocalDate.class));
+        a.setDataEncerramento(rs.getObject("DATA_ENCERRAMENTO", LocalDate.class));
 
         // Carrega canal pelo ID
-        int canalId = rs.getInt("canal_comunicacao_id");
+        int canalId = rs.getInt("CANAL_COMUNICACAO_ID");
         if (!rs.wasNull()) {
             CanalComunicacao canal = canalDAO.buscarPorId(canalId);
             a.setCanalOrigem(canal);
         }
 
         // Carrega voluntario pelo ID
-        int volId = rs.getInt("voluntario_id");
+        int volId = rs.getInt("VOLUNTARIO_ID");
         if (!rs.wasNull()) {
             Voluntario v = voluntarioDAO.buscarPorId(volId);
             a.setVoluntario(v);
         }
 
         // pessoa_atendida: só seta o ID para evitar carregar tudo
-        int pessoaId = rs.getInt("pessoa_atendida_id");
+        int pessoaId = rs.getInt("PESSOA_ATENDIDA_ID");
         if (!rs.wasNull()) {
             br.com.tdbresponde.model.CriancaAdolescente pessoa = new br.com.tdbresponde.model.CriancaAdolescente();
             pessoa.setId(pessoaId);

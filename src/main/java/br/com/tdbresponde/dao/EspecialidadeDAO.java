@@ -17,10 +17,10 @@ public class EspecialidadeDAO {
 
     // CREATE
     public void inserir(Especialidade especialidade) {
-        String sql = "INSERT INTO especialidade (nome, descricao) VALUES (?, ?)";
+        String sql = "INSERT INTO ESPECIALIDADE (NOME, DESCRICAO) VALUES (?, ?)";
 
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, new String[] {"id"})) {
+             PreparedStatement stmt = conn.prepareStatement(sql, new String[] {"ID"})) {
 
             stmt.setString(1, especialidade.getNome());
             stmt.setString(2, especialidade.getDescricao());
@@ -42,7 +42,7 @@ public class EspecialidadeDAO {
 
     // READ por ID
     public Especialidade buscarPorId(int id) {
-        String sql = "SELECT * FROM especialidade WHERE id = ?";
+        String sql = "SELECT ID, NOME, DESCRICAO FROM ESPECIALIDADE WHERE ID = ?";
         Especialidade especialidade = null;
 
         try (Connection conn = dataSource.getConnection();
@@ -53,9 +53,9 @@ public class EspecialidadeDAO {
 
             if (rs.next()) {
                 especialidade = new Especialidade();
-                especialidade.setId(rs.getInt("id"));
-                especialidade.setNome(rs.getString("nome"));
-                especialidade.setDescricao(rs.getString("descricao"));
+                especialidade.setId(rs.getInt("ID"));
+                especialidade.setNome(rs.getString("NOME"));
+                especialidade.setDescricao(rs.getString("DESCRICAO"));
             }
 
         } catch (SQLException e) {
@@ -67,7 +67,7 @@ public class EspecialidadeDAO {
 
     // READ todos
     public List<Especialidade> buscarTodos() {
-        String sql = "SELECT * FROM especialidade";
+        String sql = "SELECT ID, NOME, DESCRICAO FROM ESPECIALIDADE";
         List<Especialidade> especialidades = new ArrayList<>();
 
         try (Connection conn = dataSource.getConnection();
@@ -76,9 +76,9 @@ public class EspecialidadeDAO {
 
             while (rs.next()) {
                 Especialidade esp = new Especialidade();
-                esp.setId(rs.getInt("id"));
-                esp.setNome(rs.getString("nome"));
-                esp.setDescricao(rs.getString("descricao"));
+                esp.setId(rs.getInt("ID"));
+                esp.setNome(rs.getString("NOME"));
+                esp.setDescricao(rs.getString("DESCRICAO"));
                 especialidades.add(esp);
             }
 
@@ -91,7 +91,7 @@ public class EspecialidadeDAO {
 
     // UPDATE
     public void atualizar(Especialidade especialidade) {
-        String sql = "UPDATE especialidade SET nome = ?, descricao = ? WHERE id = ?";
+        String sql = "UPDATE ESPECIALIDADE SET NOME = ?, DESCRICAO = ? WHERE ID = ?";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -109,7 +109,7 @@ public class EspecialidadeDAO {
 
     // DELETE
     public void excluir(int id) {
-        String sql = "DELETE FROM especialidade WHERE id = ?";
+        String sql = "DELETE FROM ESPECIALIDADE WHERE ID = ?";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

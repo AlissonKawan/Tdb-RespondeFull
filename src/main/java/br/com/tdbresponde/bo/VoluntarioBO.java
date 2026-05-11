@@ -56,7 +56,7 @@ public class VoluntarioBO {
             voluntario.setNome(request.nome);
             voluntario.setUsuario(request.usuario);
             voluntario.setSenha(request.senha);
-            voluntario.setAcessoSigilo(request.acessoSigilo);
+            voluntario.setAcessoSigilo(request.acessoSigilo != null && request.acessoSigilo);
             voluntario.setDisponivel(request.disponivel);
             if (request.especialidadeId != null) {
                 Especialidade especialidade = new Especialidade();

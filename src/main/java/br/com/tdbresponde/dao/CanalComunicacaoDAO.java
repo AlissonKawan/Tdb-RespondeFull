@@ -17,10 +17,10 @@ public class CanalComunicacaoDAO {
 
     // CREATE
     public void inserir(CanalComunicacao canal) {
-        String sql = "INSERT INTO canal_comunicacao (nome, descricao) VALUES (?, ?)";
+        String sql = "INSERT INTO CANAL_COMUNICACAO (NOME, DESCRICAO) VALUES (?, ?)";
 
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, new String[]{"id"})) {
+             PreparedStatement stmt = conn.prepareStatement(sql, new String[]{"ID"})) {
 
             stmt.setString(1, canal.getNome());
             stmt.setString(2, canal.getDescricao());
@@ -41,7 +41,7 @@ public class CanalComunicacaoDAO {
 
 
     public CanalComunicacao buscarPorId(int id) {
-        String sql = "SELECT * FROM canal_comunicacao WHERE id = ?";
+        String sql = "SELECT ID, NOME, DESCRICAO FROM CANAL_COMUNICACAO WHERE ID = ?";
         CanalComunicacao canal = null;
 
         try (Connection conn = dataSource.getConnection();
@@ -52,9 +52,9 @@ public class CanalComunicacaoDAO {
 
             if (rs.next()) {
                 canal = new CanalComunicacao();
-                canal.setId(rs.getInt("id"));
-                canal.setNome(rs.getString("nome"));
-                canal.setDescricao(rs.getString("descricao"));
+                canal.setId(rs.getInt("ID"));
+                canal.setNome(rs.getString("NOME"));
+                canal.setDescricao(rs.getString("DESCRICAO"));
             }
 
         } catch (SQLException e) {
@@ -64,7 +64,7 @@ public class CanalComunicacaoDAO {
         return canal;
     }
     public List<CanalComunicacao> buscarTodos() {
-        String sql = "SELECT * FROM canal_comunicacao";
+        String sql = "SELECT ID, NOME, DESCRICAO FROM CANAL_COMUNICACAO";
         List<CanalComunicacao> canais = new ArrayList<>();
 
         try (Connection conn = dataSource.getConnection();
@@ -73,9 +73,9 @@ public class CanalComunicacaoDAO {
 
             while (rs.next()) {
                 CanalComunicacao c = new CanalComunicacao();
-                c.setId(rs.getInt("id"));
-                c.setNome(rs.getString("nome"));
-                c.setDescricao(rs.getString("descricao"));
+                c.setId(rs.getInt("ID"));
+                c.setNome(rs.getString("NOME"));
+                c.setDescricao(rs.getString("DESCRICAO"));
                 canais.add(c);
             }
 
@@ -87,7 +87,7 @@ public class CanalComunicacaoDAO {
     }
 
     public void atualizar(CanalComunicacao canal) {
-        String sql = "UPDATE canal_comunicacao SET nome = ?, descricao = ? WHERE id = ?";
+        String sql = "UPDATE CANAL_COMUNICACAO SET NOME = ?, DESCRICAO = ? WHERE ID = ?";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -103,7 +103,7 @@ public class CanalComunicacaoDAO {
     }
 
     public void excluir(int id) {
-        String sql = "DELETE FROM canal_comunicacao WHERE id = ?";
+        String sql = "DELETE FROM CANAL_COMUNICACAO WHERE ID = ?";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
