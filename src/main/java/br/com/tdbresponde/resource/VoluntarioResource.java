@@ -1,9 +1,8 @@
 package br.com.tdbresponde.resource;
 
-import br.com.tdbresponde.dao.VoluntarioDAO;
+import br.com.tdbresponde.bo.VoluntarioBO;
 import br.com.tdbresponde.dto.VoluntarioRequest;
 import br.com.tdbresponde.dto.VoluntarioResponse;
-import br.com.tdbresponde.exception.NotFoundException;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -15,7 +14,6 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import br.com.tdbresponde.model.Especialidade;
 import br.com.tdbresponde.model.Voluntario;
 
 @Path("/voluntarios")
@@ -24,11 +22,11 @@ import br.com.tdbresponde.model.Voluntario;
 public class VoluntarioResource {
 
     @Inject
-    VoluntarioDAO dao;
+    VoluntarioBO bo;
 
     @GET
     public Response listar() {
-        return Response.ok(dao.buscarTodos().stream()
+        return Response.ok(bo.listar().stream()
                 .map(VoluntarioResponse::from)
                 .toList()).build();
     }
@@ -36,17 +34,13 @@ public class VoluntarioResource {
     @GET
     @Path("/{id}")
     public Response buscarPorId(@PathParam("id") int id) {
-        Voluntario voluntario = dao.buscarPorId(id);
-        if (voluntario == null) {
-            throw new NotFoundException("Voluntario nao encontrado");
-        }
+        Voluntario voluntario = bo.buscarPorId(id);
         return Response.ok(VoluntarioResponse.from(voluntario)).build();
     }
 
     @POST
     public Response inserir(VoluntarioRequest request) {
-        Voluntario voluntario = toModel(request);
-        dao.inserir(voluntario);
+        Voluntario voluntario = bo.inserir(request);
         return Response.status(Response.Status.CREATED)
                 .entity(VoluntarioResponse.from(voluntario))
                 .build();
@@ -55,31 +49,14 @@ public class VoluntarioResource {
     @PUT
     @Path("/{id}")
     public Response atualizar(@PathParam("id") int id, VoluntarioRequest request) {
-        Voluntario voluntario = toModel(request);
-        voluntario.setId(id);
-        dao.atualizar(voluntario);
+        Voluntario voluntario = bo.atualizar(id, request);
         return Response.ok(VoluntarioResponse.from(voluntario)).build();
     }
 
     @DELETE
     @Path("/{id}")
     public Response excluir(@PathParam("id") int id) {
-        dao.excluir(id);
+        bo.excluir(id);
         return Response.noContent().build();
-    }
-
-    private Voluntario toModel(VoluntarioRequest request) {
-        Voluntario voluntario = new Voluntario();
-        voluntario.setNome(request.nome);
-        voluntario.setUsuario(request.usuario);
-        voluntario.setSenha(request.senha);
-        voluntario.setAcessoSigilo(request.acessoSigilo);
-        voluntario.setDisponivel(request.disponivel);
-        if (request.especialidadeId != null) {
-            Especialidade especialidade = new Especialidade();
-            especialidade.setId(request.especialidadeId);
-            voluntario.setEspecialidade(especialidade);
-        }
-        return voluntario;
     }
 }

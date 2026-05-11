@@ -2,10 +2,14 @@ package br.com.tdbresponde.bo;
 
 import br.com.tdbresponde.dao.AtendimentoDAO;
 import br.com.tdbresponde.dao.HistoricoStatusDAO;
+import br.com.tdbresponde.dto.AtendimentoRequest;
 import br.com.tdbresponde.exception.BusinessException;
+import br.com.tdbresponde.exception.NotFoundException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import br.com.tdbresponde.model.Atendimento;
+import br.com.tdbresponde.model.CanalComunicacao;
+import br.com.tdbresponde.model.CriancaAdolescente;
 import br.com.tdbresponde.model.HistoricoStatus;
 import br.com.tdbresponde.model.MulherApolonia;
 import br.com.tdbresponde.model.Voluntario;
@@ -13,6 +17,7 @@ import br.com.tdbresponde.model.Voluntario;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 //Aqui temos a classe que irá criar os métodos de negócio do projeto
 
@@ -24,6 +29,39 @@ public class AtendimentoBO {
 
     @Inject
     HistoricoStatusDAO historicoDAO;
+
+    public List<Atendimento> listar() {
+        return atendimentoDAO.buscarTodos();
+    }
+
+    public Atendimento buscarPorId(int id) {
+        Atendimento atendimento = atendimentoDAO.buscarPorId(id);
+        if (atendimento == null) {
+            throw new NotFoundException("Atendimento nao encontrado");
+        }
+        return atendimento;
+    }
+
+    public Atendimento inserir(AtendimentoRequest request) {
+        Atendimento atendimento = toModel(request);
+        validar(atendimento);
+        atendimentoDAO.inserir(atendimento);
+        return atendimento;
+    }
+
+    public Atendimento atualizar(int id, AtendimentoRequest request) {
+        buscarPorId(id);
+        Atendimento atendimento = toModel(request);
+        atendimento.setId(id);
+        validar(atendimento);
+        atendimentoDAO.atualizar(atendimento);
+        return atendimento;
+    }
+
+    public void excluir(int id) {
+        buscarPorId(id);
+        atendimentoDAO.excluir(id);
+    }
 
     // Metodo: Calcular prioridade automaticamente
     // Regra de negócio: quanto maior o risco da mulher, maior a prioridade
@@ -141,5 +179,51 @@ public class AtendimentoBO {
                 " durou/está durando " + dias + " dia(s).");
 
         return dias;
+    }
+
+    private Atendimento toModel(AtendimentoRequest request) {
+        Atendimento atendimento = new Atendimento();
+        if (request != null) {
+            atendimento.setPrioridade(request.prioridade);
+            atendimento.setStatus(request.status);
+            atendimento.setDataAbertura(request.dataAbertura);
+            atendimento.setDataEncerramento(request.dataEncerramento);
+
+            if (request.pessoaAtendidaId != null) {
+                CriancaAdolescente pessoa = new CriancaAdolescente();
+                pessoa.setId(request.pessoaAtendidaId);
+                atendimento.setPessoaAtendida(pessoa);
+            }
+            if (request.voluntarioId != null) {
+                Voluntario voluntario = new Voluntario();
+                voluntario.setId(request.voluntarioId);
+                atendimento.setVoluntario(voluntario);
+            }
+            if (request.canalComunicacaoId != null) {
+                CanalComunicacao canal = new CanalComunicacao();
+                canal.setId(request.canalComunicacaoId);
+                atendimento.setCanalOrigem(canal);
+            }
+        }
+        return atendimento;
+    }
+
+    private void validar(Atendimento atendimento) {
+        if (isBlank(atendimento.getStatus())) {
+            throw new BusinessException("Status do atendimento e obrigatorio");
+        }
+        if (atendimento.getPessoaAtendida() == null || atendimento.getPessoaAtendida().getId() <= 0) {
+            throw new BusinessException("ID da pessoa atendida e obrigatorio");
+        }
+        if (atendimento.getCanalOrigem() == null || atendimento.getCanalOrigem().getId() <= 0) {
+            throw new BusinessException("ID do canal de comunicacao e obrigatorio");
+        }
+        if (atendimento.getVoluntario() != null && atendimento.getVoluntario().getId() <= 0) {
+            throw new BusinessException("ID do voluntario deve ser valido");
+        }
+    }
+
+    private boolean isBlank(String valor) {
+        return valor == null || valor.trim().isEmpty();
     }
 }

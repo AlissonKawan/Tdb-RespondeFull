@@ -1,9 +1,8 @@
 package br.com.tdbresponde.resource;
 
-import br.com.tdbresponde.dao.EspecialidadeDAO;
+import br.com.tdbresponde.bo.EspecialidadeBO;
 import br.com.tdbresponde.dto.EspecialidadeRequest;
 import br.com.tdbresponde.dto.EspecialidadeResponse;
-import br.com.tdbresponde.exception.NotFoundException;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -23,11 +22,11 @@ import br.com.tdbresponde.model.Especialidade;
 public class EspecialidadeResource {
 
     @Inject
-    EspecialidadeDAO dao;
+    EspecialidadeBO bo;
 
     @GET
     public Response listar() {
-        return Response.ok(dao.buscarTodos().stream()
+        return Response.ok(bo.listar().stream()
                 .map(EspecialidadeResponse::from)
                 .toList()).build();
     }
@@ -35,17 +34,13 @@ public class EspecialidadeResource {
     @GET
     @Path("/{id}")
     public Response buscarPorId(@PathParam("id") int id) {
-        Especialidade especialidade = dao.buscarPorId(id);
-        if (especialidade == null) {
-            throw new NotFoundException("Especialidade nao encontrada");
-        }
+        Especialidade especialidade = bo.buscarPorId(id);
         return Response.ok(EspecialidadeResponse.from(especialidade)).build();
     }
 
     @POST
     public Response inserir(EspecialidadeRequest request) {
-        Especialidade especialidade = toModel(request);
-        dao.inserir(especialidade);
+        Especialidade especialidade = bo.inserir(request);
         return Response.status(Response.Status.CREATED)
                 .entity(EspecialidadeResponse.from(especialidade))
                 .build();
@@ -54,23 +49,14 @@ public class EspecialidadeResource {
     @PUT
     @Path("/{id}")
     public Response atualizar(@PathParam("id") int id, EspecialidadeRequest request) {
-        Especialidade especialidade = toModel(request);
-        especialidade.setId(id);
-        dao.atualizar(especialidade);
+        Especialidade especialidade = bo.atualizar(id, request);
         return Response.ok(EspecialidadeResponse.from(especialidade)).build();
     }
 
     @DELETE
     @Path("/{id}")
     public Response excluir(@PathParam("id") int id) {
-        dao.excluir(id);
+        bo.excluir(id);
         return Response.noContent().build();
-    }
-
-    private Especialidade toModel(EspecialidadeRequest request) {
-        Especialidade especialidade = new Especialidade();
-        especialidade.setNome(request.nome);
-        especialidade.setDescricao(request.descricao);
-        return especialidade;
     }
 }
