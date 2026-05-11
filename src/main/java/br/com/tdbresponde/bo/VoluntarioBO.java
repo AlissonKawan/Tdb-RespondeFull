@@ -6,6 +6,7 @@ import br.com.tdbresponde.exception.BusinessException;
 import br.com.tdbresponde.exception.NotFoundException;
 import br.com.tdbresponde.model.Especialidade;
 import br.com.tdbresponde.model.Voluntario;
+import br.com.tdbresponde.security.SenhaHasher;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -55,7 +56,9 @@ public class VoluntarioBO {
         if (request != null) {
             voluntario.setNome(request.nome);
             voluntario.setUsuario(request.usuario);
-            voluntario.setSenha(request.senha);
+            if (!isBlank(request.senha)) {
+                voluntario.setSenha(SenhaHasher.gerarHash(request.senha));
+            }
             voluntario.setAcessoSigilo(request.acessoSigilo != null && request.acessoSigilo);
             voluntario.setDisponivel(request.disponivel);
             if (request.especialidadeId != null) {
