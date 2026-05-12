@@ -5,6 +5,7 @@ import br.com.tdbresponde.dto.AuthUserResponse;
 import br.com.tdbresponde.dto.LoginRequest;
 import br.com.tdbresponde.dto.RegisterRequest;
 import br.com.tdbresponde.model.ContaUsuario;
+import br.com.tdbresponde.model.TipoUsuario;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
@@ -25,8 +26,16 @@ public class AuthResource {
     @Path("/register")
     public Response registrar(RegisterRequest request) {
         ContaUsuario conta = bo.registrar(request);
+
+        Integer voluntarioId = null;
+        Integer beneficiarioId = null;
+
+        if (conta.getTipoUsuario() == TipoUsuario.VOLUNTARIO) {
+            voluntarioId = bo.buscarVoluntarioIdDaConta(conta.getId());
+        }
+
         return Response.status(Response.Status.CREATED)
-                .entity(AuthUserResponse.from(conta))
+                .entity(AuthUserResponse.from(conta, voluntarioId, beneficiarioId))
                 .build();
     }
 
@@ -34,6 +43,14 @@ public class AuthResource {
     @Path("/login")
     public Response login(LoginRequest request) {
         ContaUsuario conta = bo.login(request);
-        return Response.ok(AuthUserResponse.from(conta)).build();
+
+        Integer voluntarioId = null;
+        Integer beneficiarioId = null;
+
+        if (conta.getTipoUsuario() == TipoUsuario.VOLUNTARIO) {
+            voluntarioId = bo.buscarVoluntarioIdDaConta(conta.getId());
+        }
+
+        return Response.ok(AuthUserResponse.from(conta, voluntarioId, beneficiarioId)).build();
     }
 }

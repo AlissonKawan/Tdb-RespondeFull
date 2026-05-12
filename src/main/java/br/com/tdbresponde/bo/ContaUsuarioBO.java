@@ -1,6 +1,7 @@
 package br.com.tdbresponde.bo;
 
 import br.com.tdbresponde.dao.ContaUsuarioDAO;
+import br.com.tdbresponde.dao.VoluntarioDAO;
 import br.com.tdbresponde.dto.ContaUsuarioRequest;
 import br.com.tdbresponde.dto.LoginRequest;
 import br.com.tdbresponde.dto.RegisterRequest;
@@ -10,6 +11,7 @@ import br.com.tdbresponde.exception.NotFoundException;
 import br.com.tdbresponde.exception.UnauthorizedException;
 import br.com.tdbresponde.model.ContaUsuario;
 import br.com.tdbresponde.model.TipoUsuario;
+import br.com.tdbresponde.model.Voluntario;
 import br.com.tdbresponde.security.SenhaHasher;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -25,6 +27,9 @@ public class ContaUsuarioBO {
     @Inject
     ContaUsuarioDAO dao;
 
+    @Inject
+    VoluntarioDAO voluntarioDAO;
+
     public ContaUsuario registrar(RegisterRequest request) {
         validarCadastro(request);
 
@@ -33,14 +38,21 @@ public class ContaUsuarioBO {
             throw new ConflictException("Este e-mail ja esta cadastrado.");
         }
 
+        TipoUsuario tipo = parseTipo(request.tipoUsuario);
+
         ContaUsuario conta = new ContaUsuario();
         conta.setNome(request.nome.trim());
         conta.setEmail(email);
         conta.setSenhaHash(SenhaHasher.gerarHash(request.senha));
-        conta.setTipoUsuario(parseTipo(request.tipoUsuario));
+        conta.setTipoUsuario(tipo);
         conta.setAtivo(true);
 
         dao.cadastrarConta(conta);
+
+        if (tipo == TipoUsuario.VOLUNTARIO) {
+            criarVoluntarioParaConta(conta, request.senha);
+        }
+
         return dao.buscarPorId(conta.getId());
     }
 
@@ -59,6 +71,11 @@ public class ContaUsuarioBO {
         }
 
         return conta;
+    }
+
+    public Integer buscarVoluntarioIdDaConta(int contaId) {
+        Voluntario voluntario = voluntarioDAO.buscarPorContaId(contaId);
+        return voluntario != null ? voluntario.getId() : null;
     }
 
     public List<ContaUsuario> listar() {
@@ -97,6 +114,29 @@ public class ContaUsuarioBO {
     public void desativar(int id) {
         buscarPorId(id);
         dao.desativar(id);
+    }
+
+    private void criarVoluntarioParaConta(ContaUsuario conta, String senhaOriginal) {
+        Voluntario voluntario = new Voluntario();
+
+        voluntario.setNome(conta.getNome());
+        voluntario.setUsuario(gerarUsuarioPorEmail(conta.getEmail()));
+        voluntario.setSenha(SenhaHasher.gerarHash(senhaOriginal));
+        voluntario.setAcessoSigilo(false);
+        voluntario.setDisponivel(true);
+        voluntario.setContaId(conta.getId());
+
+        voluntarioDAO.inserir(voluntario);
+    }
+
+    private String gerarUsuarioPorEmail(String email) {
+        if (email == null || !email.contains("@")) {
+            return "usuario";
+        }
+
+        return email.substring(0, email.indexOf("@"))
+                .toLowerCase()
+                .replaceAll("[^a-z0-9._-]", "");
     }
 
     private void validarCadastro(RegisterRequest request) {

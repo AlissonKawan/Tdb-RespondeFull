@@ -2,6 +2,7 @@ package br.com.tdbresponde.model;
 
 public class Voluntario {
     private int id;
+    private Integer contaId;
     private String nome;
     private String usuario;
     private String senha;
@@ -12,7 +13,26 @@ public class Voluntario {
     public Voluntario() {
     }
 
-    public Voluntario(int id, String nome, String usuario, String senha, Boolean acessoSigilo, boolean disponivel, Especialidade especialidade) {
+    public Voluntario(int id, String nome, String usuario, String senha, Boolean acessoSigilo, boolean disponivel, Especialidade especialidade, Integer contaId) {
+        this.id = id;
+        this.contaId = contaId;
+        this.nome = nome;
+        this.usuario = usuario;
+        this.senha = senha;
+        this.acessoSigilo = acessoSigilo;
+        this.disponivel = disponivel;
+        this.especialidade = especialidade;
+    }
+
+    public Voluntario(
+            int id,
+            String nome,
+            String usuario,
+            String senha,
+            Boolean acessoSigilo,
+            boolean disponivel,
+            Especialidade especialidade
+    ) {
         this.id = id;
         this.nome = nome;
         this.usuario = usuario;
@@ -78,13 +98,29 @@ public class Voluntario {
         this.especialidade = especialidade;
     }
 
+    public Integer getContaId() {
+        return contaId;
+    }
+
+    public void setContaId(Integer contaId) {
+        this.contaId = contaId;
+    }
+
+    public boolean isAcessoSigilo() {
+        return acessoSigilo;
+    }
+
+    public void setAcessoSigilo(boolean acessoSigilo) {
+        this.acessoSigilo = acessoSigilo;
+    }
+
     @Override
     public String toString() {
         return "Voluntario{" +
                 "id=" + id +
+                ", contaId=" + contaId +
                 ", nome='" + nome + '\'' +
                 ", usuario='" + usuario + '\'' +
-                ", senha='" + senha + '\'' +
                 ", acessoSigilo=" + acessoSigilo +
                 ", disponivel=" + disponivel +
                 ", especialidade=" + especialidade +

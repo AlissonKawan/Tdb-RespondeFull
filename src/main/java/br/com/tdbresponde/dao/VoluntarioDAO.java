@@ -24,10 +24,11 @@ public class VoluntarioDAO {
     EspecialidadeDAO especialidadeDAO;
 
     public void inserir(Voluntario voluntario) {
-        String sql = "INSERT INTO VOLUNTARIO (NOME, USUARIO, SENHA, ACESSO_SIGILO, DISPONIVEL) " +
-                "VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO VOLUNTARIO (NOME, USUARIO, SENHA, ACESSO_SIGILO, DISPONIVEL, ID_CONTA) " +
+                "VALUES (?, ?, ?, ?, ?, ?)";
 
         Connection conn = null;
+
         try {
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
@@ -38,6 +39,13 @@ public class VoluntarioDAO {
                 stmt.setString(3, voluntario.getSenha());
                 stmt.setBoolean(4, voluntario.getAcessoSigilo() != null && voluntario.getAcessoSigilo());
                 stmt.setBoolean(5, voluntario.isDisponivel());
+
+                if (voluntario.getContaId() != null) {
+                    stmt.setInt(6, voluntario.getContaId());
+                } else {
+                    stmt.setNull(6, java.sql.Types.INTEGER);
+                }
+
                 stmt.executeUpdate();
 
                 try (ResultSet rs = stmt.getGeneratedKeys()) {
@@ -61,14 +69,16 @@ public class VoluntarioDAO {
     }
 
     public Voluntario buscarPorId(int id) {
-        String sql = "SELECT ID, NOME, USUARIO, SENHA, ACESSO_SIGILO, DISPONIVEL " +
+        String sql = "SELECT ID, NOME, USUARIO, SENHA, ACESSO_SIGILO, DISPONIVEL, ID_CONTA " +
                 "FROM VOLUNTARIO WHERE ID = ?";
+
         Voluntario voluntario = null;
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
+
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     voluntario = mapearVoluntario(rs);
@@ -83,8 +93,34 @@ public class VoluntarioDAO {
         return voluntario;
     }
 
+    public Voluntario buscarPorContaId(int contaId) {
+        String sql = "SELECT ID, NOME, USUARIO, SENHA, ACESSO_SIGILO, DISPONIVEL, ID_CONTA " +
+                "FROM VOLUNTARIO WHERE ID_CONTA = ?";
+
+        Voluntario voluntario = null;
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, contaId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    voluntario = mapearVoluntario(rs);
+                    carregarEspecialidade(voluntario);
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new DatabaseException("Erro ao buscar voluntario por conta: " + e.getMessage(), e);
+        }
+
+        return voluntario;
+    }
+
     public List<Voluntario> buscarTodos() {
-        String sql = "SELECT ID, NOME, USUARIO, SENHA, ACESSO_SIGILO, DISPONIVEL FROM VOLUNTARIO";
+        String sql = "SELECT ID, NOME, USUARIO, SENHA, ACESSO_SIGILO, DISPONIVEL, ID_CONTA FROM VOLUNTARIO";
+
         List<Voluntario> voluntarios = new ArrayList<>();
 
         try (Connection conn = dataSource.getConnection();
@@ -106,9 +142,10 @@ public class VoluntarioDAO {
 
     public void atualizar(Voluntario voluntario) {
         String sql = "UPDATE VOLUNTARIO SET NOME = ?, USUARIO = ?, SENHA = ?, " +
-                "ACESSO_SIGILO = ?, DISPONIVEL = ? WHERE ID = ?";
+                "ACESSO_SIGILO = ?, DISPONIVEL = ?, ID_CONTA = ? WHERE ID = ?";
 
         Connection conn = null;
+
         try {
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
@@ -119,7 +156,14 @@ public class VoluntarioDAO {
                 stmt.setString(3, voluntario.getSenha());
                 stmt.setBoolean(4, voluntario.getAcessoSigilo() != null && voluntario.getAcessoSigilo());
                 stmt.setBoolean(5, voluntario.isDisponivel());
-                stmt.setInt(6, voluntario.getId());
+
+                if (voluntario.getContaId() != null) {
+                    stmt.setInt(6, voluntario.getContaId());
+                } else {
+                    stmt.setNull(6, java.sql.Types.INTEGER);
+                }
+
+                stmt.setInt(7, voluntario.getId());
                 stmt.executeUpdate();
             }
 
@@ -139,6 +183,7 @@ public class VoluntarioDAO {
         String sql = "DELETE FROM VOLUNTARIO WHERE ID = ?";
 
         Connection conn = null;
+
         try {
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
@@ -162,12 +207,19 @@ public class VoluntarioDAO {
 
     private Voluntario mapearVoluntario(ResultSet rs) throws SQLException {
         Voluntario voluntario = new Voluntario();
+
         voluntario.setId(rs.getInt("ID"));
         voluntario.setNome(rs.getString("NOME"));
         voluntario.setUsuario(rs.getString("USUARIO"));
         voluntario.setSenha(rs.getString("SENHA"));
         voluntario.setAcessoSigilo(rs.getBoolean("ACESSO_SIGILO"));
         voluntario.setDisponivel(rs.getBoolean("DISPONIVEL"));
+
+        int contaId = rs.getInt("ID_CONTA");
+        if (!rs.wasNull()) {
+            voluntario.setContaId(contaId);
+        }
+
         return voluntario;
     }
 
@@ -178,6 +230,7 @@ public class VoluntarioDAO {
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, voluntario.getId());
+
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     Especialidade especialidade = especialidadeDAO.buscarPorId(rs.getInt("ESPECIALIDADE_ID"));
@@ -193,6 +246,7 @@ public class VoluntarioDAO {
         }
 
         String sql = "INSERT INTO VOLUNTARIO_ESPECIALIDADE (VOLUNTARIO_ID, ESPECIALIDADE_ID) VALUES (?, ?)";
+
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, voluntario.getId());
             stmt.setInt(2, voluntario.getEspecialidade().getId());
@@ -202,6 +256,7 @@ public class VoluntarioDAO {
 
     private void excluirEspecialidades(Connection conn, int voluntarioId) throws SQLException {
         String sql = "DELETE FROM VOLUNTARIO_ESPECIALIDADE WHERE VOLUNTARIO_ID = ?";
+
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, voluntarioId);
             stmt.executeUpdate();
