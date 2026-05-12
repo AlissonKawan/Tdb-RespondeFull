@@ -106,6 +106,55 @@ public class AtendimentoDAO {
         return lista;
     }
 
+    public List<Atendimento> buscarSolicitados() {
+        String sql = "SELECT ID, PRIORIDADE, STATUS, DATA_ABERTURA, DATA_ENCERRAMENTO, " +
+                "PESSOA_ATENDIDA_ID, VOLUNTARIO_ID, CANAL_COMUNICACAO_ID " +
+                "FROM ATENDIMENTO " +
+                "WHERE VOLUNTARIO_ID IS NULL " +
+                "OR UPPER(STATUS) IN ('SOLICITADO', 'ABERTO', 'PENDENTE') " +
+                "ORDER BY DATA_ABERTURA DESC, PRIORIDADE ASC";
+
+        List<Atendimento> lista = new ArrayList<>();
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                lista.add(mapearResultSet(rs));
+            }
+
+        } catch (SQLException e) {
+            throw new DatabaseException("Erro ao listar atendimentos solicitados: " + e.getMessage(), e);
+        }
+        return lista;
+    }
+
+    public List<Atendimento> buscarPorVoluntario(int voluntarioId) {
+        String sql = "SELECT ID, PRIORIDADE, STATUS, DATA_ABERTURA, DATA_ENCERRAMENTO, " +
+                "PESSOA_ATENDIDA_ID, VOLUNTARIO_ID, CANAL_COMUNICACAO_ID " +
+                "FROM ATENDIMENTO " +
+                "WHERE VOLUNTARIO_ID = ? " +
+                "ORDER BY DATA_ABERTURA DESC, ID DESC";
+
+        List<Atendimento> lista = new ArrayList<>();
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, voluntarioId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(mapearResultSet(rs));
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new DatabaseException("Erro ao listar atendimentos do voluntario: " + e.getMessage(), e);
+        }
+        return lista;
+    }
+
     // UPDATE
     public void atualizar(Atendimento atendimento) {
         String sql = "UPDATE ATENDIMENTO SET " +

@@ -32,6 +32,22 @@ public class AtendimentoResource {
     }
 
     @GET
+    @Path("/solicitados")
+    public Response listarSolicitados() {
+        return Response.ok(bo.listarSolicitados().stream()
+                .map(AtendimentoResponse::from)
+                .toList()).build();
+    }
+
+    @GET
+    @Path("/voluntario/{voluntarioId}")
+    public Response listarPorVoluntario(@PathParam("voluntarioId") int voluntarioId) {
+        return Response.ok(bo.listarPorVoluntario(voluntarioId).stream()
+                .map(AtendimentoResponse::from)
+                .toList()).build();
+    }
+
+    @GET
     @Path("/{id}")
     public Response buscarPorId(@PathParam("id") int id) {
         Atendimento atendimento = bo.buscarPorId(id);

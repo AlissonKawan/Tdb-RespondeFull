@@ -280,11 +280,19 @@ Response:
 
 ```http
 GET    /atendimentos
+GET    /atendimentos/solicitados
+GET    /atendimentos/voluntario/{voluntarioId}
 GET    /atendimentos/{id}
 POST   /atendimentos
 PUT    /atendimentos/{id}
 DELETE /atendimentos/{id}
 ```
+
+`GET /atendimentos` retorna todos os atendimentos.
+
+`GET /atendimentos/solicitados` retorna a fila de atendimentos solicitados, considerando registros sem voluntario atribuido ou com status `SOLICITADO`, `ABERTO` ou `PENDENTE`.
+
+`GET /atendimentos/voluntario/{voluntarioId}` retorna todos os atendimentos vinculados ao voluntario informado, sem limitar apenas aos ativos.
 
 Request:
 

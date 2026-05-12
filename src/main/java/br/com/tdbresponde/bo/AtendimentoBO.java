@@ -34,6 +34,17 @@ public class AtendimentoBO {
         return atendimentoDAO.buscarTodos();
     }
 
+    public List<Atendimento> listarSolicitados() {
+        return atendimentoDAO.buscarSolicitados();
+    }
+
+    public List<Atendimento> listarPorVoluntario(int voluntarioId) {
+        if (voluntarioId <= 0) {
+            throw new BusinessException("ID do voluntario deve ser valido");
+        }
+        return atendimentoDAO.buscarPorVoluntario(voluntarioId);
+    }
+
     public Atendimento buscarPorId(int id) {
         Atendimento atendimento = atendimentoDAO.buscarPorId(id);
         if (atendimento == null) {
