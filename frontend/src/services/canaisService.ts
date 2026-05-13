@@ -1,0 +1,45 @@
+import { API_BASE_URL } from '../config/api';
+import type { CanalComunicacaoApi } from '../types/AtendimentoApi';
+
+const CANAIS_FALLBACK: CanalComunicacaoApi[] = [
+  { id: 1, nome: 'WhatsApp', descricao: 'Contato rapido por mensagem.' },
+  { id: 2, nome: 'Telefone', descricao: 'Ligacao da equipe responsavel.' },
+  { id: 3, nome: 'Email', descricao: 'Comunicacao por correio eletronico.' },
+];
+
+function normalizarCanais(data: unknown): CanalComunicacaoApi[] {
+  if (!Array.isArray(data)) return [];
+
+  return data.reduce<CanalComunicacaoApi[]>((canais, item) => {
+    if (!item || typeof item !== 'object') return canais;
+    const canal = item as Record<string, unknown>;
+    const id = Number(canal.id);
+    const nome = String(canal.nome ?? '').trim();
+
+    if (!Number.isFinite(id) || !nome) return canais;
+
+    canais.push({
+      id,
+      nome,
+      descricao: canal.descricao ? String(canal.descricao) : undefined,
+    });
+
+    return canais;
+  }, []);
+}
+
+export async function listarCanais(): Promise<CanalComunicacaoApi[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/canais`, {
+      method: 'GET',
+      headers: { Accept: 'application/json' },
+    });
+
+    if (!response.ok) return CANAIS_FALLBACK;
+
+    const canais = normalizarCanais(await response.json());
+    return canais.length > 0 ? canais : CANAIS_FALLBACK;
+  } catch {
+    return CANAIS_FALLBACK;
+  }
+}

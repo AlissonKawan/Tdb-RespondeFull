@@ -15,9 +15,9 @@ import type { AtendimentoApi } from '../types/AtendimentoApi';
 
 function statusTone(status?: string) {
   if (!status) return 'neutral';
-  if (['FINALIZADO', 'Encerrado'].includes(status)) return 'success';
-  if (['SOLICITADO', 'Aberto'].includes(status)) return 'info';
-  if (['EM_ANDAMENTO', 'Em andamento', 'Aguardando'].includes(status)) return 'warning';
+  if (['ENCERRADO', 'Encerrado'].includes(status)) return 'success';
+  if (['ABERTO', 'Aberto'].includes(status)) return 'info';
+  if (['EM_ATENDIMENTO', 'Em andamento', 'Aguardando'].includes(status)) return 'warning';
   return 'neutral';
 }
 
@@ -48,8 +48,6 @@ function PortalBeneficiario() {
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState('');
 
-  const pessoaAtendidaId = user?.pessoaAtendidaId ?? user?.beneficiarioId;
-
   useEffect(() => {
     async function carregarAtendimentos() {
       if (!user || user.tipoUsuario !== 'BENEFICIARIO') {
@@ -58,16 +56,10 @@ function PortalBeneficiario() {
         return;
       }
 
-      if (!pessoaAtendidaId) {
-        setLoading(false);
-        setErro('Nao foi possivel identificar seu cadastro de beneficiario. Faca login novamente ou contate o suporte.');
-        return;
-      }
-
       setLoading(true);
       setErro('');
       try {
-        setAtendimentos(await atendimentoService.listarPorBeneficiario(pessoaAtendidaId));
+        setAtendimentos(await atendimentoService.listarPorContaBeneficiario(user.id));
       } catch (error) {
         setErro(error instanceof Error ? error.message : 'Nao foi possivel carregar seus atendimentos.');
       } finally {
@@ -76,7 +68,7 @@ function PortalBeneficiario() {
     }
 
     void carregarAtendimentos();
-  }, [user, pessoaAtendidaId]);
+  }, [user]);
 
   return (
     <PageShell>

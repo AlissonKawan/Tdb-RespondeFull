@@ -9,8 +9,7 @@ import Container from '../components/ui/Container';
 import { EmptyState, ErrorState, LoadingState } from '../components/ui/FeedbackState';
 import PageHeader from '../components/ui/PageHeader';
 import SectionHeader from '../components/ui/SectionHeader';
-import { ASSUMIR_ATENDIMENTO_ENDPOINT_PENDENTE, atendimentoService } from '../services/atendimentoService';
-import { ApiError } from '../services/apiClient';
+import { atendimentoService } from '../services/atendimentoService';
 import type { AtendimentoApi } from '../types/AtendimentoApi';
 import { useAuth } from '../context/useAuth';
 
@@ -34,16 +33,17 @@ function getPessoa(atendimento: AtendimentoApi) {
 
 function statusTone(status?: string) {
   if (!status) return 'neutral';
-  if (['FINALIZADO', 'Encerrado'].includes(status)) return 'success';
-  if (['SOLICITADO', 'Aberto'].includes(status)) return 'info';
-  if (['EM_ANDAMENTO', 'Em andamento', 'Aguardando'].includes(status)) return 'warning';
+  if (['ENCERRADO', 'Encerrado'].includes(status)) return 'success';
+  if (['Aberto', 'ABERTO'].includes(status)) return 'info';
+  if (['EM_ATENDIMENTO', 'Em andamento', 'Aguardando'].includes(status)) return 'warning';
   return 'neutral';
 }
 
-function AtendimentoCard({ atendimento, onAssumir, assumindo }: {
+function AtendimentoCard({ atendimento, onAssumir, assumindo, assumirBloqueado }: {
   atendimento: AtendimentoApi;
   onAssumir?: (id: number) => void;
   assumindo?: boolean;
+  assumirBloqueado?: boolean;
 }) {
   const navigate = useNavigate();
 
@@ -66,7 +66,7 @@ function AtendimentoCard({ atendimento, onAssumir, assumindo }: {
         </div>
         <div className="flex flex-wrap gap-2">
           {onAssumir && (
-            <Button disabled={assumindo} onClick={() => onAssumir(atendimento.id)}>
+            <Button disabled={assumindo || assumirBloqueado} onClick={() => onAssumir(atendimento.id)}>
               {assumindo ? 'Assumindo...' : 'Assumir atendimento'}
             </Button>
           )}
@@ -94,6 +94,8 @@ function PortalVoluntario() {
   const [feedback, setFeedback] = useState('');
   const [assumindoId, setAssumindoId] = useState<number | null>(null);
 
+  const voluntarioSemVinculo = user?.tipoUsuario === 'VOLUNTARIO' && !user?.voluntarioId;
+
   const carregarSolicitados = async () => {
     setLoadingSolicitados(true);
     setErroSolicitados('');
@@ -118,68 +120,62 @@ function PortalVoluntario() {
     }
   };
 
-useEffect(() => {
-  async function carregarDadosDoPortal() {
-    if (!user) return;
+  useEffect(() => {
+    async function carregarDadosDoPortal() {
+      if (!user) return;
 
-    await carregarSolicitados();
+      await carregarSolicitados();
 
-    if (user.tipoUsuario !== "VOLUNTARIO") {
-      setLoadingMeus(false);
-      setErroMeus("Esta área é exclusiva para voluntários.");
-      return;
+      if (user.tipoUsuario !== 'VOLUNTARIO') {
+        setLoadingMeus(false);
+        setErroMeus('Esta area e exclusiva para voluntarios.');
+        return;
+      }
+
+      if (!user.voluntarioId) {
+        setLoadingMeus(false);
+        setErroMeus('');
+        setMeusAtendimentos([]);
+        setFeedback('Sua conta de voluntario esta sem vinculo de voluntario. Voce pode visualizar os atendimentos, mas ainda nao pode assumir casos.');
+        return;
+      }
+
+      await carregarMeus(user.voluntarioId);
     }
 
-    if (!user.voluntarioId) {
-      setLoadingMeus(false);
-      setErroMeus("Sua conta de voluntário ainda não está vinculada a um cadastro de voluntário.");
-      return;
-    }
-
-    await carregarMeus(user.voluntarioId);
-  }
-
-  void carregarDadosDoPortal();
-}, [user]);
+    void carregarDadosDoPortal();
+  }, [user]);
 
   const assumir = async (atendimentoId: number) => {
-  if (!user) return;
+    if (!user) return;
 
-  if (!user.voluntarioId) {
-    setFeedback(
-      "Sua conta de voluntário ainda não está vinculada a um cadastro de voluntário."
-    );
-    return;
-  }
+    if (!user.voluntarioId) {
+      setFeedback('Nao foi possivel assumir atendimento: sua conta ainda nao possui cadastro de voluntario vinculado.');
+      return;
+    }
 
-  const voluntarioId = user.voluntarioId;
+    const voluntarioId = user.voluntarioId;
 
-  setFeedback("");
-  setAssumindoId(atendimentoId);
+    setFeedback('');
+    setAssumindoId(atendimentoId);
 
-  try {
-    await atendimentoService.assumirAtendimento(atendimentoId, voluntarioId);
-
-    setFeedback("Atendimento assumido com sucesso.");
-
-    await Promise.all([
-      carregarSolicitados(),
-      carregarMeus(voluntarioId),
-    ]);
-  } catch (error) {
-    if (error instanceof ApiError && error.status === 501) {
-      setFeedback(ASSUMIR_ATENDIMENTO_ENDPOINT_PENDENTE);
-    } else {
+    try {
+      await atendimentoService.assumirAtendimento(atendimentoId, voluntarioId);
+      setFeedback('Atendimento assumido com sucesso.');
+      await Promise.all([
+        carregarSolicitados(),
+        carregarMeus(voluntarioId),
+      ]);
+    } catch (error) {
       setFeedback(
         error instanceof Error
           ? error.message
-          : "Nao foi possivel assumir atendimento."
+          : 'Nao foi possivel assumir atendimento.',
       );
+    } finally {
+      setAssumindoId(null);
     }
-  } finally {
-    setAssumindoId(null);
-  }
-};
+  };
 
   return (
     <PageShell>
@@ -234,6 +230,7 @@ useEffect(() => {
                   key={atendimento.id}
                   atendimento={atendimento}
                   onAssumir={assumir}
+                  assumirBloqueado={voluntarioSemVinculo}
                   assumindo={assumindoId === atendimento.id}
                 />
               ))}

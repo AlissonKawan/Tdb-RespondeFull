@@ -1,14 +1,14 @@
 export type AtendimentoStatus =
-  | 'SOLICITADO'
-  | 'EM_ANDAMENTO'
-  | 'FINALIZADO'
+  | 'ABERTO'
+  | 'EM_ATENDIMENTO'
+  | 'ENCERRADO'
   | 'CANCELADO'
   | 'Aberto'
   | 'Em andamento'
   | 'Aguardando'
   | 'Encerrado';
 
-export type AtendimentoPrioridade = 'BAIXA' | 'MEDIA' | 'ALTA' | 1 | 2 | 3 | 4;
+export type AtendimentoPrioridade = 'BAIXA' | 'MEDIA' | 'ALTA' | 1 | 2 | 3 | 4 | 5;
 
 export interface AtendimentoUsuarioResumo {
   id?: number;
@@ -34,6 +34,9 @@ export interface AtendimentoApi {
   dataEncerramento?: string | null;
   solicitanteNome?: string;
   beneficiarioNome?: string;
+  pessoaAtendidaNome?: string;
+  pessoaAtendidaEmail?: string;
+  pessoaAtendidaTelefone?: string;
   pacienteNome?: string;
   nomeVoluntario?: string;
   pessoaAtendidaId?: number;
@@ -52,6 +55,54 @@ export interface SolicitarAtendimentoRequest {
   descricao: string;
 }
 
+export type TipoPessoaRelato = 'CRIANCA_ADOLESCENTE' | 'MULHER_APOLONIA' | 'OUTRO';
+
+export interface CanalComunicacaoApi {
+  id: number;
+  nome: string;
+  descricao?: string;
+}
+
+export interface RelatarCriancaAdolescentePayload {
+  idade: number;
+  nomeResponsavel: string;
+  escola: string;
+  gravidadeBucal: number;
+}
+
+export interface RelatarMulherApoloniaPayload {
+  codinome: string;
+  nivelRisco: number;
+  temBoletimOcorrencia: boolean;
+  necessitaSigiloAbsoluto: boolean;
+}
+
+export interface RelatarAtendimentoRequest {
+  idContaBeneficiario?: number;
+  nomeCodificado: string;
+  telefone: string;
+  email: string;
+  tipo: TipoPessoaRelato;
+  canalComunicacaoId: number;
+  prioridade: number;
+  descricao: string;
+  idade?: number;
+  nomeResponsavel?: string;
+  escola?: string;
+  gravidadeBucal?: number;
+  codinome?: string;
+  nivelRisco?: number;
+  temBoletimOcorrencia?: boolean;
+  necessitaSigiloAbsoluto?: boolean;
+}
+
+export interface RelatarAtendimentoResponse {
+  atendimentoId: number;
+  pessoaAtendidaId: number;
+  status: string;
+  mensagem: string;
+}
+
 export interface Mensagem {
   id: number;
   atendimentoId: number;
@@ -62,5 +113,5 @@ export interface Mensagem {
 
 export interface MensagemRequest {
   conteudo: string;
-  enviadoPor: 'BENEFICIARIO' | 'VOLUNTARIO';
+  enviadoPor: 'BENEFICIARIO' | 'VOLUNTARIO' | 'ADMIN';
 }

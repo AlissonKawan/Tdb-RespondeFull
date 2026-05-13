@@ -51,7 +51,7 @@ export async function request<T>(path: string, options: ApiRequestOptions = {}):
       try {
         const data = JSON.parse(text) as Record<string, unknown>;
         details = data;
-        message = String(data.message ?? data.erro ?? data.error ?? data.detail ?? message);
+        message = String(data.mensagem ?? data.message ?? data.erro ?? data.error ?? data.detail ?? message);
       } catch {
         message = text;
       }
