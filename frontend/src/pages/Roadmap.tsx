@@ -156,7 +156,7 @@ function Roadmap() {
               A plataforma nao substitui o acolhimento humano. Ela remove ruido operacional para que a equipe consiga responder melhor.
             </p>
           </div>
-          <Button href="/quero-ser-voluntario" variant="secondary" size="large">
+          <Button href="/cadastro-voluntario" variant="secondary" size="large">
             Quero ser voluntario
           </Button>
         </Card>
@@ -166,4 +166,3 @@ function Roadmap() {
 }
 
 export default Roadmap;
-

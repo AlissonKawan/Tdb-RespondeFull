@@ -42,6 +42,7 @@ function App() {
             <Route path="roadmap" element={<Roadmap />} />
             <Route path="login" element={<Login />} />
             <Route path="cadastro" element={<CadastroVoluntario />} />
+            <Route path="cadastro-voluntario" element={<CadastroVoluntario />} />
             <Route path="cadastro-beneficiario" element={<CadastroBeneficiario />} />
             <Route path="quero-ser-voluntario" element={<CadastroVoluntario />} />
           </Route>
