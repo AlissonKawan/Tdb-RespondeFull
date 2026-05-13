@@ -9,6 +9,9 @@ public class AtendimentoResponse {
     public int id;
     public Integer pessoaAtendidaId;
     public Integer beneficiarioId;
+    public String pessoaAtendidaNome;
+    public String pessoaAtendidaEmail;
+    public String pessoaAtendidaTelefone;
     public Integer voluntarioId;
     public String nomeVoluntario;
     public VoluntarioResponse voluntario;
@@ -25,6 +28,9 @@ public class AtendimentoResponse {
         if (atendimento.getPessoaAtendida() != null) {
             response.pessoaAtendidaId = atendimento.getPessoaAtendida().getId();
             response.beneficiarioId = atendimento.getPessoaAtendida().getId();
+            response.pessoaAtendidaNome = atendimento.getPessoaAtendida().getNomeCodificado();
+            response.pessoaAtendidaEmail = atendimento.getPessoaAtendida().getEmail();
+            response.pessoaAtendidaTelefone = atendimento.getPessoaAtendida().getTelefone();
         }
         if (atendimento.getVoluntario() != null) {
             response.voluntarioId = atendimento.getVoluntario().getId();

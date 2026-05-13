@@ -7,6 +7,7 @@ import br.com.tdbresponde.dao.MulherApoloniaDAO;
 import br.com.tdbresponde.dao.PessoaAtendidaDAO;
 import br.com.tdbresponde.dao.VoluntarioDAO;
 import br.com.tdbresponde.dto.AtendimentoRequest;
+import br.com.tdbresponde.dto.AtendimentoAtualizacaoRequest;
 import br.com.tdbresponde.dto.RelatarSituacaoRequest;
 import br.com.tdbresponde.dto.RelatarSituacaoResponse;
 import br.com.tdbresponde.dto.SolicitarAtendimentoRequest;
@@ -72,6 +73,13 @@ public class AtendimentoBO {
         return atendimentoDAO.buscarPorBeneficiario(beneficiarioId);
     }
 
+    public List<Atendimento> listarPorContaBeneficiario(int contaId) {
+        if (contaId <= 0) {
+            throw new BusinessException("ID da conta deve ser valido");
+        }
+        return atendimentoDAO.buscarPorContaBeneficiario(contaId);
+    }
+
     public List<Atendimento> listarEmAndamento() {
         return atendimentoDAO.buscarEmAndamento();
     }
@@ -106,7 +114,7 @@ public class AtendimentoBO {
         Atendimento atendimento = new Atendimento();
         atendimento.setPessoaAtendida(beneficiario);
         atendimento.setPrioridade(request.prioridade > 0 ? request.prioridade : calcularPrioridade(beneficiario));
-        atendimento.setStatus("SOLICITADO");
+        atendimento.setStatus("ABERTO");
         atendimento.setDescricao(request.descricao.trim());
         atendimento.setDataAbertura(LocalDate.now());
         atendimento.setDataEncerramento(null);
@@ -157,6 +165,36 @@ public class AtendimentoBO {
         return atendimento;
     }
 
+    public Atendimento atualizarStatusPrioridade(int id, AtendimentoAtualizacaoRequest request) {
+        if (request == null) {
+            throw new BusinessException("Dados do atendimento sao obrigatorios");
+        }
+
+        Atendimento atendimento = buscarPorId(id);
+
+        if (request.prioridade != null) {
+            if (request.prioridade < 1 || request.prioridade > 5) {
+                throw new BusinessException("Prioridade deve estar entre 1 e 5");
+            }
+            atendimento.setPrioridade(request.prioridade);
+        }
+
+        if (!isBlank(request.status)) {
+            String status = normalizarStatus(request.status);
+            validarStatusBanco(status);
+            atendimento.setStatus(status);
+            if ("ENCERRADO".equals(status) && atendimento.getDataEncerramento() == null) {
+                atendimento.setDataEncerramento(LocalDate.now());
+            }
+            if (!"ENCERRADO".equals(status)) {
+                atendimento.setDataEncerramento(null);
+            }
+        }
+
+        atendimentoDAO.atualizar(atendimento);
+        return buscarPorId(id);
+    }
+
     public void excluir(int id) {
         buscarPorId(id);
         atendimentoDAO.excluir(id);
@@ -170,6 +208,29 @@ public class AtendimentoBO {
         }
 
         encerrarAtendimento(atendimento, responsavel);
+        return buscarPorId(atendimentoId);
+    }
+
+    public Atendimento assumir(int atendimentoId, Integer voluntarioId) {
+        if (voluntarioId == null || voluntarioId <= 0) {
+            throw new BusinessException("ID do voluntario e obrigatorio para assumir atendimento");
+        }
+
+        Atendimento atendimento = buscarPorId(atendimentoId);
+        Voluntario voluntario = voluntarioDAO.buscarPorId(voluntarioId);
+        if (voluntario == null) {
+            throw new NotFoundException("Voluntario nao encontrado");
+        }
+        if (!voluntario.isDisponivel()) {
+            throw new BusinessException("Voluntario indisponivel para assumir atendimento");
+        }
+        if (atendimento.getVoluntario() != null && atendimento.getVoluntario().getId() > 0) {
+            throw new BusinessException("Atendimento ja possui voluntario responsavel");
+        }
+
+        atendimento.setVoluntario(voluntario);
+        atendimento.setStatus("EM_ATENDIMENTO");
+        atendimentoDAO.atualizar(atendimento);
         return buscarPorId(atendimentoId);
     }
 
@@ -338,6 +399,9 @@ public class AtendimentoBO {
         if (atendimento.getPrioridade() < 1 || atendimento.getPrioridade() > 4) {
             throw new BusinessException("Prioridade deve estar entre 1 e 4");
         }
+        String status = normalizarStatus(atendimento.getStatus());
+        validarStatusBanco(status);
+        atendimento.setStatus(status);
     }
 
     public int calcularPrioridade(CriancaAdolescente crianca) {
@@ -506,6 +570,25 @@ public class AtendimentoBO {
         if (status == null) {
             return null;
         }
-        return status.trim().toUpperCase().replace(' ', '_');
+        String normalizado = status.trim().toUpperCase().replace('-', '_').replace(' ', '_');
+        if ("EM_ANDAMENTO".equals(normalizado) || "ANDAMENTO".equals(normalizado)) {
+            return "EM_ATENDIMENTO";
+        }
+        if ("SOLICITADO".equals(normalizado) || "PENDENTE".equals(normalizado)) {
+            return "ABERTO";
+        }
+        if ("FINALIZADO".equals(normalizado) || "FINALIZADA".equals(normalizado)) {
+            return "ENCERRADO";
+        }
+        return normalizado;
+    }
+
+    private void validarStatusBanco(String status) {
+        if (!"ABERTO".equals(status)
+                && !"EM_ATENDIMENTO".equals(status)
+                && !"ENCERRADO".equals(status)
+                && !"CANCELADO".equals(status)) {
+            throw new BusinessException("Status deve ser ABERTO, EM_ATENDIMENTO, ENCERRADO ou CANCELADO");
+        }
     }
 }

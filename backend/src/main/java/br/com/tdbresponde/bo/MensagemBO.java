@@ -9,6 +9,7 @@ import br.com.tdbresponde.model.CanalComunicacao;
 import br.com.tdbresponde.model.Mensagem;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -38,6 +39,7 @@ public class MensagemBO {
         return mensagem;
     }
 
+    @Transactional
     public Mensagem inserir(MensagemRequest request) {
         Mensagem mensagem = toModel(request);
         validar(mensagem);
@@ -75,8 +77,9 @@ public class MensagemBO {
             throw new BusinessException("Informe quem enviou a mensagem");
         }
         String status = mensagem.getAtendimento().getStatus();
-        if (status != null && "ENCERRADO".equals(status.trim().toUpperCase())) {
-            throw new BusinessException("Nao e possivel enviar mensagem em atendimento encerrado");
+        String statusNormalizado = status != null ? status.trim().toUpperCase() : "";
+        if ("ENCERRADO".equals(statusNormalizado) || "CANCELADO".equals(statusNormalizado)) {
+            throw new BusinessException("Nao e possivel enviar mensagem em atendimento encerrado ou cancelado");
         }
     }
 
@@ -86,9 +89,9 @@ public class MensagemBO {
         }
 
         String valor = enviadoPor.trim().toUpperCase().replace(' ', '_');
-        if ("VOLUNTARIO".equals(valor) || "BENEFICIARIO".equals(valor) || "PESSOA_ATENDIDA".equals(valor)) {
+        if ("VOLUNTARIO".equals(valor) || "BENEFICIARIO".equals(valor) || "ADMIN".equals(valor)) {
             return valor;
         }
-        throw new BusinessException("Remetente deve ser VOLUNTARIO ou BENEFICIARIO");
+        throw new BusinessException("Remetente deve ser BENEFICIARIO, VOLUNTARIO ou ADMIN");
     }
 }

@@ -73,9 +73,11 @@ public class ContaUsuarioBO {
         dao.cadastrarConta(conta);
 
         if (tipo == TipoUsuario.VOLUNTARIO) {
-            criarVoluntarioParaConta(conta, request, senhaHash, especialidades);
-        } else if (tipo == TipoUsuario.BENEFICIARIO) {
-            criarBeneficiarioParaConta(conta, request);
+            Voluntario voluntario = criarVoluntarioParaConta(conta, request, senhaHash, especialidades);
+            voluntarioDAO.inserir(voluntario);
+            if (voluntario.getId() <= 0) {
+                throw new BusinessException("Nao foi possivel vincular a conta ao cadastro de voluntario.");
+            }
         }
 
         return dao.buscarPorId(conta.getId());
@@ -151,7 +153,7 @@ public class ContaUsuarioBO {
         dao.desativar(id);
     }
 
-    private void criarVoluntarioParaConta(
+    private Voluntario criarVoluntarioParaConta(
             ContaUsuario conta,
             RegisterRequest request,
             String senhaHash,
@@ -169,7 +171,7 @@ public class ContaUsuarioBO {
         voluntario.setMotivoVoluntariado(request.motivoVoluntariado.trim());
         voluntario.setEspecialidades(especialidades);
 
-        voluntarioDAO.inserir(voluntario);
+        return voluntario;
     }
 
     private void criarBeneficiarioParaConta(ContaUsuario conta, RegisterRequest request) {
@@ -239,20 +241,8 @@ public class ContaUsuarioBO {
     }
 
     private void validarBeneficiario(RegisterRequest request) {
-        String tipoBeneficiario = normalizarTipoBeneficiario(request.tipoBeneficiario);
-        if ("CRIANCA_ADOLESCENTE".equals(tipoBeneficiario)) {
-            if (request.idade == null || request.idade < 0 || request.idade > 17) {
-                throw new BusinessException("Idade da crianca/adolescente deve estar entre 0 e 17 anos.");
-            }
-            if (request.gravidadeBucal == null || request.gravidadeBucal < 1 || request.gravidadeBucal > 5) {
-                throw new BusinessException("Gravidade bucal deve estar entre 1 e 5.");
-            }
-            return;
-        }
-
-        if (request.nivelRisco == null || request.nivelRisco < 1 || request.nivelRisco > 5) {
-            throw new BusinessException("Nivel de risco deve estar entre 1 e 5.");
-        }
+        // Cadastro do beneficiário cria apenas a conta.
+        // Os dados específicos serão coletados no fluxo de atendimento.
     }
 
     private void validarLogin(LoginRequest request) {

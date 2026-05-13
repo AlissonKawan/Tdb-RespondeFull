@@ -31,6 +31,9 @@ public class AtendimentoDAO {
     @Inject
     VoluntarioDAO voluntarioDAO;
 
+    @Inject
+    PessoaAtendidaDAO pessoaAtendidaDAO;
+
     // CREATE
     public void inserir(Atendimento atendimento) {
         String sql = "INSERT INTO ATENDIMENTO " +
@@ -143,7 +146,7 @@ public class AtendimentoDAO {
         String sql = "SELECT " + COLUNAS_ATENDIMENTO + " " +
                 "FROM ATENDIMENTO " +
                 "WHERE VOLUNTARIO_ID IS NULL " +
-                "OR UPPER(STATUS) IN ('SOLICITADO', 'ABERTO', 'PENDENTE') " +
+                "OR UPPER(STATUS) = 'ABERTO' " +
                 "ORDER BY DATA_ABERTURA DESC, PRIORIDADE ASC";
 
         List<Atendimento> lista = new ArrayList<>();
@@ -210,8 +213,38 @@ public class AtendimentoDAO {
         return lista;
     }
 
+    public List<Atendimento> buscarPorContaBeneficiario(int contaId) {
+        String sql = "SELECT A.ID AS ID, A.PRIORIDADE AS PRIORIDADE, A.STATUS AS STATUS, " +
+                "A.DESCRICAO AS DESCRICAO, A.DATA_ABERTURA AS DATA_ABERTURA, " +
+                "A.DATA_ENCERRAMENTO AS DATA_ENCERRAMENTO, " +
+                "A.PESSOA_ATENDIDA_ID AS PESSOA_ATENDIDA_ID, " +
+                "A.VOLUNTARIO_ID AS VOLUNTARIO_ID, " +
+                "A.CANAL_COMUNICACAO_ID AS CANAL_COMUNICACAO_ID " +
+                "FROM ATENDIMENTO A " +
+                "JOIN PESSOA_ATENDIDA P ON P.ID = A.PESSOA_ATENDIDA_ID " +
+                "WHERE P.ID_CONTA = ? " +
+                "ORDER BY A.DATA_ABERTURA DESC, A.ID DESC";
+
+        List<Atendimento> lista = new ArrayList<>();
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, contaId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(mapearResultSet(rs));
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new DatabaseException("Erro ao listar atendimentos da conta do beneficiario: " + e.getMessage(), e);
+        }
+        return lista;
+    }
+
     public List<Atendimento> buscarEmAndamento() {
-        return buscarPorStatus("EM_ANDAMENTO", "EM ATENDIMENTO", "EM_ATENDIMENTO", "ANDAMENTO");
+        return buscarPorStatus("EM_ATENDIMENTO");
     }
 
     public List<Atendimento> buscarEncerrados() {
@@ -291,9 +324,14 @@ public class AtendimentoDAO {
         // pessoa_atendida: só seta o ID para evitar carregar tudo
         int pessoaId = rs.getInt("PESSOA_ATENDIDA_ID");
         if (!rs.wasNull()) {
-            br.com.tdbresponde.model.CriancaAdolescente pessoa = new br.com.tdbresponde.model.CriancaAdolescente();
-            pessoa.setId(pessoaId);
-            a.setPessoaAtendida(pessoa);
+            PessoaAtendida pessoa = pessoaAtendidaDAO.buscarPorId(pessoaId);
+            if (pessoa != null) {
+                a.setPessoaAtendida(pessoa);
+            } else {
+                br.com.tdbresponde.model.PessoaAtendidaBase pessoaBase = new br.com.tdbresponde.model.PessoaAtendidaBase();
+                pessoaBase.setId(pessoaId);
+                a.setPessoaAtendida(pessoaBase);
+            }
         }
 
         return a;

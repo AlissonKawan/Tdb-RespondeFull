@@ -28,11 +28,7 @@ public class MensagemDAO {
         String sql = "INSERT INTO MENSAGEM (ATENDIMENTO_ID, CONTEUDO, DATA_HORA, ENVIADO_POR) " +
                 "VALUES (?, ?, ?, ?)";
 
-        Connection conn = null;
-        try {
-            conn = dataSource.getConnection();
-            conn.setAutoCommit(false);
-
+        try (Connection conn = dataSource.getConnection()) {
             try (PreparedStatement stmt = conn.prepareStatement(sql, new String[] { "ID" })) {
                 stmt.setInt(1, mensagem.getAtendimento().getId());
                 stmt.setString(2, mensagem.getConteudo());
@@ -50,13 +46,8 @@ public class MensagemDAO {
             }
 
             inserirCanal(conn, mensagem);
-            conn.commit();
-
         } catch (SQLException e) {
-            rollback(conn);
             throw new DatabaseException("Erro ao inserir mensagem: " + e.getMessage(), e);
-        } finally {
-            fechar(conn);
         }
     }
 
@@ -104,11 +95,7 @@ public class MensagemDAO {
     public void atualizar(Mensagem mensagem) {
         String sql = "UPDATE MENSAGEM SET CONTEUDO = ?, DATA_HORA = ?, ENVIADO_POR = ? WHERE ID = ?";
 
-        Connection conn = null;
-        try {
-            conn = dataSource.getConnection();
-            conn.setAutoCommit(false);
-
+        try (Connection conn = dataSource.getConnection()) {
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, mensagem.getConteudo());
                 stmt.setObject(2, mensagem.getDataHora());
@@ -119,38 +106,23 @@ public class MensagemDAO {
 
             excluirCanais(conn, mensagem.getId());
             inserirCanal(conn, mensagem);
-            conn.commit();
-
         } catch (SQLException e) {
-            rollback(conn);
             throw new DatabaseException("Erro ao atualizar mensagem: " + e.getMessage(), e);
-        } finally {
-            fechar(conn);
         }
     }
 
     public void excluir(int id) {
         String sql = "DELETE FROM MENSAGEM WHERE ID = ?";
 
-        Connection conn = null;
-        try {
-            conn = dataSource.getConnection();
-            conn.setAutoCommit(false);
-
+        try (Connection conn = dataSource.getConnection()) {
             excluirCanais(conn, id);
 
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setInt(1, id);
                 stmt.executeUpdate();
             }
-
-            conn.commit();
-
         } catch (SQLException e) {
-            rollback(conn);
             throw new DatabaseException("Erro ao excluir mensagem: " + e.getMessage(), e);
-        } finally {
-            fechar(conn);
         }
     }
 
@@ -209,24 +181,4 @@ public class MensagemDAO {
         }
     }
 
-    private void rollback(Connection conn) {
-        if (conn != null) {
-            try {
-                conn.rollback();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void fechar(Connection conn) {
-        if (conn != null) {
-            try {
-                conn.setAutoCommit(true);
-                conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    }
 }

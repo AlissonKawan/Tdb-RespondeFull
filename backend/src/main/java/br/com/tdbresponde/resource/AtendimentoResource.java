@@ -1,9 +1,14 @@
 package br.com.tdbresponde.resource;
 
 import br.com.tdbresponde.bo.AtendimentoBO;
+import br.com.tdbresponde.bo.MensagemBO;
+import br.com.tdbresponde.dto.AtendimentoAtualizacaoRequest;
 import br.com.tdbresponde.dto.AtendimentoRequest;
 import br.com.tdbresponde.dto.AtendimentoResponse;
+import br.com.tdbresponde.dto.AssumirAtendimentoRequest;
 import br.com.tdbresponde.dto.EncerrarAtendimentoRequest;
+import br.com.tdbresponde.dto.MensagemRequest;
+import br.com.tdbresponde.dto.MensagemResponse;
 import br.com.tdbresponde.dto.RelatarSituacaoRequest;
 import br.com.tdbresponde.dto.SolicitarAtendimentoRequest;
 import jakarta.inject.Inject;
@@ -26,6 +31,9 @@ public class AtendimentoResource {
 
     @Inject
     AtendimentoBO bo;
+
+    @Inject
+    MensagemBO mensagemBO;
 
     @GET
     public Response listar() {
@@ -54,6 +62,14 @@ public class AtendimentoResource {
     @Path("/beneficiario/{beneficiarioId}")
     public Response listarPorBeneficiario(@PathParam("beneficiarioId") int beneficiarioId) {
         return Response.ok(bo.listarPorBeneficiario(beneficiarioId).stream()
+                .map(AtendimentoResponse::from)
+                .toList()).build();
+    }
+
+    @GET
+    @Path("/beneficiario/conta/{contaId}")
+    public Response listarPorContaBeneficiario(@PathParam("contaId") int contaId) {
+        return Response.ok(bo.listarPorContaBeneficiario(contaId).stream()
                 .map(AtendimentoResponse::from)
                 .toList()).build();
     }
@@ -98,6 +114,26 @@ public class AtendimentoResource {
         return Response.ok(AtendimentoResponse.from(atendimento)).build();
     }
 
+    @GET
+    @Path("/{id}/mensagens")
+    public Response listarMensagens(@PathParam("id") int id) {
+        return Response.ok(mensagemBO.listarPorAtendimento(id).stream()
+                .map(MensagemResponse::from)
+                .toList()).build();
+    }
+
+    @POST
+    @Path("/{id}/mensagens")
+    public Response inserirMensagem(@PathParam("id") int id, MensagemRequest request) {
+        if (request == null) {
+            request = new MensagemRequest();
+        }
+        request.atendimentoId = id;
+        return Response.status(Response.Status.CREATED)
+                .entity(MensagemResponse.from(mensagemBO.inserir(request)))
+                .build();
+    }
+
     @POST
     public Response inserir(AtendimentoRequest request) {
         Atendimento atendimento = bo.inserir(request);
@@ -114,12 +150,27 @@ public class AtendimentoResource {
     }
 
     @PUT
+    @Path("/{id}/status-prioridade")
+    public Response atualizarStatusPrioridade(@PathParam("id") int id, AtendimentoAtualizacaoRequest request) {
+        Atendimento atendimento = bo.atualizarStatusPrioridade(id, request);
+        return Response.ok(AtendimentoResponse.from(atendimento)).build();
+    }
+
+    @PUT
     @Path("/{id}/encerrar")
     public Response encerrar(@PathParam("id") int id, EncerrarAtendimentoRequest request) {
         int responsavelId = request != null && request.voluntarioResponsavelId != null
                 ? request.voluntarioResponsavelId
                 : 0;
         Atendimento atendimento = bo.encerrar(id, responsavelId);
+        return Response.ok(AtendimentoResponse.from(atendimento)).build();
+    }
+
+    @PUT
+    @Path("/{id}/assumir")
+    public Response assumir(@PathParam("id") int id, AssumirAtendimentoRequest request) {
+        Integer voluntarioId = request != null ? request.voluntarioId : null;
+        Atendimento atendimento = bo.assumir(id, voluntarioId);
         return Response.ok(AtendimentoResponse.from(atendimento)).build();
     }
 

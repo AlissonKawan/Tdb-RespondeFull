@@ -22,12 +22,19 @@ public class ContaUsuarioDAO {
     DataSource dataSource;
 
     public void cadastrarConta(ContaUsuario conta) {
+        try (Connection conn = dataSource.getConnection()) {
+            cadastrarConta(conn, conta);
+        } catch (SQLException e) {
+            throw new DatabaseException("Erro ao cadastrar conta: " + e.getMessage(), e);
+        }
+    }
+
+    public void cadastrarConta(Connection conn, ContaUsuario conta) throws SQLException {
         String sql = "INSERT INTO T_CONTA_USUARIO " +
                 "(NOME, EMAIL, SENHA_HASH, TIPO_USUARIO, ATIVO) " +
                 "VALUES (?, ?, ?, ?, ?)";
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, new String[] {"ID_CONTA"})) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql, new String[] {"ID_CONTA"})) {
 
             stmt.setString(1, conta.getNome());
             stmt.setString(2, conta.getEmail());
@@ -43,9 +50,6 @@ public class ContaUsuarioDAO {
                     throw new SQLException("Nenhuma chave gerada apos insert de conta");
                 }
             }
-
-        } catch (SQLException e) {
-            throw new DatabaseException("Erro ao cadastrar conta: " + e.getMessage(), e);
         }
     }
 

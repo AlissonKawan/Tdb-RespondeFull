@@ -27,42 +27,45 @@ public class VoluntarioDAO {
     EspecialidadeDAO especialidadeDAO;
 
     public void inserir(Voluntario voluntario) {
+        try (Connection conn = dataSource.getConnection()) {
+            inserir(conn, voluntario);
+        } catch (SQLException e) {
+            throw new DatabaseException("Erro ao inserir voluntario: " + e.getMessage(), e);
+        }
+    }
+
+    public void inserir(Connection conn, Voluntario voluntario) throws SQLException {
         String sql = "INSERT INTO VOLUNTARIO " +
                 "(NOME, USUARIO, SENHA, ACESSO_SIGILO, DISPONIVEL, ID_CONTA, STATUS_APROVACAO, MOTIVO_VOLUNTARIADO) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = dataSource.getConnection()) {
-            try (PreparedStatement stmt = conn.prepareStatement(sql, new String[] { "ID" })) {
-                stmt.setString(1, voluntario.getNome());
-                stmt.setString(2, voluntario.getUsuario());
-                stmt.setString(3, voluntario.getSenha());
-                stmt.setInt(4, voluntario.getAcessoSigilo() != null && voluntario.getAcessoSigilo() ? 1 : 0);
-                stmt.setInt(5, voluntario.isDisponivel() ? 1 : 0);
+        try (PreparedStatement stmt = conn.prepareStatement(sql, new String[] { "ID" })) {
+            stmt.setString(1, voluntario.getNome());
+            stmt.setString(2, voluntario.getUsuario());
+            stmt.setString(3, voluntario.getSenha());
+            stmt.setInt(4, voluntario.getAcessoSigilo() != null && voluntario.getAcessoSigilo() ? 1 : 0);
+            stmt.setInt(5, voluntario.isDisponivel() ? 1 : 0);
 
-                if (voluntario.getContaId() != null) {
-                    stmt.setInt(6, voluntario.getContaId());
+            if (voluntario.getContaId() != null) {
+                stmt.setInt(6, voluntario.getContaId());
+            } else {
+                stmt.setNull(6, java.sql.Types.INTEGER);
+            }
+            stmt.setString(7, voluntario.getStatusAprovacao());
+            stmt.setString(8, voluntario.getMotivoVoluntariado());
+
+            stmt.executeUpdate();
+
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    voluntario.setId(rs.getInt(1));
                 } else {
-                    stmt.setNull(6, java.sql.Types.INTEGER);
-                }
-                stmt.setString(7, voluntario.getStatusAprovacao());
-                stmt.setString(8, voluntario.getMotivoVoluntariado());
-
-                stmt.executeUpdate();
-
-                try (ResultSet rs = stmt.getGeneratedKeys()) {
-                    if (rs.next()) {
-                        voluntario.setId(rs.getInt(1));
-                    } else {
-                        throw new SQLException("Nenhuma chave gerada apos insert de voluntario");
-                    }
+                    throw new SQLException("Nenhuma chave gerada apos insert de voluntario");
                 }
             }
-
-            inserirEspecialidade(conn, voluntario);
-
-        } catch (SQLException e) {
-            throw new DatabaseException("Erro ao inserir voluntario: " + e.getMessage(), e);
         }
+
+        inserirEspecialidade(conn, voluntario);
     }
 
     public Voluntario buscarPorId(int id) {
