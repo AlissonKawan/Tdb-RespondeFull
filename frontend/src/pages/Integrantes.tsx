@@ -34,7 +34,11 @@ function Integrantes() {
     },
     {
       name: 'Eduardo Boni',
+      rm: '567236',
       course: '1TDSPS',
+      image: '/img/eduardo-boni.jpeg',
+      github: 'https://github.com/bonieduardo75',
+      linkedin: 'https://www.linkedin.com/in/eduardo-boni-b6b851310?utm_source=share_via&utm_content=profile&utm_medium=member_ios',
     },
   ];
 
@@ -69,4 +73,3 @@ function Integrantes() {
 }
 
 export default Integrantes;
-
