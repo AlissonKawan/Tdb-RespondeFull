@@ -122,7 +122,7 @@ function App() {
           />
 
           <Route
-            path="/voluntarios/pendentes"
+            path="/inscricoes-pendentes"
             element={
               <ProtectedRoute allowedRoles={['VOLUNTARIO', 'ADMIN']}>
                 <AprovacaoVoluntarios />

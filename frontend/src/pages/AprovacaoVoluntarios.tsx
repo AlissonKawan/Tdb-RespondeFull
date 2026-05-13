@@ -82,7 +82,7 @@ function AprovacaoVoluntarios() {
         {loading && <LoadingState title="Carregando solicitacoes..." />}
         {erro && <ErrorState title="Erro ao carregar solicitacoes" description={erro} />}
         {!loading && !erro && solicitacoes.length === 0 && (
-          <EmptyState title="Nenhuma solicitacao pendente." description="Quando alguem solicitar cadastro como voluntario, o pedido aparecera aqui." />
+          <EmptyState title="Nenhuma inscrição pendente no momento." description="Quando alguem solicitar cadastro como voluntario, o pedido aparecera aqui." />
         )}
 
         <div className="grid gap-4">

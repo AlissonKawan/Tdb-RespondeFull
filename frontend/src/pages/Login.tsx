@@ -24,7 +24,7 @@ function Login() {
   if (user) {
     if (user.tipoUsuario === 'VOLUNTARIO') return <Navigate to="/portal-voluntario" replace />;
     if (user.tipoUsuario === 'BENEFICIARIO') return <Navigate to="/portal-beneficiario" replace />;
-    return <Navigate to="/voluntarios/pendentes" replace />;
+    return <Navigate to="/inscricoes-pendentes" replace />;
   }
 
   const errorMessage = (error: unknown) => {
@@ -66,7 +66,7 @@ function Login() {
 
       if (loggedUser.tipoUsuario === 'VOLUNTARIO') navigate('/portal-voluntario');
       else if (loggedUser.tipoUsuario === 'BENEFICIARIO') navigate('/portal-beneficiario');
-      else navigate('/voluntarios/pendentes');
+      else navigate('/inscricoes-pendentes');
     } catch (error) {
       setErro(errorMessage(error));
     } finally {

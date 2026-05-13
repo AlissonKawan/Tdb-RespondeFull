@@ -49,7 +49,11 @@ function NavBar() {
         {user && isBeneficiario && <Button href={portalPath} size="sm">Meu portal</Button>}
         {user && isBeneficiario && <Button href="/beneficiario/solicitar-atendimento" variant="secondary" size="sm">Solicitar atendimento</Button>}
         {user && isVoluntario && <Button href={portalPath} size="sm">Portal do voluntario</Button>}
-        {user && (isVoluntario || isAdmin) && <Button href="/voluntarios/pendentes" variant={isAdmin ? 'primary' : 'secondary'} size="sm">Inscricoes pendentes</Button>}
+        {user && (isVoluntario || isAdmin) && (
+          <Button type="button" onClick={() => navigate('/inscricoes-pendentes')} variant={isAdmin ? 'primary' : 'secondary'} size="sm">
+            Inscricoes pendentes
+          </Button>
+        )}
         {user && (
           <Button type="button" variant="ghost" size="sm" onClick={handleLogout}>
             Sair
