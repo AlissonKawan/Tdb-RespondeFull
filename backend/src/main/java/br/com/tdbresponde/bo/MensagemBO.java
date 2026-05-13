@@ -1,0 +1,94 @@
+package br.com.tdbresponde.bo;
+
+import br.com.tdbresponde.dao.MensagemDAO;
+import br.com.tdbresponde.dto.MensagemRequest;
+import br.com.tdbresponde.exception.BusinessException;
+import br.com.tdbresponde.exception.NotFoundException;
+import br.com.tdbresponde.model.Atendimento;
+import br.com.tdbresponde.model.CanalComunicacao;
+import br.com.tdbresponde.model.Mensagem;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@ApplicationScoped
+public class MensagemBO {
+
+    @Inject
+    MensagemDAO mensagemDAO;
+
+    @Inject
+    AtendimentoBO atendimentoBO;
+
+    public List<Mensagem> listarPorAtendimento(int atendimentoId) {
+        if (atendimentoId <= 0) {
+            throw new BusinessException("ID do atendimento deve ser valido");
+        }
+        atendimentoBO.buscarPorId(atendimentoId);
+        return mensagemDAO.buscarPorAtendimento(atendimentoId);
+    }
+
+    public Mensagem buscarPorId(int id) {
+        Mensagem mensagem = mensagemDAO.buscarPorId(id);
+        if (mensagem == null) {
+            throw new NotFoundException("Mensagem nao encontrada");
+        }
+        return mensagem;
+    }
+
+    public Mensagem inserir(MensagemRequest request) {
+        Mensagem mensagem = toModel(request);
+        validar(mensagem);
+        mensagemDAO.inserir(mensagem);
+        return mensagem;
+    }
+
+    private Mensagem toModel(MensagemRequest request) {
+        Mensagem mensagem = new Mensagem();
+        if (request != null) {
+            if (request.atendimentoId != null) {
+                Atendimento atendimento = atendimentoBO.buscarPorId(request.atendimentoId);
+                mensagem.setAtendimento(atendimento);
+            }
+            if (request.canalId != null) {
+                CanalComunicacao canal = new CanalComunicacao();
+                canal.setId(request.canalId);
+                mensagem.setCanal(canal);
+            }
+            mensagem.setConteudo(request.conteudo);
+            mensagem.setEnviadoPor(normalizarEnviadoPor(request.enviadoPor));
+            mensagem.setDataHora(LocalDateTime.now());
+        }
+        return mensagem;
+    }
+
+    private void validar(Mensagem mensagem) {
+        if (mensagem.getAtendimento() == null || mensagem.getAtendimento().getId() <= 0) {
+            throw new BusinessException("ID do atendimento e obrigatorio");
+        }
+        if (mensagem.getConteudo() == null || mensagem.getConteudo().trim().isEmpty()) {
+            throw new BusinessException("Conteudo da mensagem e obrigatorio");
+        }
+        if (mensagem.getEnviadoPor() == null) {
+            throw new BusinessException("Informe quem enviou a mensagem");
+        }
+        String status = mensagem.getAtendimento().getStatus();
+        if (status != null && "ENCERRADO".equals(status.trim().toUpperCase())) {
+            throw new BusinessException("Nao e possivel enviar mensagem em atendimento encerrado");
+        }
+    }
+
+    private String normalizarEnviadoPor(String enviadoPor) {
+        if (enviadoPor == null || enviadoPor.trim().isEmpty()) {
+            return null;
+        }
+
+        String valor = enviadoPor.trim().toUpperCase().replace(' ', '_');
+        if ("VOLUNTARIO".equals(valor) || "BENEFICIARIO".equals(valor) || "PESSOA_ATENDIDA".equals(valor)) {
+            return valor;
+        }
+        throw new BusinessException("Remetente deve ser VOLUNTARIO ou BENEFICIARIO");
+    }
+}

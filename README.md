@@ -6,7 +6,7 @@ O projeto foi organizado para a entrega da Sprint 4 mantendo as camadas exigidas
 
 ## Tecnologias
 
-- Java 17
+- Java 21 LTS
 - Quarkus 3.17.8
 - Maven
 - REST com Jackson
@@ -31,13 +31,18 @@ O projeto nao utiliza JPA, Hibernate ou Panache nesta versao. Os DAOs continuam 
 
 ## Configuracao Do Banco
 
-A conexao com Oracle e configurada em `src/main/resources/application.properties`:
+A conexao com Oracle e configurada em `backend/src/main/resources/application.properties`:
 
 ```properties
 quarkus.datasource.db-kind=oracle
 quarkus.datasource.jdbc.url=${DB_URL:jdbc:oracle:thin:@oracle.fiap.com.br:1521:orcl}
 quarkus.datasource.username=${DB_USERNAME:}
 quarkus.datasource.password=${DB_PASSWORD:}
+quarkus.datasource.jdbc.max-size=8
+quarkus.datasource.jdbc.min-size=1
+quarkus.datasource.jdbc.acquisition-timeout=10S
+quarkus.datasource.jdbc.background-validation-interval=30S
+quarkus.datasource.jdbc.validation-query-sql=SELECT 1 FROM DUAL
 ```
 
 Antes de executar endpoints que acessam o banco, defina as variaveis de ambiente.
@@ -51,6 +56,8 @@ $env:DB_URL="jdbc:oracle:thin:@oracle.fiap.com.br:1521:orcl"
 ```
 
 ## Executando O Projeto
+
+Use Java 21 LTS como Project SDK/JDK do Maven. Evite Java 26 para rodar localmente.
 
 Com Maven instalado no PATH:
 
@@ -118,9 +125,29 @@ Cadastro:
   "nome": "Dra. Ana",
   "email": "ana@email.com",
   "senha": "123456",
-  "tipoUsuario": "VOLUNTARIO"
+  "tipoUsuario": "VOLUNTARIO",
+  "especialidadeId": 1,
+  "motivoVoluntariado": "Quero contribuir com atendimento odontologico para pessoas que precisam."
 }
 ```
+
+Quando `tipoUsuario` for `VOLUNTARIO`, o cadastro cria uma solicitacao de voluntariado: a conta nasce inativa, o voluntario nasce com `statusAprovacao = PENDENTE`, `disponivel = false` e `acessoSigilo = false`. O voluntario so consegue entrar depois da aprovacao em `PUT /voluntarios/{id}/aprovar`.
+
+Cadastro de beneficiario:
+
+```json
+{
+  "nome": "Ana Beneficiaria",
+  "email": "ana.beneficiaria@email.com",
+  "senha": "123456",
+  "tipoUsuario": "BENEFICIARIO",
+  "telefone": "11999999999"
+}
+```
+
+Quando `tipoUsuario` for `BENEFICIARIO`, a conta nasce ativa e o sistema cria ou vincula um registro em `pessoa_atendida` por `ID_CONTA`. Nao existe tabela `BENEFICIARIO`; o `beneficiarioId` retornado pela API representa `PESSOA_ATENDIDA.ID`.
+
+Se `tipoPessoaAtendida` for enviado como `CRIANCA`/`CRIANCA_ADOLESCENTE` ou `MULHER`/`MULHER_APOLONIA`, o cadastro tambem cria o registro na tabela especifica correspondente.
 
 Login:
 
@@ -240,9 +267,11 @@ Response:
 
 ```http
 GET    /voluntarios
+GET    /voluntarios/pendentes
 GET    /voluntarios/{id}
 POST   /voluntarios
 PUT    /voluntarios/{id}
+PUT    /voluntarios/{id}/aprovar
 DELETE /voluntarios/{id}
 ```
 
@@ -255,6 +284,7 @@ Request:
   "senha": "123456",
   "acessoSigilo": true,
   "disponivel": true,
+  "motivoVoluntariado": "Quero ajudar pessoas que precisam de atendimento.",
   "especialidadeId": 1
 }
 ```
@@ -268,6 +298,9 @@ Response:
   "usuario": "ana.odonto",
   "acessoSigilo": true,
   "disponivel": true,
+  "statusAprovacao": "PENDENTE",
+  "motivoVoluntariado": "Quero ajudar pessoas que precisam de atendimento.",
+  "contaId": 1,
   "especialidade": {
     "id": 1,
     "nome": "Odontologia",
@@ -282,7 +315,9 @@ Response:
 GET    /atendimentos
 GET    /atendimentos/solicitados
 GET    /atendimentos/voluntario/{voluntarioId}
+GET    /atendimentos/beneficiario/{beneficiarioId}
 GET    /atendimentos/{id}
+POST   /atendimentos/solicitar
 POST   /atendimentos
 PUT    /atendimentos/{id}
 DELETE /atendimentos/{id}
@@ -294,6 +329,21 @@ DELETE /atendimentos/{id}
 
 `GET /atendimentos/voluntario/{voluntarioId}` retorna todos os atendimentos vinculados ao voluntario informado, sem limitar apenas aos ativos.
 
+`GET /atendimentos/beneficiario/{beneficiarioId}` retorna os atendimentos da pessoa atendida/beneficiario informado.
+
+`POST /atendimentos/solicitar` cria uma solicitacao de atendimento para beneficiario. O back-end define `status = SOLICITADO`, `dataAbertura = hoje`, `dataEncerramento = null` e `voluntario = null`.
+
+Request de solicitacao:
+
+```json
+{
+  "beneficiarioId": 10,
+  "prioridade": 3,
+  "canalComunicacaoId": 1,
+  "descricao": "Preciso de ajuda com atendimento odontologico."
+}
+```
+
 Request:
 
 ```json
@@ -303,6 +353,7 @@ Request:
   "canalComunicacaoId": 1,
   "prioridade": 2,
   "status": "ABERTO",
+  "descricao": "Descricao do atendimento",
   "dataAbertura": "2026-05-09",
   "dataEncerramento": null
 }
@@ -323,12 +374,49 @@ Response:
   },
   "prioridade": 2,
   "status": "ABERTO",
+  "descricao": "Descricao do atendimento",
   "canalOrigem": {
     "id": 1,
     "nome": "WhatsApp",
     "descricao": "Canal de atendimento via WhatsApp"
   },
   "dataAbertura": "2026-05-09"
+}
+```
+
+### Mensagens
+
+Chat vinculado a atendimento:
+
+```http
+GET  /atendimentos/{id}/mensagens
+POST /atendimentos/{id}/mensagens
+```
+
+Request:
+
+```json
+{
+  "conteudo": "Ola, preciso confirmar os detalhes do atendimento.",
+  "enviadoPor": "BENEFICIARIO",
+  "canalId": 1
+}
+```
+
+Response:
+
+```json
+{
+  "id": 1,
+  "atendimentoId": 5,
+  "conteudo": "Ola, preciso confirmar os detalhes do atendimento.",
+  "dataHora": "2026-05-12T10:30:00",
+  "enviadoPor": "BENEFICIARIO",
+  "canal": {
+    "id": 1,
+    "nome": "WhatsApp",
+    "descricao": "Canal de atendimento via WhatsApp"
+  }
 }
 ```
 
@@ -369,10 +457,24 @@ Criar conta de voluntario para login:
 ```powershell
 curl -X POST http://localhost:8080/auth/register `
   -H "Content-Type: application/json" `
-  -d '{"nome":"Dra. Ana","email":"ana@email.com","senha":"123456","tipoUsuario":"VOLUNTARIO"}'
+  -d '{"nome":"Dra. Ana","email":"ana@email.com","senha":"123456","tipoUsuario":"VOLUNTARIO","especialidadeId":1,"motivoVoluntariado":"Quero contribuir com atendimento odontologico para pessoas que precisam."}'
 ```
 
-Fazer login:
+Antes da aprovacao, o login deve falhar:
+
+```powershell
+curl -X POST http://localhost:8080/auth/login `
+  -H "Content-Type: application/json" `
+  -d '{"email":"ana@email.com","senha":"123456"}'
+```
+
+Aprovar voluntario:
+
+```powershell
+curl -X PUT http://localhost:8080/voluntarios/1/aprovar
+```
+
+Depois da aprovacao, o login deve funcionar:
 
 ```powershell
 curl -X POST http://localhost:8080/auth/login `
@@ -434,6 +536,18 @@ O script da tabela de contas esta em:
 src/main/resources/sql/conta_usuario_oracle.sql
 ```
 
+O script de migracao para aprovacao de voluntarios esta em:
+
+```text
+src/main/resources/sql/voluntario_aprovacao_oracle.sql
+```
+
+O script de migracao para beneficiario, solicitacao de atendimento e chat esta em:
+
+```text
+src/main/resources/sql/beneficiario_atendimento_chat_oracle.sql
+```
+
 Tabela criada:
 
 ```sql
@@ -452,6 +566,75 @@ CREATE TABLE T_CONTA_USUARIO (
 );
 ```
 
+Migracao da tabela `VOLUNTARIO`:
+
+```sql
+ALTER TABLE VOLUNTARIO ADD (
+    STATUS_APROVACAO VARCHAR2(30) DEFAULT 'PENDENTE' NOT NULL,
+    MOTIVO_VOLUNTARIADO VARCHAR2(1000)
+);
+
+ALTER TABLE VOLUNTARIO ADD CONSTRAINT CK_VOLUNTARIO_STATUS_APROVACAO
+CHECK (STATUS_APROVACAO IN ('PENDENTE', 'APROVADO', 'RECUSADO'));
+```
+
+Migracao de beneficiario/atendimento:
+
+```sql
+ALTER TABLE pessoa_atendida ADD ID_CONTA NUMBER;
+
+ALTER TABLE pessoa_atendida ADD CONSTRAINT FK_PESSOA_ATENDIDA_CONTA
+FOREIGN KEY (ID_CONTA) REFERENCES T_CONTA_USUARIO(ID_CONTA);
+
+ALTER TABLE ATENDIMENTO ADD DESCRICAO VARCHAR2(1000);
+```
+
+## Teste Manual Beneficiario
+
+Criar beneficiario:
+
+```powershell
+curl -X POST http://localhost:8080/auth/register `
+  -H "Content-Type: application/json" `
+  -d '{"nome":"Ana Beneficiaria","email":"ana.beneficiaria@email.com","senha":"123456","tipoUsuario":"BENEFICIARIO"}'
+```
+
+Fazer login:
+
+```powershell
+curl -X POST http://localhost:8080/auth/login `
+  -H "Content-Type: application/json" `
+  -d '{"email":"ana.beneficiaria@email.com","senha":"123456"}'
+```
+
+Solicitar atendimento:
+
+```powershell
+curl -X POST http://localhost:8080/atendimentos/solicitar `
+  -H "Content-Type: application/json" `
+  -d '{"beneficiarioId":1,"prioridade":3,"canalComunicacaoId":1,"descricao":"Preciso de ajuda com atendimento odontologico."}'
+```
+
+Listar meus atendimentos:
+
+```powershell
+curl http://localhost:8080/atendimentos/beneficiario/1
+```
+
+Enviar mensagem:
+
+```powershell
+curl -X POST http://localhost:8080/atendimentos/1/mensagens `
+  -H "Content-Type: application/json" `
+  -d '{"conteudo":"Ola, preciso de ajuda.","enviadoPor":"BENEFICIARIO","canalId":1}'
+```
+
+Listar mensagens:
+
+```powershell
+curl http://localhost:8080/atendimentos/1/mensagens
+```
+
 ## Integracao Com Front-End
 
 Este repositorio Git contem apenas o back-end Quarkus. Nao ha `package.json`, `vite.config`, `src/services`, telas React ou arquivos TypeScript versionados nesta pasta, portanto nao foi possivel alterar nem validar o build do front-end aqui.
@@ -466,6 +649,8 @@ export type RegisterRequest = {
   email: string;
   senha: string;
   tipoUsuario: TipoUsuario;
+  especialidadeId?: number;
+  motivoVoluntariado?: string;
 };
 
 export type LoginRequest = {
@@ -515,6 +700,7 @@ email obrigatorio e em formato valido
 senha obrigatoria com minimo de 6 caracteres
 confirmarSenha igual a senha
 tipoUsuario VOLUNTARIO, BENEFICIARIO ou ADMIN
+para VOLUNTARIO: especialidadeId obrigatorio e motivoVoluntariado com minimo de 20 caracteres
 ```
 
 ## Tratamento De Erros

@@ -1,3 +1,51 @@
+# Build outputs
 target/
+**/target/
+dist/
+**/dist/
+dist-ssr/
+**/dist-ssr/
 .quarkus/
+**/.quarkus/
 *.class
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Logs
+logs/
+**/logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Environment and secrets
+.env
+.env.*
+**/.env
+**/.env.*
+!.env.example
+!**/.env.example
+*.local
+application-local.properties
+**/application-local.properties
+
+# IDE/editor files
+.idea/
+**/.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Old nested frontend repository/build leftovers
+FrontTDBResponde/
