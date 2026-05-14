@@ -10,9 +10,14 @@ import br.com.tdbresponde.model.Mensagem;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.List;
+import br.com.tdbresponde.dto.PredictRequest;
+import br.com.tdbresponde.dto.PredictResponse;
+import br.com.tdbresponde.model.CriancaAdolescente;
+import br.com.tdbresponde.model.MulherApolonia;
+import br.com.tdbresponde.service.ClassificadorService;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 @ApplicationScoped
 public class MensagemBO {
@@ -22,6 +27,11 @@ public class MensagemBO {
 
     @Inject
     AtendimentoBO atendimentoBO;
+
+    @Inject
+    @RestClient
+    ClassificadorService classificadorService;
+
 
     public List<Mensagem> listarPorAtendimento(int atendimentoId) {
         if (atendimentoId <= 0) {
@@ -94,4 +104,55 @@ public class MensagemBO {
         }
         throw new BusinessException("Remetente deve ser BENEFICIARIO, VOLUNTARIO ou ADMIN");
     }
+
+    // Injeta o serviço de IA que criamos acima
+    @Inject
+    @RestClient
+    /**
+     * Método principal que integra com o Python.
+     */
+    public PredictResponse classificarMensagem(Mensagem mensagem) {
+        // Imprime no console para sabermos que o Java tentou chamar a IA
+        System.out.println("DEBUG: Iniciando chamada para a API Python...");
+        try {
+            // Pega o atendimento da mensagem
+            Atendimento atendimento = mensagem.getAtendimento();
+            String tipoPessoa = "OUTRO";
+            int gravidade = 3;
+
+            // Lógica para descobrir o tipo de pessoa e a gravidade específica dela
+            if (atendimento.getPessoaAtendida() instanceof CriancaAdolescente c) {
+                tipoPessoa = "CRIANCA_ADOLESCENTE";
+                gravidade = c.getGravidadeBucal();
+            } else if (atendimento.getPessoaAtendida() instanceof MulherApolonia m) {
+                tipoPessoa = "MULHER_APOLONIA";
+                gravidade = m.getNivelRisco();
+            }
+
+            // Traduz o canal para os nomes que a IA conhece
+            String canalNome = "whatsapp";
+            if (mensagem.getCanal() != null && mensagem.getCanal().getNome() != null) {
+                String nome = mensagem.getCanal().getNome().toLowerCase();
+                if (nome.contains("email")) canalNome = "email";
+                else if (nome.contains("tel") || nome.contains("fone")) canalNome = "telefone";
+            }
+
+            // Cria o pacote de dados para o Python
+            PredictRequest req = new PredictRequest(
+                    mensagem.getConteudo(), mensagem.getEnviadoPor(), canalNome,
+                    atendimento.getPrioridade(), atendimento.getStatus(), tipoPessoa, gravidade
+            );
+
+            // Faz a chamada real para a API Python
+            PredictResponse resp = classificadorService.classificar(req);
+            // Imprime o resultado no console do Java
+            System.out.println("DEBUG: IA respondeu: " + resp.categoriaPrevista);
+            return resp;
+        } catch (Exception e) {
+            // Se a IA falhar (ex: Python desligado), mostra o erro e não trava o sistema
+            System.err.println("Erro na integração com a IA: " + e.getMessage());
+            return null;
+        }
+    }
+
 }

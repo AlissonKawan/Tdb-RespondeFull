@@ -34,18 +34,32 @@
     </dependencyManagement>
 
     <dependencies>
+        <!-- Servidor REST -->
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-rest-jackson</artifactId>
         </dependency>
+
+        <!-- Banco de Dados Oracle -->
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-jdbc-oracle</artifactId>
         </dependency>
+
+        <!-- Injeção de Dependência -->
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-arc</artifactId>
         </dependency>
+
+        <!-- Adicionado dentro da tag <dependencies> -->
+        <dependency>
+            <!-- Grupo da biblioteca: io.quarkus (Framework que você está usando) -->
+            <groupId>io.quarkus</groupId>
+            <!-- Artefato: rest-client-jackson (Ferramenta para chamadas REST com suporte a JSON) -->
+            <artifactId>quarkus-rest-client-jackson</artifactId>
+        </dependency>
+        <!-- Testes -->
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-junit5</artifactId>
