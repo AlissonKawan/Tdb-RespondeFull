@@ -28,6 +28,9 @@ public class MensagemBO {
     @Inject
     AtendimentoBO atendimentoBO;
 
+    // CORREÇÃO 1: removido o @Inject @RestClient duplicado que aparecia
+    // antes do método classificarMensagem — o correto é declarar apenas aqui,
+    // como campo da classe, e não repetir antes do método.
     @Inject
     @RestClient
     ClassificadorService classificadorService;
@@ -105,11 +108,14 @@ public class MensagemBO {
         throw new BusinessException("Remetente deve ser BENEFICIARIO, VOLUNTARIO ou ADMIN");
     }
 
-    // Injeta o serviço de IA que criamos acima
-    @Inject
-    @RestClient
     /**
      * Método principal que integra com o Python.
+     * CORREÇÃO 2: removido o @Inject @RestClient que estava posicionado
+     * incorretamente aqui antes do método — anotações de injeção não podem
+     * ficar antes de métodos, apenas antes de campos da classe.
+     * CORREÇÃO 3: adicionada normalização do status e do enviadoPor antes
+     * de enviar para a API Python, garantindo que os valores estejam no
+     * formato exato que ela aceita.
      */
     public PredictResponse classificarMensagem(Mensagem mensagem) {
         // Imprime no console para sabermos que o Java tentou chamar a IA
@@ -137,10 +143,18 @@ public class MensagemBO {
                 else if (nome.contains("tel") || nome.contains("fone")) canalNome = "telefone";
             }
 
+            // CORREÇÃO 3A: normaliza o status do atendimento para o formato
+            // que a API Python aceita (ex: "Em andamento" → "EM_ATENDIMENTO")
+            String statusNormalizado = normalizarStatus(atendimento.getStatus());
+
+            // CORREÇÃO 3B: normaliza o enviadoPor — se for "ADMIN" (que o Python
+            // não aceita), mapeia para "VOLUNTARIO" para não quebrar a chamada
+            String enviadoPorNormalizado = normalizarEnviadoPorParaIA(mensagem.getEnviadoPor());
+
             // Cria o pacote de dados para o Python
             PredictRequest req = new PredictRequest(
-                    mensagem.getConteudo(), mensagem.getEnviadoPor(), canalNome,
-                    atendimento.getPrioridade(), atendimento.getStatus(), tipoPessoa, gravidade
+                    mensagem.getConteudo(), enviadoPorNormalizado, canalNome,
+                    atendimento.getPrioridade(), statusNormalizado, tipoPessoa, gravidade
             );
 
             // Faz a chamada real para a API Python
@@ -152,6 +166,35 @@ public class MensagemBO {
             // Se a IA falhar (ex: Python desligado), mostra o erro e não trava o sistema
             System.err.println("Erro na integração com a IA: " + e.getMessage());
             return null;
+        }
+    }
+
+    /**
+     * Converte o status do Atendimento para o formato aceito pela API Python.
+     * O banco pode guardar variações como "Aberto", "Em andamento", "ABERTO" etc.
+     */
+    private String normalizarStatus(String status) {
+        if (status == null) return "ABERTO";
+        switch (status.trim().toUpperCase().replace(" ", "_")) {
+            case "ABERTO":           return "ABERTO";
+            case "EM_ATENDIMENTO":
+            case "EM_ANDAMENTO":     return "EM_ATENDIMENTO";
+            case "ENCERRADO":        return "ENCERRADO";
+            case "SOLICITADO":       return "SOLICITADO";
+            default:                 return "ABERTO";
+        }
+    }
+
+    /**
+     * Converte o enviadoPor para um valor que a API Python aceita.
+     * "ADMIN" não é reconhecido pelo Python, então é mapeado para "VOLUNTARIO".
+     */
+    private String normalizarEnviadoPorParaIA(String enviadoPor) {
+        if (enviadoPor == null) return "BENEFICIARIO";
+        switch (enviadoPor.trim().toUpperCase()) {
+            case "VOLUNTARIO": return "VOLUNTARIO";
+            case "ADMIN":      return "VOLUNTARIO"; // ADMIN age como voluntário para a IA
+            default:           return "BENEFICIARIO";
         }
     }
 
