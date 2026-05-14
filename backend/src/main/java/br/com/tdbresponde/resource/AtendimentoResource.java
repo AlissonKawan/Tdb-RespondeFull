@@ -11,6 +11,7 @@ import br.com.tdbresponde.dto.MensagemRequest;
 import br.com.tdbresponde.dto.MensagemResponse;
 import br.com.tdbresponde.dto.PredictResponse; // Adicionado para a IA
 import br.com.tdbresponde.dto.RelatarSituacaoRequest;
+import br.com.tdbresponde.dto.SolicitarAtendimentoRequest;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
