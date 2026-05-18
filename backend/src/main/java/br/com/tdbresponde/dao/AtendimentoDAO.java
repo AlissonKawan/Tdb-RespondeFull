@@ -121,14 +121,8 @@ public class AtendimentoDAO {
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
 
-            int pessoaId = inserirPessoaAtendida(conn, pessoa, tipo);
+            int pessoaId = salvarPessoaRelato(conn, pessoa, tipo);
             pessoa.setId(pessoaId);
-
-            if (pessoa instanceof CriancaAdolescente crianca) {
-                inserirCriancaAdolescente(conn, pessoaId, crianca);
-            } else if (pessoa instanceof MulherApolonia mulher) {
-                inserirMulherApolonia(conn, pessoaId, mulher);
-            }
 
             atendimento.getPessoaAtendida().setId(pessoaId);
             inserirAtendimento(conn, atendimento);
@@ -362,6 +356,139 @@ public class AtendimentoDAO {
         }
 
         throw new SQLException("Nenhuma chave gerada apos insert de pessoa atendida");
+    }
+
+    private int salvarPessoaRelato(Connection conn, PessoaAtendida pessoa, String tipo) throws SQLException {
+        Integer pessoaId = null;
+        if (pessoa.getContaId() != null) {
+            pessoaId = buscarPessoaIdPorConta(conn, pessoa.getContaId());
+        }
+
+        if (pessoaId != null) {
+            atualizarPessoaAtendidaRelato(conn, pessoaId, pessoa, tipo);
+        } else {
+            pessoaId = inserirPessoaAtendida(conn, pessoa, tipo);
+        }
+
+        sincronizarDetalhePessoaRelato(conn, pessoaId, pessoa, tipo);
+        return pessoaId;
+    }
+
+    private Integer buscarPessoaIdPorConta(Connection conn, int contaId) throws SQLException {
+        String sql = "SELECT ID FROM PESSOA_ATENDIDA WHERE ID_CONTA = ?";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, contaId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("ID");
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private void atualizarPessoaAtendidaRelato(Connection conn, int pessoaId, PessoaAtendida pessoa, String tipo) throws SQLException {
+        String sql = "UPDATE PESSOA_ATENDIDA " +
+                "SET NOME_CODIFICADO = ?, TELEFONE = ?, EMAIL = ?, TIPO = ? " +
+                "WHERE ID = ?";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, pessoa.getNomeCodificado());
+            stmt.setString(2, pessoa.getTelefone());
+            stmt.setString(3, pessoa.getEmail());
+            stmt.setString(4, tipo);
+            stmt.setInt(5, pessoaId);
+            stmt.executeUpdate();
+        }
+    }
+
+    private void sincronizarDetalhePessoaRelato(Connection conn, int pessoaId, PessoaAtendida pessoa, String tipo) throws SQLException {
+        if ("CRIANCA_ADOLESCENTE".equals(tipo) && pessoa instanceof CriancaAdolescente crianca) {
+            excluirDetalheMulher(conn, pessoaId);
+            if (existeDetalheCrianca(conn, pessoaId)) {
+                atualizarCriancaAdolescente(conn, pessoaId, crianca);
+            } else {
+                inserirCriancaAdolescente(conn, pessoaId, crianca);
+            }
+            return;
+        }
+
+        if ("MULHER_APOLONIA".equals(tipo) && pessoa instanceof MulherApolonia mulher) {
+            excluirDetalheCrianca(conn, pessoaId);
+            if (existeDetalheMulher(conn, pessoaId)) {
+                atualizarMulherApolonia(conn, pessoaId, mulher);
+            } else {
+                inserirMulherApolonia(conn, pessoaId, mulher);
+            }
+            return;
+        }
+
+        excluirDetalheCrianca(conn, pessoaId);
+        excluirDetalheMulher(conn, pessoaId);
+    }
+
+    private boolean existeDetalheCrianca(Connection conn, int pessoaId) throws SQLException {
+        return existeRegistro(conn, "SELECT 1 FROM CRIANCA_ADOLESCENTE WHERE PESSOA_ID = ?", pessoaId);
+    }
+
+    private boolean existeDetalheMulher(Connection conn, int pessoaId) throws SQLException {
+        return existeRegistro(conn, "SELECT 1 FROM MULHER_APOLONIA WHERE PESSOA_ID = ?", pessoaId);
+    }
+
+    private boolean existeRegistro(Connection conn, String sql, int pessoaId) throws SQLException {
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, pessoaId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
+    private void atualizarCriancaAdolescente(Connection conn, int pessoaId, CriancaAdolescente crianca) throws SQLException {
+        String sql = "UPDATE CRIANCA_ADOLESCENTE " +
+                "SET IDADE = ?, NOME_RESPONSAVEL = ?, ESCOLA = ?, GRAVIDADE_BUCAL = ? " +
+                "WHERE PESSOA_ID = ?";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, crianca.getIdade());
+            stmt.setString(2, crianca.getNomeResponsavel());
+            stmt.setString(3, crianca.getEscola());
+            stmt.setInt(4, crianca.getGravidadeBucal());
+            stmt.setInt(5, pessoaId);
+            stmt.executeUpdate();
+        }
+    }
+
+    private void atualizarMulherApolonia(Connection conn, int pessoaId, MulherApolonia mulher) throws SQLException {
+        String sql = "UPDATE MULHER_APOLONIA " +
+                "SET CODINOME = ?, NIVEL_RISCO = ?, TEM_BOLETIM_OCORRENCIA = ?, NECESSITA_SIGILO_ABSOLUTO = ? " +
+                "WHERE PESSOA_ID = ?";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, mulher.getCodinome());
+            stmt.setInt(2, mulher.getNivelRisco());
+            stmt.setInt(3, mulher.isTemBoletimOcorrencia() ? 1 : 0);
+            stmt.setInt(4, mulher.isNecessitaSigiloAbsoluto() ? 1 : 0);
+            stmt.setInt(5, pessoaId);
+            stmt.executeUpdate();
+        }
+    }
+
+    private void excluirDetalheCrianca(Connection conn, int pessoaId) throws SQLException {
+        excluirDetalhePessoa(conn, "DELETE FROM CRIANCA_ADOLESCENTE WHERE PESSOA_ID = ?", pessoaId);
+    }
+
+    private void excluirDetalheMulher(Connection conn, int pessoaId) throws SQLException {
+        excluirDetalhePessoa(conn, "DELETE FROM MULHER_APOLONIA WHERE PESSOA_ID = ?", pessoaId);
+    }
+
+    private void excluirDetalhePessoa(Connection conn, String sql, int pessoaId) throws SQLException {
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, pessoaId);
+            stmt.executeUpdate();
+        }
     }
 
     private void inserirCriancaAdolescente(Connection conn, int pessoaId, CriancaAdolescente crianca) throws SQLException {

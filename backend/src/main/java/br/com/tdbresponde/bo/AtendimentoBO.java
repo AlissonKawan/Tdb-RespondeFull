@@ -1,6 +1,7 @@
 package br.com.tdbresponde.bo;
 
 import br.com.tdbresponde.dao.AtendimentoDAO;
+import br.com.tdbresponde.dao.CanalComunicacaoDAO;
 import br.com.tdbresponde.dao.CriancaAdolescenteDAO;
 import br.com.tdbresponde.dao.HistoricoStatusDAO;
 import br.com.tdbresponde.dao.MulherApoloniaDAO;
@@ -41,6 +42,9 @@ public class AtendimentoBO {
 
     @Inject
     PessoaAtendidaDAO pessoaAtendidaDAO;
+
+    @Inject
+    CanalComunicacaoDAO canalDAO;
 
     @Inject
     CriancaAdolescenteDAO criancaDAO;
@@ -132,6 +136,7 @@ public class AtendimentoBO {
         validarRelato(request);
 
         String tipo = normalizarTipoRelato(request.tipo);
+        validarCanalComunicacao(request.canalComunicacaoId);
         PessoaAtendida pessoa = criarPessoaRelato(request, tipo);
 
         Atendimento atendimento = new Atendimento();
@@ -490,6 +495,12 @@ public class AtendimentoBO {
             if (request.nivelRisco < 1 || request.nivelRisco > 5) {
                 throw new BusinessException("Nivel de risco deve estar entre 1 e 5");
             }
+        }
+    }
+
+    private void validarCanalComunicacao(int canalComunicacaoId) {
+        if (canalDAO.buscarPorId(canalComunicacaoId) == null) {
+            throw new NotFoundException("Canal de comunicacao nao encontrado");
         }
     }
 
