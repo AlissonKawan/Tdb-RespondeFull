@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
 import { EmptyState, ErrorState, LoadingState } from '../ui/FeedbackState';
@@ -31,30 +31,45 @@ function ChatAtendimento({ atendimentoId, enviadoPor }: ChatAtendimentoProps) {
   const [erro, setErro] = useState('');
 
   const mensagensOrdenadas = useMemo(
-    () =>
-      [...mensagens].sort((a, b) => {
-        const dataA = new Date(a.dataHora).getTime();
-        const dataB = new Date(b.dataHora).getTime();
-        return (Number.isNaN(dataA) ? 0 : dataA) - (Number.isNaN(dataB) ? 0 : dataB);
-      }),
-    [mensagens],
+      () =>
+          [...mensagens].sort((a, b) => {
+            const dataA = new Date(a.dataHora).getTime();
+            const dataB = new Date(b.dataHora).getTime();
+            return (Number.isNaN(dataA) ? 0 : dataA) - (Number.isNaN(dataB) ? 0 : dataB);
+          }),
+      [mensagens],
   );
 
-  const carregarMensagens = async () => {
-    setErro('');
-    setLoading(true);
-    try {
-      setMensagens(await mensagensService.getMensagensAtendimento(atendimentoId));
-    } catch (error) {
-      setErro(error instanceof Error ? error.message : 'Nao foi possivel carregar as mensagens.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const carregarMensagens = useCallback(
+      async (mostrarLoading = false) => {
+        setErro('');
+
+        if (mostrarLoading) {
+          setLoading(true);
+        }
+
+        try {
+          setMensagens(await mensagensService.getMensagensAtendimento(atendimentoId));
+        } catch (error) {
+          setErro(error instanceof Error ? error.message : 'Nao foi possivel carregar as mensagens.');
+        } finally {
+          if (mostrarLoading) {
+            setLoading(false);
+          }
+        }
+      },
+      [atendimentoId],
+  );
 
   useEffect(() => {
-    void carregarMensagens();
-  }, [atendimentoId]);
+    void carregarMensagens(true);
+
+    const intervalo = setInterval(() => {
+      void carregarMensagens(false);
+    }, 3000);
+
+    return () => clearInterval(intervalo);
+  }, [carregarMensagens]);
 
   const enviar = async () => {
     const conteudo = novaMensagem.trim();
@@ -65,7 +80,7 @@ function ChatAtendimento({ atendimentoId, enviadoPor }: ChatAtendimentoProps) {
     try {
       await mensagensService.enviarMensagem(atendimentoId, { conteudo, enviadoPor });
       setNovaMensagem('');
-      await carregarMensagens();
+      await carregarMensagens(false);
     } catch (error) {
       setErro(error instanceof Error ? error.message : 'Nao foi possivel enviar a mensagem.');
     } finally {
@@ -74,62 +89,67 @@ function ChatAtendimento({ atendimentoId, enviadoPor }: ChatAtendimentoProps) {
   };
 
   return (
-    <Card className="p-5 lg:p-6">
-      <div className="flex flex-col gap-3 border-b border-[#E2E8F0] pb-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">Chat</p>
-          <h2 className="mt-1 text-2xl font-bold text-[#0F172A]">Mensagens do atendimento</h2>
-        </div>
-        <Button type="button" variant="secondary" onClick={carregarMensagens} disabled={loading || enviando}>
-          Atualizar mensagens
-        </Button>
-      </div>
-
-      <div className="mt-5 min-h-80 rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] p-4">
-        {loading && <LoadingState title="Carregando mensagens..." />}
-        {erro && <ErrorState title="Erro no chat" description={erro} />}
-        {!loading && !erro && mensagensOrdenadas.length === 0 && (
-          <EmptyState title="Nenhuma mensagem ainda." description="Envie a primeira mensagem para iniciar a conversa." />
-        )}
-
-        {!loading && !erro && mensagensOrdenadas.length > 0 && (
-          <div className="flex max-h-[420px] flex-col gap-3 overflow-y-auto pr-1">
-            {mensagensOrdenadas.map((mensagem) => {
-              const minhaMensagem = mensagem.enviadoPor === enviadoPor;
-              return (
-                <div key={mensagem.id} className={`flex ${minhaMensagem ? 'justify-end' : 'justify-start'}`}>
-                  <div
-                    className={`max-w-[82%] rounded-2xl px-4 py-3 text-sm shadow-sm ${
-                      minhaMensagem
-                        ? 'bg-[#2563EB] text-white shadow-blue-600/20'
-                        : 'border border-[#E2E8F0] bg-white text-[#0F172A]'
-                    }`}
-                  >
-                    <p className="whitespace-pre-wrap leading-6">{mensagem.conteudo}</p>
-                    <p className={`mt-2 text-[11px] ${minhaMensagem ? 'text-blue-100' : 'text-slate-400'}`}>
-                      {mensagem.enviadoPor} {formatDate(mensagem.dataHora)}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
+      <Card className="p-5 lg:p-6">
+        <div className="flex flex-col gap-3 border-b border-[#E2E8F0] pb-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">Chat</p>
+            <h2 className="mt-1 text-2xl font-bold text-[#0F172A]">Mensagens do atendimento</h2>
           </div>
-        )}
-      </div>
+          <Button
+              type="button"
+              variant="secondary"
+              onClick={() => void carregarMensagens(true)}
+              disabled={loading || enviando}
+          >
+            Atualizar mensagens
+          </Button>
+        </div>
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto]">
-        <Textarea
-          rows={3}
-          value={novaMensagem}
-          onChange={(event) => setNovaMensagem(event.target.value)}
-          placeholder="Escreva sua mensagem..."
-          disabled={enviando}
-        />
-        <Button type="button" size="large" onClick={enviar} disabled={enviando || !novaMensagem.trim()}>
-          {enviando ? 'Enviando...' : 'Enviar'}
-        </Button>
-      </div>
-    </Card>
+        <div className="mt-5 min-h-80 rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] p-4">
+          {loading && <LoadingState title="Carregando mensagens..." />}
+          {erro && <ErrorState title="Erro no chat" description={erro} />}
+          {!loading && !erro && mensagensOrdenadas.length === 0 && (
+              <EmptyState title="Nenhuma mensagem ainda." description="Envie a primeira mensagem para iniciar a conversa." />
+          )}
+
+          {!loading && !erro && mensagensOrdenadas.length > 0 && (
+              <div className="flex max-h-[420px] flex-col gap-3 overflow-y-auto pr-1">
+                {mensagensOrdenadas.map((mensagem) => {
+                  const minhaMensagem = mensagem.enviadoPor === enviadoPor;
+                  return (
+                      <div key={mensagem.id} className={`flex ${minhaMensagem ? 'justify-end' : 'justify-start'}`}>
+                        <div
+                            className={`max-w-[82%] rounded-2xl px-4 py-3 text-sm shadow-sm ${
+                                minhaMensagem
+                                    ? 'bg-[#2563EB] text-white shadow-blue-600/20'
+                                    : 'border border-[#E2E8F0] bg-white text-[#0F172A]'
+                            }`}
+                        >
+                          <p className="whitespace-pre-wrap leading-6">{mensagem.conteudo}</p>
+                          <p className={`mt-2 text-[11px] ${minhaMensagem ? 'text-blue-100' : 'text-slate-400'}`}>
+                            {mensagem.enviadoPor} {formatDate(mensagem.dataHora)}
+                          </p>
+                        </div>
+                      </div>
+                  );
+                })}
+              </div>
+          )}
+        </div>
+
+        <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto]">
+          <Textarea
+              rows={3}
+              value={novaMensagem}
+              onChange={(event) => setNovaMensagem(event.target.value)}
+              placeholder="Escreva sua mensagem..."
+              disabled={enviando}
+          />
+          <Button type="button" size="large" onClick={enviar} disabled={enviando || !novaMensagem.trim()}>
+            {enviando ? 'Enviando...' : 'Enviar'}
+          </Button>
+        </div>
+      </Card>
   );
 }
 
