@@ -347,7 +347,7 @@ function DashboardAdmin() {
 
         {aba === 'atendimentos' && (
           <div className="space-y-5">
-            <SectionTitle title="Atendimentos" description="Lista local de protocolos usados no painel e portal do beneficiario." />
+            <SectionTitle title="Atendimentos" description="Acompanhe os protocolos registrados e o andamento de cada caso." />
             <Card className="grid gap-3 p-4 md:grid-cols-2">
               <Input value={busca} onChange={(e) => setBusca(e.target.value)} placeholder="Buscar por codigo ou canal" />
               <Select value={filtroStatus} onChange={(e) => setFiltroStatus(e.target.value)}>
@@ -387,7 +387,7 @@ function DashboardAdmin() {
 
         {aba === 'novo' && (
           <Card className="max-w-2xl p-6">
-            <SectionTitle title="Novo atendimento" description="Cadastro local para manter compatibilidade com o portal da Sprint 4." />
+            <SectionTitle title="Novo atendimento" description="Abra um novo protocolo para acompanhamento da equipe." />
             <div className="grid gap-4 md:grid-cols-2">
               <Field label="Tipo">
                 <Select value={novoAtendimento.tipo} onChange={(e) => setNovoAtendimento({ ...novoAtendimento, tipo: e.target.value as TipoPessoa })}>
@@ -429,7 +429,7 @@ function DashboardAdmin() {
             <div className="space-y-4">
               <SectionTitle title="Voluntarios" description="Gerencie a equipe cadastrada, suas especialidades e disponibilidade." />
               {volLoading && <LoadingState title="Carregando voluntarios..." />}
-              {volErroApi && <ErrorState title="Erro ao carregar dados" description={`${volErroApi} Exibindo dados locais quando existirem.`} />}
+              {volErroApi && <ErrorState title="Erro ao carregar dados" description={`${volErroApi} Exibindo informacoes salvas neste dispositivo quando existirem.`} />}
               {state.voluntarios.length === 0 ? <EmptyState /> : (
                 <Card className="overflow-hidden">
                   <div className="overflow-x-auto">
