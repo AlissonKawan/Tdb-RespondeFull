@@ -1,1 +1,0 @@
-﻿-- Inserts iniciais do Projeto TDB Responde.
