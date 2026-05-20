@@ -8,6 +8,7 @@ O projeto foi organizado para a entrega da Sprint 4 mantendo as camadas exigidas
 
 Este repositorio esta preparado para publicacao sem credenciais reais.
 
+- Repositorio: https://github.com/AlissonKawan/Tdb-RespondeFull.git
 - Nao versionar arquivos `.env`, `*.env`, `node_modules`, `target`, `dist` ou arquivos `.zip`.
 - Configurar credenciais somente por variaveis de ambiente, nunca direto no codigo.
 - Backend: usar `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `ADMIN_SEED_EMAIL` e `ADMIN_SEED_PASSWORD`.

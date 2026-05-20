@@ -153,6 +153,6 @@ Content-Type: application/json
 
 ## Links
 
-- GitHub: https://github.com/AlissonMarcoschalenge77
+- GitHub: https://github.com/AlissonKawan/Tdb-RespondeFull.git
 - Vercel: preencher com a URL do deploy
 - YouTube: preencher com a URL do video
