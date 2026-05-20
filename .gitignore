@@ -8,6 +8,7 @@ dist-ssr/
 .quarkus/
 **/.quarkus/
 *.class
+*.zip
 
 # Dependencies
 node_modules/
@@ -49,7 +50,3 @@ application-local.properties
 
 # Old nested frontend repository/build leftovers
 FrontTDBResponde/
-
-backend/src/main/resources/application.properties
-.env
-*.env

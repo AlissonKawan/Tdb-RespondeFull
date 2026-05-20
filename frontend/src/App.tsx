@@ -17,7 +17,7 @@ import Roadmap from './pages/Roadmap';
 // Páginas novas
 import Login from './pages/Login';
 import DashboardAdmin from './pages/Dashboardadmin';
-import PortalBeneficiario from './pages/Portalbeneficiario ';
+import PortalBeneficiario from './pages/PortalBeneficiario';
 import CadastroVoluntario from './pages/CadastroVoluntario';
 import CadastroBeneficiario from './pages/CadastroBeneficiario';
 import PortalVoluntario from './pages/PortalVoluntario';
@@ -40,6 +40,7 @@ function App() {
             <Route path="contato" element={<Contato />} />
             <Route path="integrantes" element={<Integrantes />} />
             <Route path="roadmap" element={<Roadmap />} />
+            <Route path="solucao" element={<Roadmap />} />
             <Route path="login" element={<Login />} />
             <Route path="cadastro" element={<CadastroVoluntario />} />
             <Route path="cadastro-voluntario" element={<CadastroVoluntario />} />

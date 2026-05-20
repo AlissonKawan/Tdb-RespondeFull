@@ -1,2 +1,1 @@
--- Inserts iniciais do Projeto TDB Responde.
--- Adicione aqui os dados de carga/semente quando necessário.
+﻿-- Inserts iniciais do Projeto TDB Responde.

@@ -1,4 +1,4 @@
-import { IA_API_URL } from '../config/api';
+import { IA_API_BASE_URL } from '../config/api';
 
 export type CategoriaIA = 'elogio' | 'informativo' | 'reclamacao' | 'sugestao' | 'urgencia' | string;
 export type EnviadoPorIA = 'BENEFICIARIO' | 'VOLUNTARIO' | 'PESSOA_ATENDIDA';
@@ -27,7 +27,7 @@ export async function classificarMensagemIA(
   signal?: AbortSignal,
 ): Promise<ClassificarMensagemIAResponse | null> {
   try {
-    const response = await fetch(`${IA_API_URL}/predict`, {
+    const response = await fetch(`${IA_API_BASE_URL}/predict`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',

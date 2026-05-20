@@ -1,4 +1,4 @@
-# Backend
+﻿# Backend
 
 API Java do Projeto TDB Responde.
 
@@ -12,7 +12,7 @@ No PowerShell, confira a versao ativa:
 java -version
 ```
 
-No IntelliJ, selecione um JDK 21 em `File > Project Structure > Project SDK` e também em `Settings > Build, Execution, Deployment > Build Tools > Maven > JDK for importer`.
+No IntelliJ, selecione um JDK 21 em `File > Project Structure > Project SDK` e tambÃ©m em `Settings > Build, Execution, Deployment > Build Tools > Maven > JDK for importer`.
 
 ## Banco Oracle
 
@@ -35,12 +35,6 @@ $env:DB_URL="jdbc:oracle:thin:@oracle.fiap.com.br:1521:orcl"
 ## Como executar
 
 Use os comandos Maven a partir desta pasta:
-
-```bash
-./mvnw quarkus:dev
-```
-
-Se estiver no Windows e usando Maven instalado globalmente:
 
 ```bash
 mvn quarkus:dev
@@ -72,7 +66,7 @@ PowerShell:
 
 ```powershell
 $env:ADMIN_SEED_EMAIL="admin@tdbresponde.com"
-$env:ADMIN_SEED_PASSWORD="123456"
+$env:ADMIN_SEED_PASSWORD="troque-esta-senha"
 mvn quarkus:dev
 ```
 
@@ -87,6 +81,6 @@ Login para teste:
 ```json
 {
   "email": "admin@tdbresponde.com",
-  "senha": "123456"
+  "senha": "troque-esta-senha"
 }
 ```

@@ -1,12 +1,12 @@
-// src/context/seedData.ts
+﻿// src/context/seedData.ts
 import type { TDBState } from '../types/index';
 
 export const SEED_STATE: TDBState = {
   nextId: 100,
   voluntarios: [
-    { id: 1, nome: 'Ana Souza',     usuario: 'ana.souza',     senha: '123456', especialidade: 'Odontologia',        disponivel: true,  acessoSigilo: true  },
-    { id: 2, nome: 'Carlos Lima',   usuario: 'carlos.lima',   senha: '123456', especialidade: 'Assistência Social', disponivel: true,  acessoSigilo: false },
-    { id: 3, nome: 'Beatriz Nunes', usuario: 'beatriz.nunes', senha: '123456', especialidade: 'Psicologia',         disponivel: false, acessoSigilo: true  },
+    { id: 1, nome: 'Ana Souza',     usuario: 'ana.souza',     senha: 'troque-esta-senha', especialidade: 'Odontologia',        disponivel: true,  acessoSigilo: true  },
+    { id: 2, nome: 'Carlos Lima',   usuario: 'carlos.lima',   senha: 'troque-esta-senha', especialidade: 'AssistÃªncia Social', disponivel: true,  acessoSigilo: false },
+    { id: 3, nome: 'Beatriz Nunes', usuario: 'beatriz.nunes', senha: 'troque-esta-senha', especialidade: 'Psicologia',         disponivel: false, acessoSigilo: true  },
   ],
   atendimentos: [
     {
@@ -14,7 +14,7 @@ export const SEED_STATE: TDBState = {
       tipo: 'crianca',
       pessoa: {
         nomeCodificado: 'CA-2024-001',
-        email: 'resp@email.com',
+        email: 'resp@example.com',
         telefone: '(11) 9 9000-0001',
         responsavel: 'Roberto Souza',
         escola: 'EMEF Liberdade',
@@ -27,9 +27,9 @@ export const SEED_STATE: TDBState = {
       voluntarioId: 1,
       dataAbertura: '2025-03-10',
       mensagens: [
-        { de: 'pessoa',     texto: 'Olá, preciso de ajuda com o tratamento dentário do meu filho.', hora: '09:12' },
-        { de: 'voluntario', texto: 'Olá! Pode contar. Qual é a situação atual da criança?',          hora: '09:15' },
-        { de: 'pessoa',     texto: 'Ele está com dor há 3 dias. A escola indicou consulta urgente.', hora: '09:20' },
+        { de: 'pessoa',     texto: 'OlÃ¡, preciso de ajuda com o tratamento dentÃ¡rio do meu filho.', hora: '09:12' },
+        { de: 'voluntario', texto: 'OlÃ¡! Pode contar. Qual Ã© a situaÃ§Ã£o atual da crianÃ§a?',          hora: '09:15' },
+        { de: 'pessoa',     texto: 'Ele estÃ¡ com dor hÃ¡ 3 dias. A escola indicou consulta urgente.', hora: '09:20' },
       ],
       historico: [
         { statusAnterior: 'Aberto', statusNovo: 'Em andamento', alteradoPor: 'Ana Souza', dataHora: '2025-03-10 09:14' },
@@ -40,7 +40,7 @@ export const SEED_STATE: TDBState = {
       tipo: 'mulher',
       pessoa: {
         codinome: 'VIOLETA-07',
-        email: 'prot@email.com',
+        email: 'prot@example.com',
         telefone: '(11) 9 8000-0002',
         nivelRisco: 3,
         temBoletim: true,
@@ -52,7 +52,7 @@ export const SEED_STATE: TDBState = {
       voluntarioId: null,
       dataAbertura: '2025-03-12',
       mensagens: [
-        { de: 'pessoa', texto: 'Preciso de orientação jurídica urgente sobre proteção.', hora: '14:00' },
+        { de: 'pessoa', texto: 'Preciso de orientaÃ§Ã£o jurÃ­dica urgente sobre proteÃ§Ã£o.', hora: '14:00' },
       ],
       historico: [],
     },
@@ -74,7 +74,7 @@ export const SEED_STATE: TDBState = {
       voluntarioId: 2,
       dataAbertura: '2025-03-01',
       mensagens: [
-        { de: 'pessoa',     texto: 'Gostaria de saber sobre o programa de saúde bucal.',                              hora: '10:00' },
+        { de: 'pessoa',     texto: 'Gostaria de saber sobre o programa de saÃºde bucal.',                              hora: '10:00' },
         { de: 'voluntario', texto: 'O programa inclui consultas gratuitas nas escolas parceiras. Vou agendar.',       hora: '10:45' },
         { de: 'pessoa',     texto: 'Muito obrigada!',                                                                 hora: '11:00' },
       ],
@@ -100,8 +100,8 @@ export const SEED_STATE: TDBState = {
       voluntarioId: 3,
       dataAbertura: '2025-03-14',
       mensagens: [
-        { de: 'pessoa',     texto: 'Quero saber sobre acolhimento psicológico.',               hora: '16:30' },
-        { de: 'voluntario', texto: 'Claro! Podemos agendar uma sessão. Qual sua disponibilidade?', hora: '16:45' },
+        { de: 'pessoa',     texto: 'Quero saber sobre acolhimento psicolÃ³gico.',               hora: '16:30' },
+        { de: 'voluntario', texto: 'Claro! Podemos agendar uma sessÃ£o. Qual sua disponibilidade?', hora: '16:45' },
       ],
       historico: [
         { statusAnterior: 'Aberto', statusNovo: 'Aguardando', alteradoPor: 'Beatriz Nunes', dataHora: '2025-03-14 16:44' },

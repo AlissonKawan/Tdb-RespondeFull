@@ -1,4 +1,4 @@
-import { API_BASE_URL } from '../config/api';
+import { apiClient } from './apiClient';
 import type { CanalComunicacaoApi } from '../types/AtendimentoApi';
 
 const CANAIS_FALLBACK: CanalComunicacaoApi[] = [
@@ -30,14 +30,7 @@ function normalizarCanais(data: unknown): CanalComunicacaoApi[] {
 
 export async function listarCanais(): Promise<CanalComunicacaoApi[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/canais`, {
-      method: 'GET',
-      headers: { Accept: 'application/json' },
-    });
-
-    if (!response.ok) return CANAIS_FALLBACK;
-
-    const canais = normalizarCanais(await response.json());
+    const canais = normalizarCanais(await apiClient.get<unknown>('/canais'));
     return canais.length > 0 ? canais : CANAIS_FALLBACK;
   } catch {
     return CANAIS_FALLBACK;

@@ -29,7 +29,7 @@ public class AdminSeed {
     @ConfigProperty(name = "admin.seed.email", defaultValue = "admin@tdbresponde.com")
     String email;
 
-    @ConfigProperty(name = "admin.seed.password", defaultValue = "123456")
+    @ConfigProperty(name = "admin.seed.password", defaultValue = "")
     String password;
 
     @ConfigProperty(name = "admin.seed.name", defaultValue = "Administrador")

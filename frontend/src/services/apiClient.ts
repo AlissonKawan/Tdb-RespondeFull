@@ -23,6 +23,18 @@ function friendlyMessage(status: number, path: string) {
   return `Nao foi possivel concluir a chamada ${path}.`;
 }
 
+export async function extractErrorMessage(response: Response, fallback?: string) {
+  const text = await response.text();
+  if (!text.trim()) return fallback || friendlyMessage(response.status, response.url || 'da API');
+
+  try {
+    const data = JSON.parse(text) as Record<string, unknown>;
+    return String(data.mensagem ?? data.message ?? data.erro ?? data.error ?? data.detail ?? fallback ?? text);
+  } catch {
+    return text;
+  }
+}
+
 export async function request<T>(path: string, options: ApiRequestOptions = {}): Promise<T> {
   const { body, headers, ...requestOptions } = options;
 
@@ -80,6 +92,8 @@ export const apiClient = {
     request<T>(path, { ...options, method: 'POST', body }),
   put: <T>(path: string, body?: unknown, options?: ApiRequestOptions) =>
     request<T>(path, { ...options, method: 'PUT', body }),
+  patch: <T>(path: string, body?: unknown, options?: ApiRequestOptions) =>
+    request<T>(path, { ...options, method: 'PATCH', body }),
   del: <T>(path: string, options?: ApiRequestOptions) =>
     request<T>(path, { ...options, method: 'DELETE' }),
   delete: <T>(path: string, options?: ApiRequestOptions) =>

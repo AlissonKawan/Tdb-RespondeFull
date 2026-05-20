@@ -1,8 +1,18 @@
-# Projeto TDB Responde
+﻿# Projeto TDB Responde
 
 API REST desenvolvida em Java com Quarkus para gerenciar atendimentos, canais de comunicacao, especialidades e voluntarios do projeto TDB Responde.
 
 O projeto foi organizado para a entrega da Sprint 4 mantendo as camadas exigidas de `Resource`, `BO`, `DAO` e `Model`, com persistencia via JDBC manual e conexao Oracle gerenciada pelo Quarkus.
+
+## Publicacao No GitHub
+
+Este repositorio esta preparado para publicacao sem credenciais reais.
+
+- Nao versionar arquivos `.env`, `*.env`, `node_modules`, `target`, `dist` ou arquivos `.zip`.
+- Configurar credenciais somente por variaveis de ambiente, nunca direto no codigo.
+- Backend: usar `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `ADMIN_SEED_EMAIL` e `ADMIN_SEED_PASSWORD`.
+- Frontend: usar `VITE_API_URL` e, se houver IA publicada, `VITE_IA_API_URL`.
+- Os exemplos de SQL e README usam placeholders/dados demonstrativos.
 
 ## Tecnologias
 
@@ -34,15 +44,17 @@ O projeto nao utiliza JPA, Hibernate ou Panache nesta versao. Os DAOs continuam 
 A conexao com Oracle e configurada em `backend/src/main/resources/application.properties`:
 
 ```properties
+quarkus.http.host=0.0.0.0
+quarkus.http.port=${PORT:8080}
+
 quarkus.datasource.db-kind=oracle
 quarkus.datasource.jdbc.url=${DB_URL:jdbc:oracle:thin:@oracle.fiap.com.br:1521:orcl}
-quarkus.datasource.username=${DB_USERNAME:}
-quarkus.datasource.password=${DB_PASSWORD:}
+quarkus.datasource.username=${DB_USERNAME:SEU_RM}
+quarkus.datasource.password=${DB_PASSWORD:SUA_SENHA}
+
 quarkus.datasource.jdbc.max-size=8
 quarkus.datasource.jdbc.min-size=1
 quarkus.datasource.jdbc.acquisition-timeout=10S
-quarkus.datasource.jdbc.background-validation-interval=30S
-quarkus.datasource.jdbc.validation-query-sql=SELECT 1 FROM DUAL
 ```
 
 Antes de executar endpoints que acessam o banco, defina as variaveis de ambiente.
@@ -123,8 +135,8 @@ Cadastro:
 ```json
 {
   "nome": "Dra. Ana",
-  "email": "ana@email.com",
-  "senha": "123456",
+  "email": "ana@example.com",
+  "senha": "troque-esta-senha",
   "tipoUsuario": "VOLUNTARIO",
   "especialidadeId": 1,
   "motivoVoluntariado": "Quero contribuir com atendimento odontologico para pessoas que precisam."
@@ -138,8 +150,8 @@ Cadastro de beneficiario:
 ```json
 {
   "nome": "Ana Beneficiaria",
-  "email": "ana.beneficiaria@email.com",
-  "senha": "123456",
+  "email": "ana.beneficiaria@example.com",
+  "senha": "troque-esta-senha",
   "tipoUsuario": "BENEFICIARIO",
   "telefone": "11999999999"
 }
@@ -153,8 +165,8 @@ Login:
 
 ```json
 {
-  "email": "ana@email.com",
-  "senha": "123456"
+  "email": "ana@example.com",
+  "senha": "troque-esta-senha"
 }
 ```
 
@@ -164,7 +176,7 @@ Resposta de sucesso:
 {
   "id": 1,
   "nome": "Dra. Ana",
-  "email": "ana@email.com",
+  "email": "ana@example.com",
   "tipoUsuario": "VOLUNTARIO",
   "ativo": true,
   "dataCriacao": "2026-05-11T20:30:00"
@@ -199,7 +211,7 @@ Request de atualizacao:
 ```json
 {
   "nome": "Dra. Ana Silva",
-  "email": "ana.silva@email.com",
+  "email": "ana.silva@example.com",
   "tipoUsuario": "VOLUNTARIO",
   "ativo": true
 }
@@ -281,7 +293,7 @@ Request:
 {
   "nome": "Dra. Ana",
   "usuario": "ana.odonto",
-  "senha": "123456",
+  "senha": "troque-esta-senha",
   "acessoSigilo": true,
   "disponivel": true,
   "motivoVoluntariado": "Quero ajudar pessoas que precisam de atendimento.",
@@ -449,7 +461,7 @@ Criar voluntario:
 ```powershell
 curl -X POST http://localhost:8080/voluntarios `
   -H "Content-Type: application/json" `
-  -d '{"nome":"Dra. Ana","usuario":"ana.odonto","senha":"123456","acessoSigilo":true,"disponivel":true,"especialidadeId":1}'
+  -d '{"nome":"Dra. Ana","usuario":"ana.odonto","senha":"troque-esta-senha","acessoSigilo":true,"disponivel":true,"especialidadeId":1}'
 ```
 
 Criar conta de voluntario para login:
@@ -457,7 +469,7 @@ Criar conta de voluntario para login:
 ```powershell
 curl -X POST http://localhost:8080/auth/register `
   -H "Content-Type: application/json" `
-  -d '{"nome":"Dra. Ana","email":"ana@email.com","senha":"123456","tipoUsuario":"VOLUNTARIO","especialidadeId":1,"motivoVoluntariado":"Quero contribuir com atendimento odontologico para pessoas que precisam."}'
+  -d '{"nome":"Dra. Ana","email":"ana@example.com","senha":"troque-esta-senha","tipoUsuario":"VOLUNTARIO","especialidadeId":1,"motivoVoluntariado":"Quero contribuir com atendimento odontologico para pessoas que precisam."}'
 ```
 
 Antes da aprovacao, o login deve falhar:
@@ -465,7 +477,7 @@ Antes da aprovacao, o login deve falhar:
 ```powershell
 curl -X POST http://localhost:8080/auth/login `
   -H "Content-Type: application/json" `
-  -d '{"email":"ana@email.com","senha":"123456"}'
+  -d '{"email":"ana@example.com","senha":"troque-esta-senha"}'
 ```
 
 Aprovar voluntario:
@@ -479,7 +491,7 @@ Depois da aprovacao, o login deve funcionar:
 ```powershell
 curl -X POST http://localhost:8080/auth/login `
   -H "Content-Type: application/json" `
-  -d '{"email":"ana@email.com","senha":"123456"}'
+  -d '{"email":"ana@example.com","senha":"troque-esta-senha"}'
 ```
 
 Testar email duplicado:
@@ -487,7 +499,7 @@ Testar email duplicado:
 ```powershell
 curl -X POST http://localhost:8080/auth/register `
   -H "Content-Type: application/json" `
-  -d '{"nome":"Ana Duplicada","email":"ana@email.com","senha":"123456","tipoUsuario":"VOLUNTARIO"}'
+  -d '{"nome":"Ana Duplicada","email":"ana@example.com","senha":"troque-esta-senha","tipoUsuario":"VOLUNTARIO"}'
 ```
 
 Testar senha incorreta:
@@ -495,7 +507,7 @@ Testar senha incorreta:
 ```powershell
 curl -X POST http://localhost:8080/auth/login `
   -H "Content-Type: application/json" `
-  -d '{"email":"ana@email.com","senha":"errada"}'
+  -d '{"email":"ana@example.com","senha":"errada"}'
 ```
 
 Testar email inexistente:
@@ -503,7 +515,7 @@ Testar email inexistente:
 ```powershell
 curl -X POST http://localhost:8080/auth/login `
   -H "Content-Type: application/json" `
-  -d '{"email":"naoexiste@email.com","senha":"123456"}'
+  -d '{"email":"naoexiste@example.com","senha":"troque-esta-senha"}'
 ```
 
 Testar validacoes:
@@ -511,11 +523,11 @@ Testar validacoes:
 ```powershell
 curl -X POST http://localhost:8080/auth/register `
   -H "Content-Type: application/json" `
-  -d '{"nome":"Ana","email":"email-invalido","senha":"123456","tipoUsuario":"VOLUNTARIO"}'
+  -d '{"nome":"Ana","email":"email-invalido","senha":"troque-esta-senha","tipoUsuario":"VOLUNTARIO"}'
 
 curl -X POST http://localhost:8080/auth/register `
   -H "Content-Type: application/json" `
-  -d '{"nome":"Ana","email":"ana2@email.com","senha":"123","tipoUsuario":"VOLUNTARIO"}'
+  -d '{"nome":"Ana","email":"ana2@example.com","senha":"123","tipoUsuario":"VOLUNTARIO"}'
 ```
 
 Verificar no banco que a senha nao esta em texto puro:
@@ -523,7 +535,7 @@ Verificar no banco que a senha nao esta em texto puro:
 ```sql
 SELECT ID_CONTA, EMAIL, SENHA_HASH
 FROM T_CONTA_USUARIO
-WHERE EMAIL = 'ana@email.com';
+WHERE EMAIL = 'ana@example.com';
 ```
 
 O valor de `SENHA_HASH` deve iniciar com `PBKDF2$` e nao deve ser igual a senha digitada.
@@ -596,7 +608,7 @@ Criar beneficiario:
 ```powershell
 curl -X POST http://localhost:8080/auth/register `
   -H "Content-Type: application/json" `
-  -d '{"nome":"Ana Beneficiaria","email":"ana.beneficiaria@email.com","senha":"123456","tipoUsuario":"BENEFICIARIO"}'
+  -d '{"nome":"Ana Beneficiaria","email":"ana.beneficiaria@example.com","senha":"troque-esta-senha","tipoUsuario":"BENEFICIARIO"}'
 ```
 
 Fazer login:
@@ -604,7 +616,7 @@ Fazer login:
 ```powershell
 curl -X POST http://localhost:8080/auth/login `
   -H "Content-Type: application/json" `
-  -d '{"email":"ana.beneficiaria@email.com","senha":"123456"}'
+  -d '{"email":"ana.beneficiaria@example.com","senha":"troque-esta-senha"}'
 ```
 
 Solicitar atendimento:

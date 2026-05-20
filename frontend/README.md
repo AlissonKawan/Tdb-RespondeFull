@@ -28,9 +28,31 @@ Crie um arquivo `.env` na raiz do projeto quando precisar apontar para outra API
 
 ```env
 VITE_API_URL=http://localhost:8080
+VITE_IA_API_URL=http://localhost:5000
 ```
 
-Se a variavel nao existir, o front usa `http://localhost:8080`.
+Se as variaveis nao existirem, o front usa `http://localhost:8080` para a API Java e `http://localhost:5000` para a API de IA. A tela continua funcionando mesmo se a API de IA nao estiver disponivel.
+
+## Deploy na Vercel
+
+Configure o projeto na Vercel com:
+
+- Framework Preset: Vite
+- Build Command: `npm run build`
+- Output Directory: `dist`
+
+Variaveis de ambiente:
+
+```env
+VITE_API_URL=https://URL-DO-BACKEND
+VITE_IA_API_URL=https://URL-DA-IA
+```
+
+`VITE_IA_API_URL` so precisa ser configurada se a API de IA estiver publicada.
+
+O back-end Java/Quarkus precisa estar publicado antes do deploy do front consumir dados reais. Libere CORS no Quarkus para a URL final da Vercel, por exemplo `https://seu-projeto.vercel.app`, alem do ambiente local usado em desenvolvimento.
+
+O arquivo `vercel.json` inclui rewrite para SPA, permitindo atualizar diretamente rotas do React Router como `/login`, `/integrantes`, `/solucao`, `/roadmap` e `/atendimentos/:id`.
 
 ## Como rodar o back-end
 
@@ -53,7 +75,10 @@ Autenticacao e portal:
 - `GET /atendimentos/solicitados`
 - `GET /atendimentos/voluntario/{voluntarioId}`
 - `GET /atendimentos/beneficiario/{beneficiarioId}`
+- `GET /atendimentos/beneficiario/conta/{contaId}`
 - `POST /atendimentos/solicitar`
+- `PUT /atendimentos/{atendimentoId}/assumir`
+- `PUT /atendimentos/{atendimentoId}/status-prioridade`
 - `GET /atendimentos/{id}`
 - `GET /atendimentos/{atendimentoId}/mensagens`
 - `POST /atendimentos/{atendimentoId}/mensagens`
@@ -82,6 +107,7 @@ Services administrativos ainda existentes:
 - Contato
 - Integrantes
 - Solucao
+- Alias `/solucao` para a pagina de solucao do projeto
 - Login
 - Portal do Beneficiario
 - Cadastro de Beneficiario
@@ -114,9 +140,7 @@ Services administrativos ainda existentes:
 - Chat do atendimento chama `GET /atendimentos/{atendimentoId}/mensagens` e `POST /atendimentos/{atendimentoId}/mensagens`.
 - A tela `/voluntarios/pendentes` chama `GET /voluntarios/pendentes` e `PUT /voluntarios/{id}/aprovar`.
 - `PUT /voluntarios/{id}/aprovar` pode retornar `204 No Content`; o `apiClient` trata resposta vazia sem tentar ler JSON.
-- O botao "Assumir atendimento" esta preparado, mas aguarda o back-end expor um endpoint especifico.
-
-Endpoint recomendado para assumir atendimento:
+- O botao "Assumir atendimento" chama o endpoint existente no back-end:
 
 ```http
 PUT /atendimentos/{atendimentoId}/assumir

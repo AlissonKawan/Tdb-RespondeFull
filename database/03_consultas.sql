@@ -1,13 +1,13 @@
--- ============================================================
+﻿-- ============================================================
 -- TDB RESPONDE - SCRIPT SQL ORACLE - ESTRUTURA CORRIGIDA / ALINHADA
--- Versão: arquitetura com T_CONTA_USUARIO como tabela central de autenticação
--- ATENÇÃO: este script APAGA e RECRIA as tabelas listadas abaixo.
+-- VersÃ£o: arquitetura com T_CONTA_USUARIO como tabela central de autenticaÃ§Ã£o
+-- ATENÃ‡ÃƒO: este script APAGA e RECRIA as tabelas listadas abaixo.
 -- ============================================================
 
 -- ============================================================
 -- APAGANDO AS TABELAS
 -- Ordem pensada para evitar erro de chave estrangeira.
--- Os blocos abaixo ignoram erro caso a tabela ainda não exista.
+-- Os blocos abaixo ignoram erro caso a tabela ainda nÃ£o exista.
 -- ============================================================
 
 BEGIN
@@ -147,13 +147,13 @@ CREATE TABLE ESPECIALIDADE (
 -- VOLUNTARIO
 -- Regra principal:
 -- - Login, email, senha e tipo ficam em T_CONTA_USUARIO.
--- - VOLUNTARIO guarda dados específicos do voluntário.
--- - ID_CONTA faz a ligação 1:1 com T_CONTA_USUARIO.
+-- - VOLUNTARIO guarda dados especÃ­ficos do voluntÃ¡rio.
+-- - ID_CONTA faz a ligaÃ§Ã£o 1:1 com T_CONTA_USUARIO.
 --
--- Observação:
+-- ObservaÃ§Ã£o:
 -- USUARIO e SENHA foram mantidos como campos LEGADOS/compatibilidade,
 -- porque seu backend antigo pode ainda referenciar essas colunas.
--- A autenticação oficial deve usar T_CONTA_USUARIO.EMAIL + SENHA_HASH.
+-- A autenticaÃ§Ã£o oficial deve usar T_CONTA_USUARIO.EMAIL + SENHA_HASH.
 -- ============================================================
 
 CREATE TABLE VOLUNTARIO (
@@ -163,7 +163,7 @@ CREATE TABLE VOLUNTARIO (
     -- Campo de perfil/compatibilidade. Preferencialmente manter igual ao nome da conta.
     NOME                  VARCHAR2(100) NOT NULL,
 
-    -- Campos legados. Não usar como fonte principal de login.
+    -- Campos legados. NÃ£o usar como fonte principal de login.
     USUARIO               VARCHAR2(50),
     SENHA                 VARCHAR2(255),
 
@@ -200,8 +200,8 @@ CREATE TABLE PESSOA_ATENDIDA (
 );
 
 -- ============================================================
--- ESPECIALIZAÇÕES DE PESSOA ATENDIDA
--- São tabelas-filhas de PESSOA_ATENDIDA.
+-- ESPECIALIZAÃ‡Ã•ES DE PESSOA ATENDIDA
+-- SÃ£o tabelas-filhas de PESSOA_ATENDIDA.
 -- ============================================================
 
 CREATE TABLE CRIANCA_ADOLESCENTE (
@@ -239,9 +239,9 @@ CREATE TABLE MULHER_APOLONIA (
 
 -- ============================================================
 -- ATENDIMENTO
--- Núcleo operacional do sistema.
+-- NÃºcleo operacional do sistema.
 -- VOLUNTARIO_ID pode ser nulo, porque um atendimento pode ser aberto
--- antes de ser assumido por um voluntário.
+-- antes de ser assumido por um voluntÃ¡rio.
 -- ============================================================
 
 CREATE TABLE ATENDIMENTO (
@@ -289,7 +289,7 @@ CREATE TABLE MENSAGEM (
     CONSTRAINT CK_MSG_ENVIADO_POR CHECK (ENVIADO_POR IN ('BENEFICIARIO', 'VOLUNTARIO', 'ADMIN', 'SISTEMA'))
 );
 
--- Esta tabela só é necessária se uma mensagem puder estar associada
+-- Esta tabela sÃ³ Ã© necessÃ¡ria se uma mensagem puder estar associada
 -- a mais de um canal. Mantive para compatibilidade com sua modelagem atual.
 CREATE TABLE MENSAGEM_CANAL (
     MENSAGEM_ID  NUMBER NOT NULL,
@@ -347,8 +347,8 @@ CREATE TABLE VOLUNTARIO_ESPECIALIDADE (
 );
 
 -- ============================================================
--- ÍNDICES AUXILIARES
--- PK e UK já criam índices automaticamente.
+-- ÃNDICES AUXILIARES
+-- PK e UK jÃ¡ criam Ã­ndices automaticamente.
 -- Estes abaixo ajudam nas consultas com JOIN/FK.
 -- ============================================================
 
@@ -360,9 +360,9 @@ CREATE INDEX IDX_HIST_AT ON HISTORICO_STATUS (ATENDIMENTO_ID);
 CREATE INDEX IDX_HIST_VOL ON HISTORICO_STATUS (ALTERADO_POR_ID);
 
 -- ============================================================
--- VIEW ÚTIL PARA O BACKEND/FRONT
--- Junta dados da conta com dados específicos do voluntário.
--- Pode facilitar tela de admin, listagem de voluntários e aprovação.
+-- VIEW ÃšTIL PARA O BACKEND/FRONT
+-- Junta dados da conta com dados especÃ­ficos do voluntÃ¡rio.
+-- Pode facilitar tela de admin, listagem de voluntÃ¡rios e aprovaÃ§Ã£o.
 -- ============================================================
 
 CREATE OR REPLACE VIEW VW_VOLUNTARIO_COMPLETO AS
@@ -384,21 +384,21 @@ JOIN T_CONTA_USUARIO C
     ON C.ID_CONTA = V.ID_CONTA;
 
 -- ============================================================
--- COMENTÁRIOS DE DOCUMENTAÇÃO DO MODELO
+-- COMENTÃRIOS DE DOCUMENTAÃ‡ÃƒO DO MODELO
 -- ============================================================
 
-COMMENT ON TABLE T_CONTA_USUARIO IS 'Tabela central de autenticação e controle de tipo de usuário.';
-COMMENT ON TABLE VOLUNTARIO IS 'Perfil específico do voluntário. Login oficial fica em T_CONTA_USUARIO.';
-COMMENT ON TABLE PESSOA_ATENDIDA IS 'Pessoa beneficiária/atendida pelo sistema.';
-COMMENT ON TABLE ATENDIMENTO IS 'Registro principal de atendimento entre pessoa atendida, canal e voluntário.';
+COMMENT ON TABLE T_CONTA_USUARIO IS 'Tabela central de autenticaÃ§Ã£o e controle de tipo de usuÃ¡rio.';
+COMMENT ON TABLE VOLUNTARIO IS 'Perfil especÃ­fico do voluntÃ¡rio. Login oficial fica em T_CONTA_USUARIO.';
+COMMENT ON TABLE PESSOA_ATENDIDA IS 'Pessoa beneficiÃ¡ria/atendida pelo sistema.';
+COMMENT ON TABLE ATENDIMENTO IS 'Registro principal de atendimento entre pessoa atendida, canal e voluntÃ¡rio.';
 COMMENT ON TABLE MENSAGEM IS 'Mensagens vinculadas aos atendimentos.';
-COMMENT ON TABLE MENSAGEM_CANAL IS 'Associação entre mensagem e canal. Mantida caso uma mensagem precise estar ligada a múltiplos canais.';
+COMMENT ON TABLE MENSAGEM_CANAL IS 'AssociaÃ§Ã£o entre mensagem e canal. Mantida caso uma mensagem precise estar ligada a mÃºltiplos canais.';
 
-COMMENT ON COLUMN VOLUNTARIO.USUARIO IS 'Campo legado. Preferencialmente não usar para autenticação.';
-COMMENT ON COLUMN VOLUNTARIO.SENHA IS 'Campo legado. Preferencialmente não usar para autenticação. Usar T_CONTA_USUARIO.SENHA_HASH.';
+COMMENT ON COLUMN VOLUNTARIO.USUARIO IS 'Campo legado. Preferencialmente nÃ£o usar para autenticaÃ§Ã£o.';
+COMMENT ON COLUMN VOLUNTARIO.SENHA IS 'Campo legado. Preferencialmente nÃ£o usar para autenticaÃ§Ã£o. Usar T_CONTA_USUARIO.SENHA_HASH.';
 
 -- ============================================================
--- CONSULTAS DE VALIDAÇÃO
+-- CONSULTAS DE VALIDAÃ‡ÃƒO
 -- Rode depois para conferir se tudo foi criado.
 -- ============================================================
 
