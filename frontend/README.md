@@ -44,13 +44,13 @@ Configure o projeto na Vercel com:
 Variaveis de ambiente:
 
 ```env
-VITE_API_URL=https://URL-DO-BACKEND
+VITE_API_URL=https://tdb-respondefull.onrender.com
 VITE_IA_API_URL=https://URL-DA-IA
 ```
 
 `VITE_IA_API_URL` so precisa ser configurada se a API de IA estiver publicada.
 
-O back-end Java/Quarkus precisa estar publicado antes do deploy do front consumir dados reais. Libere CORS no Quarkus para a URL final da Vercel, por exemplo `https://seu-projeto.vercel.app`, alem do ambiente local usado em desenvolvimento.
+O back-end Java/Quarkus precisa estar publicado antes do deploy do front consumir dados reais. Nesta entrega, o back-end esta em `https://tdb-respondefull.onrender.com/`. Libere CORS no Quarkus para a URL final da Vercel, `https://tdb-responde-full.vercel.app`, alem do ambiente local usado em desenvolvimento.
 
 O arquivo `vercel.json` inclui rewrite para SPA, permitindo atualizar diretamente rotas do React Router como `/login`, `/integrantes`, `/solucao`, `/roadmap` e `/atendimentos/:id`.
 
@@ -154,5 +154,6 @@ Content-Type: application/json
 ## Links
 
 - GitHub: https://github.com/AlissonKawan/Tdb-RespondeFull.git
-- Vercel: preencher com a URL do deploy
+- Frontend Vercel: https://tdb-responde-full.vercel.app/login
+- Backend Render: https://tdb-respondefull.onrender.com/
 - YouTube: preencher com a URL do video
