@@ -1,86 +1,162 @@
-﻿# Backend
+# TDB Responde - Back-end Java
 
-API Java do Projeto TDB Responde.
+## Descricao
 
-## Java
+API REST desenvolvida em Java com Quarkus para o projeto TDB Responde, solucao criada para apoiar o atendimento social, conectando pessoas atendidas, voluntarios e administradores.
 
-Use Java 21 LTS. Evite rodar o backend com Java 26, porque o projeto foi ajustado e validado para Java 21.
+## Repositorio GitHub
 
-No PowerShell, confira a versao ativa:
+Repositorio do projeto:
+https://github.com/AlissonKawan/Tdb-RespondeFull/tree/Alisson/backend
 
-```powershell
-java -version
-```
+## API publicada
 
-No IntelliJ, selecione um JDK 21 em `File > Project Structure > Project SDK` e tambÃ©m em `Settings > Build, Execution, Deployment > Build Tools > Maven > JDK for importer`.
+https://tdb-respondefull.onrender.com
 
-## Banco Oracle
+## Tecnologias utilizadas
 
-A conexao fica centralizada em `src/main/resources/application.properties`.
+- Java 21
+- Quarkus
+- Maven
+- Oracle SQL
+- JDBC
+- API REST
+- Git e GitHub
 
-URL padrao:
+## Estrutura do back-end
+
+- `model`: classes de modelo do dominio, como `Atendimento`, `Voluntario`, `PessoaAtendida`, `Mensagem` e `Especialidade`.
+- `dao`: classes de acesso ao banco de dados Oracle usando JDBC.
+- `bo`: regras de negocio da aplicacao, como cadastro, login, atendimento, voluntarios e mensagens.
+- `resource`: endpoints REST expostos pela API Quarkus.
+- `dto`: objetos de entrada e saida da API.
+- `exception`: excecoes customizadas e mappers de erro HTTP.
+- `config`: configuracoes auxiliares do projeto, incluindo seed opcional de administrador.
+- `security`: utilitarios de seguranca, como hash e validacao de senha.
+
+## Funcionalidades principais
+
+- Autenticacao de usuarios
+- Cadastro e consulta de voluntarios
+- Aprovacao de voluntarios
+- Cadastro e consulta de pessoas atendidas
+- Registro e acompanhamento de atendimentos
+- Envio e consulta de mensagens
+- Consulta de especialidades
+- Consulta de canais de comunicacao
+
+## Endpoints principais
+
+| Metodo HTTP | Endpoint | Descricao |
+|---|---|---|
+| GET | `/ping` | Verifica se a API esta respondendo. |
+| GET | `/health/db` | Verifica a conexao com o banco de dados. |
+| POST | `/auth/login` | Autentica um usuario. |
+| POST | `/auth/register` | Cadastra usuario voluntario ou beneficiario. |
+| GET | `/usuarios` | Lista usuarios cadastrados. |
+| GET | `/usuarios/{id}` | Busca usuario por ID. |
+| PUT | `/usuarios/{id}` | Atualiza dados de usuario. |
+| DELETE | `/usuarios/{id}` | Desativa usuario. |
+| GET | `/voluntarios` | Lista voluntarios. |
+| GET | `/voluntarios/pendentes` | Lista voluntarios pendentes de aprovacao. |
+| GET | `/voluntarios/ativos` | Lista voluntarios ativos. |
+| GET | `/voluntarios/{id}` | Busca voluntario por ID. |
+| POST | `/voluntarios` | Cadastra voluntario. |
+| PUT | `/voluntarios/{id}` | Atualiza voluntario. |
+| PUT | `/voluntarios/{id}/aprovar` | Aprova cadastro de voluntario. |
+| DELETE | `/voluntarios/{id}` | Exclui voluntario. |
+| GET | `/especialidades` | Lista especialidades. |
+| GET | `/especialidades/{id}` | Busca especialidade por ID. |
+| POST | `/especialidades` | Cadastra especialidade. |
+| PUT | `/especialidades/{id}` | Atualiza especialidade. |
+| DELETE | `/especialidades/{id}` | Exclui especialidade. |
+| GET | `/canais` | Lista canais de comunicacao. |
+| GET | `/canais/{id}` | Busca canal de comunicacao por ID. |
+| POST | `/canais` | Cadastra canal de comunicacao. |
+| PUT | `/canais/{id}` | Atualiza canal de comunicacao. |
+| DELETE | `/canais/{id}` | Exclui canal de comunicacao. |
+| GET | `/atendimentos` | Lista atendimentos. |
+| GET | `/atendimentos/solicitados` | Lista atendimentos solicitados ou em aberto. |
+| GET | `/atendimentos/voluntario/{voluntarioId}` | Lista atendimentos por voluntario. |
+| GET | `/atendimentos/beneficiario/{beneficiarioId}` | Lista atendimentos por beneficiario. |
+| GET | `/atendimentos/beneficiario/conta/{contaId}` | Lista atendimentos por conta de beneficiario. |
+| GET | `/atendimentos/em-andamento` | Lista atendimentos em andamento. |
+| GET | `/atendimentos/encerrados` | Lista atendimentos encerrados. |
+| POST | `/atendimentos` | Cadastra atendimento. |
+| POST | `/atendimentos/solicitar` | Solicita atendimento para beneficiario. |
+| POST | `/atendimentos/relatar` | Registra relato de situacao. |
+| GET | `/atendimentos/{id}` | Busca atendimento por ID. |
+| PUT | `/atendimentos/{id}` | Atualiza atendimento. |
+| PUT | `/atendimentos/{id}/status-prioridade` | Atualiza status e prioridade do atendimento. |
+| PUT | `/atendimentos/{id}/encerrar` | Encerra atendimento. |
+| PUT | `/atendimentos/{id}/assumir` | Permite que voluntario assuma atendimento. |
+| DELETE | `/atendimentos/{id}` | Exclui atendimento. |
+| GET | `/atendimentos/{id}/mensagens` | Lista mensagens de um atendimento. |
+| POST | `/atendimentos/{id}/mensagens` | Envia mensagem em um atendimento. |
+| GET | `/mensagens/{id}` | Busca mensagem por ID. |
+| GET | `/mensagens/atendimento/{atendimentoId}` | Lista mensagens por atendimento. |
+| POST | `/mensagens` | Cadastra mensagem. |
+
+## Variaveis de ambiente
+
+Para rodar o projeto, configure as variaveis de ambiente abaixo:
+
+- `DB_URL`: URL JDBC do banco Oracle.
+- `DB_USERNAME`: usuario do banco Oracle.
+- `DB_PASSWORD`: senha do banco Oracle.
+- `PORT`: porta HTTP usada no deploy, quando necessario.
+
+Exemplo:
 
 ```properties
-jdbc:oracle:thin:@oracle.fiap.com.br:1521:orcl
+DB_URL=jdbc:oracle:thin:@oracle.fiap.com.br:1521:orcl
+DB_USERNAME=SEU_RM
+DB_PASSWORD=SUA_SENHA
+PORT=8080
 ```
 
-Defina usuario e senha por variaveis de ambiente quando quiser sobrescrever os valores locais:
+## Como executar localmente
 
-```powershell
-$env:DB_USERNAME="seu_rm"
-$env:DB_PASSWORD="sua_senha"
-$env:DB_URL="jdbc:oracle:thin:@oracle.fiap.com.br:1521:orcl"
+1. Entrar na pasta `backend`:
+
+```bash
+cd backend
 ```
 
-## Como executar
-
-Use os comandos Maven a partir desta pasta:
+2. Rodar em modo desenvolvimento:
 
 ```bash
 mvn quarkus:dev
 ```
 
-## Testar Conexao
+3. Gerar build:
 
-Com o backend rodando, teste primeiro:
-
-```http
-GET http://localhost:8080/health/db
+```bash
+mvn clean package -DskipTests
 ```
 
-Resposta esperada:
+4. Testar a API:
 
-```json
-{
-  "status": "ok",
-  "database": "connected"
-}
+```text
+http://localhost:8080/ping
 ```
 
-## Admin Inicial
+## Banco de dados
 
-O admin inicial pode ser criado ou atualizado no startup apenas em ambiente local/dev.
-Esse seed fica desligado por padrao para nao sobrescrever senha em producao.
+A API utiliza Oracle SQL com acesso via JDBC. Antes de executar endpoints que dependem de persistencia, as tabelas precisam estar criadas conforme os scripts da pasta `database/` do projeto.
 
-PowerShell:
+Ordem recomendada dos scripts:
 
-```powershell
-$env:ADMIN_SEED_EMAIL="admin@tdbresponde.com"
-$env:ADMIN_SEED_PASSWORD="troque-esta-senha"
-mvn quarkus:dev
+```text
+01_drop_tables.sql
+02_create_tables.sql
+03_insert_data.sql
+04_updates_deletes.sql
+05_relatorios.sql
 ```
 
-Depois que o log confirmar o admin, desligue o seed:
+## Integrantes
 
-```powershell
-Remove-Item Env:ADMIN_SEED_ENABLED
-```
-
-Login para teste:
-
-```json
-{
-  "email": "admin@tdbresponde.com",
-  "senha": "troque-esta-senha"
-}
-```
+- Alisson Kawan - RM: 567598 - GitHub: https://github.com/AlissonKawan - LinkedIn: https://www.linkedin.com/in/AlissonKawan
+- Marcos Vinicius - RM: 567214 - GitHub: https://github.com/marcos-thebest - LinkedIn: https://www.linkedin.com/in/marcos-vinicius-de-jesus-almeida/
+- Eduardo Boni - RM: 567236 - GitHub: https://github.com/bonieduardo75 - LinkedIn: https://www.linkedin.com/in/eduardo-boni-b6b851310
