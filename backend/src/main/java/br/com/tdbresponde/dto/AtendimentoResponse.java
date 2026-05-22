@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 
 public class AtendimentoResponse {
 
+
     public int id;
     public Integer pessoaAtendidaId;
     public Integer beneficiarioId;
@@ -24,6 +25,8 @@ public class AtendimentoResponse {
     public LocalDate dataEncerramento;
     public String statusCheckin;
     public LocalDateTime horarioEnvioCheckin;
+    public String previsaoCheckin;
+    public Double confiancaCheckin;
 
     public static AtendimentoResponse from(Atendimento atendimento) {
         AtendimentoResponse response = new AtendimentoResponse();
@@ -50,6 +53,17 @@ public class AtendimentoResponse {
         response.dataEncerramento = atendimento.getDataEncerramento();
         response.statusCheckin = atendimento.getStatusCheckin();
         response.horarioEnvioCheckin = atendimento.getHorarioEnvioCheckin();
+        return response;
+    }
+
+    /**
+     * Versao enriquecida com previsao da IA.
+     * Usa o factory padrao e depois injeta os campos extras calculados pelo BO.
+     */
+    public static AtendimentoResponse from(Atendimento atendimento, String previsaoCheckin, Double confiancaCheckin) {
+        AtendimentoResponse response = from(atendimento);
+        response.previsaoCheckin = previsaoCheckin;
+        response.confiancaCheckin = confiancaCheckin;
         return response;
     }
 }

@@ -6,6 +6,7 @@ import br.com.tdbresponde.dto.AtendimentoAtualizacaoRequest;
 import br.com.tdbresponde.dto.AtendimentoRequest;
 import br.com.tdbresponde.dto.AtendimentoResponse;
 import br.com.tdbresponde.dto.AssumirAtendimentoRequest;
+import br.com.tdbresponde.dto.CheckinPrevisaoResponse;
 import br.com.tdbresponde.dto.CheckinRequest;
 import br.com.tdbresponde.dto.EncerrarAtendimentoRequest;
 import br.com.tdbresponde.dto.MensagemRequest;
@@ -111,8 +112,12 @@ public class AtendimentoResource {
     @GET
     @Path("/{id}")
     public Response buscarPorId(@PathParam("id") int id) {
-        Atendimento atendimento = bo.buscarPorId(id);
-        return Response.ok(AtendimentoResponse.from(atendimento)).build();
+        CheckinPrevisaoResponse[] holder = new CheckinPrevisaoResponse[1];
+        Atendimento atendimento = bo.buscarPorIdComPrevisao(id, holder);
+        CheckinPrevisaoResponse previsao = holder[0];
+        String prevStr = previsao != null ? previsao.previsaoCheckin : null;
+        Double conf = previsao != null ? previsao.confiancaCheckin : null;
+        return Response.ok(AtendimentoResponse.from(atendimento, prevStr, conf)).build();
     }
 
     @GET
@@ -178,8 +183,12 @@ public class AtendimentoResource {
     @PUT
     @Path("/{id}/checkin")
     public Response atualizarCheckin(@PathParam("id") int id, CheckinRequest request) {
-        Atendimento atendimento = bo.atualizarCheckin(id, request);
-        return Response.ok(AtendimentoResponse.from(atendimento)).build();
+        CheckinPrevisaoResponse[] holder = new CheckinPrevisaoResponse[1];
+        Atendimento atendimento = bo.atualizarCheckinComPrevisao(id, request, holder);
+        CheckinPrevisaoResponse previsao = holder[0];
+        String prevStr = previsao != null ? previsao.previsaoCheckin : null;
+        Double conf = previsao != null ? previsao.confiancaCheckin : null;
+        return Response.ok(AtendimentoResponse.from(atendimento, prevStr, conf)).build();
     }
 
     @DELETE

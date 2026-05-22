@@ -50,6 +50,8 @@ export interface AtendimentoApi {
   usuario?: AtendimentoUsuarioResumo | null;
   statusCheckin?: StatusCheckin;
   horarioEnvioCheckin?: string;
+  previsaoCheckin?: StatusCheckin | string;
+  confiancaCheckin?: number;
 }
 
 export interface SolicitarAtendimentoRequest {

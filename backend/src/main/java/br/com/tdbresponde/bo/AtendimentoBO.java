@@ -7,8 +7,10 @@ import br.com.tdbresponde.dao.HistoricoStatusDAO;
 import br.com.tdbresponde.dao.MulherApoloniaDAO;
 import br.com.tdbresponde.dao.PessoaAtendidaDAO;
 import br.com.tdbresponde.dao.VoluntarioDAO;
+import br.com.tdbresponde.config.IaClient;
 import br.com.tdbresponde.dto.AtendimentoRequest;
 import br.com.tdbresponde.dto.AtendimentoAtualizacaoRequest;
+import br.com.tdbresponde.dto.CheckinPrevisaoResponse;
 import br.com.tdbresponde.dto.CheckinRequest;
 import br.com.tdbresponde.dto.RelatarSituacaoRequest;
 import br.com.tdbresponde.dto.RelatarSituacaoResponse;
@@ -56,6 +58,9 @@ public class AtendimentoBO {
     @Inject
     VoluntarioDAO voluntarioDAO;
 
+    @Inject
+    IaClient iaClient;
+
     public List<Atendimento> listar() {
         return atendimentoDAO.buscarTodos();
     }
@@ -97,6 +102,19 @@ public class AtendimentoBO {
         Atendimento atendimento = atendimentoDAO.buscarPorId(id);
         if (atendimento == null) {
             throw new NotFoundException("Atendimento nao encontrado");
+        }
+        return atendimento;
+    }
+
+    /**
+     * Busca o atendimento por ID e enriquece com a previsao da IA.
+     * Retorna null para previsao caso a IA esteja offline.
+     */
+    public Atendimento buscarPorIdComPrevisao(int id, CheckinPrevisaoResponse[] previsaoHolder) {
+        Atendimento atendimento = buscarPorId(id);
+        CheckinPrevisaoResponse previsao = iaClient.preverCheckin(atendimento);
+        if (previsaoHolder != null && previsaoHolder.length > 0) {
+            previsaoHolder[0] = previsao;
         }
         return atendimento;
     }
@@ -257,6 +275,18 @@ public class AtendimentoBO {
         atendimentoDAO.atualizarCheckin(id, novoStatus, horarioEnvio);
 
         return buscarPorId(id);
+    }
+
+    /**
+     * Atualiza o checkin e retorna o atendimento ja enriquecido com a previsao da IA.
+     */
+    public Atendimento atualizarCheckinComPrevisao(int id, CheckinRequest request, CheckinPrevisaoResponse[] holder) {
+        Atendimento atendimento = atualizarCheckin(id, request);
+        CheckinPrevisaoResponse previsao = iaClient.preverCheckin(atendimento);
+        if (holder != null && holder.length > 0) {
+            holder[0] = previsao;
+        }
+        return atendimento;
     }
 
     // Metodo: Calcular prioridade automaticamente

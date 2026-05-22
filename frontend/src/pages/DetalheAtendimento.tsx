@@ -87,6 +87,18 @@ function labelStatusCheckin(status?: string) {
   return status ? labels[status] ?? status : 'Nao enviado';
 }
 
+function iaPrevisaoConfig(previsao?: string) {
+  if (!previsao) return null;
+  const map: Record<string, { cor: string; bg: string; border: string; icone: string }> = {
+    CONFIRMADO:               { cor: 'text-emerald-800', bg: 'bg-emerald-50',  border: 'border-emerald-200', icone: 'V' },
+    NAO_COMPARECERA:          { cor: 'text-red-800',     bg: 'bg-red-50',      border: 'border-red-200',     icone: 'X' },
+    REAGENDAMENTO_SOLICITADO: { cor: 'text-amber-800',   bg: 'bg-amber-50',    border: 'border-amber-200',   icone: '~' },
+    SEM_RESPOSTA:             { cor: 'text-slate-700',   bg: 'bg-slate-50',    border: 'border-slate-200',   icone: '?' },
+    AGUARDANDO_RESPOSTA:      { cor: 'text-blue-800',    bg: 'bg-blue-50',     border: 'border-blue-200',    icone: '...' },
+  };
+  return map[previsao] ?? { cor: 'text-slate-700', bg: 'bg-slate-50', border: 'border-slate-200', icone: '?' };
+}
+
 function DetalheAtendimento() {
   const { id } = useParams();
   const atendimentoId = Number(id);
@@ -375,6 +387,25 @@ function DetalheAtendimento() {
                       <p>Enviado em: {formatDate(atendimento.horarioEnvioCheckin)}</p>
                     )}
                   </div>
+
+                  {(() => {
+                    const cfg = iaPrevisaoConfig(atendimento.previsaoCheckin);
+                    if (!cfg) return null;
+                    const pct = atendimento.confiancaCheckin !== undefined
+                      ? Math.round(atendimento.confiancaCheckin * 100)
+                      : null;
+                    return (
+                      <div className={`mt-4 rounded-xl border px-4 py-3 ${cfg.bg} ${cfg.border}`}>
+                        <p className={`text-xs font-bold uppercase tracking-widest ${cfg.cor}`}>
+                          Previsao da Inteligencia Artificial
+                        </p>
+                        <p className={`mt-1 text-sm font-semibold ${cfg.cor}`}>
+                          [{cfg.icone}] {labelStatusCheckin(atendimento.previsaoCheckin)}
+                          {pct !== null && <span className="ml-2 opacity-75">({pct}% de confianca)</span>}
+                        </p>
+                      </div>
+                    );
+                  })()}
 
                   <div className="mt-5 space-y-3">
                     <Button

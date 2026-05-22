@@ -47,6 +47,18 @@ modelo_nome = pacote.get("modelo_nome", "desconhecido")
 # Confirma no terminal que o modelo foi carregado com sucesso
 print(f"Modelo carregado: {modelo_nome}")
 
+# Tenta carregar o modelo de check-in (se já foi treinado)
+try:
+    pacote_checkin = joblib.load("modelo_checkin.joblib")
+    pipeline_checkin = pacote_checkin["pipeline"]
+    modelo_checkin_nome = pacote_checkin.get("modelo_nome", "desconhecido")
+    print(f"Modelo Check-in carregado: {modelo_checkin_nome}")
+except FileNotFoundError:
+    pipeline_checkin = None
+    modelo_checkin_nome = "Não treinado"
+    print("Aviso: modelo_checkin.joblib não encontrado. Execute o treinador_automatico.py antes.")
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # LISTAS DE VALORES VÁLIDOS
 # Espelham exatamente os valores aceitos pelo sistema Java TDB Responde
@@ -80,6 +92,7 @@ def health():
         "status":  "ok",                                        # Indica que o serviço está ativo
         "servico": "TDB Responde — Classificador de Mensagens", # Nome do serviço
         "modelo":  modelo_nome,                                 # Nome do modelo carregado
+        "modelo_checkin": modelo_checkin_nome,                  # Nome do modelo de checkin
         "versao":  "1.0.0"                                      # Versão da API
     }), 200
 
@@ -236,6 +249,58 @@ def predict():
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# ENDPOINT /predict_checkin  —  método POST
+# ─────────────────────────────────────────────────────────────────────────────
+
+@app.route("/predict_checkin", methods=["POST"])
+def predict_checkin():
+    try:
+        if pipeline_checkin is None:
+            return jsonify({"erro": "Modelo de check-in não está treinado ainda"}), 503
+
+        dados = request.get_json()
+        if not dados:
+            return jsonify({"erro": "Corpo da requisição vazio"}), 400
+
+        campos_req = ["tipo_pessoa", "canal", "gravidade", "risco", "prioridade"]
+        for c in campos_req:
+            if c not in dados:
+                return jsonify({"erro": f"Faltando campo: {c}"}), 400
+
+        entrada = pd.DataFrame([{
+            "TIPO_PESSOA": str(dados["tipo_pessoa"]),
+            "CANAL": str(dados["canal"]),
+            "STATUS_ATENDIMENTO": str(dados.get("status_atendimento", "ABERTO")),
+            "GRAVIDADE": int(dados["gravidade"]),
+            "RISCO": int(dados["risco"]),
+            "PRIORIDADE": int(dados["prioridade"])
+        }])
+
+        pred_cat = pipeline_checkin.predict(entrada)[0]
+        probabilidades = pipeline_checkin.predict_proba(entrada)[0]
+        classes = pipeline_checkin.classes_
+
+        prob_dict = {
+            cls: round(float(prob), 4)
+            for cls, prob in zip(classes, probabilidades)
+        }
+
+        return jsonify({
+            "previsao_checkin": pred_cat,
+            "probabilidades": prob_dict,
+            "confianca": round(float(max(probabilidades)), 4)
+        }), 200
+
+    except Exception as e:
+        return jsonify({
+            "erro": "Erro ao prever check-in",
+            "detalhe": str(e),
+            "traceback": traceback.format_exc()
+        }), 500
+
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # INICIALIZAÇÃO DO SERVIDOR
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -248,6 +313,7 @@ if __name__ == "__main__":
     print("  TDB Responde — API de Classificação de Mensagens")
     print("  Health:  http://localhost:5000/health")
     print("  Predict: http://localhost:5000/predict  [POST]")
+    print("  Check-in: http://localhost:5000/predict_checkin [POST]")
     print("=" * 55)
 
     # Inicia o servidor Flask com as seguintes configurações:
