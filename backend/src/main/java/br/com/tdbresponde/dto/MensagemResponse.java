@@ -3,11 +3,13 @@ package br.com.tdbresponde.dto;
 import br.com.tdbresponde.model.Mensagem;
 
 import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class MensagemResponse {
     public int id;
     public Integer atendimentoId;
     public String conteudo;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     public LocalDateTime dataHora;
     public String enviadoPor;
     public CanalComunicacaoResponse canal;
