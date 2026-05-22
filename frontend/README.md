@@ -175,4 +175,4 @@ O arquivo `vercel.json` mantem as rotas da SPA funcionando ao atualizar a pagina
 - Repositorio do front-end: https://github.com/AlissonKawan/Tdb-RespondeFull/tree/Alisson/frontend
 - Front-end publicado: https://tdb-responde-full.vercel.app/login
 - Back-end publicado: https://tdb-respondefull.onrender.com
-- Video de apresentacao: COLOCAR_LINK_DO_YOUTUBE
+- Video de apresentacao: https://youtu.be/KRbi2tuk_iw
