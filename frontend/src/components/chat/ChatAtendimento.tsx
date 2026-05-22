@@ -75,53 +75,73 @@ function ChatAtendimento({ atendimentoId, enviadoPor }: ChatAtendimentoProps) {
 
   useEffect(() => {
     let cancelled = false;
+    let socket: WebSocket | null = null;
+    let reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
+    let reconnectAttempt = 0;
 
-    // Remove trailing slash if present, and replace protocol
-    let wsUrlBase = API_BASE_URL.replace(/\/$/, '').replace(/^http:\/\//i, 'ws://').replace(/^https:\/\//i, 'wss://');
-    
-    // Identificador unico pseudo-aleatorio para essa aba
-    const clientId = `${enviadoPor}-${Math.random().toString(36).substring(7)}`;
-    const wsUrl = `${wsUrlBase}/chat/${atendimentoId}/${clientId}`;
-    
-    console.log('[WebSocket] Conectando a:', wsUrl);
-    const socket = new WebSocket(wsUrl);
+    const wsUrlBase = API_BASE_URL.replace(/\/$/, '').replace(/^http:\/\//i, 'ws://').replace(/^https:\/\//i, 'wss://');
 
-    socket.onopen = () => {
+    function connect() {
+      if (cancelled) return;
+
+      const clientId = `${enviadoPor}-${Math.random().toString(36).substring(7)}`;
+      const wsUrl = `${wsUrlBase}/chat/${atendimentoId}/${clientId}`;
+
+      console.log(`[WebSocket] Conectando a: ${wsUrl} (tentativa ${reconnectAttempt})`);
+      socket = new WebSocket(wsUrl);
+
+      socket.onopen = () => {
         if (cancelled) {
-            console.log('[WebSocket] Aberto mas cleanup ja aconteceu, fechando...');
-            socket.close();
-            return;
+          socket?.close();
+          return;
         }
+        reconnectAttempt = 0;
         console.log('[WebSocket] Conectado com sucesso! clientId=' + clientId);
-    };
+      };
 
-    socket.onmessage = (event) => {
+      socket.onmessage = (event) => {
         if (cancelled) return;
         try {
-            console.log('[WebSocket] Mensagem recebida:', event.data);
-            const novaMensagem = JSON.parse(event.data) as Mensagem;
-            setMensagens((prev) => {
-                // Evita duplicatas caso a propria aba tenha enviado e recebido via HTTP antes
-                if (prev.some(m => m.id === novaMensagem.id)) return prev;
-                return [...prev, novaMensagem];
-            });
+          console.log('[WebSocket] Mensagem recebida:', event.data);
+          const msg = JSON.parse(event.data) as Mensagem;
+          setMensagens((prev) => {
+            if (prev.some(m => m.id === msg.id)) return prev;
+            return [...prev, msg];
+          });
         } catch (e) {
-            console.error('[WebSocket] Erro ao fazer parse:', e);
+          console.error('[WebSocket] Erro ao fazer parse:', e);
         }
-    };
+      };
 
-    socket.onerror = (error) => {
+      socket.onerror = (error) => {
         console.error('[WebSocket] Erro:', error);
-    };
+      };
 
-    socket.onclose = (event) => {
-        console.log(`[WebSocket] Fechado: code=${event.code} clientId=${clientId} cancelled=${cancelled}`);
-    };
+      socket.onclose = (event) => {
+        console.log(`[WebSocket] Fechado: code=${event.code} cancelled=${cancelled}`);
+        if (!cancelled) {
+          // Auto-reconnect com backoff: 3s, 6s, 9s... max 30s
+          reconnectAttempt++;
+          const delay = Math.min(reconnectAttempt * 3000, 30000);
+          console.log(`[WebSocket] Reconectando em ${delay / 1000}s...`);
+          reconnectTimeout = setTimeout(() => {
+            // Recarrega mensagens para pegar as que foram perdidas enquanto desconectado
+            mensagensService.getMensagensAtendimento(atendimentoId)
+              .then((msgs) => { if (!cancelled) setMensagens(msgs); })
+              .catch(() => {});
+            connect();
+          }, delay);
+        }
+      };
+    }
+
+    connect();
 
     return () => {
-        console.log('[WebSocket] Cleanup - marcando cancelled e fechando. clientId=' + clientId);
-        cancelled = true;
-        socket.close();
+      console.log('[WebSocket] Cleanup - encerrando conexao e auto-reconnect');
+      cancelled = true;
+      if (reconnectTimeout) clearTimeout(reconnectTimeout);
+      socket?.close();
     };
   }, [atendimentoId, enviadoPor]);
 
