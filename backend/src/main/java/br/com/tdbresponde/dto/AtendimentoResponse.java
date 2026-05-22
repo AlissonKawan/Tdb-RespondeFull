@@ -3,6 +3,7 @@ package br.com.tdbresponde.dto;
 import br.com.tdbresponde.model.Atendimento;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class AtendimentoResponse {
 
@@ -21,6 +22,8 @@ public class AtendimentoResponse {
     public CanalComunicacaoResponse canalOrigem;
     public LocalDate dataAbertura;
     public LocalDate dataEncerramento;
+    public String statusCheckin;
+    public LocalDateTime horarioEnvioCheckin;
 
     public static AtendimentoResponse from(Atendimento atendimento) {
         AtendimentoResponse response = new AtendimentoResponse();
@@ -45,6 +48,8 @@ public class AtendimentoResponse {
         }
         response.dataAbertura = atendimento.getDataAbertura();
         response.dataEncerramento = atendimento.getDataEncerramento();
+        response.statusCheckin = atendimento.getStatusCheckin();
+        response.horarioEnvioCheckin = atendimento.getHorarioEnvioCheckin();
         return response;
     }
 }

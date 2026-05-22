@@ -6,6 +6,7 @@ import br.com.tdbresponde.dto.AtendimentoAtualizacaoRequest;
 import br.com.tdbresponde.dto.AtendimentoRequest;
 import br.com.tdbresponde.dto.AtendimentoResponse;
 import br.com.tdbresponde.dto.AssumirAtendimentoRequest;
+import br.com.tdbresponde.dto.CheckinRequest;
 import br.com.tdbresponde.dto.EncerrarAtendimentoRequest;
 import br.com.tdbresponde.dto.MensagemRequest;
 import br.com.tdbresponde.dto.MensagemResponse;
@@ -171,6 +172,13 @@ public class AtendimentoResource {
     public Response assumir(@PathParam("id") int id, AssumirAtendimentoRequest request) {
         Integer voluntarioId = request != null ? request.voluntarioId : null;
         Atendimento atendimento = bo.assumir(id, voluntarioId);
+        return Response.ok(AtendimentoResponse.from(atendimento)).build();
+    }
+
+    @PUT
+    @Path("/{id}/checkin")
+    public Response atualizarCheckin(@PathParam("id") int id, CheckinRequest request) {
+        Atendimento atendimento = bo.atualizarCheckin(id, request);
         return Response.ok(AtendimentoResponse.from(atendimento)).build();
     }
 

@@ -17,4 +17,6 @@ export const atendimentoService = {
     apiClient.put<AtendimentoApi>(`/atendimentos/${atendimentoId}/assumir`, { voluntarioId }),
   atualizarStatusPrioridade: (atendimentoId: number, payload: { status?: string; prioridade?: number }) =>
     apiClient.put<AtendimentoApi>(`/atendimentos/${atendimentoId}/status-prioridade`, payload),
+  atualizarCheckin: (id: number, statusCheckin: string) =>
+    apiClient.put<AtendimentoApi>(`/atendimentos/${id}/checkin`, { statusCheckin }),
 };

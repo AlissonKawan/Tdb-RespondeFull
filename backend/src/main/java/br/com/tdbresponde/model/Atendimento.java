@@ -1,6 +1,7 @@
 package br.com.tdbresponde.model;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class Atendimento {
     private int id;
@@ -12,6 +13,8 @@ public class Atendimento {
     private CanalComunicacao canalOrigem;
     private LocalDate dataAbertura;
     private LocalDate dataEncerramento; // pode ser null se não encerrou
+    private String statusCheckin;
+    private LocalDateTime horarioEnvioCheckin;
 
     public Atendimento() {}
 
@@ -98,6 +101,22 @@ public class Atendimento {
         this.voluntario = voluntario;
     }
 
+    public String getStatusCheckin() {
+        return statusCheckin;
+    }
+
+    public void setStatusCheckin(String statusCheckin) {
+        this.statusCheckin = statusCheckin;
+    }
+
+    public LocalDateTime getHorarioEnvioCheckin() {
+        return horarioEnvioCheckin;
+    }
+
+    public void setHorarioEnvioCheckin(LocalDateTime horarioEnvioCheckin) {
+        this.horarioEnvioCheckin = horarioEnvioCheckin;
+    }
+
     @Override
     public String toString() {
         return "Atendimento{" +
@@ -107,6 +126,8 @@ public class Atendimento {
                 ", prioridade=" + prioridade +
                 ", status='" + status + '\'' +
                 ", descricao='" + descricao + '\'' +
+                ", statusCheckin='" + statusCheckin + '\'' +
+                ", horarioEnvioCheckin=" + horarioEnvioCheckin +
                 '}';
     }
 }

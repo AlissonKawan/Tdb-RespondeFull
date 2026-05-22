@@ -66,6 +66,27 @@ function InfoItem({ label, value }: { label: string; value?: string | number | n
   );
 }
 
+function normalizarTelefone(tel?: string) {
+  if (!tel) return '';
+  let limpo = tel.replace(/\D/g, '');
+  if (limpo.length > 0 && !limpo.startsWith('55')) {
+    limpo = '55' + limpo;
+  }
+  return limpo;
+}
+
+function labelStatusCheckin(status?: string) {
+  const labels: Record<string, string> = {
+    NAO_ENVIADO: 'Nao enviado',
+    AGUARDANDO_RESPOSTA: 'Aguardando resposta',
+    CONFIRMADO: 'Confirmado',
+    NAO_COMPARECERA: 'Nao comparecera',
+    REAGENDAMENTO_SOLICITADO: 'Reagendamento solicitado',
+    SEM_RESPOSTA: 'Sem resposta',
+  };
+  return status ? labels[status] ?? status : 'Nao enviado';
+}
+
 function DetalheAtendimento() {
   const { id } = useParams();
   const atendimentoId = Number(id);
@@ -80,6 +101,7 @@ function DetalheAtendimento() {
   const [conteudo, setConteudo] = useState('');
   const [enviando, setEnviando] = useState(false);
   const [salvando, setSalvando] = useState(false);
+  const [salvandoCheckin, setSalvandoCheckin] = useState(false);
   const [statusEdit, setStatusEdit] = useState('ABERTO');
   const [prioridadeEdit, setPrioridadeEdit] = useState('3');
 
@@ -162,6 +184,27 @@ function DetalheAtendimento() {
       setFeedback(error instanceof Error ? error.message : 'Nao foi possivel atualizar o atendimento.');
     } finally {
       setSalvando(false);
+    }
+  };
+
+  const handleAlterarCheckin = async (status: string, abrirWhats = false) => {
+    if (!atendimento) return;
+    setSalvandoCheckin(true);
+    setFeedback('');
+    try {
+      const atualizado = await atendimentoService.atualizarCheckin(atendimento.id, status);
+      setAtendimento((prev) => prev ? { ...prev, statusCheckin: atualizado.statusCheckin, horarioEnvioCheckin: atualizado.horarioEnvioCheckin } : prev);
+      
+      if (abrirWhats && atualizado.pessoaAtendidaTelefone) {
+        const telefone = normalizarTelefone(atualizado.pessoaAtendidaTelefone);
+        const nome = atualizado.pessoaAtendidaNome || 'paciente';
+        const msg = encodeURIComponent(`Olá, ${nome}! Tudo bem? Passando para confirmar sua consulta...`);
+        window.open(`https://wa.me/${telefone}?text=${msg}`, '_blank');
+      }
+    } catch (error) {
+      setFeedback(error instanceof Error ? error.message : 'Nao foi possivel atualizar o check-in.');
+    } finally {
+      setSalvandoCheckin(false);
     }
   };
 
@@ -318,6 +361,64 @@ function DetalheAtendimento() {
                     >
                       Encerrar atendimento
                     </Button>
+                  </div>
+                </Card>
+              )}
+
+              {podeAlterar && (
+                <Card className="p-6">
+                  <h2 className="text-xl font-bold text-[#0F172A]">Check-in via WhatsApp</h2>
+                  
+                  <div className="mt-4 text-sm text-[#475569]">
+                    <p>Status atual: <strong>{labelStatusCheckin(atendimento.statusCheckin)}</strong></p>
+                    {atendimento.horarioEnvioCheckin && (
+                      <p>Enviado em: {formatDate(atendimento.horarioEnvioCheckin)}</p>
+                    )}
+                  </div>
+
+                  <div className="mt-5 space-y-3">
+                    <Button
+                      fullWidth
+                      disabled={salvandoCheckin || !atendimento.pessoaAtendidaTelefone}
+                      onClick={() => void handleAlterarCheckin('AGUARDANDO_RESPOSTA', true)}
+                    >
+                      {salvandoCheckin ? 'Processando...' : 'Abrir WhatsApp'}
+                    </Button>
+
+                    {!atendimento.pessoaAtendidaTelefone && (
+                      <p className="text-xs text-red-500">Telefone nao preenchido para abrir WhatsApp.</p>
+                    )}
+
+                    <div className="grid grid-cols-2 gap-2 mt-4">
+                      <Button
+                        variant="secondary"
+                        disabled={salvandoCheckin}
+                        onClick={() => void handleAlterarCheckin('CONFIRMADO')}
+                      >
+                        Confirmou
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        disabled={salvandoCheckin}
+                        onClick={() => void handleAlterarCheckin('NAO_COMPARECERA')}
+                      >
+                        Nao vai
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        disabled={salvandoCheckin}
+                        onClick={() => void handleAlterarCheckin('REAGENDAMENTO_SOLICITADO')}
+                      >
+                        Reagendar
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        disabled={salvandoCheckin}
+                        onClick={() => void handleAlterarCheckin('SEM_RESPOSTA')}
+                      >
+                        Sem resposta
+                      </Button>
+                    </div>
                   </div>
                 </Card>
               )}

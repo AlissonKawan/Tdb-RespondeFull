@@ -9,6 +9,7 @@ import br.com.tdbresponde.dao.PessoaAtendidaDAO;
 import br.com.tdbresponde.dao.VoluntarioDAO;
 import br.com.tdbresponde.dto.AtendimentoRequest;
 import br.com.tdbresponde.dto.AtendimentoAtualizacaoRequest;
+import br.com.tdbresponde.dto.CheckinRequest;
 import br.com.tdbresponde.dto.RelatarSituacaoRequest;
 import br.com.tdbresponde.dto.RelatarSituacaoResponse;
 import br.com.tdbresponde.dto.SolicitarAtendimentoRequest;
@@ -237,6 +238,25 @@ public class AtendimentoBO {
         atendimento.setStatus("EM_ATENDIMENTO");
         atendimentoDAO.atualizar(atendimento);
         return buscarPorId(atendimentoId);
+    }
+
+    public Atendimento atualizarCheckin(int id, CheckinRequest request) {
+        if (request == null || request.statusCheckin == null) {
+            throw new BusinessException("Status de check-in e obrigatorio");
+        }
+
+        Atendimento atendimento = buscarPorId(id);
+        LocalDateTime horarioEnvio = atendimento.getHorarioEnvioCheckin();
+        String novoStatus = request.statusCheckin;
+        String statusAtual = atendimento.getStatusCheckin();
+
+        if ("AGUARDANDO_RESPOSTA".equals(novoStatus) && (statusAtual == null || "NAO_ENVIADO".equals(statusAtual))) {
+            horarioEnvio = LocalDateTime.now();
+        }
+
+        atendimentoDAO.atualizarCheckin(id, novoStatus, horarioEnvio);
+
+        return buscarPorId(id);
     }
 
     // Metodo: Calcular prioridade automaticamente

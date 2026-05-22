@@ -10,6 +10,8 @@ export type AtendimentoStatus =
 
 export type AtendimentoPrioridade = 'BAIXA' | 'MEDIA' | 'ALTA' | 1 | 2 | 3 | 4 | 5;
 
+export type StatusCheckin = 'NAO_ENVIADO' | 'AGUARDANDO_RESPOSTA' | 'CONFIRMADO' | 'NAO_COMPARECERA' | 'REAGENDAMENTO_SOLICITADO' | 'SEM_RESPOSTA';
+
 export interface AtendimentoUsuarioResumo {
   id?: number;
   nome?: string;
@@ -46,6 +48,8 @@ export interface AtendimentoApi {
   voluntario?: AtendimentoUsuarioResumo | null;
   beneficiario?: AtendimentoUsuarioResumo | null;
   usuario?: AtendimentoUsuarioResumo | null;
+  statusCheckin?: StatusCheckin;
+  horarioEnvioCheckin?: string;
 }
 
 export interface SolicitarAtendimentoRequest {

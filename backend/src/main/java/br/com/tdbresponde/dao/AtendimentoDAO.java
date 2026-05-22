@@ -12,6 +12,7 @@ import jakarta.inject.Inject;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +21,7 @@ public class AtendimentoDAO {
 
     private static final String COLUNAS_ATENDIMENTO =
             "ID, PRIORIDADE, STATUS, DESCRICAO, DATA_ABERTURA, DATA_ENCERRAMENTO, " +
-                    "PESSOA_ATENDIDA_ID, VOLUNTARIO_ID, CANAL_COMUNICACAO_ID";
+                    "PESSOA_ATENDIDA_ID, VOLUNTARIO_ID, CANAL_COMUNICACAO_ID, STATUS_CHECKIN, HORARIO_ENVIO_CHECKIN";
 
     @Inject
     DataSource dataSource;
@@ -213,7 +214,9 @@ public class AtendimentoDAO {
                 "A.DATA_ENCERRAMENTO AS DATA_ENCERRAMENTO, " +
                 "A.PESSOA_ATENDIDA_ID AS PESSOA_ATENDIDA_ID, " +
                 "A.VOLUNTARIO_ID AS VOLUNTARIO_ID, " +
-                "A.CANAL_COMUNICACAO_ID AS CANAL_COMUNICACAO_ID " +
+                "A.CANAL_COMUNICACAO_ID AS CANAL_COMUNICACAO_ID, " +
+                "A.STATUS_CHECKIN AS STATUS_CHECKIN, " +
+                "A.HORARIO_ENVIO_CHECKIN AS HORARIO_ENVIO_CHECKIN " +
                 "FROM ATENDIMENTO A " +
                 "JOIN PESSOA_ATENDIDA P ON P.ID = A.PESSOA_ATENDIDA_ID " +
                 "WHERE P.ID_CONTA = ? " +
@@ -276,6 +279,23 @@ public class AtendimentoDAO {
         }
     }
 
+    public void atualizarCheckin(int id, String statusCheckin, LocalDateTime horarioEnvioCheckin) {
+        String sql = "UPDATE ATENDIMENTO SET STATUS_CHECKIN = ?, HORARIO_ENVIO_CHECKIN = ? WHERE ID = ?";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, statusCheckin);
+            stmt.setObject(2, horarioEnvioCheckin);
+            stmt.setInt(3, id);
+
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new DatabaseException("Erro ao atualizar checkin do atendimento: " + e.getMessage(), e);
+        }
+    }
+
     // DELETE
     public void excluir(int id) {
         String sql = "DELETE FROM ATENDIMENTO WHERE ID = ?";
@@ -300,6 +320,8 @@ public class AtendimentoDAO {
         a.setDescricao(rs.getString("DESCRICAO"));
         a.setDataAbertura(rs.getObject("DATA_ABERTURA", LocalDate.class));
         a.setDataEncerramento(rs.getObject("DATA_ENCERRAMENTO", LocalDate.class));
+        a.setStatusCheckin(rs.getString("STATUS_CHECKIN"));
+        a.setHorarioEnvioCheckin(rs.getObject("HORARIO_ENVIO_CHECKIN", LocalDateTime.class));
 
         // Carrega canal pelo ID
         int canalId = rs.getInt("CANAL_COMUNICACAO_ID");
