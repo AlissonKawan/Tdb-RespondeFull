@@ -68,10 +68,12 @@ function ChatAtendimento({ atendimentoId, enviadoPor }: ChatAtendimentoProps) {
       [atendimentoId],
   );
 
+
   useEffect(() => {
     void carregarMensagens(true);
+  }, [carregarMensagens]);
 
-    // ... inside useEffect
+  useEffect(() => {
     // Remove trailing slash if present, and replace protocol
     let wsUrlBase = API_BASE_URL.replace(/\/$/, '').replace(/^http:\/\//i, 'ws://').replace(/^https:\/\//i, 'wss://');
     
@@ -79,10 +81,16 @@ function ChatAtendimento({ atendimentoId, enviadoPor }: ChatAtendimentoProps) {
     const clientId = `${enviadoPor}-${Math.random().toString(36).substring(7)}`;
     const wsUrl = `${wsUrlBase}/chat/${atendimentoId}/${clientId}`;
     
+    console.log('[WebSocket] Conectando a:', wsUrl);
     const socket = new WebSocket(wsUrl);
+
+    socket.onopen = () => {
+        console.log('[WebSocket] Conectado com sucesso!');
+    };
 
     socket.onmessage = (event) => {
         try {
+            console.log('[WebSocket] Mensagem recebida:', event.data);
             const novaMensagem = JSON.parse(event.data) as Mensagem;
             setMensagens((prev) => {
                 // Evita duplicatas caso a propria aba tenha enviado e recebido via HTTP antes
@@ -95,13 +103,18 @@ function ChatAtendimento({ atendimentoId, enviadoPor }: ChatAtendimentoProps) {
     };
 
     socket.onerror = (error) => {
-        console.error("Erro no WebSocket", error);
+        console.error("[WebSocket] Erro:", error);
+    };
+
+    socket.onclose = (event) => {
+        console.log(`[WebSocket] Fechado: code=${event.code} reason=${event.reason}`);
     };
 
     return () => {
+        console.log('[WebSocket] Cleanup - fechando conexao');
         socket.close();
     };
-  }, [carregarMensagens, atendimentoId, enviadoPor]);
+  }, [atendimentoId, enviadoPor]);
 
   const enviar = async () => {
     const conteudo = novaMensagem.trim();
@@ -112,9 +125,11 @@ function ChatAtendimento({ atendimentoId, enviadoPor }: ChatAtendimentoProps) {
     try {
       await mensagensService.enviarMensagem(atendimentoId, { conteudo, enviadoPor });
       setNovaMensagem('');
-      await carregarMensagens(false);
+      // Nao precisa recarregar via HTTP — o WebSocket ja vai entregar a mensagem nova
     } catch (error) {
       setErro(error instanceof Error ? error.message : 'Nao foi possivel enviar a mensagem.');
+      // Em caso de erro, recarrega para garantir consistencia
+      await carregarMensagens(false);
     } finally {
       setEnviando(false);
     }
