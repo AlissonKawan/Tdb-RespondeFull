@@ -64,12 +64,41 @@ function ChatAtendimento({ atendimentoId, enviadoPor }: ChatAtendimentoProps) {
   useEffect(() => {
     void carregarMensagens(true);
 
-    const intervalo = setInterval(() => {
-      void carregarMensagens(false);
-    }, 3000);
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    let wsHost = window.location.host;
+    
+    // Se estivermos rodando no Vite (porta 5173), a API esta no 8080
+    if (window.location.port === '5173') {
+        wsHost = 'localhost:8080';
+    }
 
-    return () => clearInterval(intervalo);
-  }, [carregarMensagens]);
+    // Identificador unico pseudo-aleatorio para essa aba
+    const clientId = `${enviadoPor}-${Math.random().toString(36).substring(7)}`;
+    const wsUrl = `${wsProtocol}//${wsHost}/chat/${atendimentoId}/${clientId}`;
+    
+    const socket = new WebSocket(wsUrl);
+
+    socket.onmessage = (event) => {
+        try {
+            const novaMensagem = JSON.parse(event.data) as Mensagem;
+            setMensagens((prev) => {
+                // Evita duplicatas caso a propria aba tenha enviado e recebido via HTTP antes
+                if (prev.some(m => m.id === novaMensagem.id)) return prev;
+                return [...prev, novaMensagem];
+            });
+        } catch (e) {
+            console.error("Erro ao fazer parse da mensagem WebSocket", e);
+        }
+    };
+
+    socket.onerror = (error) => {
+        console.error("Erro no WebSocket", error);
+    };
+
+    return () => {
+        socket.close();
+    };
+  }, [carregarMensagens, atendimentoId, enviadoPor]);
 
   const enviar = async () => {
     const conteudo = novaMensagem.trim();

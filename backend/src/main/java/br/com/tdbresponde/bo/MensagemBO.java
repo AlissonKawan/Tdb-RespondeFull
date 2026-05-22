@@ -39,11 +39,19 @@ public class MensagemBO {
         return mensagem;
     }
 
+    @Inject
+    br.com.tdbresponde.resource.ChatWebSocket chatWebSocket;
+
     @Transactional
     public Mensagem inserir(MensagemRequest request) {
         Mensagem mensagem = toModel(request);
         validar(mensagem);
         mensagemDAO.inserir(mensagem);
+        
+        // Broadcast the new message to active WebSocket sessions
+        br.com.tdbresponde.dto.MensagemResponse response = br.com.tdbresponde.dto.MensagemResponse.from(mensagem);
+        chatWebSocket.broadcast(mensagem.getAtendimento().getId(), response);
+        
         return mensagem;
     }
 
