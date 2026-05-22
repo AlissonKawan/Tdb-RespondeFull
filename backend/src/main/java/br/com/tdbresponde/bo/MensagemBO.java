@@ -40,7 +40,7 @@ public class MensagemBO {
     }
 
     @Inject
-    br.com.tdbresponde.resource.ChatWebSocket chatWebSocket;
+    com.fasterxml.jackson.databind.ObjectMapper objectMapper;
 
     @Transactional
     public Mensagem inserir(MensagemRequest request) {
@@ -49,8 +49,13 @@ public class MensagemBO {
         mensagemDAO.inserir(mensagem);
         
         // Broadcast the new message to active WebSocket sessions
-        br.com.tdbresponde.dto.MensagemResponse response = br.com.tdbresponde.dto.MensagemResponse.from(mensagem);
-        chatWebSocket.broadcast(mensagem.getAtendimento().getId(), response);
+        try {
+            br.com.tdbresponde.dto.MensagemResponse response = br.com.tdbresponde.dto.MensagemResponse.from(mensagem);
+            String json = objectMapper.writeValueAsString(response);
+            br.com.tdbresponde.resource.ChatWebSocket.broadcastText(mensagem.getAtendimento().getId(), json);
+        } catch (Exception e) {
+            System.out.println("Erro ao converter e enviar mensagem via WebSocket: " + e.getMessage());
+        }
         
         return mensagem;
     }

@@ -21,9 +21,6 @@ public class ChatWebSocket {
     // outer map: atendimentoId, inner map: usuarioId -> Session
     private static final Map<Integer, Map<String, Session>> sessions = new ConcurrentHashMap<>();
 
-    @Inject
-    ObjectMapper objectMapper;
-
     @OnOpen
     public void onOpen(Session session, @PathParam("atendimentoId") Integer atendimentoId, @PathParam("usuarioId") String usuarioId) {
         sessions.computeIfAbsent(atendimentoId, k -> new ConcurrentHashMap<>()).put(usuarioId, session);
@@ -60,21 +57,16 @@ public class ChatWebSocket {
         // apenas usaremos a REST API e faremos o broadcast por aqui.
     }
 
-    public void broadcast(Integer atendimentoId, Object object) {
+    public static void broadcastText(Integer atendimentoId, String json) {
         Map<String, Session> atendimentoSessions = sessions.get(atendimentoId);
         if (atendimentoSessions != null) {
-            try {
-                String json = objectMapper.writeValueAsString(object);
-                atendimentoSessions.values().forEach(s -> {
-                    s.getAsyncRemote().sendText(json, result ->  {
-                        if (result.getException() != null) {
-                            System.out.println("Nao foi possivel enviar mensagem: " + result.getException());
-                        }
-                    });
+            atendimentoSessions.values().forEach(s -> {
+                s.getAsyncRemote().sendText(json, result ->  {
+                    if (result.getException() != null) {
+                        System.out.println("Nao foi possivel enviar mensagem: " + result.getException());
+                    }
                 });
-            } catch (Exception e) {
-                System.out.println("Erro ao converter mensagem para JSON no WebSocket: " + e.getMessage());
-            }
+            });
         }
     }
 }

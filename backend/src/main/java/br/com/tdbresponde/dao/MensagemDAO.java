@@ -28,10 +28,20 @@ public class MensagemDAO {
     void init() {
         try (Connection conn = dataSource.getConnection();
              Statement stmt = conn.createStatement()) {
-            stmt.execute("ALTER TABLE MENSAGEM MODIFY CONTEUDO VARCHAR2(4000)");
-            System.out.println("Tabela MENSAGEM alterada com sucesso para VARCHAR2(4000)");
+            
+            // Tenta adicionar a coluna CLOB, ignorando erro se já existir ou se tabela for nova
+            try {
+                stmt.execute("ALTER TABLE MENSAGEM ADD (CONTEUDO_CLOB CLOB)");
+                stmt.execute("UPDATE MENSAGEM SET CONTEUDO_CLOB = CONTEUDO");
+                stmt.execute("ALTER TABLE MENSAGEM DROP COLUMN CONTEUDO");
+                stmt.execute("ALTER TABLE MENSAGEM RENAME COLUMN CONTEUDO_CLOB TO CONTEUDO");
+                System.out.println("Tabela MENSAGEM alterada com sucesso para CLOB");
+            } catch (Exception e) {
+                System.out.println("Aviso na conversao para CLOB (pode ja ser CLOB): " + e.getMessage());
+            }
+
         } catch (Exception e) {
-            System.out.println("Nao foi possivel alterar a tabela MENSAGEM: " + e.getMessage());
+            System.out.println("Erro na inicializacao da tabela MENSAGEM: " + e.getMessage());
         }
     }
 
