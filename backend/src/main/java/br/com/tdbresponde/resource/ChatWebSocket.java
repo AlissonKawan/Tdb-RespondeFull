@@ -66,7 +66,7 @@ public class ChatWebSocket {
             try {
                 String json = objectMapper.writeValueAsString(object);
                 atendimentoSessions.values().forEach(s -> {
-                    s.getAsyncRemote().sendObject(json, result ->  {
+                    s.getAsyncRemote().sendText(json, result ->  {
                         if (result.getException() != null) {
                             System.out.println("Nao foi possivel enviar mensagem: " + result.getException());
                         }

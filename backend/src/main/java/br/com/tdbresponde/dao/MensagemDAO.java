@@ -3,6 +3,8 @@ package br.com.tdbresponde.dao;
 import br.com.tdbresponde.exception.DatabaseException;
 import br.com.tdbresponde.model.CanalComunicacao;
 import br.com.tdbresponde.model.Mensagem;
+import io.agroal.api.AgroalDataSource;
+import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -11,6 +13,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +22,18 @@ import java.util.List;
 public class MensagemDAO {
 
     @Inject
-    DataSource dataSource;
+    AgroalDataSource dataSource;
+
+    @PostConstruct
+    void init() {
+        try (Connection conn = dataSource.getConnection();
+             Statement stmt = conn.createStatement()) {
+            stmt.execute("ALTER TABLE MENSAGEM MODIFY CONTEUDO VARCHAR2(4000)");
+            System.out.println("Tabela MENSAGEM alterada com sucesso para VARCHAR2(4000)");
+        } catch (Exception e) {
+            System.out.println("Nao foi possivel alterar a tabela MENSAGEM: " + e.getMessage());
+        }
+    }
 
     @Inject
     CanalComunicacaoDAO canalDAO;
