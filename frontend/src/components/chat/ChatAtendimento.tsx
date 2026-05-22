@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
 import { EmptyState, ErrorState, LoadingState } from '../ui/FeedbackState';
@@ -41,6 +41,12 @@ function ChatAtendimento({ atendimentoId, enviadoPor }: ChatAtendimentoProps) {
       [mensagens],
   );
 
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [mensagensOrdenadas]);
+
   const carregarMensagens = useCallback(
       async (mostrarLoading = false) => {
         setErro('');
@@ -66,7 +72,8 @@ function ChatAtendimento({ atendimentoId, enviadoPor }: ChatAtendimentoProps) {
     void carregarMensagens(true);
 
     // ... inside useEffect
-    let wsUrlBase = API_BASE_URL.replace(/^http:\/\//i, 'ws://').replace(/^https:\/\//i, 'wss://');
+    // Remove trailing slash if present, and replace protocol
+    let wsUrlBase = API_BASE_URL.replace(/\/$/, '').replace(/^http:\/\//i, 'ws://').replace(/^https:\/\//i, 'wss://');
     
     // Identificador unico pseudo-aleatorio para essa aba
     const clientId = `${enviadoPor}-${Math.random().toString(36).substring(7)}`;
@@ -158,6 +165,7 @@ function ChatAtendimento({ atendimentoId, enviadoPor }: ChatAtendimentoProps) {
                       </div>
                   );
                 })}
+                <div ref={messagesEndRef} />
               </div>
           )}
         </div>
