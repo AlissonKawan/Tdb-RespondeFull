@@ -5,6 +5,7 @@ import { EmptyState, ErrorState, LoadingState } from '../ui/FeedbackState';
 import { Textarea } from '../ui/Input';
 import { mensagensService } from '../../services/mensagensService';
 import type { Mensagem } from '../../types/AtendimentoApi';
+import { API_BASE_URL } from '../../config/api';
 
 interface ChatAtendimentoProps {
   atendimentoId: number;
@@ -64,17 +65,12 @@ function ChatAtendimento({ atendimentoId, enviadoPor }: ChatAtendimentoProps) {
   useEffect(() => {
     void carregarMensagens(true);
 
-    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    let wsHost = window.location.host;
+    // ... inside useEffect
+    let wsUrlBase = API_BASE_URL.replace(/^http:\/\//i, 'ws://').replace(/^https:\/\//i, 'wss://');
     
-    // Se estivermos rodando no Vite (porta 5173), a API esta no 8080
-    if (window.location.port === '5173') {
-        wsHost = 'localhost:8080';
-    }
-
     // Identificador unico pseudo-aleatorio para essa aba
     const clientId = `${enviadoPor}-${Math.random().toString(36).substring(7)}`;
-    const wsUrl = `${wsProtocol}//${wsHost}/chat/${atendimentoId}/${clientId}`;
+    const wsUrl = `${wsUrlBase}/chat/${atendimentoId}/${clientId}`;
     
     const socket = new WebSocket(wsUrl);
 
