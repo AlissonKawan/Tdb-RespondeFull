@@ -87,7 +87,7 @@ export const apiRequest = request;
 
 export const apiClient = {
   get: <T>(path: string, options?: ApiRequestOptions) =>
-    request<T>(path, { ...options, method: 'GET' }),
+    request<T>(path, { ...options, method: 'GET', headers: { ...options?.headers, 'Cache-Control': 'no-cache, no-store, must-revalidate' }, cache: 'no-store' }),
   post: <T>(path: string, body?: unknown, options?: ApiRequestOptions) =>
     request<T>(path, { ...options, method: 'POST', body }),
   put: <T>(path: string, body?: unknown, options?: ApiRequestOptions) =>
