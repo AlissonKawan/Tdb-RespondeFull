@@ -86,8 +86,12 @@ export async function request<T>(path: string, options: ApiRequestOptions = {}):
 export const apiRequest = request;
 
 export const apiClient = {
-  get: <T>(path: string, options?: ApiRequestOptions) =>
-    request<T>(path, { ...options, method: 'GET', headers: { ...options?.headers, 'Cache-Control': 'no-cache, no-store, must-revalidate' }, cache: 'no-store' }),
+  get: <T>(path: string, options?: ApiRequestOptions) => {
+    // Para evitar cache sem causar erro de CORS, usamos url params ou apenas 'cache: no-store' sem Headers extras.
+    const urlSep = path.includes('?') ? '&' : '?';
+    const noCachePath = `${path}${urlSep}t=${Date.now()}`;
+    return request<T>(noCachePath, { ...options, method: 'GET' });
+  },
   post: <T>(path: string, body?: unknown, options?: ApiRequestOptions) =>
     request<T>(path, { ...options, method: 'POST', body }),
   put: <T>(path: string, body?: unknown, options?: ApiRequestOptions) =>
