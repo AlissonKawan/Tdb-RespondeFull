@@ -52,9 +52,11 @@ public class MensagemBO {
         try {
             br.com.tdbresponde.dto.MensagemResponse response = br.com.tdbresponde.dto.MensagemResponse.from(mensagem);
             String json = objectMapper.writeValueAsString(response);
-            br.com.tdbresponde.resource.ChatWebSocket.broadcastText(mensagem.getAtendimento().getId(), json);
+            System.out.println("[MensagemBO] Broadcast WS: atendimento=" + mensagem.getAtendimento().getId() + " json=" + json.substring(0, Math.min(json.length(), 100)));
+            br.com.tdbresponde.resource.ChatWebSocket.broadcastText(String.valueOf(mensagem.getAtendimento().getId()), json);
         } catch (Exception e) {
-            System.out.println("Erro ao converter e enviar mensagem via WebSocket: " + e.getMessage());
+            System.out.println("[MensagemBO] ERRO FATAL no WebSocket broadcast:");
+            e.printStackTrace();
         }
         
         return mensagem;

@@ -1,8 +1,6 @@
 package br.com.tdbresponde.resource;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import jakarta.websocket.OnClose;
 import jakarta.websocket.OnError;
 import jakarta.websocket.OnMessage;
@@ -18,29 +16,34 @@ import java.util.concurrent.ConcurrentHashMap;
 @ApplicationScoped
 public class ChatWebSocket {
 
-    // outer map: atendimentoId, inner map: usuarioId -> Session
-    private static final Map<Integer, Map<String, Session>> sessions = new ConcurrentHashMap<>();
+    // Chaves String para evitar problemas de autoboxing int/Integer no ConcurrentHashMap
+    private static final Map<String, Map<String, Session>> sessions = new ConcurrentHashMap<>();
 
     @OnOpen
-    public void onOpen(Session session, @PathParam("atendimentoId") Integer atendimentoId, @PathParam("usuarioId") String usuarioId) {
+    public void onOpen(Session session, @PathParam("atendimentoId") String atendimentoId, @PathParam("usuarioId") String usuarioId) {
         sessions.computeIfAbsent(atendimentoId, k -> new ConcurrentHashMap<>()).put(usuarioId, session);
-        System.out.println("WebSocket aberto para atendimento " + atendimentoId + " usuario " + usuarioId);
+        System.out.println("[WS] Conectado: atendimento=" + atendimentoId + " usuario=" + usuarioId + " | Salas ativas: " + sessions.keySet());
     }
 
     @OnClose
-    public void onClose(Session session, @PathParam("atendimentoId") Integer atendimentoId, @PathParam("usuarioId") String usuarioId) {
+    public void onClose(Session session, @PathParam("atendimentoId") String atendimentoId, @PathParam("usuarioId") String usuarioId) {
         Map<String, Session> atendimentoSessions = sessions.get(atendimentoId);
         if (atendimentoSessions != null) {
-            atendimentoSessions.remove(usuarioId);
-            if (atendimentoSessions.isEmpty()) {
-                sessions.remove(atendimentoId);
+            // Apenas remove se a session armazenada for a mesma que esta sendo fechada
+            // Evita race condition do React StrictMode (mount/unmount/mount)
+            Session stored = atendimentoSessions.get(usuarioId);
+            if (stored != null && stored.equals(session)) {
+                atendimentoSessions.remove(usuarioId);
+                if (atendimentoSessions.isEmpty()) {
+                    sessions.remove(atendimentoId);
+                }
             }
         }
-        System.out.println("WebSocket fechado para atendimento " + atendimentoId + " usuario " + usuarioId);
+        System.out.println("[WS] Desconectado: atendimento=" + atendimentoId + " usuario=" + usuarioId + " | Salas ativas: " + sessions.keySet());
     }
 
     @OnError
-    public void onError(Session session, @PathParam("atendimentoId") Integer atendimentoId, @PathParam("usuarioId") String usuarioId, Throwable throwable) {
+    public void onError(Session session, @PathParam("atendimentoId") String atendimentoId, @PathParam("usuarioId") String usuarioId, Throwable throwable) {
         Map<String, Session> atendimentoSessions = sessions.get(atendimentoId);
         if (atendimentoSessions != null) {
             atendimentoSessions.remove(usuarioId);
@@ -48,25 +51,30 @@ public class ChatWebSocket {
                 sessions.remove(atendimentoId);
             }
         }
-        System.out.println("WebSocket erro para atendimento " + atendimentoId + " usuario " + usuarioId + ": " + throwable.getMessage());
+        System.out.println("[WS] Erro: atendimento=" + atendimentoId + " usuario=" + usuarioId + ": " + throwable.getMessage());
     }
 
     @OnMessage
-    public void onMessage(String message, @PathParam("atendimentoId") Integer atendimentoId, @PathParam("usuarioId") String usuarioId) {
+    public void onMessage(String message, @PathParam("atendimentoId") String atendimentoId, @PathParam("usuarioId") String usuarioId) {
         // Nao usaremos mensagens recebidas via WS do frontend para salvar no DB no momento,
         // apenas usaremos a REST API e faremos o broadcast por aqui.
     }
 
-    public static void broadcastText(Integer atendimentoId, String json) {
+    public static void broadcastText(String atendimentoId, String json) {
         Map<String, Session> atendimentoSessions = sessions.get(atendimentoId);
-        if (atendimentoSessions != null) {
+        if (atendimentoSessions != null && !atendimentoSessions.isEmpty()) {
+            System.out.println("[WS] Broadcast para sala " + atendimentoId + " (" + atendimentoSessions.size() + " clientes)");
             atendimentoSessions.values().forEach(s -> {
-                s.getAsyncRemote().sendText(json, result ->  {
-                    if (result.getException() != null) {
-                        System.out.println("Nao foi possivel enviar mensagem: " + result.getException());
-                    }
-                });
+                if (s.isOpen()) {
+                    s.getAsyncRemote().sendText(json, result -> {
+                        if (result.getException() != null) {
+                            System.out.println("[WS] Falha no envio: " + result.getException());
+                        }
+                    });
+                }
             });
+        } else {
+            System.out.println("[WS] Broadcast ignorado: sala " + atendimentoId + " vazia ou inexistente. Salas ativas: " + sessions.keySet());
         }
     }
 }

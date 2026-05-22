@@ -74,6 +74,8 @@ function ChatAtendimento({ atendimentoId, enviadoPor }: ChatAtendimentoProps) {
   }, [carregarMensagens]);
 
   useEffect(() => {
+    let cancelled = false;
+
     // Remove trailing slash if present, and replace protocol
     let wsUrlBase = API_BASE_URL.replace(/\/$/, '').replace(/^http:\/\//i, 'ws://').replace(/^https:\/\//i, 'wss://');
     
@@ -85,10 +87,16 @@ function ChatAtendimento({ atendimentoId, enviadoPor }: ChatAtendimentoProps) {
     const socket = new WebSocket(wsUrl);
 
     socket.onopen = () => {
-        console.log('[WebSocket] Conectado com sucesso!');
+        if (cancelled) {
+            console.log('[WebSocket] Aberto mas cleanup ja aconteceu, fechando...');
+            socket.close();
+            return;
+        }
+        console.log('[WebSocket] Conectado com sucesso! clientId=' + clientId);
     };
 
     socket.onmessage = (event) => {
+        if (cancelled) return;
         try {
             console.log('[WebSocket] Mensagem recebida:', event.data);
             const novaMensagem = JSON.parse(event.data) as Mensagem;
@@ -98,20 +106,21 @@ function ChatAtendimento({ atendimentoId, enviadoPor }: ChatAtendimentoProps) {
                 return [...prev, novaMensagem];
             });
         } catch (e) {
-            console.error("Erro ao fazer parse da mensagem WebSocket", e);
+            console.error('[WebSocket] Erro ao fazer parse:', e);
         }
     };
 
     socket.onerror = (error) => {
-        console.error("[WebSocket] Erro:", error);
+        console.error('[WebSocket] Erro:', error);
     };
 
     socket.onclose = (event) => {
-        console.log(`[WebSocket] Fechado: code=${event.code} reason=${event.reason}`);
+        console.log(`[WebSocket] Fechado: code=${event.code} clientId=${clientId} cancelled=${cancelled}`);
     };
 
     return () => {
-        console.log('[WebSocket] Cleanup - fechando conexao');
+        console.log('[WebSocket] Cleanup - marcando cancelled e fechando. clientId=' + clientId);
+        cancelled = true;
         socket.close();
     };
   }, [atendimentoId, enviadoPor]);
