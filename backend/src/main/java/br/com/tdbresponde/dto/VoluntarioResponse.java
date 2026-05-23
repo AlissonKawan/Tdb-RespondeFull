@@ -12,6 +12,9 @@ public class VoluntarioResponse {
     public String statusAprovacao;
     public String motivoVoluntariado;
     public Integer contaId;
+    public String codigoIndicacao;
+    public Integer pontosIndicacao;
+    public Integer idVoluntarioIndicador;
     public EspecialidadeResponse especialidade;
     public java.util.List<EspecialidadeResponse> especialidades;
 
@@ -25,6 +28,9 @@ public class VoluntarioResponse {
         response.statusAprovacao = voluntario.getStatusAprovacao();
         response.motivoVoluntariado = voluntario.getMotivoVoluntariado();
         response.contaId = voluntario.getContaId();
+        response.codigoIndicacao = voluntario.getCodigoIndicacao();
+        response.pontosIndicacao = voluntario.getPontosIndicacao();
+        response.idVoluntarioIndicador = voluntario.getIdVoluntarioIndicador();
         if (voluntario.getEspecialidade() != null) {
             response.especialidade = EspecialidadeResponse.from(voluntario.getEspecialidade());
         }

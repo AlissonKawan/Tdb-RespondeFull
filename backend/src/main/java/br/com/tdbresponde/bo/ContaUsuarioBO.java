@@ -171,6 +171,16 @@ public class ContaUsuarioBO {
         voluntario.setMotivoVoluntariado(request.motivoVoluntariado.trim());
         voluntario.setEspecialidades(especialidades);
 
+        voluntario.setCodigoIndicacao(java.util.UUID.randomUUID().toString().substring(0, 8).toUpperCase());
+
+        if (request.codigoIndicacao != null && !request.codigoIndicacao.trim().isEmpty()) {
+            Voluntario indicador = voluntarioDAO.buscarPorCodigoIndicacao(request.codigoIndicacao.trim());
+            if (indicador == null) {
+                throw new BusinessException("Codigo de indicacao invalido.");
+            }
+            voluntario.setIdVoluntarioIndicador(indicador.getId());
+        }
+
         return voluntario;
     }
 

@@ -16,6 +16,11 @@ public class Voluntario {
     private Especialidade especialidade; //mantido para compatibilidade com telas antigas
     private List<Especialidade> especialidades = new ArrayList<>();
 
+    // Novos campos de Indicação e Ranking
+    private String codigoIndicacao;
+    private Integer pontosIndicacao = 0;
+    private Integer idVoluntarioIndicador;
+
     public Voluntario() {
     }
 
@@ -148,6 +153,30 @@ public class Voluntario {
         this.acessoSigilo = acessoSigilo;
     }
 
+    public String getCodigoIndicacao() {
+        return codigoIndicacao;
+    }
+
+    public void setCodigoIndicacao(String codigoIndicacao) {
+        this.codigoIndicacao = codigoIndicacao;
+    }
+
+    public Integer getPontosIndicacao() {
+        return pontosIndicacao;
+    }
+
+    public void setPontosIndicacao(Integer pontosIndicacao) {
+        this.pontosIndicacao = pontosIndicacao;
+    }
+
+    public Integer getIdVoluntarioIndicador() {
+        return idVoluntarioIndicador;
+    }
+
+    public void setIdVoluntarioIndicador(Integer idVoluntarioIndicador) {
+        this.idVoluntarioIndicador = idVoluntarioIndicador;
+    }
+
     @Override
     public String toString() {
         return "Voluntario{" +
@@ -160,6 +189,9 @@ public class Voluntario {
                 ", statusAprovacao='" + statusAprovacao + '\'' +
                 ", motivoVoluntariado='" + motivoVoluntariado + '\'' +
                 ", especialidades=" + especialidades +
+                ", codigoIndicacao='" + codigoIndicacao + '\'' +
+                ", pontosIndicacao=" + pontosIndicacao +
+                ", idVoluntarioIndicador=" + idVoluntarioIndicador +
                 '}';
     }
 }

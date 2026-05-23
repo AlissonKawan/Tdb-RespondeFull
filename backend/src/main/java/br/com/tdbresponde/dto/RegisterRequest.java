@@ -22,4 +22,5 @@ public class RegisterRequest {
     public Integer especialidadeId;
     public String especialidade;
     public java.util.List<Integer> especialidadeIds;
+    public String codigoIndicacao;
 }

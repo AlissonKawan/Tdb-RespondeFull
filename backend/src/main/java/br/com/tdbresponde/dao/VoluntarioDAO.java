@@ -18,7 +18,7 @@ import java.util.List;
 public class VoluntarioDAO {
 
     private static final String COLUNAS_VOLUNTARIO =
-            "ID, NOME, USUARIO, SENHA, ACESSO_SIGILO, DISPONIVEL, ID_CONTA, STATUS_APROVACAO, MOTIVO_VOLUNTARIADO";
+            "ID, NOME, USUARIO, SENHA, ACESSO_SIGILO, DISPONIVEL, ID_CONTA, STATUS_APROVACAO, MOTIVO_VOLUNTARIADO, CODIGO_INDICACAO, PONTOS_INDICACAO, ID_VOLUNTARIO_INDICADOR";
 
     @Inject
     DataSource dataSource;
@@ -36,8 +36,8 @@ public class VoluntarioDAO {
 
     public void inserir(Connection conn, Voluntario voluntario) throws SQLException {
         String sql = "INSERT INTO VOLUNTARIO " +
-                "(NOME, USUARIO, SENHA, ACESSO_SIGILO, DISPONIVEL, ID_CONTA, STATUS_APROVACAO, MOTIVO_VOLUNTARIADO) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                "(NOME, USUARIO, SENHA, ACESSO_SIGILO, DISPONIVEL, ID_CONTA, STATUS_APROVACAO, MOTIVO_VOLUNTARIADO, CODIGO_INDICACAO, PONTOS_INDICACAO, ID_VOLUNTARIO_INDICADOR) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql, new String[] { "ID" })) {
             stmt.setString(1, voluntario.getNome());
@@ -53,6 +53,14 @@ public class VoluntarioDAO {
             }
             stmt.setString(7, voluntario.getStatusAprovacao());
             stmt.setString(8, voluntario.getMotivoVoluntariado());
+            stmt.setString(9, voluntario.getCodigoIndicacao());
+            stmt.setInt(10, voluntario.getPontosIndicacao() != null ? voluntario.getPontosIndicacao() : 0);
+
+            if (voluntario.getIdVoluntarioIndicador() != null) {
+                stmt.setInt(11, voluntario.getIdVoluntarioIndicador());
+            } else {
+                stmt.setNull(11, java.sql.Types.INTEGER);
+            }
 
             stmt.executeUpdate();
 
@@ -118,6 +126,31 @@ public class VoluntarioDAO {
         return voluntario;
     }
 
+    public Voluntario buscarPorCodigoIndicacao(String codigo) {
+        String sql = "SELECT " + COLUNAS_VOLUNTARIO + " " +
+                "FROM VOLUNTARIO WHERE CODIGO_INDICACAO = ?";
+
+        Voluntario voluntario = null;
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, codigo);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    voluntario = mapearVoluntario(rs);
+                    carregarEspecialidade(voluntario);
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new DatabaseException("Erro ao buscar voluntario por codigo indicacao: " + e.getMessage(), e);
+        }
+
+        return voluntario;
+    }
+
     public List<Voluntario> buscarTodos() {
         String sql = "SELECT " + COLUNAS_VOLUNTARIO + " FROM VOLUNTARIO";
 
@@ -165,7 +198,7 @@ public class VoluntarioDAO {
 
     public void atualizar(Voluntario voluntario) {
         String sql = "UPDATE VOLUNTARIO SET NOME = ?, USUARIO = ?, SENHA = ?, " +
-                "ACESSO_SIGILO = ?, DISPONIVEL = ?, ID_CONTA = ?, STATUS_APROVACAO = ?, MOTIVO_VOLUNTARIADO = ? " +
+                "ACESSO_SIGILO = ?, DISPONIVEL = ?, ID_CONTA = ?, STATUS_APROVACAO = ?, MOTIVO_VOLUNTARIADO = ?, CODIGO_INDICACAO = ?, PONTOS_INDICACAO = ?, ID_VOLUNTARIO_INDICADOR = ? " +
                 "WHERE ID = ?";
 
         Connection conn = null;
@@ -189,7 +222,16 @@ public class VoluntarioDAO {
 
                 stmt.setString(7, voluntario.getStatusAprovacao());
                 stmt.setString(8, voluntario.getMotivoVoluntariado());
-                stmt.setInt(9, voluntario.getId());
+                stmt.setString(9, voluntario.getCodigoIndicacao());
+                stmt.setInt(10, voluntario.getPontosIndicacao() != null ? voluntario.getPontosIndicacao() : 0);
+
+                if (voluntario.getIdVoluntarioIndicador() != null) {
+                    stmt.setInt(11, voluntario.getIdVoluntarioIndicador());
+                } else {
+                    stmt.setNull(11, java.sql.Types.INTEGER);
+                }
+
+                stmt.setInt(12, voluntario.getId());
                 stmt.executeUpdate();
             }
 
@@ -283,6 +325,13 @@ public class VoluntarioDAO {
         }
         voluntario.setStatusAprovacao(rs.getString("STATUS_APROVACAO"));
         voluntario.setMotivoVoluntariado(rs.getString("MOTIVO_VOLUNTARIADO"));
+
+        voluntario.setCodigoIndicacao(rs.getString("CODIGO_INDICACAO"));
+        voluntario.setPontosIndicacao(rs.getInt("PONTOS_INDICACAO"));
+        int indicadorId = rs.getInt("ID_VOLUNTARIO_INDICADOR");
+        if (!rs.wasNull()) {
+            voluntario.setIdVoluntarioIndicador(indicadorId);
+        }
 
         return voluntario;
     }
