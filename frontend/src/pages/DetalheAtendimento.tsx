@@ -150,6 +150,78 @@ function DetalheAtendimento() {
     void carregarDados();
   }, [atendimentoId]);
 
+  useEffect(() => {
+    let cancelled = false;
+    let socket: WebSocket | null = null;
+    let reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
+    let reconnectAttempt = 0;
+
+    // A URL base precisa ser limpa e trocada de http para ws
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const baseUrl = import.meta.env.VITE_API_URL || (isLocalhost ? 'http://localhost:8080' : 'https://tdb-respondefull.onrender.com');
+    const wsUrlBase = baseUrl.replace(/\/$/, '').replace(/^http:\/\//i, 'ws://').replace(/^https:\/\//i, 'wss://');
+
+    function connect() {
+      if (cancelled || !atendimentoId) return;
+
+      const clientId = `${remetenteAtual}-${Math.random().toString(36).substring(7)}`;
+      const wsUrl = `${wsUrlBase}/chat/${atendimentoId}/${clientId}`;
+
+      console.log(`[WebSocket] Conectando a: ${wsUrl} (tentativa ${reconnectAttempt})`);
+      socket = new WebSocket(wsUrl);
+
+      socket.onopen = () => {
+        if (cancelled) {
+          socket?.close();
+          return;
+        }
+        reconnectAttempt = 0;
+        console.log('[WebSocket] Conectado com sucesso! clientId=' + clientId);
+      };
+
+      socket.onmessage = (event) => {
+        if (cancelled) return;
+        try {
+          const msg = JSON.parse(event.data) as Mensagem;
+          setMensagens((prev) => {
+            if (prev.some(m => m.id === msg.id)) return prev;
+            return [...prev, msg];
+          });
+        } catch (e) {
+          console.error('[WebSocket] Erro ao fazer parse:', e);
+        }
+      };
+
+      socket.onerror = (error) => {
+        console.error('[WebSocket] Erro:', error);
+      };
+
+      socket.onclose = (event) => {
+        console.log(`[WebSocket] Fechado: code=${event.code} cancelled=${cancelled}`);
+        if (!cancelled) {
+          reconnectAttempt++;
+          const delay = Math.min(reconnectAttempt * 3000, 30000);
+          console.log(`[WebSocket] Reconectando em ${delay / 1000}s...`);
+          reconnectTimeout = setTimeout(() => {
+            mensagensService.getMensagensAtendimento(atendimentoId)
+              .then((msgs) => { if (!cancelled) setMensagens(msgs); })
+              .catch(() => {});
+            connect();
+          }, delay);
+        }
+      };
+    }
+
+    connect();
+
+    return () => {
+      console.log('[WebSocket] Cleanup - encerrando conexao e auto-reconnect');
+      cancelled = true;
+      if (reconnectTimeout) clearTimeout(reconnectTimeout);
+      socket?.close();
+    };
+  }, [atendimentoId, remetenteAtual]);
+
   const pessoaAtendida = useMemo(() => (
     atendimento?.pessoaAtendidaNome
       ?? atendimento?.beneficiarioNome
