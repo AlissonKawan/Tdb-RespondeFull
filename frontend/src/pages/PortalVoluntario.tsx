@@ -10,6 +10,7 @@ import { EmptyState, ErrorState, LoadingState } from '../components/ui/FeedbackS
 import PageHeader from '../components/ui/PageHeader';
 import SectionHeader from '../components/ui/SectionHeader';
 import { atendimentoService } from '../services/atendimentoService';
+import { voluntariosService } from '../services/voluntariosService';
 import type { AtendimentoApi } from '../types/AtendimentoApi';
 import { useAuth } from '../context/useAuth';
 
@@ -93,6 +94,8 @@ function PortalVoluntario() {
   const [erroMeus, setErroMeus] = useState('');
   const [feedback, setFeedback] = useState('');
   const [assumindoId, setAssumindoId] = useState<number | null>(null);
+  const [codigoIndicacao, setCodigoIndicacao] = useState<string>('');
+  const [copiado, setCopiado] = useState(false);
 
   const voluntarioSemVinculo = user?.tipoUsuario === 'VOLUNTARIO' && !user?.voluntarioId;
 
@@ -140,7 +143,12 @@ function PortalVoluntario() {
         return;
       }
 
-      await carregarMeus(user.voluntarioId);
+      await Promise.all([
+        carregarMeus(user.voluntarioId),
+        voluntariosService.buscarPorId(user.voluntarioId).then(vol => {
+          if (vol.codigoIndicacao) setCodigoIndicacao(vol.codigoIndicacao);
+        }).catch(err => console.error('Erro ao buscar codigo de indicacao', err))
+      ]);
     }
 
     void carregarDadosDoPortal();
@@ -174,6 +182,18 @@ function PortalVoluntario() {
       );
     } finally {
       setAssumindoId(null);
+    }
+  };
+
+  const copiarLink = async () => {
+    if (!codigoIndicacao) return;
+    const link = `${window.location.origin}/cadastro?ref=${codigoIndicacao}`;
+    try {
+      await navigator.clipboard.writeText(link);
+      setCopiado(true);
+      setTimeout(() => setCopiado(false), 2000);
+    } catch (err) {
+      console.error('Falha ao copiar link', err);
     }
   };
 
@@ -211,17 +231,51 @@ function PortalVoluntario() {
       />
 
       <Section tone="white">
-        <Card className="mb-6 flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">Bem-vindo</p>
-            <h2 className="mt-2 text-2xl font-bold text-[#0F172A]">{user?.nome}</h2>
-            <p className="mt-1 text-[#475569]">{user?.email}</p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Button variant={aba === 'solicitados' ? 'primary' : 'secondary'} onClick={() => setAba('solicitados')}>Atendimentos solicitados</Button>
-            <Button variant={aba === 'meus' ? 'primary' : 'secondary'} onClick={() => setAba('meus')}>Meus atendimentos</Button>
-          </div>
-        </Card>
+        <div className="mb-6 grid gap-6 lg:grid-cols-[1fr_350px]">
+          <Card className="flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">Bem-vindo</p>
+              <h2 className="mt-2 text-2xl font-bold text-[#0F172A]">{user?.nome}</h2>
+              <p className="mt-1 text-[#475569]">{user?.email}</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button variant={aba === 'solicitados' ? 'primary' : 'secondary'} onClick={() => setAba('solicitados')}>Atendimentos solicitados</Button>
+              <Button variant={aba === 'meus' ? 'primary' : 'secondary'} onClick={() => setAba('meus')}>Meus atendimentos</Button>
+            </div>
+          </Card>
+
+          {user?.tipoUsuario === 'VOLUNTARIO' && codigoIndicacao && (
+            <Card className="p-6">
+              <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                </div>
+                <div>
+                  <h3 className="font-bold text-[#0F172A]">Campanha de Indicações</h3>
+                  <p className="mt-1 text-sm text-[#475569]">Convide outros profissionais e ganhe pontos no ranking!</p>
+                  <div className="mt-4 flex gap-2">
+                    <input 
+                      type="text" 
+                      readOnly 
+                      value={`${window.location.origin}/cadastro?ref=${codigoIndicacao}`}
+                      className="w-full truncate rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-500 outline-none"
+                    />
+                    <Button variant={copiado ? 'primary' : 'secondary'} onClick={copiarLink} className={copiado ? 'bg-emerald-600 hover:bg-emerald-700' : ''}>
+                      {copiado ? (
+                        <>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1.5"><polyline points="20 6 9 17 4 12"/></svg>
+                          Copiado
+                        </>
+                      ) : 'Copiar'}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          )}
+        </div>
+
+
 
         {feedback && (
           <div className="mb-5 rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm font-semibold text-[#2563EB]">

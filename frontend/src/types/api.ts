@@ -12,6 +12,7 @@ export interface VoluntarioApi {
   especialidade?: EspecialidadeApi | null;
   disponivel: boolean;
   acessoSigilo: boolean;
+  codigoIndicacao?: string;
 }
 
 export interface VoluntarioRequestApi {
