@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getRanking, RankingResponse } from '../services/voluntariosService';
+import { getRanking, type RankingResponse } from '../services/voluntariosService';
 import PageHeader from '../components/ui/PageHeader';
 import Button from '../components/ui/Button';
 import Container from '../components/ui/Container';
@@ -23,7 +23,7 @@ const RankingVoluntarios: React.FC = () => {
       setError(null);
       // Puxando o top 10
       const response = await getRanking(10);
-      setRanking(response.data);
+      setRanking(response);
     } catch (err) {
       console.error('Erro ao carregar ranking:', err);
       setError('Não foi possível carregar o ranking de indicações.');
