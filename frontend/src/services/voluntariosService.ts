@@ -16,6 +16,16 @@ export interface Voluntario {
   };
 }
 
+export interface RankingResponse {
+  nome: string;
+  codigoIndicacao: string;
+  pontosIndicacao: number;
+  especialidade?: {
+    id: number;
+    nome: string;
+  };
+}
+
 export const voluntariosService = {
   listar: () => apiClient.get<VoluntarioApi[]>('/voluntarios'),
   buscarPorId: (id: number) => apiClient.get<VoluntarioApi>(`/voluntarios/${id}`),
@@ -25,9 +35,11 @@ export const voluntariosService = {
   excluir: (id: number) => apiClient.delete<void>(`/voluntarios/${id}`),
   listarPendentes: () => apiClient.get<Voluntario[]>('/voluntarios/pendentes'),
   aprovar: (id: number) => apiClient.put<void>(`/voluntarios/${id}/aprovar`),
+  listarRanking: (limite = 10) => apiClient.get<RankingResponse[]>(`/voluntarios/ranking?limite=${limite}`),
 };
 
 export const getVoluntarios = voluntariosService.listar;
 export const createVoluntario = voluntariosService.criar;
 export const getVoluntariosPendentes = voluntariosService.listarPendentes;
 export const aprovarVoluntario = voluntariosService.aprovar;
+export const getRanking = voluntariosService.listarRanking;
