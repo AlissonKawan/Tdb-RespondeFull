@@ -41,7 +41,8 @@ function AprovacaoVoluntarios() {
     setAprovandoId(id);
     setFeedback('');
     try {
-      await voluntariosService.aprovar(id);
+      if (!user) throw new Error('Usuario logado nao encontrado');
+      await voluntariosService.aprovar(id, { aprovadorId: user.id });
       setFeedback('Solicitacao aprovada com sucesso.');
       await carregar();
     } catch (error) {

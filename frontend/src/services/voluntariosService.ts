@@ -34,7 +34,7 @@ export const voluntariosService = {
     apiClient.put<VoluntarioApi>(`/voluntarios/${id}`, payload),
   excluir: (id: number) => apiClient.delete<void>(`/voluntarios/${id}`),
   listarPendentes: () => apiClient.get<Voluntario[]>('/voluntarios/pendentes'),
-  aprovar: (id: number) => apiClient.put<void>(`/voluntarios/${id}/aprovar`),
+  aprovar: (id: number, payload: { aprovadorId: number }) => apiClient.put<void>(`/voluntarios/${id}/aprovar`, payload),
   listarRanking: (limite = 10) => apiClient.get<RankingResponse[]>(`/voluntarios/ranking?limite=${limite}`),
   gerarCodigoIndicacao: (id: number) => apiClient.post<VoluntarioApi>(`/voluntarios/${id}/gerar-codigo`, {}),
 };
