@@ -187,7 +187,10 @@ function PortalVoluntario() {
             </button>
             <p className="mt-1 text-sm text-[#475569]">Sessao de {user?.nome}</p>
           </div>
-          <Button variant="secondary" onClick={() => { logout(); navigate('/login'); }}>Sair</Button>
+          <div className="flex gap-2">
+            <Button variant="secondary" onClick={() => navigate('/ranking')}>🏆 Ver Ranking</Button>
+            <Button variant="secondary" onClick={() => { logout(); navigate('/login'); }}>Sair</Button>
+          </div>
         </Container>
       </header>
 
