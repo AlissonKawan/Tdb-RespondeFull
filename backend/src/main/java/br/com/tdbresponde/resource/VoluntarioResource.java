@@ -108,4 +108,11 @@ public class VoluntarioResource {
         bo.excluir(id);
         return Response.noContent().build();
     }
+
+    @POST
+    @Path("/{id}/gerar-codigo")
+    public Response gerarCodigo(@PathParam("id") int id) {
+        Voluntario voluntario = bo.gerarCodigoIndicacao(id);
+        return Response.ok(VoluntarioResponse.from(voluntario)).build();
+    }
 }

@@ -244,7 +244,7 @@ function PortalVoluntario() {
             </div>
           </Card>
 
-          {user?.tipoUsuario === 'VOLUNTARIO' && codigoIndicacao && (
+          {user?.tipoUsuario === 'VOLUNTARIO' && (
             <Card className="p-6">
               <div className="flex items-start gap-3">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600">
@@ -253,26 +253,48 @@ function PortalVoluntario() {
                 <div>
                   <h3 className="font-bold text-[#0F172A]">Campanha de Indicações</h3>
                   <p className="mt-1 text-sm text-[#475569]">Convide outros profissionais e ganhe pontos no ranking!</p>
-                  <div className="mt-4 flex gap-2">
-                    <input 
-                      type="text" 
-                      readOnly 
-                      value={`${window.location.origin}/cadastro?ref=${codigoIndicacao}`}
-                      className="w-full truncate rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-500 outline-none"
-                    />
-                    <Button variant={copiado ? 'primary' : 'secondary'} onClick={copiarLink} className={copiado ? 'bg-emerald-600 hover:bg-emerald-700' : ''}>
-                      {copiado ? (
-                        <>
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1.5"><polyline points="20 6 9 17 4 12"/></svg>
-                          Copiado
-                        </>
-                      ) : 'Copiar'}
-                    </Button>
+                  <div className="mt-4 flex flex-col gap-2">
+                    {codigoIndicacao ? (
+                      <div className="flex gap-2">
+                        <input 
+                          type="text" 
+                          readOnly 
+                          value={`${window.location.origin}/cadastro?ref=${codigoIndicacao}`}
+                          className="w-full truncate rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-500 outline-none"
+                        />
+                        <Button variant={copiado ? 'primary' : 'secondary'} onClick={copiarLink} className={copiado ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : ''}>
+                          {copiado ? (
+                            <>
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1.5"><polyline points="20 6 9 17 4 12"/></svg>
+                              Copiado
+                            </>
+                          ) : 'Copiar'}
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button 
+                        variant="secondary" 
+                        className="w-fit"
+                        onClick={async () => {
+                          if (user?.voluntarioId) {
+                            try {
+                              const res = await voluntariosService.gerarCodigoIndicacao(user.voluntarioId);
+                              if (res.codigoIndicacao) setCodigoIndicacao(res.codigoIndicacao);
+                            } catch (err) {
+                              console.error('Erro ao gerar codigo', err);
+                            }
+                          }
+                        }}
+                      >
+                        Gerar meu Link
+                      </Button>
+                    )}
                   </div>
                 </div>
               </div>
             </Card>
           )}
+
         </div>
 
 

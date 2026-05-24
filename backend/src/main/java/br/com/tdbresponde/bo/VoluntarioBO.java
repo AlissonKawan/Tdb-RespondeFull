@@ -99,6 +99,18 @@ public class VoluntarioBO {
         dao.excluir(id);
     }
 
+    public Voluntario gerarCodigoIndicacao(int id) {
+        Voluntario voluntario = buscarPorId(id);
+        if (voluntario.getCodigoIndicacao() != null && !voluntario.getCodigoIndicacao().trim().isEmpty()) {
+            return voluntario; // ja possui
+        }
+        
+        String codigo = java.util.UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+        voluntario.setCodigoIndicacao(codigo);
+        dao.atualizar(voluntario);
+        return voluntario;
+    }
+
     private Voluntario toModel(VoluntarioRequest request) {
         Voluntario voluntario = new Voluntario();
         if (request != null) {
