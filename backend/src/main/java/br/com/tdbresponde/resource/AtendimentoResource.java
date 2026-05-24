@@ -53,6 +53,30 @@ public class AtendimentoResource {
                 .toList()).build();
     }
 
+    @GET
+    @Path("/voluntario/{voluntarioId}")
+    public Response listarPorVoluntario(@PathParam("voluntarioId") int voluntarioId) {
+        return Response.ok(bo.listarPorVoluntario(voluntarioId).stream()
+                .map(AtendimentoResponse::from)
+                .toList()).build();
+    }
+
+    @GET
+    @Path("/beneficiario/{beneficiarioId}")
+    public Response listarPorBeneficiario(@PathParam("beneficiarioId") int beneficiarioId) {
+        return Response.ok(bo.listarPorBeneficiario(beneficiarioId).stream()
+                .map(AtendimentoResponse::from)
+                .toList()).build();
+    }
+
+    @GET
+    @Path("/beneficiario/conta/{contaId}")
+    public Response listarPorContaBeneficiario(@PathParam("contaId") int contaId) {
+        return Response.ok(bo.listarPorContaBeneficiario(contaId).stream()
+                .map(AtendimentoResponse::from)
+                .toList()).build();
+    }
+
     @POST
     @Path("/relatar")
     public Response relatar(RelatarSituacaoRequest request) {
