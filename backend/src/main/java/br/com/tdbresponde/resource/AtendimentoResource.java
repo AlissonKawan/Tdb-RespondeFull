@@ -11,6 +11,7 @@ import br.com.tdbresponde.dto.CheckinRequest;
 import br.com.tdbresponde.dto.EncerrarAtendimentoRequest;
 import br.com.tdbresponde.dto.MensagemRequest;
 import br.com.tdbresponde.dto.MensagemResponse;
+import br.com.tdbresponde.dto.PredictResponse; // Adicionado para a IA
 import br.com.tdbresponde.dto.RelatarSituacaoRequest;
 import br.com.tdbresponde.dto.SolicitarAtendimentoRequest;
 import jakarta.inject.Inject;
@@ -52,55 +53,6 @@ public class AtendimentoResource {
                 .toList()).build();
     }
 
-    @GET
-    @Path("/voluntario/{voluntarioId}")
-    public Response listarPorVoluntario(@PathParam("voluntarioId") int voluntarioId) {
-        return Response.ok(bo.listarPorVoluntario(voluntarioId).stream()
-                .map(AtendimentoResponse::from)
-                .toList()).build();
-    }
-
-    @GET
-    @Path("/beneficiario/{beneficiarioId}")
-    public Response listarPorBeneficiario(@PathParam("beneficiarioId") int beneficiarioId) {
-        return Response.ok(bo.listarPorBeneficiario(beneficiarioId).stream()
-                .map(AtendimentoResponse::from)
-                .toList()).build();
-    }
-
-    @GET
-    @Path("/beneficiario/conta/{contaId}")
-    public Response listarPorContaBeneficiario(@PathParam("contaId") int contaId) {
-        return Response.ok(bo.listarPorContaBeneficiario(contaId).stream()
-                .map(AtendimentoResponse::from)
-                .toList()).build();
-    }
-
-    @GET
-    @Path("/em-andamento")
-    public Response listarEmAndamento() {
-        return Response.ok(bo.listarEmAndamento().stream()
-                .map(AtendimentoResponse::from)
-                .toList()).build();
-    }
-
-    @GET
-    @Path("/encerrados")
-    public Response listarEncerrados() {
-        return Response.ok(bo.listarEncerrados().stream()
-                .map(AtendimentoResponse::from)
-                .toList()).build();
-    }
-
-    @POST
-    @Path("/solicitar")
-    public Response solicitar(SolicitarAtendimentoRequest request) {
-        Atendimento atendimento = bo.solicitar(request);
-        return Response.status(Response.Status.CREATED)
-                .entity(AtendimentoResponse.from(atendimento))
-                .build();
-    }
-
     @POST
     @Path("/relatar")
     public Response relatar(RelatarSituacaoRequest request) {
@@ -128,6 +80,10 @@ public class AtendimentoResource {
                 .toList()).build();
     }
 
+    /**
+     * Endpoint de inserção de mensagem via atendimento.
+     * Modificado para chamar a IA do Python e classificar o conteúdo.
+     */
     @POST
     @Path("/{id}/mensagens")
     public Response inserirMensagem(@PathParam("id") int id, MensagemRequest request) {
@@ -135,8 +91,24 @@ public class AtendimentoResource {
             request = new MensagemRequest();
         }
         request.atendimentoId = id;
+
+        // 1. Salva a mensagem no banco (Lógica Original)
+        br.com.tdbresponde.model.Mensagem mensagem = mensagemBO.inserir(request);
+
+        // 2. Converte para o DTO de resposta
+        MensagemResponse response = MensagemResponse.from(mensagem);
+
+        // 3. INTEGRAÇÃO: Chama a IA para classificar a mensagem recém-criada
+        PredictResponse predicao = mensagemBO.classificarMensagem(mensagem);
+
+        // 4. Se a IA respondeu, preenchemos os campos de classificação na resposta
+        if (predicao != null) {
+            response.categoriaIA = predicao.categoriaPrevista;
+            response.confiancaIA = predicao.confianca;
+        }
+
         return Response.status(Response.Status.CREATED)
-                .entity(MensagemResponse.from(mensagemBO.inserir(request)))
+                .entity(response)
                 .build();
     }
 
