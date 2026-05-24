@@ -2,8 +2,13 @@ package br.com.tdbresponde.resource;
 
 import br.com.tdbresponde.bo.VoluntarioBO;
 import br.com.tdbresponde.dto.AprovacaoVoluntarioRequest;
+import br.com.tdbresponde.dto.RankingResponse;
 import br.com.tdbresponde.dto.VoluntarioRequest;
 import br.com.tdbresponde.dto.VoluntarioResponse;
+import br.com.tdbresponde.dao.ContaUsuarioDAO;
+import br.com.tdbresponde.model.ContaUsuario;
+import br.com.tdbresponde.model.TipoUsuario;
+import br.com.tdbresponde.exception.UnauthorizedException;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -25,6 +30,9 @@ public class VoluntarioResource {
     @Inject
     VoluntarioBO bo;
 
+    @Inject
+    ContaUsuarioDAO contaUsuarioDAO;
+
     @GET
     public Response listar() {
         return Response.ok(bo.listar().stream()
@@ -45,6 +53,14 @@ public class VoluntarioResource {
     public Response listarAtivos() {
         return Response.ok(bo.listarAtivos().stream()
                 .map(VoluntarioResponse::from)
+                .toList()).build();
+    }
+
+    @GET
+    @Path("/ranking")
+    public Response listarRanking(@jakarta.ws.rs.QueryParam("limite") @jakarta.ws.rs.DefaultValue("10") int limite) {
+        return Response.ok(bo.buscarTopRanking(limite).stream()
+                .map(RankingResponse::from)
                 .toList()).build();
     }
 
@@ -73,11 +89,16 @@ public class VoluntarioResource {
     @PUT
     @Path("/{id}/aprovar")
     public Response aprovar(@PathParam("id") int id, AprovacaoVoluntarioRequest request) {
-        if (request != null && request.aprovadorId != null) {
-            bo.aprovar(id, request.aprovadorId);
-        } else {
-            bo.aprovar(id);
+        if (request == null || request.aprovadorId == null) {
+            throw new UnauthorizedException("Aprovador nao identificado.");
         }
+
+        ContaUsuario aprovador = contaUsuarioDAO.buscarPorId(request.aprovadorId);
+        if (aprovador == null || aprovador.getTipoUsuario() != TipoUsuario.ADMIN) {
+            throw new UnauthorizedException("Apenas administradores podem aprovar novos voluntarios.");
+        }
+
+        bo.aprovar(id);
         return Response.noContent().build();
     }
 

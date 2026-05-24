@@ -35,6 +35,10 @@ public class VoluntarioBO {
         return dao.buscarPendentes();
     }
 
+    public List<Voluntario> buscarTopRanking(int limite) {
+        return dao.buscarTopRanking(limite);
+    }
+
     public Voluntario buscarPorId(int id) {
         Voluntario voluntario = dao.buscarPorId(id);
         if (voluntario == null) {
@@ -79,19 +83,15 @@ public class VoluntarioBO {
 
         dao.aprovar(id);
         contaUsuarioDAO.ativar(voluntario.getContaId());
-    }
 
-    public void aprovar(int id, int aprovadorId) {
-        if (id == aprovadorId) {
-            throw new BusinessException("Um voluntario nao pode aprovar o proprio cadastro.");
+        if (voluntario.getIdVoluntarioIndicador() != null) {
+            Voluntario indicador = dao.buscarPorId(voluntario.getIdVoluntarioIndicador());
+            if (indicador != null) {
+                int pontosAtuais = indicador.getPontosIndicacao() != null ? indicador.getPontosIndicacao() : 0;
+                indicador.setPontosIndicacao(pontosAtuais + 10);
+                dao.atualizar(indicador);
+            }
         }
-
-        Voluntario aprovador = buscarPorId(aprovadorId);
-        if (!aprovador.isDisponivel() || !"APROVADO".equalsIgnoreCase(aprovador.getStatusAprovacao())) {
-            throw new BusinessException("Apenas voluntarios aprovados e ativos podem aprovar novos voluntarios.");
-        }
-
-        aprovar(id);
     }
 
     public void excluir(int id) {

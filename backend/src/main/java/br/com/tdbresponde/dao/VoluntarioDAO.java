@@ -196,6 +196,34 @@ public class VoluntarioDAO {
         return voluntarios;
     }
 
+    public List<Voluntario> buscarTopRanking(int limite) {
+        String sql = "SELECT " + COLUNAS_VOLUNTARIO + " FROM VOLUNTARIO " +
+                "WHERE PONTOS_INDICACAO > 0 " +
+                "ORDER BY PONTOS_INDICACAO DESC " +
+                "FETCH FIRST ? ROWS ONLY";
+
+        List<Voluntario> voluntarios = new ArrayList<>();
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, limite);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Voluntario voluntario = mapearVoluntario(rs);
+                    carregarEspecialidade(voluntario);
+                    voluntarios.add(voluntario);
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new DatabaseException("Erro ao buscar top ranking: " + e.getMessage(), e);
+        }
+
+        return voluntarios;
+    }
+
     public void atualizar(Voluntario voluntario) {
         String sql = "UPDATE VOLUNTARIO SET NOME = ?, USUARIO = ?, SENHA = ?, " +
                 "ACESSO_SIGILO = ?, DISPONIVEL = ?, ID_CONTA = ?, STATUS_APROVACAO = ?, MOTIVO_VOLUNTARIADO = ?, CODIGO_INDICACAO = ?, PONTOS_INDICACAO = ?, ID_VOLUNTARIO_INDICADOR = ? " +

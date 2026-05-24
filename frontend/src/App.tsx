@@ -24,6 +24,7 @@ import PortalVoluntario from './pages/PortalVoluntario';
 import AprovacaoVoluntarios from './pages/AprovacaoVoluntarios';
 import SolicitarAtendimento from './pages/SolicitarAtendimento';
 import DetalheAtendimento from './pages/DetalheAtendimento';
+import RankingVoluntarios from './pages/RankingVoluntarios';
 
 function App() {
   return (
@@ -137,6 +138,15 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['VOLUNTARIO', 'ADMIN']}>
                 <AprovacaoVoluntarios />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/ranking"
+            element={
+              <ProtectedRoute allowedRoles={['VOLUNTARIO', 'ADMIN']}>
+                <RankingVoluntarios />
               </ProtectedRoute>
             }
           />
