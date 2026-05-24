@@ -140,7 +140,15 @@ function DetalheAtendimento() {
       setStatusEdit(dadosAtendimento.status ?? 'ABERTO');
       setPrioridadeEdit(String(dadosAtendimento.prioridade ?? 3));
     } catch (error) {
-      setErro(error instanceof Error ? error.message : 'Nao foi possivel carregar o atendimento.');
+      let msgErro = 'Nao foi possivel carregar os detalhes deste atendimento. Tente novamente mais tarde.';
+      if (error instanceof Error) {
+        if (error.message.includes('Error injecting') || error.message.includes('Internal Server Error') || error.message.includes('500')) {
+          msgErro = 'Houve uma falha interna no servidor ao carregar este atendimento. A equipe tecnica ja foi notificada.';
+        } else {
+          msgErro = error.message;
+        }
+      }
+      setErro(msgErro);
     } finally {
       setLoading(false);
     }
