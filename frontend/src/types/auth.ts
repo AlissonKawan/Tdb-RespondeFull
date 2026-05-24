@@ -10,6 +10,7 @@ export interface RegisterPayload {
   motivoVoluntariado?: string;
   tipoPessoaAtendida?: TipoPessoaAtendida;
   tipoBeneficiario?: TipoPessoaAtendida;
+  codigoIndicacao?: string;
 }
 
 export type RegisterRequest = RegisterPayload;

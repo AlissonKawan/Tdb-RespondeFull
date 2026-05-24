@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import Section from '../components/layout/Section';
 import PageShell from '../components/layout/PageShell';
@@ -25,6 +25,8 @@ interface FormData {
 
 function CadastroVoluntario() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const codigoIndicacao = searchParams.get('ref') || undefined;
   const { register: registerAccount } = useAuth();
   const [especialidades, setEspecialidades] = useState<EspecialidadeApi[]>([]);
   const [loadingEspecialidades, setLoadingEspecialidades] = useState(true);
@@ -80,6 +82,7 @@ function CadastroVoluntario() {
         tipoUsuario: 'VOLUNTARIO',
         especialidadeId: data.especialidadeId,
         motivoVoluntariado: data.motivoVoluntariado,
+        codigoIndicacao,
       });
 
       setSucesso('Solicitacao enviada com sucesso. Aguarde a aprovacao de um voluntario responsavel para acessar o portal.');
