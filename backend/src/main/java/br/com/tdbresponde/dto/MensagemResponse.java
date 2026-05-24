@@ -28,4 +28,7 @@ public class MensagemResponse {
         }
         return response;
     }
+    public String categoriaIA;
+    public Double confiancaIA;
+
 }
