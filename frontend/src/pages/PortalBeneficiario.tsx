@@ -11,6 +11,7 @@ import PageHeader from '../components/ui/PageHeader';
 import SectionHeader from '../components/ui/SectionHeader';
 import { useAuth } from '../context/useAuth';
 import { atendimentoService } from '../services/atendimentoService';
+import { mensagensService } from '../services/mensagensService';
 import type { AtendimentoApi } from '../types/AtendimentoApi';
 
 function statusTone(status?: string) {
@@ -23,28 +24,44 @@ function statusTone(status?: string) {
 
 function prioridadeLabel(prioridade?: string | number) {
   const labels: Record<string, string> = {
-    '1': 'Critico',
+    '1': 'Crítico',
     '2': 'Alto',
-    '3': 'Medio',
+    '3': 'Médio',
     '4': 'Baixo',
     ALTA: 'Alto',
-    MEDIA: 'Medio',
+    MEDIA: 'Médio',
     BAIXA: 'Baixo',
   };
-  return prioridade === undefined ? 'Nao informada' : labels[String(prioridade)] ?? String(prioridade);
+  return prioridade === undefined ? 'Não informada' : labels[String(prioridade)] ?? String(prioridade);
 }
 
 function formatDate(value?: string | null) {
-  if (!value) return 'Nao informada';
+  if (!value) return 'Não informada';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
   return date.toLocaleDateString('pt-BR');
+}
+
+function sortAtendimentos(a: AtendimentoApi, b: AtendimentoApi) {
+  const dateA = new Date(a.dataAtualizacao ?? a.dataCriacao ?? a.dataAbertura ?? 0).getTime();
+  const dateB = new Date(b.dataAtualizacao ?? b.dataCriacao ?? b.dataAbertura ?? 0).getTime();
+  return dateB - dateA; // Descending
+}
+
+function getPessoa(atendimento: AtendimentoApi) {
+  return atendimento.beneficiarioNome
+    ?? atendimento.pacienteNome
+    ?? atendimento.solicitanteNome
+    ?? atendimento.beneficiario?.nome
+    ?? atendimento.usuario?.nome
+    ?? 'Beneficiário não informado';
 }
 
 function PortalBeneficiario() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [atendimentos, setAtendimentos] = useState<AtendimentoApi[]>([]);
+  const [novasMensagens, setNovasMensagens] = useState<Record<number, boolean>>({});
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState('');
 
@@ -59,7 +76,25 @@ function PortalBeneficiario() {
       setLoading(true);
       setErro('');
       try {
-        setAtendimentos(await atendimentoService.listarPorContaBeneficiario(user.id));
+        const data = await atendimentoService.listarPorContaBeneficiario(user.id);
+        const sorted = data.sort(sortAtendimentos);
+        setAtendimentos(sorted);
+
+        // Fetch mensagens para verificar novidades
+        const unreadMap: Record<number, boolean> = {};
+        await Promise.all(sorted.map(async (atendimento) => {
+          try {
+            const msgs = await mensagensService.getMensagensAtendimento(atendimento.id);
+            if (msgs.length > 0) {
+              const ultima = msgs[msgs.length - 1];
+              // Se a última mensagem não foi enviada pelo beneficiário, conta como nova
+              if (ultima.enviadoPor !== 'BENEFICIARIO') {
+                unreadMap[atendimento.id] = true;
+              }
+            }
+          } catch { /* ignora */ }
+        }));
+        setNovasMensagens(prev => ({ ...prev, ...unreadMap }));
       } catch (error) {
         setErro(error instanceof Error ? error.message : 'Nao foi possivel carregar seus atendimentos.');
       } finally {
@@ -124,14 +159,16 @@ function PortalBeneficiario() {
               <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="text-lg font-bold text-[#0F172A]">Atendimento #{atendimento.id}</h3>
+                    <h3 className="text-lg font-bold text-[#0F172A]">{getPessoa(atendimento)}</h3>
+                    <Badge tone="neutral">Atendimento #{atendimento.id}</Badge>
                     {atendimento.status && <Badge tone={statusTone(atendimento.status)}>{atendimento.status}</Badge>}
+                    {novasMensagens[atendimento.id] && <Badge tone="critical">Nova Mensagem</Badge>}
                   </div>
                   <div className="mt-3 grid gap-2 text-sm text-[#475569] md:grid-cols-2">
                     <p><strong className="text-[#0F172A]">Prioridade:</strong> {prioridadeLabel(atendimento.prioridade)}</p>
-                    <p><strong className="text-[#0F172A]">Abertura:</strong> {formatDate(atendimento.dataAbertura ?? atendimento.dataCriacao)}</p>
+                    <p><strong className="text-[#0F172A]">Última Atividade:</strong> {atendimento.dataAtualizacao ?? formatDate(atendimento.dataAbertura ?? atendimento.dataCriacao)}</p>
                     <p><strong className="text-[#0F172A]">Encerramento:</strong> {formatDate(atendimento.dataEncerramento)}</p>
-                    <p><strong className="text-[#0F172A]">Voluntario:</strong> {atendimento.nomeVoluntario ?? atendimento.voluntario?.nome ?? 'Aguardando definicao'}</p>
+                    <p><strong className="text-[#0F172A]">Voluntário:</strong> {atendimento.nomeVoluntario ?? atendimento.voluntario?.nome ?? 'Aguardando definicao'}</p>
                   </div>
                   {atendimento.descricao && (
                     <p className="mt-4 max-w-3xl text-sm leading-6 text-[#475569]">{atendimento.descricao}</p>

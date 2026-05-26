@@ -11,17 +11,11 @@ import PageHeader from '../components/ui/PageHeader';
 import SectionHeader from '../components/ui/SectionHeader';
 import { atendimentoService } from '../services/atendimentoService';
 import { voluntariosService } from '../services/voluntariosService';
+import { mensagensService } from '../services/mensagensService';
 import type { AtendimentoApi } from '../types/AtendimentoApi';
 import { useAuth } from '../context/useAuth';
 
 type Aba = 'solicitados' | 'meus';
-
-function getAtendimentoTitle(atendimento: AtendimentoApi) {
-  return atendimento.titulo
-    ?? atendimento.descricao
-    ?? atendimento.observacao
-    ?? `Atendimento #${atendimento.id}`;
-}
 
 function getPessoa(atendimento: AtendimentoApi) {
   return atendimento.beneficiarioNome
@@ -29,22 +23,36 @@ function getPessoa(atendimento: AtendimentoApi) {
     ?? atendimento.solicitanteNome
     ?? atendimento.beneficiario?.nome
     ?? atendimento.usuario?.nome
-    ?? 'Beneficiario nao informado';
+    ?? 'Beneficiário não informado';
+}
+
+function getAtendimentoDescricaoContexto(atendimento: AtendimentoApi) {
+  return atendimento.titulo
+    ?? atendimento.descricao
+    ?? atendimento.observacao
+    ?? `Atendimento #${atendimento.id}`;
 }
 
 function statusTone(status?: string) {
   if (!status) return 'neutral';
   if (['ENCERRADO', 'Encerrado'].includes(status)) return 'success';
-  if (['Aberto', 'ABERTO'].includes(status)) return 'info';
+  if (['ABERTO', 'Aberto'].includes(status)) return 'info';
   if (['EM_ATENDIMENTO', 'Em andamento', 'Aguardando'].includes(status)) return 'warning';
   return 'neutral';
 }
 
-function AtendimentoCard({ atendimento, onAssumir, assumindo, assumirBloqueado }: {
+function sortAtendimentos(a: AtendimentoApi, b: AtendimentoApi) {
+  const dateA = new Date(a.dataAtualizacao ?? a.dataCriacao ?? a.dataAbertura ?? 0).getTime();
+  const dateB = new Date(b.dataAtualizacao ?? b.dataCriacao ?? b.dataAbertura ?? 0).getTime();
+  return dateB - dateA; // Descending
+}
+
+function AtendimentoCard({ atendimento, onAssumir, assumindo, assumirBloqueado, hasNovaMensagem }: {
   atendimento: AtendimentoApi;
   onAssumir?: (id: number) => void;
   assumindo?: boolean;
   assumirBloqueado?: boolean;
+  hasNovaMensagem?: boolean;
 }) {
   const navigate = useNavigate();
 
@@ -53,15 +61,16 @@ function AtendimentoCard({ atendimento, onAssumir, assumindo, assumirBloqueado }
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <h3 className="text-lg font-bold text-[#0F172A]">{getAtendimentoTitle(atendimento)}</h3>
+            <h3 className="text-lg font-bold text-[#0F172A]">{getPessoa(atendimento)}</h3>
             {atendimento.status && <Badge tone={statusTone(atendimento.status)}>{atendimento.status}</Badge>}
+            {hasNovaMensagem && <Badge tone="critical">Nova Mensagem</Badge>}
           </div>
           <div className="mt-3 grid gap-2 text-sm text-[#475569] md:grid-cols-2">
-            <p><strong className="text-[#0F172A]">Pessoa:</strong> {getPessoa(atendimento)}</p>
+            <p><strong className="text-[#0F172A]">Contexto:</strong> <span className="line-clamp-1">{getAtendimentoDescricaoContexto(atendimento)}</span></p>
             {atendimento.canal && <p><strong className="text-[#0F172A]">Canal:</strong> {atendimento.canal}</p>}
             {atendimento.prioridade && <p><strong className="text-[#0F172A]">Prioridade:</strong> {atendimento.prioridade}</p>}
-            {(atendimento.dataCriacao || atendimento.dataAbertura) && (
-              <p><strong className="text-[#0F172A]">Data:</strong> {atendimento.dataCriacao ?? atendimento.dataAbertura}</p>
+            {(atendimento.dataAtualizacao || atendimento.dataCriacao || atendimento.dataAbertura) && (
+              <p><strong className="text-[#0F172A]">Última Atividade:</strong> {atendimento.dataAtualizacao ?? atendimento.dataCriacao ?? atendimento.dataAbertura}</p>
             )}
           </div>
         </div>
@@ -88,6 +97,7 @@ function PortalVoluntario() {
   const [aba, setAba] = useState<Aba>('solicitados');
   const [solicitados, setSolicitados] = useState<AtendimentoApi[]>([]);
   const [meusAtendimentos, setMeusAtendimentos] = useState<AtendimentoApi[]>([]);
+  const [novasMensagens, setNovasMensagens] = useState<Record<number, boolean>>({});
   const [loadingSolicitados, setLoadingSolicitados] = useState(true);
   const [loadingMeus, setLoadingMeus] = useState(true);
   const [erroSolicitados, setErroSolicitados] = useState('');
@@ -103,7 +113,8 @@ function PortalVoluntario() {
     setLoadingSolicitados(true);
     setErroSolicitados('');
     try {
-      setSolicitados(await atendimentoService.listarSolicitados());
+      const data = await atendimentoService.listarSolicitados();
+      setSolicitados(data.sort(sortAtendimentos));
     } catch (error) {
       setErroSolicitados(error instanceof Error ? error.message : 'Erro ao carregar dados.');
     } finally {
@@ -115,7 +126,26 @@ function PortalVoluntario() {
     setLoadingMeus(true);
     setErroMeus('');
     try {
-      setMeusAtendimentos(await atendimentoService.listarPorVoluntario(voluntarioId));
+      const data = await atendimentoService.listarPorVoluntario(voluntarioId);
+      const sorted = data.sort(sortAtendimentos);
+      setMeusAtendimentos(sorted);
+
+      // Fetch mensagens para verificar novidades
+      const unreadMap: Record<number, boolean> = {};
+      await Promise.all(sorted.map(async (atendimento) => {
+        try {
+          const msgs = await mensagensService.getMensagensAtendimento(atendimento.id);
+          if (msgs.length > 0) {
+            const ultima = msgs[msgs.length - 1];
+            // Se a última mensagem não foi enviada pelo voluntário ou admin, conta como nova
+            if (ultima.enviadoPor === 'BENEFICIARIO') {
+              unreadMap[atendimento.id] = true;
+            }
+          }
+        } catch { /* ignora se falhar ao buscar msgs */ }
+      }));
+      setNovasMensagens(prev => ({ ...prev, ...unreadMap }));
+
     } catch (error) {
       setErroMeus(error instanceof Error ? error.message : 'Erro ao carregar dados.');
     } finally {
@@ -205,7 +235,7 @@ function PortalVoluntario() {
             <button onClick={() => navigate('/')} className="text-sm font-semibold text-[#2563EB] hover:text-[#1E3A8A]">
               Voltar para o site
             </button>
-            <p className="mt-1 text-sm text-[#475569]">Sessao de {user?.nome}</p>
+            <p className="mt-1 text-sm text-[#475569]">Sessão de {user?.nome}</p>
           </div>
           <div className="flex gap-2">
             <Button variant="secondary" onClick={() => navigate('/ranking')}>
@@ -226,8 +256,8 @@ function PortalVoluntario() {
 
       <PageHeader
         eyebrow="Portal"
-        title="Portal do Voluntario"
-        description="Acompanhe atendimentos solicitados e veja os atendimentos vinculados ao seu usuario."
+        title="Portal do Voluntário"
+        description="Acompanhe atendimentos solicitados e veja os atendimentos vinculados ao seu usuário."
       />
 
       <Section tone="white">
@@ -297,8 +327,6 @@ function PortalVoluntario() {
 
         </div>
 
-
-
         {feedback && (
           <div className="mb-5 rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm font-semibold text-[#2563EB]">
             {feedback}
@@ -307,7 +335,7 @@ function PortalVoluntario() {
 
         {aba === 'solicitados' && (
           <div>
-            <SectionHeader title="Atendimentos solicitados" description="Casos aguardando acolhimento da equipe voluntaria." />
+            <SectionHeader title="Atendimentos solicitados" description="Casos aguardando acolhimento da equipe voluntária." />
             {loadingSolicitados && <LoadingState title="Carregando atendimentos solicitados..." />}
             {erroSolicitados && <ErrorState title="Erro ao carregar atendimentos" description={erroSolicitados} />}
             {!loadingSolicitados && !erroSolicitados && solicitados.length === 0 && (
@@ -329,15 +357,15 @@ function PortalVoluntario() {
 
         {aba === 'meus' && (
           <div>
-            <SectionHeader title="Meus atendimentos" description="Casos que ja estao vinculados ao seu acompanhamento." />
+            <SectionHeader title="Meus atendimentos" description="Casos que já estão vinculados ao seu acompanhamento." />
             {loadingMeus && <LoadingState title="Carregando seus atendimentos..." />}
             {erroMeus && <ErrorState title="Erro ao carregar seus atendimentos" description={erroMeus} />}
             {!loadingMeus && !erroMeus && meusAtendimentos.length === 0 && (
-              <EmptyState title="Nenhum atendimento vinculado ao seu usuario." />
+              <EmptyState title="Nenhum atendimento vinculado ao seu usuário." />
             )}
             <div className="grid gap-4">
               {!loadingMeus && !erroMeus && meusAtendimentos.map((atendimento) => (
-                <AtendimentoCard key={atendimento.id} atendimento={atendimento} />
+                <AtendimentoCard key={atendimento.id} atendimento={atendimento} hasNovaMensagem={novasMensagens[atendimento.id]} />
               ))}
             </div>
           </div>
