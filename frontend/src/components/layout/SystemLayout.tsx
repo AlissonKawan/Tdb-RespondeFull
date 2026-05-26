@@ -23,12 +23,20 @@ export default function SystemLayout() {
         
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           {isAdmin && (
-            <Link 
-              to="/admin" 
-              className="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded transition-colors"
-            >
-              Dashboard Admin
-            </Link>
+            <>
+              <Link 
+                to="/admin" 
+                className="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded transition-colors"
+              >
+                Dashboard Admin
+              </Link>
+              <Link 
+                to="/inscricoes-pendentes" 
+                className="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded transition-colors"
+              >
+                Inscrições Pendentes
+              </Link>
+            </>
           )}
           
           {(isVoluntario || isAdmin) && (
@@ -38,12 +46,6 @@ export default function SystemLayout() {
                 className="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded transition-colors"
               >
                 Portal Voluntário
-              </Link>
-              <Link 
-                to="/inscricoes-pendentes" 
-                className="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded transition-colors"
-              >
-                Inscrições Pendentes
               </Link>
               <Link 
                 to="/ranking" 

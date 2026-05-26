@@ -86,7 +86,7 @@ function App() {
               <Route
                 path="/portal-beneficiario"
                 element={
-                  <ProtectedRoute allowedRoles={['BENEFICIARIO']}>
+                  <ProtectedRoute allowedRoles={['BENEFICIARIO', 'ADMIN']}>
                     <PortalBeneficiario />
                   </ProtectedRoute>
                 }
@@ -113,7 +113,7 @@ function App() {
               <Route
                 path="/beneficiario/solicitar-atendimento"
                 element={
-                  <ProtectedRoute allowedRoles={['BENEFICIARIO']}>
+                  <ProtectedRoute allowedRoles={['BENEFICIARIO', 'ADMIN']}>
                     <SolicitarAtendimento />
                   </ProtectedRoute>
                 }
@@ -131,7 +131,7 @@ function App() {
               <Route
                 path="/inscricoes-pendentes"
                 element={
-                  <ProtectedRoute allowedRoles={['VOLUNTARIO', 'ADMIN']}>
+                  <ProtectedRoute allowedRoles={['ADMIN']}>
                     <AprovacaoVoluntarios />
                   </ProtectedRoute>
                 }
@@ -140,7 +140,7 @@ function App() {
               <Route
                 path="/inscricoes-voluntarios"
                 element={
-                  <ProtectedRoute allowedRoles={['VOLUNTARIO', 'ADMIN']}>
+                  <ProtectedRoute allowedRoles={['ADMIN']}>
                     <AprovacaoVoluntarios />
                   </ProtectedRoute>
                 }

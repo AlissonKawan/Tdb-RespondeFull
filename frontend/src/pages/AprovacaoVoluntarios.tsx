@@ -57,8 +57,8 @@ function AprovacaoVoluntarios() {
       <header className="border-b border-[#E2E8F0] bg-white/90 backdrop-blur-xl">
         <Container className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <button onClick={() => navigate('/portal-voluntario')} className="text-sm font-semibold text-[#2563EB] hover:text-[#1E3A8A]">
-              Voltar para o portal
+            <button onClick={() => navigate('/admin')} className="text-sm font-semibold text-[#2563EB] hover:text-[#1E3A8A]">
+              Voltar para o Painel Admin
             </button>
             <p className="mt-1 text-sm text-[#475569]">Sessao de {user?.nome}</p>
           </div>

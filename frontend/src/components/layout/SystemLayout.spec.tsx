@@ -4,14 +4,12 @@ import { describe, it, expect, vi } from 'vitest';
 import SystemLayout from './SystemLayout';
 import * as useAuthHook from '../../context/useAuth';
 
-// Faz o mock do hook de autenticação
 vi.mock('../../context/useAuth', () => ({
   useAuth: vi.fn(),
 }));
 
 describe('SystemLayout', () => {
   it('renderiza a sidebar com o nome do usuário e botão sair para voluntário', () => {
-    // Definindo o retorno simulado do useAuth
     vi.mocked(useAuthHook.useAuth).mockReturnValue({
       user: {
         id: 1,
@@ -35,18 +33,14 @@ describe('SystemLayout', () => {
       </MemoryRouter>
     );
 
-    // Verifica se a marca/logo da plataforma aparece
     expect(screen.getByText('Turma do Bem')).toBeInTheDocument();
-    
-    // Verifica se o nome do usuário logado aparece corretamente
     expect(screen.getByText('Olá, João Silva')).toBeInTheDocument();
-
-    // Verifica se os links específicos do voluntário aparecem
     expect(screen.getByText('Portal Voluntário')).toBeInTheDocument();
-    expect(screen.getByText('Inscrições Pendentes')).toBeInTheDocument();
     expect(screen.getByText('Ranking')).toBeInTheDocument();
 
-    // Verifica se o botão sair aparece
+    // Inscrições Pendentes NÃO deve mais aparecer para voluntário comum
+    expect(screen.queryByText('Inscrições Pendentes')).not.toBeInTheDocument();
+
     expect(screen.getByText('Sair')).toBeInTheDocument();
   });
 
@@ -74,8 +68,37 @@ describe('SystemLayout', () => {
       </MemoryRouter>
     );
 
-    // Verifica se os links específicos do beneficiário aparecem
     expect(screen.getByText('Portal Beneficiário')).toBeInTheDocument();
     expect(screen.getByText('Solicitar Atendimento')).toBeInTheDocument();
+  });
+
+  it('renderiza links corretos para administrador', () => {
+    vi.mocked(useAuthHook.useAuth).mockReturnValue({
+      user: {
+        id: 3,
+        nome: 'Admin Chefe',
+        email: 'admin@example.com',
+        tipoUsuario: 'ADMIN',
+        ativo: true,
+      },
+      isVoluntario: false,
+      isBeneficiario: false,
+      isAdmin: true,
+      isAuthenticated: true,
+      logout: vi.fn(),
+      login: vi.fn(),
+      register: vi.fn(),
+    });
+
+    render(
+      <MemoryRouter>
+        <SystemLayout />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText('Dashboard Admin')).toBeInTheDocument();
+    expect(screen.getByText('Inscrições Pendentes')).toBeInTheDocument();
+    expect(screen.getByText('Portal Voluntário')).toBeInTheDocument();
+    expect(screen.getByText('Portal Beneficiário')).toBeInTheDocument();
   });
 });
