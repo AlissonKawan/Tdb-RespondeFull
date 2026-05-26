@@ -18,7 +18,8 @@ import { useAuth } from '../context/useAuth';
 type Aba = 'solicitados' | 'meus';
 
 function getPessoa(atendimento: AtendimentoApi) {
-  return atendimento.beneficiarioNome
+  return atendimento.pessoaAtendidaNome
+    ?? atendimento.beneficiarioNome
     ?? atendimento.pacienteNome
     ?? atendimento.solicitanteNome
     ?? atendimento.beneficiario?.nome
@@ -129,26 +130,28 @@ function PortalVoluntario() {
       const data = await atendimentoService.listarPorVoluntario(voluntarioId);
       const sorted = data.sort(sortAtendimentos);
       setMeusAtendimentos(sorted);
+      setLoadingMeus(false); // Desbloqueia a UI imediatamente
 
-      // Fetch mensagens para verificar novidades
-      const unreadMap: Record<number, boolean> = {};
-      await Promise.all(sorted.map(async (atendimento) => {
-        try {
-          const msgs = await mensagensService.getMensagensAtendimento(atendimento.id);
-          if (msgs.length > 0) {
-            const ultima = msgs[msgs.length - 1];
-            // Se a última mensagem não foi enviada pelo voluntário ou admin, conta como nova
-            if (ultima.enviadoPor === 'BENEFICIARIO') {
-              unreadMap[atendimento.id] = true;
+      // Fetch mensagens para verificar novidades em background
+      void (async () => {
+        const unreadMap: Record<number, boolean> = {};
+        await Promise.all(sorted.map(async (atendimento) => {
+          try {
+            const msgs = await mensagensService.getMensagensAtendimento(atendimento.id);
+            if (msgs.length > 0) {
+              const ultima = msgs[msgs.length - 1];
+              // Se a última mensagem não foi enviada pelo voluntário ou admin, conta como nova
+              if (ultima.enviadoPor === 'BENEFICIARIO') {
+                unreadMap[atendimento.id] = true;
+              }
             }
-          }
-        } catch { /* ignora se falhar ao buscar msgs */ }
-      }));
-      setNovasMensagens(prev => ({ ...prev, ...unreadMap }));
+          } catch { /* ignora se falhar ao buscar msgs */ }
+        }));
+        setNovasMensagens(prev => ({ ...prev, ...unreadMap }));
+      })();
 
     } catch (error) {
       setErroMeus(error instanceof Error ? error.message : 'Erro ao carregar dados.');
-    } finally {
       setLoadingMeus(false);
     }
   };

@@ -23,21 +23,33 @@ function ChartCard() {
           usuarioService.listar().catch(() => []),
         ]);
 
-        let totalMensagens = 0;
-        // Pega as mensagens de até 20 atendimentos recentes para não sobrecarregar
-        const recentes = atends.slice(0, 20);
-        const mensagensPromises = recentes.map((a) =>
-          mensagensService.getMensagensAtendimento(a.id).catch(() => [])
-        );
-        const todasMensagens = await Promise.all(mensagensPromises);
-        totalMensagens = todasMensagens.reduce((acc, curr) => acc + curr.length, 0);
-
-        setStats({
+        setStats(prev => ({
+          ...prev,
           atendimentos: String(atends.length),
-          mensagens: String(totalMensagens) + (atends.length > 20 ? '+' : ''),
           voluntarios: String(vols.length),
           beneficiarios: String(users.filter((u) => u.tipoUsuario === 'BENEFICIARIO').length),
-        });
+        }));
+
+        // Fetch mensagens em background
+        void (async () => {
+          try {
+            let totalMensagens = 0;
+            // Pega as mensagens de até 10 atendimentos recentes para não sobrecarregar
+            const recentes = atends.slice(0, 10);
+            const mensagensPromises = recentes.map((a) =>
+              mensagensService.getMensagensAtendimento(a.id).catch(() => [])
+            );
+            const todasMensagens = await Promise.all(mensagensPromises);
+            totalMensagens = todasMensagens.reduce((acc, curr) => acc + curr.length, 0);
+
+            setStats(prev => ({
+              ...prev,
+              mensagens: String(totalMensagens) + (atends.length > 10 ? '+' : ''),
+            }));
+          } catch {
+            setStats(prev => ({ ...prev, mensagens: '0' }));
+          }
+        })();
       } catch (error) {
         setStats({
           atendimentos: '0',

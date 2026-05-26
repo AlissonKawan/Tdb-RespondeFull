@@ -49,7 +49,8 @@ function sortAtendimentos(a: AtendimentoApi, b: AtendimentoApi) {
 }
 
 function getPessoa(atendimento: AtendimentoApi) {
-  return atendimento.beneficiarioNome
+  return atendimento.pessoaAtendidaNome
+    ?? atendimento.beneficiarioNome
     ?? atendimento.pacienteNome
     ?? atendimento.solicitanteNome
     ?? atendimento.beneficiario?.nome
@@ -79,25 +80,27 @@ function PortalBeneficiario() {
         const data = await atendimentoService.listarPorContaBeneficiario(user.id);
         const sorted = data.sort(sortAtendimentos);
         setAtendimentos(sorted);
+        setLoading(false); // Desbloqueia a UI imediatamente
 
-        // Fetch mensagens para verificar novidades
-        const unreadMap: Record<number, boolean> = {};
-        await Promise.all(sorted.map(async (atendimento) => {
-          try {
-            const msgs = await mensagensService.getMensagensAtendimento(atendimento.id);
-            if (msgs.length > 0) {
-              const ultima = msgs[msgs.length - 1];
-              // Se a última mensagem não foi enviada pelo beneficiário, conta como nova
-              if (ultima.enviadoPor !== 'BENEFICIARIO') {
-                unreadMap[atendimento.id] = true;
+        // Fetch mensagens para verificar novidades em background
+        void (async () => {
+          const unreadMap: Record<number, boolean> = {};
+          await Promise.all(sorted.map(async (atendimento) => {
+            try {
+              const msgs = await mensagensService.getMensagensAtendimento(atendimento.id);
+              if (msgs.length > 0) {
+                const ultima = msgs[msgs.length - 1];
+                // Se a última mensagem não foi enviada pelo beneficiário, conta como nova
+                if (ultima.enviadoPor !== 'BENEFICIARIO') {
+                  unreadMap[atendimento.id] = true;
+                }
               }
-            }
-          } catch { /* ignora */ }
-        }));
-        setNovasMensagens(prev => ({ ...prev, ...unreadMap }));
+            } catch { /* ignora */ }
+          }));
+          setNovasMensagens(prev => ({ ...prev, ...unreadMap }));
+        })();
       } catch (error) {
         setErro(error instanceof Error ? error.message : 'Nao foi possivel carregar seus atendimentos.');
-      } finally {
         setLoading(false);
       }
     }
