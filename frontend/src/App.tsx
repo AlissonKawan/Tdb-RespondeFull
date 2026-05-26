@@ -1,10 +1,6 @@
 // src/App.tsx
 // Rotas atualizadas com sistema de autenticação.
 
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import Layout from './components/layout/Layout';
-import ProtectedRoute from './components/ui/ProtectedRoute';
 
 import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
