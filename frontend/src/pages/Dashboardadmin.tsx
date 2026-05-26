@@ -30,7 +30,6 @@ export default function DashboardAdmin() {
   const [voluntarios, setVoluntarios] = useState<VoluntarioApi[]>([]);
   const [beneficiarios, setBeneficiarios] = useState<AuthUser[]>([]);
   const [inscricoes, setInscricoes] = useState<Voluntario[]>([]);
-  const [especialidades, setEspecialidades] = useState<EspecialidadeApi[]>([]);
 
   // States de UI
   const [loading, setLoading] = useState(true);
@@ -56,21 +55,18 @@ export default function DashboardAdmin() {
         atends, 
         vols, 
         users, 
-        pends, 
-        esp
+        pends
       ] = await Promise.all([
         atendimentoService.listarTodos().catch(() => []),
         voluntariosService.listar().catch(() => []),
         usuarioService.listar().catch(() => []),
-        voluntariosService.listarPendentes().catch(() => []),
-        getEspecialidades().catch(() => [])
+        voluntariosService.listarPendentes().catch(() => [])
       ]);
 
       setAtendimentos(atends);
       setVoluntarios(vols);
       setBeneficiarios(users.filter(u => u.tipoUsuario === 'BENEFICIARIO'));
       setInscricoes(pends);
-      setEspecialidades(esp);
     } catch (e) {
       setErro('Ocorreu um erro ao carregar os dados. Verifique a conexão com o servidor.');
     } finally {
@@ -251,9 +247,11 @@ export default function DashboardAdmin() {
               <Field label="Canal de Comunicação (ID)">
                 <Input type="number" value={novoAtendimento.canalComunicacaoId} onChange={(e) => setNovoAtendimento({ ...novoAtendimento, canalComunicacaoId: e.target.value })} />
               </Field>
-              <Field label="Descrição" className="md:col-span-2">
-                <Textarea value={novoAtendimento.descricao} onChange={(e) => setNovoAtendimento({ ...novoAtendimento, descricao: e.target.value })} rows={3} />
-              </Field>
+              <div className="md:col-span-2">
+                <Field label="Descrição">
+                  <Textarea value={novoAtendimento.descricao} onChange={(e) => setNovoAtendimento({ ...novoAtendimento, descricao: e.target.value })} rows={3} />
+                </Field>
+              </div>
             </div>
             <Button className="mt-5" onClick={criarAtendimento} disabled={submitting}>Abrir atendimento</Button>
           </Card>
