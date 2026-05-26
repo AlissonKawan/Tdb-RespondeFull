@@ -3,8 +3,6 @@ import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import DashboardAdmin from '../Dashboardadmin';
 import * as useAuthHook from '../../context/useAuth';
-import { atendimentoService } from '../../services/atendimentoService';
-import { voluntariosService } from '../../services/voluntariosService';
 import { usuarioService } from '../../services/usuarioService';
 
 vi.mock('../../context/useAuth', () => ({

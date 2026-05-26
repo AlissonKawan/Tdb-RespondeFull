@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
-import { getEspecialidades } from '../services/especialidadesService';
 import { voluntariosService, type Voluntario } from '../services/voluntariosService';
 import { atendimentoService } from '../services/atendimentoService';
 import { usuarioService } from '../services/usuarioService';
-import type { EspecialidadeApi, VoluntarioApi } from '../types/api';
+import type { VoluntarioApi } from '../types/api';
 import type { AtendimentoApi } from '../types/AtendimentoApi';
 import type { AuthUser } from '../types/auth';
 import Badge from '../components/ui/Badge';
