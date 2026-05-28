@@ -129,7 +129,7 @@ function PortalBeneficiario() {
       />
 
       <Section tone="white">
-        <Card className="mb-6 flex flex-col gap-5 p-6 md:flex-row md:items-center md:justify-between">
+        <Card className="mb-6 flex flex-col gap-5 p-4 md:p-6 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">Pessoa atendida</p>
             <h2 className="mt-2 text-2xl font-bold text-[#0F172A]">Meus atendimentos</h2>
@@ -158,14 +158,14 @@ function PortalBeneficiario() {
 
         <div className="grid gap-4">
           {!loading && !erro && atendimentos.map((atendimento) => (
-            <Card key={atendimento.id} className="p-6 transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-950/10">
+            <Card key={atendimento.id} className="p-4 md:p-6 transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-950/10">
               <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-                <div>
+                <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="text-lg font-bold text-[#0F172A]">{getPessoa(atendimento)}</h3>
+                    <h3 className="text-lg font-bold text-[#0F172A] truncate">{getPessoa(atendimento)}</h3>
                     <Badge tone="neutral">Atendimento #{atendimento.id}</Badge>
                     {atendimento.status && <Badge tone={statusTone(atendimento.status) as any}>{atendimento.status}</Badge>}
-                    {novasMensagens[atendimento.id] && <Badge tone="danger">Nova Mensagem</Badge>}
+                    {novasMensagens[atendimento.id] && <Badge tone="danger">Nova</Badge>}
                   </div>
                   <div className="mt-3 grid gap-2 text-sm text-[#475569] md:grid-cols-2">
                     <p><strong className="text-[#0F172A]">Prioridade:</strong> {prioridadeLabel(atendimento.prioridade)}</p>

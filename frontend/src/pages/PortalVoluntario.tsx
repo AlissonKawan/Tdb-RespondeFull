@@ -58,7 +58,7 @@ function AtendimentoCard({ atendimento, onAssumir, assumindo, assumirBloqueado, 
   const navigate = useNavigate();
 
   return (
-    <Card className="p-6 transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-950/10">
+    <Card className="p-4 md:p-6 transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-950/10">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <div className="flex flex-wrap items-center gap-2">
@@ -265,7 +265,7 @@ function PortalVoluntario() {
 
       <Section tone="white">
         <div className="mb-6 grid gap-6 lg:grid-cols-[1fr_350px]">
-          <Card className="flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between">
+          <Card className="flex flex-col gap-4 p-4 md:p-6 md:flex-row md:items-center md:justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">Bem-vindo</p>
               <h2 className="mt-2 text-2xl font-bold text-[#0F172A]">{user?.nome}</h2>
@@ -278,7 +278,7 @@ function PortalVoluntario() {
           </Card>
 
           {user?.tipoUsuario === 'VOLUNTARIO' && (
-            <Card className="p-6">
+            <Card className="p-4 md:p-6">
               <div className="flex items-start gap-3">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>

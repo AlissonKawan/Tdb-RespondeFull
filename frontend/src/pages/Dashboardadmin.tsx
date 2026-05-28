@@ -154,9 +154,9 @@ export default function DashboardAdmin() {
   if (loading) return <div className="p-10"><LoadingState title="Carregando sistema..." /></div>;
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-full bg-[#F8FAFC]">
       <header className="border-b border-[#E2E8F0] bg-white/90 backdrop-blur-xl">
-        <Container className="flex flex-col gap-3 py-5 sm:flex-row sm:items-center sm:justify-between">
+        <Container className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="mt-2 text-3xl font-black text-[#0F172A]">Painel do Administrador</h1>
             <p className="text-sm text-[#475569]">Logado como {user?.nome}</p>
@@ -167,8 +167,8 @@ export default function DashboardAdmin() {
         </Container>
       </header>
 
-      <Container className="py-8">
-        <div className="mb-6 flex flex-wrap gap-2">
+      <Container className="py-4 md:py-8">
+        <div className="mb-6 flex flex-wrap gap-2 overflow-x-auto pb-2 scrollbar-hide">
           {abas.map(([id, label]) => (
             <Button key={id} variant={aba === id ? 'primary' : 'secondary'} size="sm" onClick={() => setAba(id)}>
               {label}
@@ -260,9 +260,9 @@ export default function DashboardAdmin() {
           <div className="space-y-4">
             <SectionTitle title="Voluntários Aprovados" description="Equipe cadastrada no sistema." />
             {voluntarios.length === 0 ? <EmptyState /> : (
-              <Card className="overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
+              <Card className="overflow-hidden border-0 shadow-sm md:border md:shadow-none">
+                <div className="overflow-x-auto w-full -mx-4 md:mx-0 px-4 md:px-0">
+                  <table className="w-full text-sm min-w-[600px]">
                     <thead className="bg-slate-50 text-xs uppercase text-slate-500">
                       <tr>
                         <th className="px-4 py-3 text-left">Nome</th>
@@ -294,9 +294,9 @@ export default function DashboardAdmin() {
           <div className="space-y-4">
             <SectionTitle title="Beneficiários Cadastrados" description="Pessoas assistidas que criaram conta na plataforma." />
             {beneficiarios.length === 0 ? <EmptyState /> : (
-              <Card className="overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
+              <Card className="overflow-hidden border-0 shadow-sm md:border md:shadow-none">
+                <div className="overflow-x-auto w-full -mx-4 md:mx-0 px-4 md:px-0">
+                  <table className="w-full text-sm min-w-[600px]">
                     <thead className="bg-slate-50 text-xs uppercase text-slate-500">
                       <tr>
                         <th className="px-4 py-3 text-left">ID</th>
