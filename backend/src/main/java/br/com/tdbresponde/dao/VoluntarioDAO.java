@@ -197,10 +197,11 @@ public class VoluntarioDAO {
     }
 
     public List<Voluntario> buscarTopRanking(int limite) {
-        String sql = "SELECT " + COLUNAS_VOLUNTARIO + " FROM VOLUNTARIO " +
-                "WHERE PONTOS_INDICACAO > 0 " +
-                "ORDER BY PONTOS_INDICACAO DESC " +
-                "FETCH FIRST ? ROWS ONLY";
+        String sql = "SELECT * FROM ( " +
+                "  SELECT " + COLUNAS_VOLUNTARIO + " FROM VOLUNTARIO " +
+                "  WHERE PONTOS_INDICACAO > 0 " +
+                "  ORDER BY PONTOS_INDICACAO DESC " +
+                ") WHERE ROWNUM <= ?";
 
         List<Voluntario> voluntarios = new ArrayList<>();
 

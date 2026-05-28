@@ -9,6 +9,7 @@ import jakarta.transaction.Transactional;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 
+import java.util.Optional;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -29,8 +30,8 @@ public class AdminSeed {
     @ConfigProperty(name = "admin.seed.email", defaultValue = "admin@tdbresponde.com")
     String email;
 
-    @ConfigProperty(name = "admin.seed.password", defaultValue = "")
-    String password;
+    @ConfigProperty(name = "admin.seed.password")
+    Optional<String> password;
 
     @ConfigProperty(name = "admin.seed.name", defaultValue = "Administrador")
     String name;
@@ -43,11 +44,11 @@ public class AdminSeed {
         }
 
         String normalizedEmail = email.trim().toLowerCase();
-        if (password == null || password.isBlank()) {
+        if (password.isEmpty() || password.get().isBlank()) {
             LOG.error("AdminSeed ativado, mas admin.seed.password/ADMIN_SEED_PASSWORD nao foi informado");
             return;
         }
-        String senhaHash = SenhaHasher.gerarHash(password);
+        String senhaHash = SenhaHasher.gerarHash(password.get());
         LOG.infof("AdminSeed executando para o e-mail %s", normalizedEmail);
 
         try (Connection conn = dataSource.getConnection()) {
