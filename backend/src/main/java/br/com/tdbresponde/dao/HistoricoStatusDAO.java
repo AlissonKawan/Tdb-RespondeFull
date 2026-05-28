@@ -55,7 +55,10 @@ public class HistoricoStatusDAO {
 
     // READ por ID
     public HistoricoStatus buscarPorId(int id) {
-        String sql = "SELECT * FROM historico_status WHERE id = ?";
+        String sql = "SELECT H.*, V.ID AS VOL_ID, V.NOME AS VOL_NOME, V.USUARIO AS VOL_USR " +
+                     "FROM historico_status H " +
+                     "LEFT JOIN VOLUNTARIO V ON H.alterado_por_id = V.ID " +
+                     "WHERE H.id = ?";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -75,7 +78,10 @@ public class HistoricoStatusDAO {
 
     // READ todos os históricos de um atendimento
     public List<HistoricoStatus> buscarPorAtendimento(int atendimentoId) {
-        String sql = "SELECT * FROM historico_status WHERE atendimento_id = ? ORDER BY data_hora ASC";
+        String sql = "SELECT H.*, V.ID AS VOL_ID, V.NOME AS VOL_NOME, V.USUARIO AS VOL_USR " +
+                     "FROM historico_status H " +
+                     "LEFT JOIN VOLUNTARIO V ON H.alterado_por_id = V.ID " +
+                     "WHERE H.atendimento_id = ? ORDER BY H.data_hora ASC";
         List<HistoricoStatus> historicos = new ArrayList<>();
 
         try (Connection conn = dataSource.getConnection();
@@ -128,7 +134,12 @@ public class HistoricoStatusDAO {
         // Carrega voluntário completo
         int voluntarioId = rs.getInt("alterado_por_id");
         if (!rs.wasNull()) {
-            Voluntario v = voluntarioDAO.buscarPorId(voluntarioId);
+            Voluntario v = new Voluntario();
+            v.setId(rs.getInt("VOL_ID"));
+            try {
+                v.setNome(rs.getString("VOL_NOME"));
+                v.setUsuario(rs.getString("VOL_USR"));
+            } catch (SQLException e) {}
             h.setAlteradoPor(v);
         }
 

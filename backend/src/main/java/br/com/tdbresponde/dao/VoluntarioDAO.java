@@ -90,7 +90,7 @@ public class VoluntarioDAO {
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     voluntario = mapearVoluntario(rs);
-                    carregarEspecialidade(voluntario);
+                    carregarEspecialidadesLista(java.util.Collections.singletonList(voluntario));
                 }
             }
 
@@ -115,7 +115,7 @@ public class VoluntarioDAO {
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     voluntario = mapearVoluntario(rs);
-                    carregarEspecialidade(voluntario);
+                    carregarEspecialidadesLista(java.util.Collections.singletonList(voluntario));
                 }
             }
 
@@ -140,7 +140,7 @@ public class VoluntarioDAO {
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     voluntario = mapearVoluntario(rs);
-                    carregarEspecialidade(voluntario);
+                    carregarEspecialidadesLista(java.util.Collections.singletonList(voluntario));
                 }
             }
 
@@ -162,7 +162,7 @@ public class VoluntarioDAO {
 
             while (rs.next()) {
                 Voluntario voluntario = mapearVoluntario(rs);
-                carregarEspecialidade(voluntario);
+                    carregarEspecialidadesLista(java.util.Collections.singletonList(voluntario));
                 voluntarios.add(voluntario);
             }
 
@@ -185,7 +185,7 @@ public class VoluntarioDAO {
 
             while (rs.next()) {
                 Voluntario voluntario = mapearVoluntario(rs);
-                carregarEspecialidade(voluntario);
+                    carregarEspecialidadesLista(java.util.Collections.singletonList(voluntario));
                 voluntarios.add(voluntario);
             }
 
@@ -212,7 +212,7 @@ public class VoluntarioDAO {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Voluntario voluntario = mapearVoluntario(rs);
-                    carregarEspecialidade(voluntario);
+                    carregarEspecialidadesLista(java.util.Collections.singletonList(voluntario));
                     voluntarios.add(voluntario);
                 }
             }
@@ -300,7 +300,7 @@ public class VoluntarioDAO {
 
             while (rs.next()) {
                 Voluntario voluntario = mapearVoluntario(rs);
-                carregarEspecialidade(voluntario);
+                    carregarEspecialidadesLista(java.util.Collections.singletonList(voluntario));
                 voluntarios.add(voluntario);
             }
 
@@ -364,26 +364,47 @@ public class VoluntarioDAO {
         return voluntario;
     }
 
-    private void carregarEspecialidade(Voluntario voluntario) throws SQLException {
-        String sql = "SELECT ESPECIALIDADE_ID FROM VOLUNTARIO_ESPECIALIDADE WHERE VOLUNTARIO_ID = ? ORDER BY ESPECIALIDADE_ID";
-        List<Especialidade> especialidades = new ArrayList<>();
-
+    private void carregarEspecialidadesLista(List<Voluntario> voluntarios) throws SQLException {
+        if (voluntarios == null || voluntarios.isEmpty()) return;
+        
+        StringBuilder placeholders = new StringBuilder();
+        for (int i = 0; i < voluntarios.size(); i++) {
+            placeholders.append("?");
+            if (i < voluntarios.size() - 1) placeholders.append(",");
+        }
+        
+        String sql = "SELECT VE.VOLUNTARIO_ID, E.ID AS ESP_ID, E.NOME, E.DESCRICAO " +
+                     "FROM VOLUNTARIO_ESPECIALIDADE VE " +
+                     "JOIN ESPECIALIDADE E ON VE.ESPECIALIDADE_ID = E.ID " +
+                     "WHERE VE.VOLUNTARIO_ID IN (" + placeholders + ")";
+                     
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, voluntario.getId());
-
+             
+            for (int i = 0; i < voluntarios.size(); i++) {
+                stmt.setInt(i + 1, voluntarios.get(i).getId());
+            }
+            
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    Especialidade especialidade = especialidadeDAO.buscarPorId(rs.getInt("ESPECIALIDADE_ID"));
-                    if (especialidade != null) {
-                        especialidades.add(especialidade);
+                    int volId = rs.getInt("VOLUNTARIO_ID");
+                    for (Voluntario v : voluntarios) {
+                        if (v.getId() == volId) {
+                            Especialidade esp = new Especialidade();
+                            esp.setId(rs.getInt("ESP_ID"));
+                            esp.setNome(rs.getString("NOME"));
+                            esp.setDescricao(rs.getString("DESCRICAO"));
+                            
+                            if (v.getEspecialidades() == null) {
+                                v.setEspecialidades(new ArrayList<>());
+                            }
+                            v.getEspecialidades().add(esp);
+                            break;
+                        }
                     }
                 }
             }
         }
-
-        voluntario.setEspecialidades(especialidades);
     }
 
     private void inserirEspecialidade(Connection conn, Voluntario voluntario) throws SQLException {

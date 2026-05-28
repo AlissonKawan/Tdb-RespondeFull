@@ -609,7 +609,7 @@ public class AtendimentoBO {
         return valor == null || valor.trim().isEmpty();
     }
 
-    private PessoaAtendida buscarPessoaCompleta(int pessoaId) {
+    public PessoaAtendida buscarPessoaCompleta(int pessoaId) {
         CriancaAdolescente crianca = criancaDAO.buscarPorId(pessoaId);
         if (crianca != null) {
             return crianca;

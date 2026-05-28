@@ -142,10 +142,11 @@ public class MensagemBO {
             int gravidade = 3;
 
             // Lógica para descobrir o tipo de pessoa e a gravidade específica dela
-            if (atendimento.getPessoaAtendida() instanceof CriancaAdolescente c) {
+            br.com.tdbresponde.model.PessoaAtendida pessoaCompleta = atendimentoBO.buscarPessoaCompleta(atendimento.getPessoaAtendida().getId());
+            if (pessoaCompleta instanceof CriancaAdolescente c) {
                 tipoPessoa = "CRIANCA_ADOLESCENTE";
                 gravidade = c.getGravidadeBucal();
-            } else if (atendimento.getPessoaAtendida() instanceof MulherApolonia m) {
+            } else if (pessoaCompleta instanceof MulherApolonia m) {
                 tipoPessoa = "MULHER_APOLONIA";
                 gravidade = m.getNivelRisco();
             }
