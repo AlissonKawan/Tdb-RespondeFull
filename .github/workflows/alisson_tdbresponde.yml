@@ -25,14 +25,16 @@ jobs:
           distribution: 'microsoft'
 
       - name: Build with Maven
-        run: mvn clean package -DskipTests
+        run: |
+          mvn clean package -DskipTests
+          mv target/*-runner.jar target/app.jar
         working-directory: ./backend
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: java-app
-          path: '${{ github.workspace }}/backend/target/*-runner.jar'
+          path: '${{ github.workspace }}/backend/target/app.jar'
 
   deploy:
     runs-on: ubuntu-latest
@@ -60,4 +62,4 @@ jobs:
         with:
           app-name: 'TDBResponde'
           slot-name: 'Production'
-          package: '*-runner.jar'
+          package: 'app.jar'
