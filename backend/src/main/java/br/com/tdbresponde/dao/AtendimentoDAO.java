@@ -19,9 +19,16 @@ import java.util.List;
 @ApplicationScoped
 public class AtendimentoDAO {
 
-    private static final String COLUNAS_ATENDIMENTO =
-            "ID, PRIORIDADE, STATUS, DESCRICAO, DATA_ABERTURA, DATA_ENCERRAMENTO, " +
-                    "PESSOA_ATENDIDA_ID, VOLUNTARIO_ID, CANAL_COMUNICACAO_ID, STATUS_CHECKIN, HORARIO_ENVIO_CHECKIN";
+    private static final String SELECT_BASE = 
+            "SELECT A.ID, A.PRIORIDADE, A.STATUS, A.DESCRICAO, A.DATA_ABERTURA, A.DATA_ENCERRAMENTO, " +
+            "A.PESSOA_ATENDIDA_ID, A.VOLUNTARIO_ID, A.CANAL_COMUNICACAO_ID, A.STATUS_CHECKIN, A.HORARIO_ENVIO_CHECKIN, " +
+            "C.ID AS CANAL_ID, C.NOME AS CANAL_NOME, C.DESCRICAO AS CANAL_DESC, " +
+            "V.ID AS VOLUNTARIO_ID_REAL, V.NOME AS VOLUNTARIO_NOME, V.DISPONIVEL AS VOLUNTARIO_DISP, V.ACESSO_SIGILO AS VOLUNTARIO_SIGILO, " +
+            "P.ID AS PESSOA_ID, P.NOME_CODIFICADO AS PESSOA_NOME, P.DATA_CADASTRO AS PESSOA_DATA, P.TELEFONE AS PESSOA_TEL, P.EMAIL AS PESSOA_EMAIL, P.TIPO AS PESSOA_TIPO, P.ID_CONTA AS PESSOA_CONTA " +
+            "FROM ATENDIMENTO A " +
+            "LEFT JOIN CANAL_COMUNICACAO C ON A.CANAL_COMUNICACAO_ID = C.ID " +
+            "LEFT JOIN VOLUNTARIO V ON A.VOLUNTARIO_ID = V.ID " +
+            "LEFT JOIN PESSOA_ATENDIDA P ON A.PESSOA_ATENDIDA_ID = P.ID ";
 
     @Inject
     DataSource dataSource;
@@ -76,8 +83,7 @@ public class AtendimentoDAO {
 
     // READ por ID
     public Atendimento buscarPorId(int id) {
-        String sql = "SELECT " + COLUNAS_ATENDIMENTO + " " +
-                "FROM ATENDIMENTO WHERE ID = ?";
+        String sql = SELECT_BASE + " WHERE A.ID = ?";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -97,7 +103,7 @@ public class AtendimentoDAO {
 
     // READ todos
     public List<Atendimento> buscarTodos() {
-        String sql = "SELECT " + COLUNAS_ATENDIMENTO + " FROM ATENDIMENTO";
+        String sql = SELECT_BASE;
 
         List<Atendimento> lista = new ArrayList<>();
 
@@ -138,11 +144,7 @@ public class AtendimentoDAO {
     }
 
     public List<Atendimento> buscarSolicitados() {
-        String sql = "SELECT " + COLUNAS_ATENDIMENTO + " " +
-                "FROM ATENDIMENTO " +
-                "WHERE VOLUNTARIO_ID IS NULL " +
-                "OR UPPER(STATUS) = 'ABERTO' " +
-                "ORDER BY DATA_ABERTURA DESC, PRIORIDADE ASC";
+        String sql = SELECT_BASE + " WHERE A.VOLUNTARIO_ID IS NULL OR UPPER(A.STATUS) = 'ABERTO' ORDER BY A.DATA_ABERTURA DESC, A.PRIORIDADE ASC";
 
         List<Atendimento> lista = new ArrayList<>();
 
@@ -161,10 +163,7 @@ public class AtendimentoDAO {
     }
 
     public List<Atendimento> buscarPorVoluntario(int voluntarioId) {
-        String sql = "SELECT " + COLUNAS_ATENDIMENTO + " " +
-                "FROM ATENDIMENTO " +
-                "WHERE VOLUNTARIO_ID = ? " +
-                "ORDER BY DATA_ABERTURA DESC, ID DESC";
+        String sql = SELECT_BASE + " WHERE A.VOLUNTARIO_ID = ? ORDER BY A.DATA_ABERTURA DESC, A.ID DESC";
 
         List<Atendimento> lista = new ArrayList<>();
 
@@ -185,10 +184,7 @@ public class AtendimentoDAO {
     }
 
     public List<Atendimento> buscarPorBeneficiario(int beneficiarioId) {
-        String sql = "SELECT " + COLUNAS_ATENDIMENTO + " " +
-                "FROM ATENDIMENTO " +
-                "WHERE PESSOA_ATENDIDA_ID = ? " +
-                "ORDER BY DATA_ABERTURA DESC, ID DESC";
+        String sql = SELECT_BASE + " WHERE A.PESSOA_ATENDIDA_ID = ? ORDER BY A.DATA_ABERTURA DESC, A.ID DESC";
 
         List<Atendimento> lista = new ArrayList<>();
 
@@ -209,18 +205,7 @@ public class AtendimentoDAO {
     }
 
     public List<Atendimento> buscarPorContaBeneficiario(int contaId) {
-        String sql = "SELECT A.ID AS ID, A.PRIORIDADE AS PRIORIDADE, A.STATUS AS STATUS, " +
-                "A.DESCRICAO AS DESCRICAO, A.DATA_ABERTURA AS DATA_ABERTURA, " +
-                "A.DATA_ENCERRAMENTO AS DATA_ENCERRAMENTO, " +
-                "A.PESSOA_ATENDIDA_ID AS PESSOA_ATENDIDA_ID, " +
-                "A.VOLUNTARIO_ID AS VOLUNTARIO_ID, " +
-                "A.CANAL_COMUNICACAO_ID AS CANAL_COMUNICACAO_ID, " +
-                "A.STATUS_CHECKIN AS STATUS_CHECKIN, " +
-                "A.HORARIO_ENVIO_CHECKIN AS HORARIO_ENVIO_CHECKIN " +
-                "FROM ATENDIMENTO A " +
-                "JOIN PESSOA_ATENDIDA P ON P.ID = A.PESSOA_ATENDIDA_ID " +
-                "WHERE P.ID_CONTA = ? " +
-                "ORDER BY A.DATA_ABERTURA DESC, A.ID DESC";
+        String sql = SELECT_BASE + " WHERE P.ID_CONTA = ? ORDER BY A.DATA_ABERTURA DESC, A.ID DESC";
 
         List<Atendimento> lista = new ArrayList<>();
 
@@ -323,31 +308,44 @@ public class AtendimentoDAO {
         a.setStatusCheckin(rs.getString("STATUS_CHECKIN"));
         a.setHorarioEnvioCheckin(rs.getObject("HORARIO_ENVIO_CHECKIN", LocalDateTime.class));
 
-        // Carrega canal pelo ID
+        // Carrega canal pelo JOIN
         int canalId = rs.getInt("CANAL_COMUNICACAO_ID");
         if (!rs.wasNull()) {
-            CanalComunicacao canal = canalDAO.buscarPorId(canalId);
-            a.setCanalOrigem(canal);
+            CanalComunicacao canal = new CanalComunicacao();
+            canal.setId(canalId);
+            try {
+                canal.setNome(rs.getString("CANAL_NOME"));
+                canal.setDescricao(rs.getString("CANAL_DESC"));
+                a.setCanalOrigem(canal);
+            } catch (SQLException e) {}
         }
 
-        // Carrega voluntario pelo ID
+        // Carrega voluntario pelo JOIN
         int volId = rs.getInt("VOLUNTARIO_ID");
         if (!rs.wasNull()) {
-            Voluntario v = voluntarioDAO.buscarPorId(volId);
-            a.setVoluntario(v);
+            Voluntario v = new Voluntario();
+            v.setId(volId);
+            try {
+                v.setNome(rs.getString("VOLUNTARIO_NOME"));
+                v.setDisponivel(rs.getBoolean("VOLUNTARIO_DISP"));
+                v.setAcessoSigilo(rs.getBoolean("VOLUNTARIO_SIGILO"));
+                a.setVoluntario(v);
+            } catch (SQLException e) {}
         }
 
-        // pessoa_atendida: só seta o ID para evitar carregar tudo
+        // pessoa_atendida pelo JOIN
         int pessoaId = rs.getInt("PESSOA_ATENDIDA_ID");
         if (!rs.wasNull()) {
-            PessoaAtendida pessoa = pessoaAtendidaDAO.buscarPorId(pessoaId);
-            if (pessoa != null) {
+            br.com.tdbresponde.model.PessoaAtendidaBase pessoa = new br.com.tdbresponde.model.PessoaAtendidaBase();
+            pessoa.setId(pessoaId);
+            try {
+                pessoa.setNomeCodificado(rs.getString("PESSOA_NOME"));
+                pessoa.setData(rs.getObject("PESSOA_DATA", LocalDate.class));
+                pessoa.setTelefone(rs.getString("PESSOA_TEL"));
+                pessoa.setEmail(rs.getString("PESSOA_EMAIL"));
+                pessoa.setContaId(rs.getInt("PESSOA_CONTA"));
                 a.setPessoaAtendida(pessoa);
-            } else {
-                br.com.tdbresponde.model.PessoaAtendidaBase pessoaBase = new br.com.tdbresponde.model.PessoaAtendidaBase();
-                pessoaBase.setId(pessoaId);
-                a.setPessoaAtendida(pessoaBase);
-            }
+            } catch (SQLException e) {}
         }
 
         return a;
@@ -589,9 +587,7 @@ public class AtendimentoDAO {
 
     private List<Atendimento> buscarPorStatus(String... status) {
         String placeholders = String.join(", ", java.util.Collections.nCopies(status.length, "?"));
-        String sql = "SELECT " + COLUNAS_ATENDIMENTO + " FROM ATENDIMENTO " +
-                "WHERE UPPER(STATUS) IN (" + placeholders + ") " +
-                "ORDER BY DATA_ABERTURA DESC, ID DESC";
+        String sql = SELECT_BASE + " WHERE UPPER(A.STATUS) IN (" + placeholders + ") ORDER BY A.DATA_ABERTURA DESC, A.ID DESC";
 
         List<Atendimento> lista = new ArrayList<>();
 

@@ -48,6 +48,13 @@ public class MensagemDAO {
     @Inject
     CanalComunicacaoDAO canalDAO;
 
+    private static final String SELECT_BASE = 
+            "SELECT M.ID, M.ATENDIMENTO_ID, M.CONTEUDO, M.DATA_HORA, M.ENVIADO_POR, " +
+            "C.ID AS CANAL_ID, C.NOME AS CANAL_NOME, C.DESCRICAO AS CANAL_DESC " +
+            "FROM MENSAGEM M " +
+            "LEFT JOIN MENSAGEM_CANAL MC ON MC.MENSAGEM_ID = M.ID " +
+            "LEFT JOIN CANAL_COMUNICACAO C ON MC.CANAL_ID = C.ID ";
+            
     public void inserir(Mensagem mensagem) {
         String sql = "INSERT INTO MENSAGEM (ATENDIMENTO_ID, CONTEUDO, DATA_HORA, ENVIADO_POR) " +
                 "VALUES (?, ?, ?, ?)";
@@ -76,8 +83,7 @@ public class MensagemDAO {
     }
 
     public Mensagem buscarPorId(int id) {
-        String sql = "SELECT ID, ATENDIMENTO_ID, CONTEUDO, DATA_HORA, ENVIADO_POR " +
-                "FROM MENSAGEM WHERE ID = ?";
+        String sql = SELECT_BASE + "WHERE M.ID = ?";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -96,8 +102,7 @@ public class MensagemDAO {
     }
 
     public List<Mensagem> buscarPorAtendimento(int atendimentoId) {
-        String sql = "SELECT ID, ATENDIMENTO_ID, CONTEUDO, DATA_HORA, ENVIADO_POR " +
-                "FROM MENSAGEM WHERE ATENDIMENTO_ID = ? ORDER BY DATA_HORA ASC";
+        String sql = SELECT_BASE + "WHERE M.ATENDIMENTO_ID = ? ORDER BY M.DATA_HORA ASC";
         List<Mensagem> mensagens = new ArrayList<>();
 
         try (Connection conn = dataSource.getConnection();
@@ -164,7 +169,18 @@ public class MensagemDAO {
             mensagem.setAtendimento(atendimento);
         }
 
-        carregarCanal(mensagem);
+        // Carrega canal pelo JOIN
+        int canalId = rs.getInt("CANAL_ID");
+        if (!rs.wasNull() && canalId > 0) {
+            CanalComunicacao canal = new CanalComunicacao();
+            canal.setId(canalId);
+            try {
+                canal.setNome(rs.getString("CANAL_NOME"));
+                canal.setDescricao(rs.getString("CANAL_DESC"));
+                mensagem.setCanal(canal);
+            } catch (SQLException e) {}
+        }
+        
         return mensagem;
     }
 
