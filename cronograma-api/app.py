@@ -21,16 +21,10 @@ CORS(app)  # Permite requisições do front-end React
 # ============================================================
 
 def get_connection():
-    """Retorna uma conexão com o banco Oracle via variáveis de ambiente."""
-    dsn = oracledb.makedsn(
-        host=os.environ.get("DB_HOST", "oracle.fiap.com.br"),
-        port=int(os.environ.get("DB_PORT", 1521)),
-        sid=os.environ.get("DB_SID", "orcl")
-    )
     conn = oracledb.connect(
         user=os.environ.get("DB_USERNAME"),
         password=os.environ.get("DB_PASSWORD"),
-        dsn=dsn
+        dsn=f"{os.environ.get('DB_HOST', 'oracle.fiap.com.br')}:{os.environ.get('DB_PORT', '1521')}/{os.environ.get('DB_SID', 'orcl')}"
     )
     return conn
 
