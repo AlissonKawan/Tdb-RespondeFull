@@ -2,14 +2,15 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import PageShell from '../components/layout/PageShell';
 import Section from '../components/layout/Section';
-import Container from '../components/layout/Container';
+import Container from '../components/ui/Container';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Badge from '../components/ui/Badge';
 import PageHeader from '../components/ui/PageHeader';
 import { EmptyState, ErrorState, LoadingState } from '../components/ui/FeedbackState';
 import { useAuth } from '../context/useAuth';
-import { cronogramaService, TarefaCronograma } from '../services/cronogramaService';
+import { cronogramaService } from '../services/cronogramaService';
+import type { TarefaCronograma } from '../services/cronogramaService';
 
 const DIAS_SEMANA = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
 
