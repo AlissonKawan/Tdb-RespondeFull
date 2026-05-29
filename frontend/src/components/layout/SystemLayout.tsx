@@ -66,6 +66,13 @@ export default function SystemLayout() {
                 Portal Voluntário
               </Link>
               <Link 
+                to="/cronograma" 
+                onClick={() => setIsSidebarOpen(false)}
+                className={`block px-4 py-2 rounded transition-colors ${location.pathname === '/cronograma' ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-700 hover:bg-slate-50'}`}
+              >
+                Cronograma
+              </Link>
+              <Link 
                 to="/ranking" 
                 onClick={() => setIsSidebarOpen(false)}
                 className={`block px-4 py-2 rounded transition-colors ${location.pathname === '/ranking' ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-700 hover:bg-slate-50'}`}
