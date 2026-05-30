@@ -32,7 +32,13 @@ def get_connection():
 def tarefa_to_dict(row, cursor):
     """Converte uma linha do Oracle em dicionário Python."""
     columns = [col[0].lower() for col in cursor.description]
-    return dict(zip(columns, row))
+    d = dict(zip(columns, row))
+    if "status" in d and d["status"]:
+        if d["status"] in ["Concluido", "Concluida", "Concluído", "Concluída"]:
+            d["status"] = "Concluído"
+        else:
+            d["status"] = "Pendente"
+    return d
 
 
 # ============================================================
@@ -67,7 +73,7 @@ def cadastrar_tarefa():
         data = request.get_json()
 
         # Validações obrigatórias
-        campos_obrigatorios = ["voluntario_id", "tipo", "dia_semana", "titulo", "status", "prioridade"]
+        campos_obrigatorios = ["voluntario_id", "tipo", "dia_semana", "titulo", "prioridade"]
         for campo in campos_obrigatorios:
             if not data.get(campo):
                 return jsonify({"erro": "VALIDACAO", "mensagem": f"Campo '{campo}' é obrigatório."}), 400
@@ -75,10 +81,6 @@ def cadastrar_tarefa():
         dias_validos = ["Domingo", "Segunda-feira", "Terca-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sabado"]
         if data["dia_semana"] not in dias_validos:
             return jsonify({"erro": "VALIDACAO", "mensagem": f"Dia da semana inválido. Use: {dias_validos}"}), 400
-
-        status_validos = ["Pendente", "Em andamento", "Concluida", "Cancelada", "Atrasada"]
-        if data["status"] not in status_validos:
-            return jsonify({"erro": "VALIDACAO", "mensagem": f"Status inválido. Use: {status_validos}"}), 400
 
         prioridades_validas = ["Baixa", "Media", "Alta", "Urgente"]
         if data["prioridade"] not in prioridades_validas:
@@ -101,7 +103,7 @@ def cadastrar_tarefa():
             data["dia_semana"],
             data["titulo"],
             data.get("descricao", ""),
-            data["status"],
+            "Pendente",
             data["prioridade"],
             data.get("data_atividade", ""),
             data.get("hora_inicio", ""),
@@ -243,6 +245,14 @@ def alterar_tarefa(id_tarefa):
             if not data.get(campo):
                 return jsonify({"erro": "VALIDACAO", "mensagem": f"Campo '{campo}' é obrigatório."}), 400
 
+        status_norm = data["status"]
+        if status_norm in ["Pendente"]:
+            status_norm = "Pendente"
+        elif status_norm in ["Concluido", "Concluida", "Concluído", "Concluída"]:
+            status_norm = "Concluído"
+        else:
+            return jsonify({"erro": "VALIDACAO", "mensagem": "Status inválido. Use: ['Pendente', 'Concluído']"}), 400
+
         conn = get_connection()
         cursor = conn.cursor()
 
@@ -271,7 +281,7 @@ def alterar_tarefa(id_tarefa):
             data["dia_semana"],
             data["titulo"],
             data.get("descricao", ""),
-            data["status"],
+            status_norm,
             data["prioridade"],
             data.get("data_atividade", ""),
             data.get("hora_inicio", ""),

@@ -215,7 +215,7 @@ export default function Cronograma() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className={tarefaEmEdicao ? "grid grid-cols-2 gap-4" : ""}>
                 <div>
                   <label className="mb-1 block text-sm font-medium text-slate-700">Tipo</label>
                   <select {...register('tipo')} className="w-full rounded-lg border border-slate-300 p-2 text-sm">
@@ -225,14 +225,15 @@ export default function Cronograma() {
                     <option value="Outros">Outros</option>
                   </select>
                 </div>
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700">Status</label>
-                  <select {...register('status')} className="w-full rounded-lg border border-slate-300 p-2 text-sm">
-                    <option value="Pendente">Pendente</option>
-                    <option value="Em andamento">Em andamento</option>
-                    <option value="Concluído">Concluído</option>
-                  </select>
-                </div>
+                {tarefaEmEdicao && (
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-slate-700">Status</label>
+                    <select {...register('status')} className="w-full rounded-lg border border-slate-300 p-2 text-sm">
+                      <option value="Pendente">Pendente</option>
+                      <option value="Concluído">Concluído</option>
+                    </select>
+                  </div>
+                )}
               </div>
 
               <div className="mt-4 flex justify-end gap-2">
