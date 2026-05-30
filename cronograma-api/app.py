@@ -17,6 +17,34 @@ app = Flask(__name__)
 CORS(app)  # Permite requisições do front-end React
 
 # ============================================================
+# EXCEÇÕES CUSTOMIZADAS E TRATAMENTO DE ERROS
+# ============================================================
+
+class ValidacaoError(Exception):
+    def __init__(self, mensagem):
+        self.mensagem = mensagem
+
+class NaoEncontradoError(Exception):
+    def __init__(self, mensagem):
+        self.mensagem = mensagem
+
+class BancoDadosError(Exception):
+    def __init__(self, mensagem):
+        self.mensagem = mensagem
+
+@app.errorhandler(ValidacaoError)
+def handle_validacao_error(e):
+    return jsonify({"erro": "VALIDACAO", "mensagem": e.mensagem}), 400
+
+@app.errorhandler(NaoEncontradoError)
+def handle_nao_encontrado_error(e):
+    return jsonify({"erro": "NAO_ENCONTRADO", "mensagem": e.mensagem}), 404
+
+@app.errorhandler(BancoDadosError)
+def handle_banco_dados_error(e):
+    return jsonify({"erro": "BANCO_DADOS", "mensagem": e.mensagem}), 500
+
+# ============================================================
 # CONEXÃO COM ORACLE
 # ============================================================
 
@@ -73,18 +101,18 @@ def cadastrar_tarefa():
         data = request.get_json()
 
         # Validações obrigatórias
-        campos_obrigatorios = ["voluntario_id", "tipo", "dia_semana", "titulo", "prioridade"]
+        campos_obrigatorios = ["id_voluntario", "tipo", "dia_semana", "titulo", "prioridade"]
         for campo in campos_obrigatorios:
             if not data.get(campo):
-                return jsonify({"erro": "VALIDACAO", "mensagem": f"Campo '{campo}' é obrigatório."}), 400
+                raise ValidacaoError(f"Campo '{campo}' é obrigatório.")
 
         dias_validos = ["Domingo", "Segunda-feira", "Terca-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sabado"]
         if data["dia_semana"] not in dias_validos:
-            return jsonify({"erro": "VALIDACAO", "mensagem": f"Dia da semana inválido. Use: {dias_validos}"}), 400
+            raise ValidacaoError(f"Dia da semana inválido. Use: {dias_validos}")
 
         prioridades_validas = ["Baixa", "Media", "Alta", "Urgente"]
         if data["prioridade"] not in prioridades_validas:
-            return jsonify({"erro": "VALIDACAO", "mensagem": f"Prioridade inválida. Use: {prioridades_validas}"}), 400
+            raise ValidacaoError(f"Prioridade inválida. Use: {prioridades_validas}")
 
         conn = get_connection()
         cursor = conn.cursor()
@@ -98,7 +126,7 @@ def cadastrar_tarefa():
                 (:1, :2, :3, :4, :5, :6, :7, :8, :9, :10)
             RETURNING ID_TAREFA INTO :11
         """, [
-            data["voluntario_id"],
+            data["id_voluntario"],
             data["tipo"],
             data["dia_semana"],
             data["titulo"],
@@ -122,9 +150,9 @@ def cadastrar_tarefa():
         }), 201
 
     except oracledb.DatabaseError as e:
-        return jsonify({"erro": "BANCO_DADOS", "mensagem": str(e)}), 500
+        raise BancoDadosError(str(e))
     except Exception as e:
-        return jsonify({"erro": "ERRO_INTERNO", "mensagem": str(e)}), 500
+        raise ValidacaoError(str(e))
 
 
 # --- READ: Listar todas as tarefas de um voluntário ---
@@ -188,9 +216,9 @@ def listar_tarefas_voluntario(voluntario_id):
         }), 200
 
     except oracledb.DatabaseError as e:
-        return jsonify({"erro": "BANCO_DADOS", "mensagem": str(e)}), 500
+        raise BancoDadosError(str(e))
     except Exception as e:
-        return jsonify({"erro": "ERRO_INTERNO", "mensagem": str(e)}), 500
+        raise ValidacaoError(str(e))
 
 
 # --- READ: Buscar uma tarefa por ID ---
@@ -212,7 +240,7 @@ def buscar_tarefa(id_tarefa):
         if not row:
             cursor.close()
             conn.close()
-            return jsonify({"erro": "NAO_ENCONTRADO", "mensagem": f"Tarefa {id_tarefa} não encontrada."}), 404
+            raise NaoEncontradoError(f"Tarefa {id_tarefa} não encontrada.")
 
         tarefa = tarefa_to_dict(row, cursor)
         if tarefa.get("data_criacao"):
@@ -226,9 +254,11 @@ def buscar_tarefa(id_tarefa):
         return jsonify(tarefa), 200
 
     except oracledb.DatabaseError as e:
-        return jsonify({"erro": "BANCO_DADOS", "mensagem": str(e)}), 500
+        raise BancoDadosError(str(e))
     except Exception as e:
-        return jsonify({"erro": "ERRO_INTERNO", "mensagem": str(e)}), 500
+        if isinstance(e, NaoEncontradoError):
+            raise e
+        raise ValidacaoError(str(e))
 
 
 # --- UPDATE: Alterar uma tarefa ---
@@ -243,7 +273,7 @@ def alterar_tarefa(id_tarefa):
         campos_obrigatorios = ["tipo", "dia_semana", "titulo", "status", "prioridade"]
         for campo in campos_obrigatorios:
             if not data.get(campo):
-                return jsonify({"erro": "VALIDACAO", "mensagem": f"Campo '{campo}' é obrigatório."}), 400
+                raise ValidacaoError(f"Campo '{campo}' é obrigatório.")
 
         status_norm = data["status"]
         if status_norm in ["Pendente"]:
@@ -251,7 +281,7 @@ def alterar_tarefa(id_tarefa):
         elif status_norm in ["Concluido", "Concluida", "Concluído", "Concluída"]:
             status_norm = "Concluído"
         else:
-            return jsonify({"erro": "VALIDACAO", "mensagem": "Status inválido. Use: ['Pendente', 'Concluído']"}), 400
+            raise ValidacaoError("Status inválido. Use: ['Pendente', 'Concluído']")
 
         conn = get_connection()
         cursor = conn.cursor()
@@ -261,7 +291,7 @@ def alterar_tarefa(id_tarefa):
         if not cursor.fetchone():
             cursor.close()
             conn.close()
-            return jsonify({"erro": "NAO_ENCONTRADO", "mensagem": f"Tarefa {id_tarefa} não encontrada."}), 404
+            raise NaoEncontradoError(f"Tarefa {id_tarefa} não encontrada.")
 
         cursor.execute("""
             UPDATE T_TAREFA_CRONOGRAMA SET
@@ -295,9 +325,11 @@ def alterar_tarefa(id_tarefa):
         return jsonify({"mensagem": "Tarefa atualizada com sucesso!", "id_tarefa": id_tarefa}), 200
 
     except oracledb.DatabaseError as e:
-        return jsonify({"erro": "BANCO_DADOS", "mensagem": str(e)}), 500
+        raise BancoDadosError(str(e))
     except Exception as e:
-        return jsonify({"erro": "ERRO_INTERNO", "mensagem": str(e)}), 500
+        if isinstance(e, NaoEncontradoError):
+            raise e
+        raise ValidacaoError(str(e))
 
 
 # --- DELETE: Excluir uma tarefa ---
@@ -311,7 +343,7 @@ def excluir_tarefa(id_tarefa):
         if not cursor.fetchone():
             cursor.close()
             conn.close()
-            return jsonify({"erro": "NAO_ENCONTRADO", "mensagem": f"Tarefa {id_tarefa} não encontrada."}), 404
+            raise NaoEncontradoError(f"Tarefa {id_tarefa} não encontrada.")
 
         cursor.execute("DELETE FROM T_TAREFA_CRONOGRAMA WHERE ID_TAREFA = :1", [id_tarefa])
         conn.commit()
@@ -321,9 +353,11 @@ def excluir_tarefa(id_tarefa):
         return jsonify({"mensagem": "Tarefa excluída com sucesso!", "id_tarefa": id_tarefa}), 200
 
     except oracledb.DatabaseError as e:
-        return jsonify({"erro": "BANCO_DADOS", "mensagem": str(e)}), 500
+        raise BancoDadosError(str(e))
     except Exception as e:
-        return jsonify({"erro": "ERRO_INTERNO", "mensagem": str(e)}), 500
+        if isinstance(e, NaoEncontradoError):
+            raise e
+        raise ValidacaoError(str(e))
 
 
 # --- EXTRA: Resumo semanal por dia ---
@@ -362,9 +396,9 @@ def resumo_semanal(voluntario_id):
         return jsonify({"voluntario_id": voluntario_id, "resumo": resumo}), 200
 
     except oracledb.DatabaseError as e:
-        return jsonify({"erro": "BANCO_DADOS", "mensagem": str(e)}), 500
+        raise BancoDadosError(str(e))
     except Exception as e:
-        return jsonify({"erro": "ERRO_INTERNO", "mensagem": str(e)}), 500
+        raise ValidacaoError(str(e))
 
 
 # ============================================================
