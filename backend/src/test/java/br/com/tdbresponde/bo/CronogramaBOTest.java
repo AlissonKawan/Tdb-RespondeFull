@@ -8,7 +8,9 @@ import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.core.Response;
+import br.com.tdbresponde.exception.BusinessException;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -68,5 +70,48 @@ public class CronogramaBOTest {
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1L, result.getVoluntario_id());
         Assertions.assertTrue(result.getResumo().containsKey("Segunda-feira"));
+    }
+
+    @Test
+    public void testCriarTarefaErroValidacao() {
+        TarefaCronogramaDTO tarefaInvalida = new TarefaCronogramaDTO();
+        
+        Map<String, Object> errorBody = new HashMap<>();
+        errorBody.put("mensagem", "Campo 'titulo' é obrigatório.");
+        
+        Response badRequestResponse = Response.status(400).entity(errorBody).build();
+        Mockito.when(restClient.criarTarefa(Mockito.any(TarefaCronogramaDTO.class)))
+               .thenThrow(new WebApplicationException(badRequestResponse));
+
+        BusinessException exception = Assertions.assertThrows(BusinessException.class, () -> {
+            cronogramaBO.criarTarefa(tarefaInvalida);
+        });
+        
+        Assertions.assertTrue(exception.getMessage().contains("Campo 'titulo' é obrigatório."));
+    }
+
+    @Test
+    public void testAtualizarTarefaErroServidor() {
+        TarefaCronogramaDTO mockTarefa = new TarefaCronogramaDTO();
+        Response serverErrorResponse = Response.status(500).build();
+        Mockito.when(restClient.atualizarTarefa(Mockito.eq(1L), Mockito.any(TarefaCronogramaDTO.class)))
+               .thenThrow(new WebApplicationException(serverErrorResponse));
+
+        BusinessException exception = Assertions.assertThrows(BusinessException.class, () -> {
+            cronogramaBO.atualizarTarefa(1L, mockTarefa);
+        });
+        
+        Assertions.assertTrue(exception.getMessage().contains("Erro 500 na API de Cronograma"));
+    }
+
+    @Test
+    public void testExcluirTarefaErroConexao() {
+        Mockito.when(restClient.excluirTarefa(1L)).thenThrow(new ProcessingException("Connection refused"));
+
+        BusinessException exception = Assertions.assertThrows(BusinessException.class, () -> {
+            cronogramaBO.excluirTarefa(1L);
+        });
+        
+        Assertions.assertTrue(exception.getMessage().contains("Não foi possível conectar à API de Cronograma"));
     }
 }

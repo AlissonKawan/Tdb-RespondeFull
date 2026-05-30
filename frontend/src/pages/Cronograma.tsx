@@ -91,6 +91,12 @@ export default function Cronograma() {
 
   const onSubmit = async (data: TarefaCronograma) => {
     if (!user?.voluntarioId) return;
+
+    const acao = tarefaEmEdicao ? 'editar' : 'criar';
+    if (!confirm(`Deseja realmente ${acao} esta tarefa no seu cronograma?`)) {
+      return;
+    }
+
     try {
       const payload = { 
         ...data, 
