@@ -43,6 +43,7 @@ public class TarefaCronogramaDTO {
 
     // Getters and Setters
 
+    @JsonProperty("id_tarefa")
     public Long getIdTarefa() {
         return idTarefa;
     }
@@ -51,6 +52,7 @@ public class TarefaCronogramaDTO {
         this.idTarefa = idTarefa;
     }
 
+    @JsonProperty("id_voluntario")
     public Long getIdVoluntario() {
         return idVoluntario;
     }
@@ -67,6 +69,7 @@ public class TarefaCronogramaDTO {
         this.tipo = tipo;
     }
 
+    @JsonProperty("dia_semana")
     public String getDiaSemana() {
         return diaSemana;
     }
@@ -107,6 +110,7 @@ public class TarefaCronogramaDTO {
         this.prioridade = prioridade;
     }
 
+    @JsonProperty("data_atividade")
     public String getDataAtividade() {
         return dataAtividade;
     }
@@ -115,6 +119,7 @@ public class TarefaCronogramaDTO {
         this.dataAtividade = dataAtividade;
     }
 
+    @JsonProperty("hora_inicio")
     public String getHoraInicio() {
         return horaInicio;
     }
@@ -123,6 +128,7 @@ public class TarefaCronogramaDTO {
         this.horaInicio = horaInicio;
     }
 
+    @JsonProperty("hora_fim")
     public String getHoraFim() {
         return horaFim;
     }
@@ -131,6 +137,7 @@ public class TarefaCronogramaDTO {
         this.horaFim = horaFim;
     }
 
+    @JsonProperty("data_criacao")
     public String getDataCriacao() {
         return dataCriacao;
     }
@@ -139,6 +146,7 @@ public class TarefaCronogramaDTO {
         this.dataCriacao = dataCriacao;
     }
 
+    @JsonProperty("data_atualizacao")
     public String getDataAtualizacao() {
         return dataAtualizacao;
     }
