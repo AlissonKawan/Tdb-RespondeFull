@@ -60,20 +60,7 @@ export default function Cronograma() {
   const [modalOpen, setModalOpen] = useState(false);
   const [tarefaEmEdicao, setTarefaEmEdicao] = useState<TarefaCronograma | null>(null);
 
-  const { register, handleSubmit, reset, watch, setValue, formState: { isSubmitting } } = useForm<TarefaCronograma>();
-
-  const dataAtividade = watch('data_atividade');
-
-  useEffect(() => {
-    if (dataAtividade) {
-      const [ano, mes, dia] = dataAtividade.split('-');
-      if (ano && mes && dia) {
-        const date = new Date(Number(ano), Number(mes) - 1, Number(dia), 12, 0, 0);
-        const diasSemanaMap = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
-        setValue('dia_semana', diasSemanaMap[date.getDay()]);
-      }
-    }
-  }, [dataAtividade, setValue]);
+  const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm<TarefaCronograma>();
 
   const carregarTarefas = async () => {
     if (!user?.voluntarioId) {
@@ -111,10 +98,20 @@ export default function Cronograma() {
     }
 
     try {
+      let diaCalculado = 'Segunda-feira'; // Fallback
+      if (data.data_atividade) {
+        const [ano, mes, dia] = data.data_atividade.split('-');
+        if (ano && mes && dia) {
+          const date = new Date(Number(ano), Number(mes) - 1, Number(dia), 12, 0, 0);
+          const diasSemanaMap = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+          diaCalculado = diasSemanaMap[date.getDay()];
+        }
+      }
+
       const payload = { 
         ...data, 
         id_voluntario: user.voluntarioId,
-        dia_semana: normalizeParaBackend(data.dia_semana),
+        dia_semana: normalizeParaBackend(diaCalculado),
         prioridade: normalizeParaBackend(data.prioridade)
       };
       if (tarefaEmEdicao?.id_tarefa) {
@@ -152,7 +149,6 @@ export default function Cronograma() {
     // Garantir que o form mostre os valores com acento
     reset({
       ...t,
-      dia_semana: normalizeParaFrontend(t.dia_semana),
       prioridade: normalizeParaFrontend(t.prioridade)
     });
     setModalOpen(true);
@@ -268,22 +264,12 @@ export default function Cronograma() {
                 <label className="mb-1 block text-sm font-medium text-slate-700">Data Prevista</label>
                 <input 
                   type="date"
-                  {...register('data_atividade')} 
+                  {...register('data_atividade', { required: true })} 
                   className="w-full rounded-lg border border-slate-300 p-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" 
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700">Dia da Semana</label>
-                  <select 
-                    {...register('dia_semana')} 
-                    className={`w-full rounded-lg border border-slate-300 p-2 text-sm ${dataAtividade ? 'bg-slate-100 pointer-events-none' : ''}`}
-                    tabIndex={dataAtividade ? -1 : 0}
-                  >
-                    {DIAS_SEMANA.map(dia => <option key={dia} value={dia}>{dia}</option>)}
-                  </select>
-                </div>
                 <div>
                   <label className="mb-1 block text-sm font-medium text-slate-700">Prioridade</label>
                   <select {...register('prioridade')} className="w-full rounded-lg border border-slate-300 p-2 text-sm">
@@ -292,9 +278,6 @@ export default function Cronograma() {
                     <option value="Alta">Alta</option>
                   </select>
                 </div>
-              </div>
-
-              <div className={tarefaEmEdicao ? "grid grid-cols-2 gap-4" : ""}>
                 <div>
                   <label className="mb-1 block text-sm font-medium text-slate-700">Tipo</label>
                   <select {...register('tipo')} className="w-full rounded-lg border border-slate-300 p-2 text-sm">
@@ -304,16 +287,17 @@ export default function Cronograma() {
                     <option value="Outros">Outros</option>
                   </select>
                 </div>
-                {tarefaEmEdicao && (
-                  <div>
-                    <label className="mb-1 block text-sm font-medium text-slate-700">Status</label>
-                    <select {...register('status')} className="w-full rounded-lg border border-slate-300 p-2 text-sm">
-                      <option value="Pendente">Pendente</option>
-                      <option value="Concluído">Concluído</option>
-                    </select>
-                  </div>
-                )}
               </div>
+
+              {tarefaEmEdicao && (
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-slate-700">Status</label>
+                  <select {...register('status')} className="w-full rounded-lg border border-slate-300 p-2 text-sm">
+                    <option value="Pendente">Pendente</option>
+                    <option value="Concluído">Concluído</option>
+                  </select>
+                </div>
+              )}
 
               <div className="mt-4 flex justify-end gap-2">
                 <Button variant="secondary" onClick={() => setModalOpen(false)} type="button">
