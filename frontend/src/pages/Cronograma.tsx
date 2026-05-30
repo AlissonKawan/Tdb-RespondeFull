@@ -166,7 +166,7 @@ export default function Cronograma() {
         ...tarefa,
         status: 'Concluído',
         dia_semana: normalizeParaBackend(tarefa.dia_semana),
-        prioridade: tarefa.prioridade ? normalizeParaBackend(tarefa.prioridade) : undefined
+        prioridade: normalizeParaBackend(tarefa.prioridade || 'Média')
       };
       await cronogramaService.atualizarTarefa(tarefa.id_tarefa!, payload);
       await carregarTarefas();
