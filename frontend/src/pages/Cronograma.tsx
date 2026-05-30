@@ -41,6 +41,27 @@ function normalizeParaFrontend(str: string) {
   return str;
 }
 
+function getStatusVencimento(dataAtividade?: string, status?: string) {
+  if (!dataAtividade) return null;
+  if (status === 'Concluído' || status === 'Finalizado') return null;
+
+  const [ano, mes, dia] = dataAtividade.split('-');
+  if (!ano || !mes || !dia) return null;
+
+  const dataTarefa = new Date(Number(ano), Number(mes) - 1, Number(dia));
+  dataTarefa.setHours(0, 0, 0, 0);
+
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
+
+  const diffTime = dataTarefa.getTime() - hoje.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // usa Math.ceil para arredondar pra cima se houver fração, mas zeramos as horas
+
+  if (diffDays < 0) return 'Vencido';
+  if (diffDays <= 2) return 'Próximo';
+  return null;
+}
+
 function formatarData(dataStr?: string) {
   if (!dataStr) return '';
   if (dataStr.includes('-')) {
@@ -208,12 +229,29 @@ export default function Cronograma() {
                           </div>
                            {tarefa.descricao && <p className="text-sm text-slate-500 mb-2">{tarefa.descricao}</p>}
                            
-                           {tarefa.data_atividade && (
-                             <div className="mt-1 mb-2.5 flex items-center gap-1.5 text-[11px] font-medium text-slate-500 bg-slate-50 border border-slate-100 rounded-md py-1 px-2.5 w-fit">
-                               <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
-                               <span>Previsão: {formatarData(tarefa.data_atividade)}</span>
-                             </div>
-                           )}
+                           {tarefa.data_atividade && (() => {
+                             const aviso = getStatusVencimento(tarefa.data_atividade, tarefa.status);
+                             let corBg = 'bg-slate-50 border-slate-100 text-slate-500';
+                             let corIcone = 'text-slate-400';
+                             let labelSecundario = '';
+                             
+                             if (aviso === 'Vencido') {
+                               corBg = 'bg-red-50 border-red-100 text-red-600';
+                               corIcone = 'text-red-500';
+                               labelSecundario = ' (Vencida)';
+                             } else if (aviso === 'Próximo') {
+                               corBg = 'bg-amber-50 border-amber-200 text-amber-700';
+                               corIcone = 'text-amber-500';
+                               labelSecundario = ' (Vence em breve)';
+                             }
+
+                             return (
+                               <div className={`mt-1 mb-2.5 flex items-center gap-1.5 text-[11px] font-medium border rounded-md py-1 px-2.5 w-fit ${corBg}`}>
+                                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={corIcone}><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                                 <span>Previsão: {formatarData(tarefa.data_atividade)}{labelSecundario}</span>
+                               </div>
+                             );
+                           })()}
 
                            <div className="mt-2 flex flex-wrap gap-2 text-xs">
                              <Badge tone={statusTone(tarefa.status) as any}>{tarefa.status}</Badge>
