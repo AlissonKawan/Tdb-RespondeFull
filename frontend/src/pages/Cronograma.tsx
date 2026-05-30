@@ -60,7 +60,20 @@ export default function Cronograma() {
   const [modalOpen, setModalOpen] = useState(false);
   const [tarefaEmEdicao, setTarefaEmEdicao] = useState<TarefaCronograma | null>(null);
 
-  const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm<TarefaCronograma>();
+  const { register, handleSubmit, reset, watch, setValue, formState: { isSubmitting } } = useForm<TarefaCronograma>();
+
+  const dataAtividade = watch('data_atividade');
+
+  useEffect(() => {
+    if (dataAtividade) {
+      const [ano, mes, dia] = dataAtividade.split('-');
+      if (ano && mes && dia) {
+        const date = new Date(Number(ano), Number(mes) - 1, Number(dia), 12, 0, 0);
+        const diasSemanaMap = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+        setValue('dia_semana', diasSemanaMap[date.getDay()]);
+      }
+    }
+  }, [dataAtividade, setValue]);
 
   const carregarTarefas = async () => {
     if (!user?.voluntarioId) {
@@ -263,7 +276,11 @@ export default function Cronograma() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="mb-1 block text-sm font-medium text-slate-700">Dia da Semana</label>
-                  <select {...register('dia_semana')} className="w-full rounded-lg border border-slate-300 p-2 text-sm">
+                  <select 
+                    {...register('dia_semana')} 
+                    className={`w-full rounded-lg border border-slate-300 p-2 text-sm ${dataAtividade ? 'bg-slate-100 pointer-events-none' : ''}`}
+                    tabIndex={dataAtividade ? -1 : 0}
+                  >
                     {DIAS_SEMANA.map(dia => <option key={dia} value={dia}>{dia}</option>)}
                   </select>
                 </div>
