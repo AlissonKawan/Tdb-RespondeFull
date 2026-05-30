@@ -22,9 +22,23 @@ function statusTone(status?: string) {
 }
 
 function prioridadeTone(prioridade?: string) {
-  if (prioridade === 'Alta') return 'danger';
-  if (prioridade === 'Média') return 'warning';
+  if (prioridade === 'Alta' || prioridade === 'Urgente') return 'danger';
+  if (prioridade === 'Média' || prioridade === 'Media') return 'warning';
   return 'info';
+}
+
+function normalizeParaBackend(str: string) {
+  if (str === 'Média') return 'Media';
+  if (str === 'Terça-feira') return 'Terca-feira';
+  if (str === 'Sábado') return 'Sabado';
+  return str;
+}
+
+function normalizeParaFrontend(str: string) {
+  if (str === 'Media') return 'Média';
+  if (str === 'Terca-feira') return 'Terça-feira';
+  if (str === 'Sabado') return 'Sábado';
+  return str;
 }
 
 function formatarData(dataStr?: string) {
@@ -58,7 +72,12 @@ export default function Cronograma() {
     setError('');
     try {
       const response = await cronogramaService.listarTarefas(user.voluntarioId);
-      setTarefas(response.tarefas || []);
+      const tarefasNormalizadas = (response.tarefas || []).map(t => ({
+        ...t,
+        dia_semana: normalizeParaFrontend(t.dia_semana),
+        prioridade: normalizeParaFrontend(t.prioridade)
+      }));
+      setTarefas(tarefasNormalizadas);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao carregar cronograma.');
     } finally {
@@ -73,7 +92,12 @@ export default function Cronograma() {
   const onSubmit = async (data: TarefaCronograma) => {
     if (!user?.voluntarioId) return;
     try {
-      const payload = { ...data, id_voluntario: user.voluntarioId };
+      const payload = { 
+        ...data, 
+        id_voluntario: user.voluntarioId,
+        dia_semana: normalizeParaBackend(data.dia_semana),
+        prioridade: normalizeParaBackend(data.prioridade)
+      };
       if (tarefaEmEdicao?.id_tarefa) {
         await cronogramaService.atualizarTarefa(tarefaEmEdicao.id_tarefa, payload);
       } else {
@@ -106,7 +130,12 @@ export default function Cronograma() {
 
   const abrirModalEdicao = (t: TarefaCronograma) => {
     setTarefaEmEdicao(t);
-    reset(t);
+    // Garantir que o form mostre os valores com acento
+    reset({
+      ...t,
+      dia_semana: normalizeParaFrontend(t.dia_semana),
+      prioridade: normalizeParaFrontend(t.prioridade)
+    });
     setModalOpen(true);
   };
 
@@ -238,6 +267,7 @@ export default function Cronograma() {
                     <option value="Baixa">Baixa</option>
                     <option value="Média">Média</option>
                     <option value="Alta">Alta</option>
+                    <option value="Urgente">Urgente</option>
                   </select>
                 </div>
               </div>
