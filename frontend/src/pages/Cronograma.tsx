@@ -162,7 +162,13 @@ export default function Cronograma() {
   const confirmarTarefa = async (tarefa: TarefaCronograma) => {
     if (!confirm('Deseja confirmar que esta tarefa foi realizada?')) return;
     try {
-      await cronogramaService.atualizarTarefa(tarefa.id_tarefa!, { ...tarefa, status: 'Concluído' });
+      const payload = {
+        ...tarefa,
+        status: 'Concluído',
+        dia_semana: normalizeParaBackend(tarefa.dia_semana),
+        prioridade: tarefa.prioridade ? normalizeParaBackend(tarefa.prioridade) : undefined
+      };
+      await cronogramaService.atualizarTarefa(tarefa.id_tarefa!, payload);
       await carregarTarefas();
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Erro ao confirmar tarefa');
