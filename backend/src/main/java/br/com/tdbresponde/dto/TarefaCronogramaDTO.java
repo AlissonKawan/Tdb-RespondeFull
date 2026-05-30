@@ -57,6 +57,12 @@ public class TarefaCronogramaDTO {
         return idVoluntario;
     }
 
+    // Fallback para a versão da API Python que possa estar esperando voluntario_id
+    @JsonProperty("voluntario_id")
+    public Long getVoluntarioIdAlternativo() {
+        return idVoluntario;
+    }
+
     public void setIdVoluntario(Long idVoluntario) {
         this.idVoluntario = idVoluntario;
     }
