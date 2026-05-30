@@ -267,7 +267,6 @@ export default function Cronograma() {
                     <option value="Baixa">Baixa</option>
                     <option value="Média">Média</option>
                     <option value="Alta">Alta</option>
-                    <option value="Urgente">Urgente</option>
                   </select>
                 </div>
               </div>
