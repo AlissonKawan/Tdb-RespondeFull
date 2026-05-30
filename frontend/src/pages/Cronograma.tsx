@@ -159,6 +159,16 @@ export default function Cronograma() {
     }
   };
 
+  const confirmarTarefa = async (tarefa: TarefaCronograma) => {
+    if (!confirm('Deseja confirmar que esta tarefa foi realizada?')) return;
+    try {
+      await cronogramaService.atualizarTarefa(tarefa.id_tarefa!, { ...tarefa, status: 'Concluído' });
+      await carregarTarefas();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Erro ao confirmar tarefa');
+    }
+  };
+
   const abrirModalNova = () => {
     setTarefaEmEdicao(null);
     reset({ tipo: 'Atividade Social', dia_semana: 'Segunda-feira', status: 'Pendente', prioridade: 'Média', data_atividade: '' });
@@ -218,11 +228,16 @@ export default function Cronograma() {
                         <div key={tarefa.id_tarefa} className="rounded-lg bg-white p-3 shadow-sm border border-slate-100 hover:shadow-md transition">
                           <div className="mb-1 flex items-start justify-between">
                             <h4 className="font-bold text-slate-900">{tarefa.titulo}</h4>
-                            <div className="flex gap-1">
-                              <button onClick={() => abrirModalEdicao(tarefa)} className="text-blue-500 hover:text-blue-700">
+                            <div className="flex gap-2">
+                              {tarefa.status !== 'Concluído' && tarefa.status !== 'Finalizado' && (
+                                <button title="Marcar como concluída" onClick={() => confirmarTarefa(tarefa)} className="text-green-500 hover:text-green-700 bg-green-50 hover:bg-green-100 p-1 rounded transition">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                </button>
+                              )}
+                              <button title="Editar tarefa" onClick={() => abrirModalEdicao(tarefa)} className="text-blue-500 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 p-1 rounded transition">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
                               </button>
-                              <button onClick={() => excluirTarefa(tarefa.id_tarefa!)} className="text-red-500 hover:text-red-700">
+                              <button title="Excluir tarefa" onClick={() => excluirTarefa(tarefa.id_tarefa!)} className="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-1 rounded transition">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
                               </button>
                             </div>
