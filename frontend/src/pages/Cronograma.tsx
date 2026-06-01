@@ -156,10 +156,15 @@ export default function Cronograma() {
       await carregarTarefas();
     } catch (err) {
       console.error('Erro na API:', err);
-      if (err && typeof err === 'object' && 'details' in err && err.details) {
-         alert(`Erro ao salvar: ${(err as Error).message}\nDetalhes: ${JSON.stringify(err.details)}`);
+      if (err instanceof Error) {
+        const errorDetails = (err as any).details;
+        if (errorDetails) {
+          alert(`Erro ao salvar: ${err.message}\nDetalhes: ${JSON.stringify(errorDetails)}`);
+        } else {
+          alert(err.message);
+        }
       } else {
-         alert(err instanceof Error ? err.message : 'Erro ao salvar tarefa');
+        alert('Erro ao salvar tarefa');
       }
     }
   };
@@ -192,10 +197,15 @@ export default function Cronograma() {
       await carregarTarefas();
     } catch (err) {
       console.error('Erro na API:', err);
-      if (err && typeof err === 'object' && 'details' in err && err.details) {
-         alert(`Erro ao confirmar: ${(err as Error).message}\nDetalhes: ${JSON.stringify(err.details)}`);
+      if (err instanceof Error) {
+        const errorDetails = (err as any).details;
+        if (errorDetails) {
+          alert(`Erro ao confirmar: ${err.message}\nDetalhes: ${JSON.stringify(errorDetails)}`);
+        } else {
+          alert(err.message);
+        }
       } else {
-         alert(err instanceof Error ? err.message : 'Erro ao confirmar tarefa');
+        alert('Erro ao confirmar tarefa');
       }
     }
   };
