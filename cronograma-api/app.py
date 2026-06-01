@@ -63,7 +63,7 @@ def tarefa_to_dict(row, cursor):
     d = dict(zip(columns, row))
     if "status" in d and d["status"]:
         if d["status"] in ["Concluido", "Concluida", "Concluído", "Concluída"]:
-            d["status"] = "Concluído"
+            d["status"] = "Concluido"
         else:
             d["status"] = "Pendente"
     return d
@@ -279,9 +279,9 @@ def alterar_tarefa(id_tarefa):
         if status_norm in ["Pendente"]:
             status_norm = "Pendente"
         elif status_norm in ["Concluido", "Concluida", "Concluído", "Concluída"]:
-            status_norm = "Concluído"
+            status_norm = "Concluido"
         else:
-            raise ValidacaoError("Status inválido. Use: ['Pendente', 'Concluído']")
+            raise ValidacaoError("Status inválido. Use: ['Pendente', 'Concluido']")
 
         conn = get_connection()
         cursor = conn.cursor()
