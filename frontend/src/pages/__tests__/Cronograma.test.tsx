@@ -19,15 +19,18 @@ vi.mock('../../services/cronogramaService', () => ({
 }));
 
 const originalConfirm = window.confirm;
+const originalAlert = window.alert;
 
 describe('Cronograma', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     window.confirm = vi.fn().mockReturnValue(true);
+    window.alert = vi.fn();
   });
 
   afterAll(() => {
     window.confirm = originalConfirm;
+    window.alert = originalAlert;
   });
 
   it('deve normalizar o status Concluído para Concluido ao confirmar uma tarefa (enviando sem acento para a API)', async () => {
@@ -105,5 +108,46 @@ describe('Cronograma', () => {
     
     // O botão de concluir não deve existir se a tarefa já está concluída
     expect(screen.queryByTitle('Marcar como concluída')).not.toBeInTheDocument();
+  });
+
+  it('deve exibir um alerta com detalhes do erro se a API retornar erro de validação (ex: 400 Bad Request)', async () => {
+    const user = userEvent.setup();
+    vi.mocked(useAuth).mockReturnValue({
+      user: { id: 1, nome: 'Voluntario', tipoUsuario: 'VOLUNTARIO', voluntarioId: 10 },
+      logout: vi.fn(),
+    } as any);
+
+    vi.mocked(cronogramaService.listarTarefas).mockResolvedValue({
+      tarefas: [
+        {
+          id_tarefa: 3,
+          titulo: 'Tarefa com Erro',
+          dia_semana: 'Sexta-feira',
+          prioridade: 'Alta',
+          status: 'Pendente',
+          tipo: 'Reunião'
+        }
+      ]
+    } as any);
+
+    const apiError = new Error('Erro de validação');
+    (apiError as any).details = { mensagem: "O campo 'id_voluntario' é obrigatório." };
+    vi.mocked(cronogramaService.atualizarTarefa).mockRejectedValue(apiError);
+
+    render(<Cronograma />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Tarefa com Erro')).toBeInTheDocument();
+    });
+
+    const btnConfirmar = await screen.findByTitle('Marcar como concluída');
+    await user.click(btnConfirmar);
+
+    await waitFor(() => {
+      // Verifica se a mensagem de erro da API foi mostrada no alerta para o usuário
+      expect(window.alert).toHaveBeenCalledWith(
+        expect.stringContaining("O campo 'id_voluntario' é obrigatório.")
+      );
+    });
   });
 });

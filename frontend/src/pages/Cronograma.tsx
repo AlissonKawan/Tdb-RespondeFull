@@ -135,8 +135,12 @@ export default function Cronograma() {
       }
 
       const payload = { 
-        ...data, 
+        id_tarefa: tarefaEmEdicao?.id_tarefa,
         id_voluntario: user.voluntarioId,
+        tipo: data.tipo,
+        titulo: data.titulo,
+        descricao: data.descricao,
+        data_atividade: data.data_atividade,
         dia_semana: normalizeParaBackend(diaCalculado),
         prioridade: normalizeParaBackend(data.prioridade),
         status: data.status ? normalizeParaBackend(data.status) : 'Pendente'
@@ -151,7 +155,12 @@ export default function Cronograma() {
       setTarefaEmEdicao(null);
       await carregarTarefas();
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Erro ao salvar tarefa');
+      console.error('Erro na API:', err);
+      if (err && typeof err === 'object' && 'details' in err && err.details) {
+         alert(`Erro ao salvar: ${(err as Error).message}\nDetalhes: ${JSON.stringify(err.details)}`);
+      } else {
+         alert(err instanceof Error ? err.message : 'Erro ao salvar tarefa');
+      }
     }
   };
 
@@ -169,7 +178,12 @@ export default function Cronograma() {
     if (!confirm('Deseja confirmar que esta tarefa foi realizada?')) return;
     try {
       const payload = {
-        ...tarefa,
+        id_tarefa: tarefa.id_tarefa,
+        id_voluntario: user?.voluntarioId || tarefa.id_voluntario,
+        tipo: tarefa.tipo,
+        titulo: tarefa.titulo,
+        descricao: tarefa.descricao,
+        data_atividade: tarefa.data_atividade,
         status: 'Concluido',
         dia_semana: normalizeParaBackend(tarefa.dia_semana),
         prioridade: normalizeParaBackend(tarefa.prioridade || 'Média')
@@ -177,7 +191,12 @@ export default function Cronograma() {
       await cronogramaService.atualizarTarefa(tarefa.id_tarefa!, payload);
       await carregarTarefas();
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Erro ao confirmar tarefa');
+      console.error('Erro na API:', err);
+      if (err && typeof err === 'object' && 'details' in err && err.details) {
+         alert(`Erro ao confirmar: ${(err as Error).message}\nDetalhes: ${JSON.stringify(err.details)}`);
+      } else {
+         alert(err instanceof Error ? err.message : 'Erro ao confirmar tarefa');
+      }
     }
   };
 
