@@ -28,16 +28,20 @@ function prioridadeTone(prioridade?: string) {
 }
 
 function normalizeParaBackend(str: string) {
+  if (!str) return str;
   if (str === 'Média') return 'Media';
   if (str === 'Terça-feira') return 'Terca-feira';
   if (str === 'Sábado') return 'Sabado';
+  if (str === 'Concluído') return 'Concluido';
   return str;
 }
 
 function normalizeParaFrontend(str: string) {
+  if (!str) return str;
   if (str === 'Media') return 'Média';
   if (str === 'Terca-feira') return 'Terça-feira';
   if (str === 'Sabado') return 'Sábado';
+  if (str === 'Concluido') return 'Concluído';
   return str;
 }
 
@@ -96,7 +100,8 @@ export default function Cronograma() {
       const tarefasNormalizadas = (response.tarefas || []).map(t => ({
         ...t,
         dia_semana: normalizeParaFrontend(t.dia_semana),
-        prioridade: normalizeParaFrontend(t.prioridade)
+        prioridade: normalizeParaFrontend(t.prioridade),
+        status: normalizeParaFrontend(t.status || '')
       }));
       setTarefas(tarefasNormalizadas);
     } catch (err) {
@@ -133,7 +138,8 @@ export default function Cronograma() {
         ...data, 
         id_voluntario: user.voluntarioId,
         dia_semana: normalizeParaBackend(diaCalculado),
-        prioridade: normalizeParaBackend(data.prioridade)
+        prioridade: normalizeParaBackend(data.prioridade),
+        status: data.status ? normalizeParaBackend(data.status) : 'Pendente'
       };
       if (tarefaEmEdicao?.id_tarefa) {
         await cronogramaService.atualizarTarefa(tarefaEmEdicao.id_tarefa, payload);
@@ -164,7 +170,7 @@ export default function Cronograma() {
     try {
       const payload = {
         ...tarefa,
-        status: 'Concluído',
+        status: 'Concluido',
         dia_semana: normalizeParaBackend(tarefa.dia_semana),
         prioridade: normalizeParaBackend(tarefa.prioridade || 'Média')
       };
