@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useState, useRef, type FormEvent } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Section from '../components/layout/Section';
 import PageShell from '../components/layout/PageShell';
@@ -108,6 +108,14 @@ function DetalheAtendimento() {
   const [atendimento, setAtendimento] = useState<AtendimentoApi | null>(null);
   const [mensagens, setMensagens] = useState<Mensagem[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Ref síncrona para rastrear IDs de mensagens já exibidas.
+  // Usamos um ref (e não o state) porque o state é assíncrono —
+  // quando duas mensagens WebSocket chegam quase ao mesmo tempo,
+  // o React pode ainda não ter aplicado o state da primeira quando
+  // a segunda chega, fazendo o check "prev.some()" falhar.
+  // O ref é atualizado instantaneamente, evitando duplicatas.
+  const seenIdsRef = useRef<Set<number>>(new Set());
   const [erro, setErro] = useState('');
   const [feedback, setFeedback] = useState('');
   const [conteudo, setConteudo] = useState('');
@@ -135,6 +143,7 @@ function DetalheAtendimento() {
         atendimentoService.buscarPorId(atendimentoId),
         mensagensService.getMensagensAtendimento(atendimentoId),
       ]);
+      seenIdsRef.current = new Set(dadosMensagens.map(m => m.id));
       setAtendimento(dadosAtendimento);
       setMensagens(dadosMensagens);
       setStatusEdit(dadosAtendimento.status ?? 'ABERTO');
@@ -191,10 +200,10 @@ function DetalheAtendimento() {
         if (cancelled) return;
         try {
           const msg = JSON.parse(event.data) as Mensagem;
-          setMensagens((prev) => {
-            if (prev.some(m => m.id === msg.id)) return prev;
-            return [...prev, msg];
-          });
+          // Verifica de forma SÍNCRONA se já vimos essa mensagem.
+          if (seenIdsRef.current.has(msg.id)) return;
+          seenIdsRef.current.add(msg.id);
+          setMensagens((prev) => [...prev, msg]);
         } catch (e) {
           console.error('[WebSocket] Erro ao fazer parse:', e);
         }
@@ -212,7 +221,12 @@ function DetalheAtendimento() {
           console.log(`[WebSocket] Reconectando em ${delay / 1000}s...`);
           reconnectTimeout = setTimeout(() => {
             mensagensService.getMensagensAtendimento(atendimentoId)
-              .then((msgs) => { if (!cancelled) setMensagens(msgs); })
+              .then((msgs) => {
+                if (!cancelled) {
+                  seenIdsRef.current = new Set(msgs.map(m => m.id));
+                  setMensagens(msgs);
+                }
+              })
               .catch(() => {});
             connect();
           }, delay);
@@ -248,7 +262,10 @@ function DetalheAtendimento() {
         conteudo: conteudo.trim(),
         enviadoPor: remetenteAtual,
       });
-      setMensagens((atuais) => [...atuais, novaMensagem]);
+      if (!seenIdsRef.current.has(novaMensagem.id)) {
+        seenIdsRef.current.add(novaMensagem.id);
+        setMensagens((atuais) => [...atuais, novaMensagem]);
+      }
       setConteudo('');
     } catch (error) {
       setFeedback(error instanceof Error ? error.message : 'Nao foi possivel enviar a mensagem.');
