@@ -62,10 +62,16 @@ def tarefa_to_dict(row, cursor):
     columns = [col[0].lower() for col in cursor.description]
     d = dict(zip(columns, row))
     if "status" in d and d["status"]:
-        if d["status"] in ["Concluido", "Concluida", "Concluído", "Concluída"]:
+        if d["status"] in ["Concluida", "Concluido", "Concluído", "Concluída"]:
             d["status"] = "Concluido"
-        else:
+        elif d["status"] in ["Pendente"]:
             d["status"] = "Pendente"
+        elif d["status"] in ["Em andamento"]:
+            d["status"] = "Em andamento"
+        elif d["status"] in ["Cancelada"]:
+            d["status"] = "Cancelada"
+        elif d["status"] in ["Atrasada"]:
+            d["status"] = "Atrasada"
     return d
 
 
@@ -276,12 +282,18 @@ def alterar_tarefa(id_tarefa):
                 raise ValidacaoError(f"Campo '{campo}' é obrigatório.")
 
         status_norm = data["status"]
-        if status_norm in ["Pendente"]:
+        if status_norm in ["Pendente", "PENDENTE"]:
             status_norm = "Pendente"
-        elif status_norm in ["Concluido", "Concluida", "Concluído", "Concluída"]:
-            status_norm = "Concluido"
+        elif status_norm in ["Concluido", "Concluida", "Concluído", "Concluída", "CONCLUIDO", "CONCLUIDA"]:
+            status_norm = "Concluida"
+        elif status_norm in ["Em andamento"]:
+            status_norm = "Em andamento"
+        elif status_norm in ["Cancelada"]:
+            status_norm = "Cancelada"
+        elif status_norm in ["Atrasada"]:
+            status_norm = "Atrasada"
         else:
-            raise ValidacaoError("Status inválido. Use: ['Pendente', 'Concluido']")
+            raise ValidacaoError("Status inválido. Use: ['Pendente', 'Em andamento', 'Concluida', 'Cancelada', 'Atrasada']")
 
         conn = get_connection()
         cursor = conn.cursor()
