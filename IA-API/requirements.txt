@@ -7,4 +7,3 @@ oracledb
 numpy
 xgboost
 gunicorn
-
