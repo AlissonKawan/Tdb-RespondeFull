@@ -49,203 +49,1454 @@ O voluntário não sabia responder minhas perguntas básicas,BENEFICIARIO,email,
 Enviou mensagem pelo whatsapp e ficou sem resposta por dias,BENEFICIARIO,presencial,2,ABERTO,CRIANCA_ADOLESCENTE,2,reclamacao
 Minha consulta foi remarcada três vezes seguidas,BENEFICIARIO,email,3,ABERTO,CRIANCA_ADOLESCENTE,1,reclamacao
 Não fui informada sobre os direitos que tenho nesse atendimento,BENEFICIARIO,whatsapp,4,SOLICITADO,MULHER_APOLONIA,1,reclamacao
-"O dentista foi muito cuidadoso com minha filha, adoramos",BENEFICIARIO,presencial,4,ENCERRADO,MULHER_APOLONIA,2,elogio
-Quero agradecer imensamente pelo atendimento que recebi,BENEFICIARIO,telefone,4,ENCERRADO,OUTRO,1,elogio
-"Excelente serviço, meu filho saiu sorrindo da consulta",BENEFICIARIO,presencial,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
-"A voluntária foi super atenciosa e paciente, parabéns",BENEFICIARIO,email,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
-Graças a vocês meu filho está sem dor de dente pela primeira vez,BENEFICIARIO,email,4,ENCERRADO,MULHER_APOLONIA,1,elogio
-"Nunca fui tão bem atendida, estão de parabéns",BENEFICIARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
-"A equipe foi incrível, me senti acolhida em todos os momentos",BENEFICIARIO,presencial,3,ENCERRADO,MULHER_APOLONIA,2,elogio
-"O atendimento foi muito rápido e eficiente, impressionante",BENEFICIARIO,whatsapp,3,ENCERRADO,OUTRO,2,elogio
-Obrigada de coração pelo cuidado com meu filho,BENEFICIARIO,telefone,4,ENCERRADO,OUTRO,1,elogio
-Vocês fazem um trabalho lindo e muito importante,BENEFICIARIO,telefone,4,ENCERRADO,OUTRO,2,elogio
-A recepcionista foi muito simpática e me deixou à vontade,BENEFICIARIO,whatsapp,3,ENCERRADO,OUTRO,2,elogio
-"Meu filho tinha medo de dentista, mas saiu feliz dessa vez",BENEFICIARIO,presencial,3,ENCERRADO,OUTRO,2,elogio
-"Melhor atendimento que já recebi, gratidão enorme",BENEFICIARIO,whatsapp,3,ENCERRADO,MULHER_APOLONIA,1,elogio
-O voluntário explicou tudo com muita calma e atenção,BENEFICIARIO,telefone,4,ENCERRADO,MULHER_APOLONIA,1,elogio
-"Serviço impecável do início ao fim, muito obrigada",BENEFICIARIO,telefone,4,ENCERRADO,MULHER_APOLONIA,2,elogio
-A consulta foi rápida e a doutora foi muito gentil,BENEFICIARIO,whatsapp,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
-Vocês mudaram a vida do meu filho com esse atendimento,BENEFICIARIO,whatsapp,4,ENCERRADO,MULHER_APOLONIA,2,elogio
-Fiquei impressionada com a qualidade do serviço de vocês,BENEFICIARIO,whatsapp,3,ENCERRADO,OUTRO,1,elogio
-"O atendimento presencial foi perfeito, me senti cuidada",BENEFICIARIO,whatsapp,3,ENCERRADO,OUTRO,1,elogio
-"Equipe muito profissional e humana, é difícil encontrar isso",BENEFICIARIO,presencial,4,ENCERRADO,OUTRO,2,elogio
-Parabéns a todos que fazem esse projeto acontecer,BENEFICIARIO,presencial,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+Esperamos mais de duas horas e ninguém nos atendeu,BENEFICIARIO,presencial,3,SOLICITADO,MULHER_APOLONIA,3,reclamacao
+"Meu filho foi maltratado pelo atendente, péssimo serviço",BENEFICIARIO,presencial,4,ABERTO,OUTRO,1,reclamacao
+"Fui embora sem ser atendida, uma vergonha isso",BENEFICIARIO,telefone,3,SOLICITADO,CRIANCA_ADOLESCENTE,2,reclamacao
+Já é a terceira vez que venho aqui e não consigo atendimento,BENEFICIARIO,email,3,ABERTO,OUTRO,1,reclamacao
+"O dentista não apareceu na consulta marcada, absurdo",BENEFICIARIO,whatsapp,4,SOLICITADO,CRIANCA_ADOLESCENTE,3,reclamacao
+"Fui atendida depois de 3 horas de espera, completamente desorganizado",BENEFICIARIO,presencial,4,SOLICITADO,OUTRO,2,reclamacao
+Minha filha ficou chorando de dor esperando e ninguém fez nada,BENEFICIARIO,telefone,4,ABERTO,OUTRO,1,reclamacao
+Reclamei do atendimento e ninguém me deu retorno nenhum,BENEFICIARIO,whatsapp,4,SOLICITADO,CRIANCA_ADOLESCENTE,3,reclamacao
+"O sistema não funciona, tentei agendar e deu erro várias vezes",BENEFICIARIO,presencial,2,ABERTO,MULHER_APOLONIA,3,reclamacao
+"Trataram meu filho com descaso, vou reclamar formalmente",BENEFICIARIO,telefone,3,SOLICITADO,OUTRO,3,reclamacao
+Não fui informada sobre o cancelamento da consulta,BENEFICIARIO,presencial,3,SOLICITADO,CRIANCA_ADOLESCENTE,1,reclamacao
+"Chegamos cedo e fomos atendidos por último, sem explicação",BENEFICIARIO,email,2,SOLICITADO,MULHER_APOLONIA,1,reclamacao
+O voluntário foi grosseiro e não deixou eu falar,BENEFICIARIO,whatsapp,4,ABERTO,CRIANCA_ADOLESCENTE,1,reclamacao
+Ninguém me respondeu no whatsapp há dois dias,BENEFICIARIO,telefone,4,SOLICITADO,OUTRO,2,reclamacao
+Marquei consulta por email e não recebi confirmação nenhuma,BENEFICIARIO,presencial,2,SOLICITADO,OUTRO,1,reclamacao
+Fui encaminhada pro lugar errado e tive que voltar outra hora,BENEFICIARIO,presencial,3,SOLICITADO,MULHER_APOLONIA,3,reclamacao
+Minha situação piorou enquanto esperava o atendimento,BENEFICIARIO,presencial,3,ABERTO,OUTRO,1,reclamacao
+"Não consigo agendar pelo site, está fora do ar desde ontem",BENEFICIARIO,whatsapp,3,SOLICITADO,MULHER_APOLONIA,2,reclamacao
+Fui ignorada quando pedi informação na recepção,BENEFICIARIO,email,3,ABERTO,CRIANCA_ADOLESCENTE,1,reclamacao
+Prometeram me ligar e nunca ligaram,BENEFICIARIO,presencial,2,SOLICITADO,CRIANCA_ADOLESCENTE,2,reclamacao
+O atendimento foi cancelado sem aviso prévio,BENEFICIARIO,whatsapp,4,ABERTO,CRIANCA_ADOLESCENTE,1,reclamacao
+"Não tem cadeira pra sentar enquanto espera, péssimo",BENEFICIARIO,presencial,4,ABERTO,MULHER_APOLONIA,3,reclamacao
+Meu caso foi passado para outro voluntário sem me avisar,BENEFICIARIO,email,3,SOLICITADO,MULHER_APOLONIA,2,reclamacao
+Perdi dia de trabalho pra vir aqui e não fui atendida,BENEFICIARIO,whatsapp,4,SOLICITADO,OUTRO,3,reclamacao
+O dentista atrasou duas horas e não pediu desculpas,BENEFICIARIO,email,2,SOLICITADO,CRIANCA_ADOLESCENTE,3,reclamacao
+Meu filho tem medo e o atendente foi impaciente com ele,BENEFICIARIO,presencial,2,ABERTO,CRIANCA_ADOLESCENTE,3,reclamacao
+Ninguém explicou o procedimento antes de fazer,BENEFICIARIO,presencial,4,SOLICITADO,CRIANCA_ADOLESCENTE,1,reclamacao
+Saí sem entender nada do que foi feito no atendimento,BENEFICIARIO,presencial,3,ABERTO,MULHER_APOLONIA,1,reclamacao
+Me pediram documentos que eu já tinha entregado antes,BENEFICIARIO,email,4,SOLICITADO,CRIANCA_ADOLESCENTE,1,reclamacao
+"O telefone não atende, tentei ligar quinze vezes",BENEFICIARIO,presencial,2,ABERTO,MULHER_APOLONIA,1,reclamacao
+Meu caso ficou parado por semanas sem nenhuma atualização,BENEFICIARIO,telefone,4,SOLICITADO,CRIANCA_ADOLESCENTE,3,reclamacao
+Fui ao endereço indicado e o local estava fechado,BENEFICIARIO,whatsapp,2,SOLICITADO,OUTRO,1,reclamacao
+Perdi o ônibus esperando e não fui atendida mesmo assim,BENEFICIARIO,presencial,4,SOLICITADO,MULHER_APOLONIA,1,reclamacao
+Recebi informações diferentes de dois atendentes diferentes,BENEFICIARIO,email,4,SOLICITADO,MULHER_APOLONIA,3,reclamacao
+Me disseram que meu caso não era urgente e eu discordo,BENEFICIARIO,presencial,3,SOLICITADO,MULHER_APOLONIA,3,reclamacao
+O tratamento foi interrompido sem explicação,BENEFICIARIO,email,4,SOLICITADO,OUTRO,3,reclamacao
+Ninguém me avisou que precisaria de exame antes da consulta,BENEFICIARIO,email,3,SOLICITADO,CRIANCA_ADOLESCENTE,1,reclamacao
+Minha solicitação foi ignorada por mais de uma semana,BENEFICIARIO,whatsapp,4,SOLICITADO,OUTRO,1,reclamacao
+O sistema marcou minha consulta no dia errado,BENEFICIARIO,email,4,SOLICITADO,OUTRO,2,reclamacao
+"Fui mal atendida por telefone, a pessoa foi grossa comigo",BENEFICIARIO,whatsapp,2,SOLICITADO,MULHER_APOLONIA,3,reclamacao
+Chegamos no horário marcado e a consulta havia sido cancelada,BENEFICIARIO,whatsapp,2,SOLICITADO,CRIANCA_ADOLESCENTE,2,reclamacao
+Meu filho ficou com dor depois do procedimento e ninguém orientou,BENEFICIARIO,presencial,3,SOLICITADO,OUTRO,3,reclamacao
+Não consegui falar com nenhum responsável sobre meu caso,BENEFICIARIO,telefone,3,SOLICITADO,OUTRO,3,reclamacao
+O atendimento foi muito demorado para um caso simples,BENEFICIARIO,email,4,ABERTO,MULHER_APOLONIA,3,reclamacao
+Me mandaram de um lado pro outro sem resolver nada,BENEFICIARIO,email,2,SOLICITADO,MULHER_APOLONIA,2,reclamacao
+"Fui atendida por alguém sem preparo, me senti insegura",BENEFICIARIO,email,2,SOLICITADO,MULHER_APOLONIA,2,reclamacao
+O voluntário não sabia responder minhas perguntas básicas,BENEFICIARIO,telefone,3,ABERTO,CRIANCA_ADOLESCENTE,1,reclamacao
+Enviou mensagem pelo whatsapp e ficou sem resposta por dias,BENEFICIARIO,presencial,2,SOLICITADO,CRIANCA_ADOLESCENTE,3,reclamacao
+Minha consulta foi remarcada três vezes seguidas,BENEFICIARIO,presencial,3,ABERTO,MULHER_APOLONIA,3,reclamacao
+Não fui informada sobre os direitos que tenho nesse atendimento,BENEFICIARIO,telefone,4,SOLICITADO,CRIANCA_ADOLESCENTE,2,reclamacao
+nao me atenderam de novo,BENEFICIARIO,presencial,3,SOLICITADO,OUTRO,1,reclamacao
+Pessimo pessimo pessimo,BENEFICIARIO,presencial,4,ABERTO,MULHER_APOLONIA,3,reclamacao
+ninguem responde o zap,BENEFICIARIO,email,2,SOLICITADO,CRIANCA_ADOLESCENTE,2,reclamacao
+odeio esse atendimento,BENEFICIARIO,telefone,4,ABERTO,CRIANCA_ADOLESCENTE,1,reclamacao
+Nao consigo agendamento,BENEFICIARIO,email,3,ABERTO,OUTRO,2,reclamacao
+esperando ha 3 horas aqui,BENEFICIARIO,presencial,3,SOLICITADO,CRIANCA_ADOLESCENTE,1,reclamacao
+ninguem apareceu,BENEFICIARIO,whatsapp,2,SOLICITADO,CRIANCA_ADOLESCENTE,3,reclamacao
+Muito ruim tudo,BENEFICIARIO,presencial,4,ABERTO,MULHER_APOLONIA,1,reclamacao
+nao gostei nada,BENEFICIARIO,telefone,4,SOLICITADO,MULHER_APOLONIA,3,reclamacao
+sao horriveis,BENEFICIARIO,whatsapp,3,ABERTO,CRIANCA_ADOLESCENTE,2,reclamacao
+Horrivel o atendimento,BENEFICIARIO,presencial,2,ABERTO,CRIANCA_ADOLESCENTE,2,reclamacao
+fui embora sem ser atendida,BENEFICIARIO,email,3,SOLICITADO,CRIANCA_ADOLESCENTE,2,reclamacao
+nao resolveram nada,BENEFICIARIO,email,2,ABERTO,CRIANCA_ADOLESCENTE,2,reclamacao
+me deixaram esperando e fui embora,BENEFICIARIO,email,2,ABERTO,MULHER_APOLONIA,2,reclamacao
+isso é uma vergonha,BENEFICIARIO,email,2,SOLICITADO,MULHER_APOLONIA,3,reclamacao
+nao voltarei mais,BENEFICIARIO,email,3,ABERTO,MULHER_APOLONIA,1,reclamacao
+atendimento pessimo como sempre,BENEFICIARIO,presencial,2,ABERTO,OUTRO,2,reclamacao
+Nao recebi resposta nenhuma,BENEFICIARIO,whatsapp,4,SOLICITADO,MULHER_APOLONIA,3,reclamacao
+nao funciona o site de vcs,BENEFICIARIO,presencial,2,ABERTO,CRIANCA_ADOLESCENTE,3,reclamacao
+que atendente grosseiro meu deus,BENEFICIARIO,telefone,2,SOLICITADO,OUTRO,1,reclamacao
+tive que ir embora,BENEFICIARIO,whatsapp,3,ABERTO,CRIANCA_ADOLESCENTE,1,reclamacao
+Fui ignorada la,BENEFICIARIO,presencial,4,SOLICITADO,MULHER_APOLONIA,1,reclamacao
+Nunca vi atendimento tao ruim,BENEFICIARIO,telefone,3,ABERTO,OUTRO,1,reclamacao
+Minha filah ficou esperando 2 horas e nada,BENEFICIARIO,email,2,SOLICITADO,MULHER_APOLONIA,2,reclamacao
+o dentista nao veio,BENEFICIARIO,email,3,ABERTO,CRIANCA_ADOLESCENTE,3,reclamacao
+cancelaram sem avisar de novo,BENEFICIARIO,presencial,3,ABERTO,MULHER_APOLONIA,1,reclamacao
+me passaram informacao errada,BENEFICIARIO,telefone,2,SOLICITADO,CRIANCA_ADOLESCENTE,1,reclamacao
+"nao consigo falar com ninguem, fico no silencio",BENEFICIARIO,whatsapp,2,SOLICITADO,MULHER_APOLONIA,1,reclamacao
+atendimento horrivel nao recomendo,BENEFICIARIO,whatsapp,4,ABERTO,OUTRO,2,reclamacao
+terceira vez q nao me atendem,BENEFICIARIO,whatsapp,4,SOLICITADO,OUTRO,2,reclamacao
+vixi que demora,BENEFICIARIO,presencial,2,SOLICITADO,CRIANCA_ADOLESCENTE,3,reclamacao
+pior atendimento da vida,BENEFICIARIO,whatsapp,4,ABERTO,OUTRO,1,reclamacao
+me senti muito mal la,BENEFICIARIO,email,2,ABERTO,MULHER_APOLONIA,1,reclamacao
+nao me ligaram como prometeram,BENEFICIARIO,email,2,ABERTO,OUTRO,1,reclamacao
+Ja mandei 5 mensagem e nada,BENEFICIARIO,presencial,2,ABERTO,OUTRO,1,reclamacao
+atendimento sem qualidade nenhuma,BENEFICIARIO,telefone,3,ABERTO,OUTRO,2,reclamacao
+Agendei e nao confirmaram,BENEFICIARIO,telefone,2,ABERTO,OUTRO,1,reclamacao
+fui mal atendida la,BENEFICIARIO,presencial,4,ABERTO,CRIANCA_ADOLESCENTE,3,reclamacao
+n consigo agendar pelo site,BENEFICIARIO,presencial,2,ABERTO,CRIANCA_ADOLESCENTE,1,reclamacao
+pessima organizacao,BENEFICIARIO,email,3,ABERTO,MULHER_APOLONIA,3,reclamacao
+Que demora absurda,BENEFICIARIO,email,2,ABERTO,OUTRO,1,reclamacao
+meu filho ta sofrendo esperando,BENEFICIARIO,telefone,4,SOLICITADO,OUTRO,1,reclamacao
+Reclamei e nao fizeram nada,BENEFICIARIO,email,3,SOLICITADO,CRIANCA_ADOLESCENTE,1,reclamacao
+Perderam meu cadastro,BENEFICIARIO,email,4,SOLICITADO,CRIANCA_ADOLESCENTE,2,reclamacao
+fui encaminhada errado de novo,BENEFICIARIO,whatsapp,3,ABERTO,MULHER_APOLONIA,2,reclamacao
+dentista atrasou 2h sem avisar,BENEFICIARIO,whatsapp,2,ABERTO,MULHER_APOLONIA,3,reclamacao
+Sao muito desorganizados,BENEFICIARIO,presencial,2,ABERTO,MULHER_APOLONIA,1,reclamacao
+nao me deram nem agua enquanto esperava,BENEFICIARIO,telefone,4,ABERTO,CRIANCA_ADOLESCENTE,2,reclamacao
+foi horrivel essa visita,BENEFICIARIO,presencial,4,ABERTO,CRIANCA_ADOLESCENTE,2,reclamacao
+Me trataram como se eu fosse burra,BENEFICIARIO,telefone,4,SOLICITADO,MULHER_APOLONIA,3,reclamacao
+Nao consigo contato com vcs,BENEFICIARIO,telefone,3,ABERTO,CRIANCA_ADOLESCENTE,1,reclamacao
+Cada vez pior,BENEFICIARIO,email,3,SOLICITADO,CRIANCA_ADOLESCENTE,3,reclamacao
+nao recomendo pra ninguem,BENEFICIARIO,whatsapp,4,ABERTO,OUTRO,1,reclamacao
+ja nao aguento mais esse atendimento,BENEFICIARIO,presencial,3,ABERTO,OUTRO,1,reclamacao
+O dentista foi rude com minha crianca,BENEFICIARIO,whatsapp,2,SOLICITADO,CRIANCA_ADOLESCENTE,2,reclamacao
+me ligaram na hora errada,BENEFICIARIO,email,2,SOLICITADO,CRIANCA_ADOLESCENTE,1,reclamacao
+nao consigo remarcar,BENEFICIARIO,telefone,2,SOLICITADO,MULHER_APOLONIA,1,reclamacao
+Sempre tem problema,BENEFICIARIO,telefone,2,SOLICITADO,OUTRO,3,reclamacao
+deixaram minha filha esperando so,BENEFICIARIO,presencial,2,SOLICITADO,OUTRO,1,reclamacao
+ninguem sabia de nada la,BENEFICIARIO,whatsapp,3,ABERTO,OUTRO,1,reclamacao
+atendimento precario demais,BENEFICIARIO,whatsapp,3,SOLICITADO,OUTRO,3,reclamacao
+pedi ajuda e ningueam ajudou,BENEFICIARIO,whatsapp,4,SOLICITADO,MULHER_APOLONIA,2,reclamacao
+Fui tratada com descaso,BENEFICIARIO,presencial,2,SOLICITADO,MULHER_APOLONIA,2,reclamacao
+tentei ligar 20 vezes e nao atenderam,BENEFICIARIO,presencial,3,SOLICITADO,MULHER_APOLONIA,1,reclamacao
+Me colocaram no lugar errado,BENEFICIARIO,whatsapp,4,SOLICITADO,OUTRO,1,reclamacao
+nao tenho palavras pra descrever como foi ruim,BENEFICIARIO,whatsapp,2,ABERTO,CRIANCA_ADOLESCENTE,1,reclamacao
+me fizeram voltar de graça,BENEFICIARIO,whatsapp,3,ABERTO,CRIANCA_ADOLESCENTE,2,reclamacao
+passei vergonha la na frente de todos,BENEFICIARIO,email,4,SOLICITADO,CRIANCA_ADOLESCENTE,3,reclamacao
+me trataram feio,BENEFICIARIO,whatsapp,3,SOLICITADO,MULHER_APOLONIA,2,reclamacao
+Muito decepcionada,BENEFICIARIO,telefone,2,ABERTO,OUTRO,1,reclamacao
+nao to satisfeita com esse servico nao,BENEFICIARIO,email,2,SOLICITADO,OUTRO,1,reclamacao
+q absurdo esse atendimento,BENEFICIARIO,telefone,2,SOLICITADO,OUTRO,1,reclamacao
+me atenderam muito mal la,BENEFICIARIO,email,4,ABERTO,CRIANCA_ADOLESCENTE,1,reclamacao
+nao resolveram o meu problema,BENEFICIARIO,whatsapp,3,ABERTO,OUTRO,3,reclamacao
+nao tem organizacao nenhuma,BENEFICIARIO,whatsapp,2,SOLICITADO,OUTRO,2,reclamacao
+me fizeram esperar muito e nada,BENEFICIARIO,presencial,2,ABERTO,OUTRO,1,reclamacao
+o dentitsa nao apareceu de novo,BENEFICIARIO,email,4,ABERTO,OUTRO,1,reclamacao
+q falta de respeito comigo,BENEFICIARIO,whatsapp,2,SOLICITADO,MULHER_APOLONIA,3,reclamacao
+nao gostei mesmo,BENEFICIARIO,whatsapp,2,SOLICITADO,CRIANCA_ADOLESCENTE,2,reclamacao
+eles me trataram pessimo,BENEFICIARIO,whatsapp,4,ABERTO,CRIANCA_ADOLESCENTE,2,reclamacao
+meu filho ficou sem atendimento de novo,BENEFICIARIO,whatsapp,2,SOLICITADO,MULHER_APOLONIA,3,reclamacao
+uma hora de espera e nada,BENEFICIARIO,presencial,4,SOLICITADO,MULHER_APOLONIA,2,reclamacao
+nao tem como entrar em contato,BENEFICIARIO,email,3,ABERTO,OUTRO,2,reclamacao
+cancelaram tudo de ultima hora,BENEFICIARIO,presencial,2,SOLICITADO,CRIANCA_ADOLESCENTE,2,reclamacao
+meu caso ta parado ha semanas,BENEFICIARIO,email,4,ABERTO,CRIANCA_ADOLESCENTE,3,reclamacao
+nao me ajudaram em nada,BENEFICIARIO,telefone,4,ABERTO,CRIANCA_ADOLESCENTE,1,reclamacao
+voltei com a mesma duvida sem resposta,BENEFICIARIO,email,3,ABERTO,OUTRO,3,reclamacao
+atendimento demorou demais pra caso simples,BENEFICIARIO,email,3,SOLICITADO,MULHER_APOLONIA,2,reclamacao
+me deixaram sem informacao nenhuma,BENEFICIARIO,email,3,ABERTO,OUTRO,3,reclamacao
+nao confio mais nesse servico,BENEFICIARIO,telefone,3,SOLICITADO,CRIANCA_ADOLESCENTE,2,reclamacao
+a voluntaria foi grossa comigo,BENEFICIARIO,whatsapp,4,SOLICITADO,MULHER_APOLONIA,3,reclamacao
+nao recebo retorno de forma alguma,BENEFICIARIO,email,4,ABERTO,CRIANCA_ADOLESCENTE,1,reclamacao
+me repetiram pedido de docs que já entreguei,BENEFICIARIO,presencial,3,SOLICITADO,CRIANCA_ADOLESCENTE,2,reclamacao
+passaram meu horario pra outro sem avisar,BENEFICIARIO,whatsapp,2,SOLICITADO,MULHER_APOLONIA,1,reclamacao
+nao consigo agendar de jeito nenhum,BENEFICIARIO,email,2,SOLICITADO,OUTRO,3,reclamacao
+Fui embora sem resolver mais uma vez,BENEFICIARIO,presencial,4,ABERTO,OUTRO,1,reclamacao
+que falta de cuidado com a gente,BENEFICIARIO,telefone,4,SOLICITADO,OUTRO,3,reclamacao
+Ninguem sabia o que estava fazendo,BENEFICIARIO,email,2,ABERTO,OUTRO,3,reclamacao
+minha consulta sumiu do sistema,BENEFICIARIO,whatsapp,3,ABERTO,MULHER_APOLONIA,3,reclamacao
+eles estao me ignorando ha dias,BENEFICIARIO,telefone,2,ABERTO,MULHER_APOLONIA,2,reclamacao
+Que atendimento desorganizado meu Deus,BENEFICIARIO,whatsapp,3,ABERTO,MULHER_APOLONIA,1,reclamacao
+a sala de espera estava suja e feia,BENEFICIARIO,whatsapp,2,SOLICITADO,MULHER_APOLONIA,2,reclamacao
+ninguem me deu satisfacao alguma,BENEFICIARIO,email,2,SOLICITADO,MULHER_APOLONIA,1,reclamacao
+nao tem cuidado com as criancas aqui,BENEFICIARIO,telefone,2,SOLICITADO,CRIANCA_ADOLESCENTE,3,reclamacao
+nunca vi atendimento tao confuso,BENEFICIARIO,whatsapp,3,ABERTO,MULHER_APOLONIA,3,reclamacao
+me enganaram sobre o horario,BENEFICIARIO,telefone,2,ABERTO,MULHER_APOLONIA,1,reclamacao
+a minha ficha sumiu la,BENEFICIARIO,presencial,2,ABERTO,CRIANCA_ADOLESCENTE,3,reclamacao
+fui mal recebida na entrada,BENEFICIARIO,telefone,4,SOLICITADO,MULHER_APOLONIA,2,reclamacao
+passaram errado as instrucoes pra mim,BENEFICIARIO,email,4,SOLICITADO,MULHER_APOLONIA,1,reclamacao
+me mandaram embora sem atender,BENEFICIARIO,email,3,ABERTO,OUTRO,3,reclamacao
+o voluntario falou errado sobre meu caso,BENEFICIARIO,telefone,4,ABERTO,MULHER_APOLONIA,3,reclamacao
+ficam mudando as regras toda hora,BENEFICIARIO,telefone,2,SOLICITADO,MULHER_APOLONIA,2,reclamacao
+nao consigo cancelar pelo site,BENEFICIARIO,telefone,4,ABERTO,CRIANCA_ADOLESCENTE,3,reclamacao
+me deixaram sem saber o que fazer,BENEFICIARIO,whatsapp,3,ABERTO,CRIANCA_ADOLESCENTE,1,reclamacao
+perdi duas horas la pra nada,BENEFICIARIO,telefone,3,SOLICITADO,MULHER_APOLONIA,1,reclamacao
+atendemeto ruim e descuidado,BENEFICIARIO,whatsapp,2,SOLICITADO,CRIANCA_ADOLESCENTE,2,reclamacao
+nao fui tratada com respeito,BENEFICIARIO,telefone,2,ABERTO,MULHER_APOLONIA,3,reclamacao
+o local estava fechado quando cheguei,BENEFICIARIO,presencial,4,SOLICITADO,MULHER_APOLONIA,3,reclamacao
+tive que adivinhar o que fazer sozinha,BENEFICIARIO,presencial,2,SOLICITADO,OUTRO,2,reclamacao
+nao me informaram nada,BENEFICIARIO,whatsapp,2,SOLICITADO,MULHER_APOLONIA,2,reclamacao
+nao voltarei nessa unidade,BENEFICIARIO,telefone,4,ABERTO,MULHER_APOLONIA,1,reclamacao
+saí la pior do que entrei,BENEFICIARIO,whatsapp,2,ABERTO,MULHER_APOLONIA,1,reclamacao
+minha filha ficou assustada com a forma que falaram,BENEFICIARIO,email,3,ABERTO,MULHER_APOLONIA,3,reclamacao
+o sistema nao aceitou meu cadastro,BENEFICIARIO,email,3,SOLICITADO,OUTRO,3,reclamacao
+a comunicacao de vcs e muito ruim,BENEFICIARIO,whatsapp,4,ABERTO,OUTRO,3,reclamacao
+ninguem me orientou antes do procedimento,BENEFICIARIO,presencial,2,SOLICITADO,OUTRO,2,reclamacao
+colocaram meu filho na fila errada,BENEFICIARIO,email,4,SOLICITADO,OUTRO,2,reclamacao
+perdi o dia de trabalho e nao fui atendida,BENEFICIARIO,email,2,SOLICITADO,MULHER_APOLONIA,3,reclamacao
+me deixaram com duvidas sobre o tratamento,BENEFICIARIO,email,2,SOLICITADO,OUTRO,3,reclamacao
+o atendente foi impatiente e grosseiro,BENEFICIARIO,presencial,3,ABERTO,CRIANCA_ADOLESCENTE,1,reclamacao
+nao resolveram o problema raiz,BENEFICIARIO,email,3,SOLICITADO,OUTRO,1,reclamacao
+fui embora com raiva do atendimento,BENEFICIARIO,presencial,2,SOLICITADO,OUTRO,1,reclamacao
+cada vez mais dificil conseguir vaga,BENEFICIARIO,email,3,SOLICITADO,MULHER_APOLONIA,1,reclamacao
+marquei e nao ficou registrado,BENEFICIARIO,email,4,ABERTO,CRIANCA_ADOLESCENTE,3,reclamacao
+nao me chamaram sendo que ja estava la,BENEFICIARIO,telefone,2,SOLICITADO,MULHER_APOLONIA,2,reclamacao
+me disseram uma coisa e fizeram outra,BENEFICIARIO,whatsapp,4,SOLICITADO,MULHER_APOLONIA,1,reclamacao
+fui a terceira vez e mesma coisa,BENEFICIARIO,presencial,3,SOLICITADO,CRIANCA_ADOLESCENTE,3,reclamacao
+o voluntario nao escutou o que eu falei,BENEFICIARIO,whatsapp,2,ABERTO,CRIANCA_ADOLESCENTE,3,reclamacao
+nao tem acesso facil pro local,BENEFICIARIO,telefone,3,ABERTO,OUTRO,2,reclamacao
+esperava mais de um servico assim,BENEFICIARIO,telefone,2,ABERTO,MULHER_APOLONIA,2,reclamacao
+minha consulta ja foi cancelada 2 vezes,BENEFICIARIO,email,2,SOLICITADO,OUTRO,1,reclamacao
+a fila nao tem organizacao nenhuma,BENEFICIARIO,email,4,ABERTO,CRIANCA_ADOLESCENTE,2,reclamacao
+ninguem me recebeu quando cheguei,BENEFICIARIO,presencial,2,SOLICITADO,OUTRO,1,reclamacao
+o email que mandei ficou sem resposta,BENEFICIARIO,whatsapp,3,SOLICITADO,MULHER_APOLONIA,3,reclamacao
+nao consigo informacao sobre meu caso,BENEFICIARIO,whatsapp,2,ABERTO,OUTRO,3,reclamacao
+fiquei la mais de 2h sem explicacao,BENEFICIARIO,email,3,SOLICITADO,CRIANCA_ADOLESCENTE,1,reclamacao
+meu caso foi enviado pro lugar errado,BENEFICIARIO,email,2,SOLICITADO,OUTRO,2,reclamacao
+liguei varias vezes e ninguem atendeu,BENEFICIARIO,presencial,4,ABERTO,MULHER_APOLONIA,1,reclamacao
+me enviaram pro lugar errado de proposito,BENEFICIARIO,telefone,4,ABERTO,CRIANCA_ADOLESCENTE,1,reclamacao
+o sistema travou e perdi meu horario,BENEFICIARIO,whatsapp,2,ABERTO,OUTRO,2,reclamacao
+o dentista nao se apresentou,BENEFICIARIO,email,2,SOLICITADO,OUTRO,3,reclamacao
+nao achei o local com as instrucoes dadas,BENEFICIARIO,telefone,3,SOLICITADO,OUTRO,3,reclamacao
+me colocaram pra esperar sem explicar,BENEFICIARIO,telefone,3,SOLICITADO,OUTRO,3,reclamacao
+nao gostei do jeito que fui tratada,BENEFICIARIO,whatsapp,2,SOLICITADO,MULHER_APOLONIA,3,reclamacao
+nao me deram retorno do meu caso,BENEFICIARIO,telefone,2,SOLICITADO,CRIANCA_ADOLESCENTE,1,reclamacao
+fui desconsiderada la na frente de todos,BENEFICIARIO,whatsapp,2,ABERTO,OUTRO,1,reclamacao
+o servico esta muito aquem do esperado,BENEFICIARIO,email,3,SOLICITADO,MULHER_APOLONIA,1,reclamacao
+me fizeram ficar esperando sem motivo,BENEFICIARIO,telefone,3,ABERTO,MULHER_APOLONIA,2,reclamacao
+minha filha saiu sem atendimento completo,BENEFICIARIO,whatsapp,4,ABERTO,CRIANCA_ADOLESCENTE,3,reclamacao
+nao tive acesso ao responsavel do meu caso,BENEFICIARIO,whatsapp,2,ABERTO,OUTRO,1,reclamacao
+q descuido com a nossa situacao,BENEFICIARIO,email,4,ABERTO,OUTRO,3,reclamacao
+me senti abandonada la dentro,BENEFICIARIO,presencial,3,ABERTO,OUTRO,1,reclamacao
+pior experiencia que tive num atendimento,BENEFICIARIO,presencial,4,SOLICITADO,MULHER_APOLONIA,2,reclamacao
+nao tem jeito de reclamar la,BENEFICIARIO,email,4,ABERTO,MULHER_APOLONIA,2,reclamacao
+nao solucionaram nada do meu caso,BENEFICIARIO,telefone,3,ABERTO,MULHER_APOLONIA,2,reclamacao
+me trataram com indiferenca total,BENEFICIARIO,whatsapp,2,ABERTO,OUTRO,1,reclamacao
+que servico frustrante,BENEFICIARIO,presencial,2,SOLICITADO,OUTRO,2,reclamacao
+minha crianca ficou com medo do lugar,BENEFICIARIO,whatsapp,4,SOLICITADO,CRIANCA_ADOLESCENTE,2,reclamacao
+voltei de maos vazias depois de horas,BENEFICIARIO,telefone,2,SOLICITADO,CRIANCA_ADOLESCENTE,2,reclamacao
+nao consigo noticias do meu caso,BENEFICIARIO,telefone,4,ABERTO,MULHER_APOLONIA,1,reclamacao
+o atendimento nao foi compativel com minha necessidade,BENEFICIARIO,whatsapp,3,SOLICITADO,MULHER_APOLONIA,3,reclamacao
+foi muito ruim voltarei nao,BENEFICIARIO,whatsapp,2,ABERTO,MULHER_APOLONIA,3,reclamacao
+o site de vcs nao funciona direito,BENEFICIARIO,telefone,4,ABERTO,OUTRO,1,reclamacao
+nao me deram opcao de horario,BENEFICIARIO,whatsapp,2,SOLICITADO,CRIANCA_ADOLESCENTE,1,reclamacao
+fui encaminhada errada e perdi a viagem,BENEFICIARIO,email,2,ABERTO,OUTRO,1,reclamacao
+ficaram me enrolando sem resolucao,BENEFICIARIO,email,4,SOLICITADO,MULHER_APOLONIA,3,reclamacao
+nao me avisaram sobre mudanca de local,BENEFICIARIO,email,4,SOLICITADO,OUTRO,1,reclamacao
+me passaram numero errado de contato,BENEFICIARIO,presencial,4,ABERTO,OUTRO,3,reclamacao
+minha consulta foi esquecida no sistema,BENEFICIARIO,email,2,ABERTO,MULHER_APOLONIA,1,reclamacao
+o voluntario foi indelicado e arrogante,BENEFICIARIO,presencial,2,ABERTO,CRIANCA_ADOLESCENTE,3,reclamacao
+nao tenho como acessar meu historico,BENEFICIARIO,telefone,3,SOLICITADO,MULHER_APOLONIA,1,reclamacao
+me fizeram preencher tudo de novo sem motivo,BENEFICIARIO,whatsapp,4,ABERTO,CRIANCA_ADOLESCENTE,1,reclamacao
+nao resolvi nada mesmo indo pessoalmente,BENEFICIARIO,presencial,3,SOLICITADO,OUTRO,1,reclamacao
+que falta de comunicacao entre a equipe,BENEFICIARIO,presencial,2,ABERTO,CRIANCA_ADOLESCENTE,1,reclamacao
+minha filha ficou com duvida e ninguem ajudou,BENEFICIARIO,email,4,ABERTO,OUTRO,3,reclamacao
+me mandaram pro local errado duas vezes,BENEFICIARIO,email,3,ABERTO,CRIANCA_ADOLESCENTE,1,reclamacao
+senti que ninguem queria me atender,BENEFICIARIO,whatsapp,3,SOLICITADO,OUTRO,2,reclamacao
+o atendimento foi desrespeitoso,BENEFICIARIO,whatsapp,3,ABERTO,OUTRO,2,reclamacao
+nao cumpriram o que prometeram,BENEFICIARIO,email,3,SOLICITADO,CRIANCA_ADOLESCENTE,2,reclamacao
+me senti um fardo pra eles,BENEFICIARIO,email,3,ABERTO,OUTRO,1,reclamacao
+atendimento lento e descuidado,BENEFICIARIO,presencial,2,ABERTO,OUTRO,3,reclamacao
+fui atendida mas nao resolvi o problema,BENEFICIARIO,presencial,3,SOLICITADO,OUTRO,2,reclamacao
+me cobram doc diferente toda vez,BENEFICIARIO,email,2,ABERTO,OUTRO,2,reclamacao
+nao tem como agendar online,BENEFICIARIO,telefone,2,SOLICITADO,CRIANCA_ADOLESCENTE,1,reclamacao
+que demora enorme pra simples resposta,BENEFICIARIO,telefone,4,SOLICITADO,OUTRO,3,reclamacao
+minha filha saiu da consulta sem entender nada,BENEFICIARIO,telefone,2,SOLICITADO,MULHER_APOLONIA,1,reclamacao
+me deram retorno errado sobre meu caso,BENEFICIARIO,telefone,2,ABERTO,OUTRO,1,reclamacao
+fui pro local e estava tudo fechado,BENEFICIARIO,presencial,4,SOLICITADO,MULHER_APOLONIA,3,reclamacao
+atendimento aquem do esperado,BENEFICIARIO,presencial,3,SOLICITADO,MULHER_APOLONIA,3,reclamacao
+nao confio mais nas informacoes que dao,BENEFICIARIO,presencial,2,SOLICITADO,CRIANCA_ADOLESCENTE,2,reclamacao
+Que experiencia horrivel,BENEFICIARIO,telefone,4,SOLICITADO,MULHER_APOLONIA,3,reclamacao
+"O dentista foi muito cuidadoso com minha filha, adoramos",BENEFICIARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+Quero agradecer imensamente pelo atendimento que recebi,BENEFICIARIO,whatsapp,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+"Excelente serviço, meu filho saiu sorrindo da consulta",BENEFICIARIO,presencial,3,ENCERRADO,MULHER_APOLONIA,2,elogio
+"A voluntária foi super atenciosa e paciente, parabéns",BENEFICIARIO,whatsapp,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+Graças a vocês meu filho está sem dor de dente pela primeira vez,BENEFICIARIO,telefone,4,ENCERRADO,OUTRO,2,elogio
+"Nunca fui tão bem atendida, estão de parabéns",BENEFICIARIO,telefone,3,ENCERRADO,OUTRO,2,elogio
+"A equipe foi incrível, me senti acolhida em todos os momentos",BENEFICIARIO,presencial,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+"O atendimento foi muito rápido e eficiente, impressionante",BENEFICIARIO,presencial,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+Obrigada de coração pelo cuidado com meu filho,BENEFICIARIO,whatsapp,4,ENCERRADO,OUTRO,2,elogio
+Vocês fazem um trabalho lindo e muito importante,BENEFICIARIO,email,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+A recepcionista foi muito simpática e me deixou à vontade,BENEFICIARIO,email,4,ENCERRADO,OUTRO,2,elogio
+"Meu filho tinha medo de dentista, mas saiu feliz dessa vez",BENEFICIARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+"Melhor atendimento que já recebi, gratidão enorme",BENEFICIARIO,telefone,3,ENCERRADO,MULHER_APOLONIA,1,elogio
+O voluntário explicou tudo com muita calma e atenção,BENEFICIARIO,presencial,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+"Serviço impecável do início ao fim, muito obrigada",BENEFICIARIO,telefone,3,ENCERRADO,MULHER_APOLONIA,2,elogio
+A consulta foi rápida e a doutora foi muito gentil,BENEFICIARIO,telefone,4,ENCERRADO,MULHER_APOLONIA,2,elogio
+Vocês mudaram a vida do meu filho com esse atendimento,BENEFICIARIO,whatsapp,3,ENCERRADO,MULHER_APOLONIA,1,elogio
+Fiquei impressionada com a qualidade do serviço de vocês,BENEFICIARIO,whatsapp,3,ENCERRADO,MULHER_APOLONIA,2,elogio
+"O atendimento presencial foi perfeito, me senti cuidada",BENEFICIARIO,presencial,3,ENCERRADO,MULHER_APOLONIA,2,elogio
+"Equipe muito profissional e humana, é difícil encontrar isso",BENEFICIARIO,whatsapp,4,ENCERRADO,MULHER_APOLONIA,1,elogio
+Parabéns a todos que fazem esse projeto acontecer,BENEFICIARIO,whatsapp,3,ENCERRADO,MULHER_APOLONIA,2,elogio
 Me trataram com muito respeito e dignidade,BENEFICIARIO,presencial,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
-O dentista foi incrível com minha menina de 5 anos,BENEFICIARIO,presencial,4,ENCERRADO,MULHER_APOLONIA,1,elogio
-"Meu filho não queria ir mas agora quer voltar, que conquista",BENEFICIARIO,presencial,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
-Agradeço cada detalhe do atendimento que recebi hoje,BENEFICIARIO,whatsapp,3,ENCERRADO,MULHER_APOLONIA,2,elogio
-A voluntária me ligou para confirmar e fui muito bem recebida,BENEFICIARIO,email,4,ENCERRADO,MULHER_APOLONIA,2,elogio
-Serviço de altíssima qualidade para quem mais precisa,BENEFICIARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
-O tratamento foi completo e o acompanhamento foi excelente,BENEFICIARIO,presencial,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
-"Fui bem orientada em todos os passos, obrigada pela paciência",BENEFICIARIO,whatsapp,4,ENCERRADO,OUTRO,1,elogio
-O ambiente é acolhedor e a equipe é muito dedicada,BENEFICIARIO,whatsapp,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
-Recomendo esse serviço para todas as mães que conheço,BENEFICIARIO,presencial,3,ENCERRADO,OUTRO,2,elogio
-Me senti respeitada e bem cuidada durante todo o processo,BENEFICIARIO,telefone,4,ENCERRADO,MULHER_APOLONIA,2,elogio
-O atendimento superou todas as minhas expectativas,BENEFICIARIO,email,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
-Cada pessoa que me atendeu foi extraordinária,BENEFICIARIO,email,4,ENCERRADO,OUTRO,1,elogio
-Meu filho está muito feliz com o resultado do tratamento,BENEFICIARIO,email,3,ENCERRADO,MULHER_APOLONIA,1,elogio
-"Foram pontuais, atenciosos e muito competentes",BENEFICIARIO,presencial,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
-Nunca imaginei receber um atendimento tão humanizado,BENEFICIARIO,presencial,3,ENCERRADO,OUTRO,2,elogio
-"A equipe é nota dez, não tenho nada a reclamar",BENEFICIARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
-Obrigada por existirem e fazerem a diferença na minha vida,BENEFICIARIO,whatsapp,4,ENCERRADO,MULHER_APOLONIA,1,elogio
-Foram muito pacientes com minha filha que tem autismo,BENEFICIARIO,email,3,ENCERRADO,MULHER_APOLONIA,1,elogio
-O tratamento foi longo mas o acompanhamento foi perfeito,BENEFICIARIO,presencial,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
-"Voltarei sempre que precisar, confiança total no serviço",BENEFICIARIO,whatsapp,3,ENCERRADO,MULHER_APOLONIA,1,elogio
-Saí da consulta com o coração cheio de gratidão,BENEFICIARIO,telefone,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
-"Excelente iniciativa e execução, parabéns pela organização",BENEFICIARIO,telefone,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
-"O voluntário foi além do que eu esperava, muito dedicado",BENEFICIARIO,telefone,3,ENCERRADO,OUTRO,2,elogio
-Me surpreenderam positivamente em cada etapa,BENEFICIARIO,email,3,ENCERRADO,MULHER_APOLONIA,1,elogio
-Atendimento com muita empatia e cuidado genuíno,BENEFICIARIO,email,4,ENCERRADO,OUTRO,2,elogio
-"Tudo correu perfeitamente, estou muito satisfeita",BENEFICIARIO,email,4,ENCERRADO,MULHER_APOLONIA,2,elogio
-"Que trabalho bonito e necessário, meu muito obrigada",BENEFICIARIO,telefone,4,ENCERRADO,OUTRO,2,elogio
-A equipe se importou de verdade com o meu caso,BENEFICIARIO,telefone,3,ENCERRADO,MULHER_APOLONIA,2,elogio
-Seria ótimo ter atendimento aos sábados para quem trabalha,BENEFICIARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,sugestao
-Sugiro criar um aplicativo para facilitar o agendamento,BENEFICIARIO,telefone,4,ENCERRADO,OUTRO,1,sugestao
-Seria bom ter uma sala de espera maior e mais confortável,BENEFICIARIO,email,3,ENCERRADO,OUTRO,2,sugestao
-Poderiam enviar lembrete por whatsapp um dia antes da consulta,BENEFICIARIO,whatsapp,4,ABERTO,MULHER_APOLONIA,3,sugestao
-Seria útil ter uma lista de documentos necessários no site,BENEFICIARIO,whatsapp,4,ABERTO,CRIANCA_ADOLESCENTE,2,sugestao
-Sugiro atendimento por videochamada para casos de urgência,BENEFICIARIO,presencial,4,ENCERRADO,OUTRO,3,sugestao
-Seria bom ter brinquedos na sala de espera para as crianças,BENEFICIARIO,telefone,4,ENCERRADO,MULHER_APOLONIA,3,sugestao
-Poderiam disponibilizar um canal de atendimento no telegram,BENEFICIARIO,telefone,4,ABERTO,CRIANCA_ADOLESCENTE,2,sugestao
-Sugiro criar um formulário online mais simples de preencher,BENEFICIARIO,telefone,4,ABERTO,MULHER_APOLONIA,2,sugestao
-Seria interessante ter retorno automático após o envio,BENEFICIARIO,email,4,ABERTO,MULHER_APOLONIA,2,sugestao
-Poderiam melhorar a comunicação sobre os horários disponíveis,BENEFICIARIO,telefone,4,ABERTO,CRIANCA_ADOLESCENTE,1,sugestao
-Sugiro adicionar um chat ao vivo no site de vocês,BENEFICIARIO,presencial,3,ENCERRADO,CRIANCA_ADOLESCENTE,3,sugestao
-Seria bom ter atendimento em mais bairros da cidade,BENEFICIARIO,presencial,4,ABERTO,MULHER_APOLONIA,3,sugestao
-Poderiam criar uma área do usuário para acompanhar o caso,BENEFICIARIO,telefone,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,sugestao
-Sugiro enviar um resumo do atendimento por email ao final,BENEFICIARIO,presencial,4,ENCERRADO,OUTRO,1,sugestao
-Seria útil ter uma linha direta para casos urgentes,BENEFICIARIO,presencial,3,ABERTO,MULHER_APOLONIA,3,sugestao
-Poderiam ampliar o horário de atendimento para noite,BENEFICIARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,sugestao
-Sugiro ter um voluntário especializado em atender crianças pequenas,BENEFICIARIO,telefone,3,ABERTO,CRIANCA_ADOLESCENTE,1,sugestao
-Seria ótimo ter parceria com escolas para facilitar o acesso,BENEFICIARIO,email,4,ABERTO,OUTRO,2,sugestao
-Poderiam disponibilizar transporte para quem mora longe,BENEFICIARIO,presencial,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,sugestao
-Sugiro criar um grupo no whatsapp com dicas de saúde bucal,BENEFICIARIO,whatsapp,3,ENCERRADO,CRIANCA_ADOLESCENTE,3,sugestao
-Seria bom ter acompanhamento pós-consulta por pelo menos um mês,BENEFICIARIO,presencial,3,ABERTO,MULHER_APOLONIA,1,sugestao
-Poderiam treinar os voluntários para atender casos de ansiedade,BENEFICIARIO,telefone,3,ENCERRADO,MULHER_APOLONIA,3,sugestao
-Sugiro criar um programa de visitas às escolas da região,BENEFICIARIO,whatsapp,4,ABERTO,CRIANCA_ADOLESCENTE,2,sugestao
-Seria útil ter um número de emergência fora do horário comercial,BENEFICIARIO,presencial,3,ABERTO,CRIANCA_ADOLESCENTE,2,sugestao
-Poderiam oferecer material educativo sobre prevenção bucal,BENEFICIARIO,email,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,sugestao
-Sugiro aumentar a frequência dos atendimentos nos bairros mais distantes,BENEFICIARIO,email,4,ABERTO,OUTRO,1,sugestao
-Seria bom ter intérprete de libras disponível no atendimento,BENEFICIARIO,email,4,ABERTO,OUTRO,2,sugestao
-Poderiam criar um sistema de fila online para evitar espera,BENEFICIARIO,email,4,ABERTO,MULHER_APOLONIA,3,sugestao
-Sugiro disponibilizar os formulários também em papel para quem não tem internet,BENEFICIARIO,email,4,ABERTO,MULHER_APOLONIA,1,sugestao
-Seria interessante ter parcerias com creches e berçários,BENEFICIARIO,presencial,3,ABERTO,OUTRO,2,sugestao
-Poderiam criar um programa de fidelização para casos de longo prazo,BENEFICIARIO,whatsapp,4,ENCERRADO,OUTRO,2,sugestao
-Sugiro criar uma newsletter mensal com novidades do projeto,BENEFICIARIO,telefone,4,ABERTO,CRIANCA_ADOLESCENTE,1,sugestao
-Seria bom ter mais opções de canal para enviar documentos,BENEFICIARIO,telefone,3,ABERTO,OUTRO,1,sugestao
-Poderiam criar um guia de primeiros socorros bucais para distribuir,BENEFICIARIO,whatsapp,4,ENCERRADO,OUTRO,1,sugestao
-Sugiro fazer um evento aberto na comunidade para divulgar o projeto,BENEFICIARIO,whatsapp,4,ABERTO,MULHER_APOLONIA,2,sugestao
-Seria útil ter um painel online com horários disponíveis em tempo real,BENEFICIARIO,whatsapp,3,ENCERRADO,OUTRO,3,sugestao
-Poderiam criar um programa de mentoria para os voluntários novos,BENEFICIARIO,whatsapp,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,sugestao
-Sugiro criar um canal específico no youtube com orientações bucais,BENEFICIARIO,email,4,ENCERRADO,MULHER_APOLONIA,3,sugestao
-Seria bom ter um espaço no site para depoimentos de quem foi atendido,BENEFICIARIO,whatsapp,3,ENCERRADO,MULHER_APOLONIA,1,sugestao
-Poderiam enviar pesquisa de satisfação após cada atendimento,BENEFICIARIO,email,3,ABERTO,CRIANCA_ADOLESCENTE,1,sugestao
-Sugiro criar um mapa interativo com os pontos de atendimento,BENEFICIARIO,whatsapp,3,ABERTO,MULHER_APOLONIA,1,sugestao
-Seria interessante ter parceria com farmácias locais para medicamentos,BENEFICIARIO,whatsapp,4,ENCERRADO,OUTRO,1,sugestao
-Poderiam criar um grupo de apoio entre as famílias atendidas,BENEFICIARIO,telefone,4,ENCERRADO,MULHER_APOLONIA,1,sugestao
-Sugiro que o site tenha versão simplificada para celular mais antigo,BENEFICIARIO,telefone,4,ENCERRADO,OUTRO,2,sugestao
-Seria bom ter um voluntário disponível apenas para dúvidas rápidas,BENEFICIARIO,presencial,3,ENCERRADO,CRIANCA_ADOLESCENTE,3,sugestao
-Poderiam criar um fluxo mais claro de como funciona o atendimento,BENEFICIARIO,whatsapp,3,ABERTO,OUTRO,1,sugestao
-Sugiro criar um canal de atendimento exclusivo para adolescentes,BENEFICIARIO,email,3,ABERTO,MULHER_APOLONIA,1,sugestao
-Seria útil ter um histórico de atendimentos acessível pelo beneficiário,BENEFICIARIO,email,3,ABERTO,OUTRO,1,sugestao
-Poderiam criar um programa de reconhecimento para os voluntários mais ativos,BENEFICIARIO,presencial,4,ABERTO,CRIANCA_ADOLESCENTE,3,sugestao
-"Minha filha está com muita dor de dente, precisa de ajuda hoje",BENEFICIARIO,presencial,1,ABERTO,MULHER_APOLONIA,4,urgencia
-"Preciso de atendimento urgente, meu filho não para de chorar de dor",BENEFICIARIO,presencial,2,ABERTO,MULHER_APOLONIA,4,urgencia
-"Situação crítica, minha menina não consegue comer de tanta dor",BENEFICIARIO,presencial,1,ABERTO,OUTRO,5,urgencia
-"Urgente, meu filho está com o rosto inchado e com febre",BENEFICIARIO,whatsapp,2,ABERTO,CRIANCA_ADOLESCENTE,5,urgencia
-"Preciso de socorro agora, minha filha está sofrendo muito",BENEFICIARIO,whatsapp,1,SOLICITADO,CRIANCA_ADOLESCENTE,4,urgencia
-"Não aguenta mais de dor, precisamos de ajuda com urgência",BENEFICIARIO,whatsapp,1,SOLICITADO,MULHER_APOLONIA,4,urgencia
-"Dor insuportável, meu filho não dormiu a noite toda",BENEFICIARIO,email,1,SOLICITADO,CRIANCA_ADOLESCENTE,4,urgencia
-"Caso urgente, criança com infecção na boca e febre alta",BENEFICIARIO,telefone,1,ABERTO,OUTRO,5,urgencia
-"Preciso de atendimento hoje, está em situação crítica de dor",BENEFICIARIO,telefone,2,ABERTO,MULHER_APOLONIA,5,urgencia
-"Minha menina está em pânico de dor, por favor me ajudem",BENEFICIARIO,presencial,1,ABERTO,MULHER_APOLONIA,4,urgencia
-"Urgentíssimo, o dente do meu filho quebrou e está sangrando",BENEFICIARIO,email,1,SOLICITADO,MULHER_APOLONIA,4,urgencia
-"Meu filho caiu e bateu os dentes, está com sangramento",BENEFICIARIO,email,1,SOLICITADO,MULHER_APOLONIA,4,urgencia
-"Preciso de ajuda hoje mesmo, é grave",BENEFICIARIO,whatsapp,1,SOLICITADO,OUTRO,5,urgencia
-"Situação de emergência bucal, dente infeccionado com pus",BENEFICIARIO,presencial,1,ABERTO,MULHER_APOLONIA,5,urgencia
+O dentista foi incrível com minha menina de 5 anos,BENEFICIARIO,email,3,ENCERRADO,OUTRO,1,elogio
+"Meu filho não queria ir mas agora quer voltar, que conquista",BENEFICIARIO,telefone,4,ENCERRADO,OUTRO,2,elogio
+Agradeço cada detalhe do atendimento que recebi hoje,BENEFICIARIO,email,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+A voluntária me ligou para confirmar e fui muito bem recebida,BENEFICIARIO,whatsapp,3,ENCERRADO,MULHER_APOLONIA,1,elogio
+Serviço de altíssima qualidade para quem mais precisa,BENEFICIARIO,whatsapp,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+O tratamento foi completo e o acompanhamento foi excelente,BENEFICIARIO,email,4,ENCERRADO,MULHER_APOLONIA,2,elogio
+"Fui bem orientada em todos os passos, obrigada pela paciência",BENEFICIARIO,email,4,ENCERRADO,MULHER_APOLONIA,1,elogio
+O ambiente é acolhedor e a equipe é muito dedicada,BENEFICIARIO,whatsapp,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+Recomendo esse serviço para todas as mães que conheço,BENEFICIARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+Me senti respeitada e bem cuidada durante todo o processo,BENEFICIARIO,telefone,4,ENCERRADO,OUTRO,2,elogio
+O atendimento superou todas as minhas expectativas,BENEFICIARIO,presencial,3,ENCERRADO,OUTRO,1,elogio
+Cada pessoa que me atendeu foi extraordinária,BENEFICIARIO,presencial,3,ENCERRADO,MULHER_APOLONIA,2,elogio
+Meu filho está muito feliz com o resultado do tratamento,BENEFICIARIO,telefone,3,ENCERRADO,MULHER_APOLONIA,2,elogio
+"Foram pontuais, atenciosos e muito competentes",BENEFICIARIO,whatsapp,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+Nunca imaginei receber um atendimento tão humanizado,BENEFICIARIO,presencial,3,ENCERRADO,OUTRO,1,elogio
+"A equipe é nota dez, não tenho nada a reclamar",BENEFICIARIO,presencial,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+Obrigada por existirem e fazerem a diferença na minha vida,BENEFICIARIO,telefone,3,ENCERRADO,OUTRO,2,elogio
+Foram muito pacientes com minha filha que tem autismo,BENEFICIARIO,whatsapp,4,ENCERRADO,MULHER_APOLONIA,1,elogio
+O tratamento foi longo mas o acompanhamento foi perfeito,BENEFICIARIO,whatsapp,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+"Voltarei sempre que precisar, confiança total no serviço",BENEFICIARIO,whatsapp,3,ENCERRADO,OUTRO,2,elogio
+Saí da consulta com o coração cheio de gratidão,BENEFICIARIO,email,3,ENCERRADO,OUTRO,1,elogio
+"Excelente iniciativa e execução, parabéns pela organização",BENEFICIARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+"O voluntário foi além do que eu esperava, muito dedicado",BENEFICIARIO,presencial,3,ENCERRADO,MULHER_APOLONIA,2,elogio
+Me surpreenderam positivamente em cada etapa,BENEFICIARIO,email,4,ENCERRADO,OUTRO,1,elogio
+Atendimento com muita empatia e cuidado genuíno,BENEFICIARIO,presencial,3,ENCERRADO,OUTRO,1,elogio
+"Tudo correu perfeitamente, estou muito satisfeita",BENEFICIARIO,whatsapp,3,ENCERRADO,MULHER_APOLONIA,1,elogio
+"Que trabalho bonito e necessário, meu muito obrigada",BENEFICIARIO,telefone,3,ENCERRADO,OUTRO,2,elogio
+A equipe se importou de verdade com o meu caso,BENEFICIARIO,email,4,ENCERRADO,OUTRO,2,elogio
+O dentista foi muito cuidadoso com minha filha adoramos,BENEFICIARIO,telefone,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+Quero agradecer imensamente pelo atendimento que recebi,BENEFICIARIO,whatsapp,4,ENCERRADO,MULHER_APOLONIA,2,elogio
+"Excelente serviço, meu filho saiu sorrindo da consulta",BENEFICIARIO,whatsapp,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+"A voluntária foi super atenciosa e paciente, parabéns",BENEFICIARIO,telefone,3,ENCERRADO,MULHER_APOLONIA,1,elogio
+Graças a vocês meu filho está sem dor de dente pela primeira vez,BENEFICIARIO,whatsapp,4,ENCERRADO,OUTRO,2,elogio
+"Nunca fui tão bem atendida, estão de parabéns",BENEFICIARIO,email,4,ENCERRADO,OUTRO,1,elogio
+"A equipe foi incrível, me senti acolhida em todos os momentos",BENEFICIARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+"O atendimento foi muito rápido e eficiente, impressionante",BENEFICIARIO,email,3,ENCERRADO,MULHER_APOLONIA,1,elogio
+Obrigada de coração pelo cuidado com meu filho,BENEFICIARIO,whatsapp,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+Vocês fazem um trabalho lindo e muito importante,BENEFICIARIO,presencial,4,ENCERRADO,MULHER_APOLONIA,1,elogio
+A recepcionista foi muito simpática e me deixou à vontade,BENEFICIARIO,telefone,3,ENCERRADO,MULHER_APOLONIA,1,elogio
+"Meu filho tinha medo de dentista, mas saiu feliz dessa vez",BENEFICIARIO,email,4,ENCERRADO,OUTRO,1,elogio
+"Melhor atendimento que já recebi, gratidão enorme",BENEFICIARIO,email,3,ENCERRADO,MULHER_APOLONIA,1,elogio
+O voluntário explicou tudo com muita calma e atenção,BENEFICIARIO,whatsapp,4,ENCERRADO,OUTRO,2,elogio
+"Serviço impecável do início ao fim, muito obrigada",BENEFICIARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+A consulta foi rápida e a doutora foi muito gentil,BENEFICIARIO,telefone,3,ENCERRADO,OUTRO,2,elogio
+Vocês mudaram a vida do meu filho com esse atendimento,BENEFICIARIO,email,3,ENCERRADO,OUTRO,2,elogio
+Fiquei impressionada com a qualidade do serviço de vocês,BENEFICIARIO,telefone,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+"O atendimento presencial foi perfeito, me senti cuidada",BENEFICIARIO,whatsapp,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+"Equipe muito profissional e humana, é difícil encontrar isso",BENEFICIARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+Parabéns a todos que fazem esse projeto acontecer,BENEFICIARIO,presencial,4,ENCERRADO,MULHER_APOLONIA,1,elogio
+Me trataram com muito respeito e dignidade,BENEFICIARIO,telefone,4,ENCERRADO,MULHER_APOLONIA,2,elogio
+O dentista foi incrível com minha menina de 5 anos,BENEFICIARIO,telefone,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+"Meu filho não queria ir mas agora quer voltar, que conquista",BENEFICIARIO,email,4,ENCERRADO,OUTRO,1,elogio
+Agradeço cada detalhe do atendimento que recebi hoje,BENEFICIARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+A voluntária me ligou para confirmar e fui muito bem recebida,BENEFICIARIO,whatsapp,3,ENCERRADO,MULHER_APOLONIA,1,elogio
+Serviço de altíssima qualidade para quem mais precisa,BENEFICIARIO,presencial,3,ENCERRADO,OUTRO,1,elogio
+O tratamento foi completo e o acompanhamento foi excelente,BENEFICIARIO,email,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+"Fui bem orientada em todos os passos, obrigada pela paciência",BENEFICIARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+O ambiente é acolhedor e a equipe é muito dedicada,BENEFICIARIO,email,3,ENCERRADO,OUTRO,1,elogio
+Recomendo esse serviço para todas as mães que conheço,BENEFICIARIO,email,4,ENCERRADO,MULHER_APOLONIA,2,elogio
+Me senti respeitada e bem cuidada durante todo o processo,BENEFICIARIO,presencial,4,ENCERRADO,MULHER_APOLONIA,1,elogio
+O atendimento superou todas as minhas expectativas,BENEFICIARIO,whatsapp,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+Cada pessoa que me atendeu foi extraordinária,BENEFICIARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+Meu filho está muito feliz com o resultado do tratamento,BENEFICIARIO,whatsapp,3,ENCERRADO,OUTRO,2,elogio
+"Foram pontuais, atenciosos e muito competentes",BENEFICIARIO,whatsapp,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+Nunca imaginei receber um atendimento tão humanizado,BENEFICIARIO,presencial,4,ENCERRADO,OUTRO,2,elogio
+"A equipe é nota dez, não tenho nada a reclamar",BENEFICIARIO,telefone,4,ENCERRADO,OUTRO,2,elogio
+Obrigada por existirem e fazerem a diferença na minha vida,BENEFICIARIO,whatsapp,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+Foram muito pacientes com minha filha que tem autismo,BENEFICIARIO,presencial,4,ENCERRADO,OUTRO,2,elogio
+O tratamento foi longo mas o acompanhamento foi perfeito,BENEFICIARIO,presencial,3,ENCERRADO,OUTRO,2,elogio
+"Voltarei sempre que precisar, confiança total no serviço",BENEFICIARIO,whatsapp,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+Saí da consulta com o coração cheio de gratidão,BENEFICIARIO,email,3,ENCERRADO,MULHER_APOLONIA,1,elogio
+"Excelente iniciativa e execução, parabéns pela organização",BENEFICIARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+"O voluntário foi além do que eu esperava, muito dedicado",BENEFICIARIO,telefone,4,ENCERRADO,MULHER_APOLONIA,1,elogio
+Me surpreenderam positivamente em cada etapa,BENEFICIARIO,whatsapp,4,ENCERRADO,OUTRO,1,elogio
+Atendimento com muita empatia e cuidado genuíno,BENEFICIARIO,whatsapp,3,ENCERRADO,OUTRO,2,elogio
+"Tudo correu perfeitamente, estou muito satisfeita",BENEFICIARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+"Que trabalho bonito e necessário, meu muito obrigada",BENEFICIARIO,email,3,ENCERRADO,MULHER_APOLONIA,2,elogio
+A equipe se importou de verdade com o meu caso,BENEFICIARIO,email,3,ENCERRADO,OUTRO,2,elogio
+mt bom o atendimento,BENEFICIARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+amei demais!!!,BENEFICIARIO,whatsapp,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+top demais o servico,BENEFICIARIO,presencial,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+Uau adorei tudo,BENEFICIARIO,telefone,3,ENCERRADO,OUTRO,1,elogio
+otimo obrigada,BENEFICIARIO,presencial,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+muito bom mesmo,BENEFICIARIO,whatsapp,4,ENCERRADO,MULHER_APOLONIA,1,elogio
+parabens pra vcs,BENEFICIARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+adorei o atendimento,BENEFICIARIO,telefone,3,ENCERRADO,MULHER_APOLONIA,2,elogio
+que gente boa!,BENEFICIARIO,presencial,3,ENCERRADO,MULHER_APOLONIA,2,elogio
+meu filho adorou,BENEFICIARIO,telefone,3,ENCERRADO,MULHER_APOLONIA,2,elogio
+show de bola,BENEFICIARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+otimo servico!,BENEFICIARIO,whatsapp,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+Melhor atendimento,BENEFICIARIO,presencial,3,ENCERRADO,MULHER_APOLONIA,1,elogio
+Maravilhoso demais,BENEFICIARIO,telefone,4,ENCERRADO,OUTRO,2,elogio
+perfeito 10/10,BENEFICIARIO,presencial,4,ENCERRADO,OUTRO,1,elogio
+Gostei muito do servico,BENEFICIARIO,whatsapp,3,ENCERRADO,MULHER_APOLONIA,2,elogio
+muito obrigada a todos,BENEFICIARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+minha filha adorou a doutora,BENEFICIARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+Excelentes profissionais,BENEFICIARIO,telefone,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+Que atendimento lindo,BENEFICIARIO,email,4,ENCERRADO,OUTRO,1,elogio
+muito humanizado gostei,BENEFICIARIO,email,4,ENCERRADO,OUTRO,1,elogio
+Nota mil,BENEFICIARIO,telefone,3,ENCERRADO,MULHER_APOLONIA,1,elogio
+nunca fui tao bem tratada,BENEFICIARIO,telefone,3,ENCERRADO,OUTRO,2,elogio
+mt atenciosos,BENEFICIARIO,email,4,ENCERRADO,OUTRO,1,elogio
+foi incrivel,BENEFICIARIO,email,3,ENCERRADO,OUTRO,2,elogio
+Voltaria mil vezes,BENEFICIARIO,presencial,4,ENCERRADO,MULHER_APOLONIA,1,elogio
+q gentileza impressionante,BENEFICIARIO,whatsapp,4,ENCERRADO,OUTRO,2,elogio
+Servico incrivel e de graca ainda,BENEFICIARIO,presencial,3,ENCERRADO,MULHER_APOLONIA,1,elogio
+Deus abencoe vcs,BENEFICIARIO,whatsapp,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+muito feliz com o resultado,BENEFICIARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+Que time dedicado,BENEFICIARIO,presencial,4,ENCERRADO,OUTRO,2,elogio
+Meus parabens a todos,BENEFICIARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+atendimento rapido e eficiente,BENEFICIARIO,email,3,ENCERRADO,OUTRO,2,elogio
+Que surpresa boa,BENEFICIARIO,whatsapp,3,ENCERRADO,MULHER_APOLONIA,2,elogio
+ficou excelente o tratamento,BENEFICIARIO,presencial,4,ENCERRADO,MULHER_APOLONIA,2,elogio
+amei a equipe,BENEFICIARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+foi muito melhor do que esperava,BENEFICIARIO,email,3,ENCERRADO,MULHER_APOLONIA,2,elogio
+Sao anjos esses dentistas,BENEFICIARIO,whatsapp,4,ENCERRADO,MULHER_APOLONIA,2,elogio
+Que projeto lindo,BENEFICIARIO,telefone,4,ENCERRADO,MULHER_APOLONIA,2,elogio
+muito aconchegante o lugar,BENEFICIARIO,presencial,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+recomendo de olhos fechados,BENEFICIARIO,presencial,3,ENCERRADO,OUTRO,2,elogio
+minha filha finalmente ta bem,BENEFICIARIO,whatsapp,4,ENCERRADO,OUTRO,1,elogio
+incrivel como se dedicam,BENEFICIARIO,telefone,3,ENCERRADO,MULHER_APOLONIA,1,elogio
+Gente muito boa,BENEFICIARIO,telefone,4,ENCERRADO,OUTRO,1,elogio
+que atendentes maravilhosos,BENEFICIARIO,email,3,ENCERRADO,MULHER_APOLONIA,2,elogio
+amo vcs!,BENEFICIARIO,email,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+meu filho ta super feliz,BENEFICIARIO,whatsapp,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+Nota 10 com folga,BENEFICIARIO,telefone,3,ENCERRADO,OUTRO,1,elogio
+Que experiencia incrivel,BENEFICIARIO,whatsapp,3,ENCERRADO,MULHER_APOLONIA,1,elogio
+Gratidao eterna,BENEFICIARIO,email,4,ENCERRADO,MULHER_APOLONIA,1,elogio
+muito atencioso e dedicado,BENEFICIARIO,telefone,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+Voluntarios incriveis,BENEFICIARIO,presencial,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+q servico bom esse,BENEFICIARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+meu filho sorriu o tempo todo la,BENEFICIARIO,presencial,4,ENCERRADO,OUTRO,1,elogio
+Que bom encontrar gente assim,BENEFICIARIO,whatsapp,3,ENCERRADO,OUTRO,1,elogio
+top vcs sao demais,BENEFICIARIO,email,4,ENCERRADO,MULHER_APOLONIA,1,elogio
+Adorei e meu filho amou tambem,BENEFICIARIO,email,3,ENCERRADO,OUTRO,2,elogio
+que atendimento incrivel mesmo,BENEFICIARIO,whatsapp,3,ENCERRADO,MULHER_APOLONIA,1,elogio
+vcs sao os melhores mesmo,BENEFICIARIO,presencial,4,ENCERRADO,OUTRO,2,elogio
+equipe muito boa e cuidadosa,BENEFICIARIO,presencial,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+saimos muito felizes daqui,BENEFICIARIO,whatsapp,3,ENCERRADO,OUTRO,1,elogio
+Tratamento perfeito parabens,BENEFICIARIO,email,4,ENCERRADO,OUTRO,1,elogio
+Excelente trabalho voluntario,BENEFICIARIO,whatsapp,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+Que gente dedicada e carinhosa,BENEFICIARIO,presencial,4,ENCERRADO,OUTRO,2,elogio
+minha filha ta bem e muito feliz,BENEFICIARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+fui surpreendida positivamente,BENEFICIARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+o dentista e muito bom,BENEFICIARIO,presencial,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+atendimento feito com amor,BENEFICIARIO,presencial,3,ENCERRADO,OUTRO,2,elogio
+Realmente faz diferenca na nossa vida,BENEFICIARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+que projeto lindo que vcs tem,BENEFICIARIO,presencial,4,ENCERRADO,OUTRO,2,elogio
+foi tudo perfeito do inicio ao fim,BENEFICIARIO,whatsapp,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+o local e limpo e agradavel,BENEFICIARIO,email,4,ENCERRADO,MULHER_APOLONIA,2,elogio
+o atendente foi mt paciente com meu filho,BENEFICIARIO,telefone,3,ENCERRADO,MULHER_APOLONIA,2,elogio
+Muito carinhosos com as criancas,BENEFICIARIO,telefone,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+Que profissionalismo incrivel,BENEFICIARIO,presencial,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+gostei muito de tudo,BENEFICIARIO,telefone,4,ENCERRADO,OUTRO,2,elogio
+meu filho sorriu o tempo todo,BENEFICIARIO,whatsapp,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+foi além das expectativas,BENEFICIARIO,presencial,3,ENCERRADO,MULHER_APOLONIA,2,elogio
+equipe unida e muito eficiente,BENEFICIARIO,presencial,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+Que equipe incrivel parabens a todos,BENEFICIARIO,presencial,4,ENCERRADO,MULHER_APOLONIA,2,elogio
+ficamos muito satisfeitas,BENEFICIARIO,whatsapp,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+nunca vi cuidado assim com crianca,BENEFICIARIO,whatsapp,3,ENCERRADO,MULHER_APOLONIA,1,elogio
+atendimento humanizado de verdade,BENEFICIARIO,whatsapp,4,ENCERRADO,MULHER_APOLONIA,2,elogio
+q coisa linda vcs fazem,BENEFICIARIO,telefone,4,ENCERRADO,MULHER_APOLONIA,1,elogio
+tratamento excepcional parabens,BENEFICIARIO,email,4,ENCERRADO,MULHER_APOLONIA,2,elogio
+Meu filho ja nao tem mais dor,BENEFICIARIO,telefone,4,ENCERRADO,MULHER_APOLONIA,1,elogio
+Impressionante a qualidade aqui,BENEFICIARIO,presencial,3,ENCERRADO,OUTRO,1,elogio
+Deus abencoe essa equipe toda,BENEFICIARIO,telefone,3,ENCERRADO,MULHER_APOLONIA,1,elogio
+nunca me senti tao acolhida,BENEFICIARIO,email,3,ENCERRADO,OUTRO,1,elogio
+atendimento top obrigada de coracao,BENEFICIARIO,presencial,3,ENCERRADO,MULHER_APOLONIA,2,elogio
+amo demais esse servico,BENEFICIARIO,presencial,4,ENCERRADO,MULHER_APOLONIA,2,elogio
+que sorriso lindo saiu daqui,BENEFICIARIO,email,4,ENCERRADO,MULHER_APOLONIA,1,elogio
+trabalho lindo e muito necessario,BENEFICIARIO,telefone,3,ENCERRADO,OUTRO,1,elogio
+cada detalhe foi perfeito,BENEFICIARIO,presencial,4,ENCERRADO,MULHER_APOLONIA,2,elogio
+atencao e cuidado nao faltaram,BENEFICIARIO,email,4,ENCERRADO,OUTRO,1,elogio
+Nota 1000 pra vocês,BENEFICIARIO,telefone,3,ENCERRADO,MULHER_APOLONIA,2,elogio
+nunca vi tanta dedicacao assim,BENEFICIARIO,telefone,4,ENCERRADO,MULHER_APOLONIA,2,elogio
+melhor servico gratuito que existe,BENEFICIARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+Gratidao enorme com todo mundo,BENEFICIARIO,whatsapp,3,ENCERRADO,MULHER_APOLONIA,1,elogio
+fiquei muito emocionada com o carinho,BENEFICIARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+sem palavras de tao bom que foi,BENEFICIARIO,whatsapp,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+a doutora conquistou a confianca do meu filho,BENEFICIARIO,presencial,3,ENCERRADO,MULHER_APOLONIA,2,elogio
+Que recepcionista gentil e querida,BENEFICIARIO,email,3,ENCERRADO,MULHER_APOLONIA,1,elogio
+minha filha nao queria ir mas amou,BENEFICIARIO,presencial,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+cuidaram muito bem de nos,BENEFICIARIO,telefone,4,ENCERRADO,MULHER_APOLONIA,1,elogio
+que atendimento cuidadoso,BENEFICIARIO,telefone,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+Parabens a dentista nota 10,BENEFICIARIO,telefone,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+servico feito com muito amor,BENEFICIARIO,presencial,3,ENCERRADO,MULHER_APOLONIA,1,elogio
+que gentileza de todos,BENEFICIARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+A equipe e ótima,BENEFICIARIO,presencial,3,ENCERRADO,MULHER_APOLONIA,2,elogio
+muito bem atendida obrigada,BENEFICIARIO,presencial,4,ENCERRADO,MULHER_APOLONIA,1,elogio
+orgulho de existir um servico assim,BENEFICIARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+que tratamento maravilhoso,BENEFICIARIO,email,3,ENCERRADO,MULHER_APOLONIA,2,elogio
+dentista muito habilidosa e gentil,BENEFICIARIO,presencial,4,ENCERRADO,OUTRO,2,elogio
+equipe de primeiro time,BENEFICIARIO,presencial,4,ENCERRADO,OUTRO,2,elogio
+atendimento impecavel e cuidadoso,BENEFICIARIO,telefone,3,ENCERRADO,MULHER_APOLONIA,2,elogio
+que eficiencia e carinho,BENEFICIARIO,whatsapp,4,ENCERRADO,OUTRO,1,elogio
+o atendimento foi rapido e excelente,BENEFICIARIO,email,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+meu filho quer voltar logo,BENEFICIARIO,whatsapp,3,ENCERRADO,MULHER_APOLONIA,2,elogio
+confiamos muito no trabalho de vcs,BENEFICIARIO,presencial,4,ENCERRADO,MULHER_APOLONIA,1,elogio
+Que time de voluntarios dedicados,BENEFICIARIO,email,4,ENCERRADO,MULHER_APOLONIA,2,elogio
+saimos sorrindo e gratos,BENEFICIARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+tratamento com carinho e competencia,BENEFICIARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+que resultado lindo no tratamento,BENEFICIARIO,email,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+o melhor que poderia ter acontecido,BENEFICIARIO,email,4,ENCERRADO,OUTRO,1,elogio
+que alegria de ter esse servico aqui,BENEFICIARIO,presencial,4,ENCERRADO,OUTRO,2,elogio
+muito eficiente e muito humano,BENEFICIARIO,whatsapp,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+Que abençoadas somos de ter isso,BENEFICIARIO,presencial,4,ENCERRADO,OUTRO,1,elogio
+atenderam o meu filho como rei,BENEFICIARIO,whatsapp,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+que experiencia positiva demais,BENEFICIARIO,presencial,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+meu filho ta sem dor e sorrindo muito,BENEFICIARIO,telefone,3,ENCERRADO,OUTRO,2,elogio
+obrigada pela paciencia e cuidado,BENEFICIARIO,telefone,4,ENCERRADO,MULHER_APOLONIA,2,elogio
+vocês fazem milagres mesmo,BENEFICIARIO,email,3,ENCERRADO,MULHER_APOLONIA,2,elogio
+o projeto mais importante da cidade,BENEFICIARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+fiquei sem palavras de tao bom,BENEFICIARIO,presencial,4,ENCERRADO,OUTRO,2,elogio
+que dentista incrivel e amorosa,BENEFICIARIO,whatsapp,3,ENCERRADO,MULHER_APOLONIA,2,elogio
+minha filha pediu pra voltar la,BENEFICIARIO,presencial,3,ENCERRADO,OUTRO,1,elogio
+muito feliz com esse atendimento,BENEFICIARIO,telefone,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+Que servico excelente e de graca,BENEFICIARIO,whatsapp,4,ENCERRADO,OUTRO,1,elogio
+cuidaram muito bem da minha filha,BENEFICIARIO,email,4,ENCERRADO,OUTRO,1,elogio
+nao esperava tamanha qualidade,BENEFICIARIO,presencial,4,ENCERRADO,MULHER_APOLONIA,2,elogio
+que recebimento caloroso e gentil,BENEFICIARIO,whatsapp,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+Que surpresa agradável este serviço,BENEFICIARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+que consulta perfeita foi essa,BENEFICIARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+equipe amorosa e muito capaz,BENEFICIARIO,telefone,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+voltamos de casa super felizes,BENEFICIARIO,telefone,4,ENCERRADO,MULHER_APOLONIA,2,elogio
+ja recomendei para toda minha familia,BENEFICIARIO,whatsapp,4,ENCERRADO,OUTRO,1,elogio
+melhor projeto que conheci,BENEFICIARIO,email,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+fiquei emocionada com o cuidado,BENEFICIARIO,whatsapp,3,ENCERRADO,OUTRO,1,elogio
+que dentistas excelentes,BENEFICIARIO,presencial,3,ENCERRADO,OUTRO,2,elogio
+meu filho ficou fala que fala do dentista,BENEFICIARIO,telefone,4,ENCERRADO,MULHER_APOLONIA,2,elogio
+que gentileza e carinho da equipe,BENEFICIARIO,telefone,4,ENCERRADO,MULHER_APOLONIA,1,elogio
+minha filha adorou a doutora nova,BENEFICIARIO,presencial,4,ENCERRADO,MULHER_APOLONIA,2,elogio
+que profissionais competentes,BENEFICIARIO,presencial,3,ENCERRADO,MULHER_APOLONIA,1,elogio
+atendimento com muito amor e cuidado,BENEFICIARIO,whatsapp,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+nunca fui tao bem cuidada,BENEFICIARIO,email,3,ENCERRADO,OUTRO,2,elogio
+muito feliz com tudo,BENEFICIARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+que atendimento lindo parabens,BENEFICIARIO,telefone,4,ENCERRADO,OUTRO,2,elogio
+perfeito do comeco ao fim,BENEFICIARIO,email,4,ENCERRADO,MULHER_APOLONIA,1,elogio
+adorei cada momento la,BENEFICIARIO,email,4,ENCERRADO,OUTRO,2,elogio
+que consulta incrivel,BENEFICIARIO,whatsapp,4,ENCERRADO,OUTRO,2,elogio
+meu filho ficou muito a vontade,BENEFICIARIO,whatsapp,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+que acolhimento maravilhoso,BENEFICIARIO,telefone,3,ENCERRADO,MULHER_APOLONIA,1,elogio
+equipe nota mil parabens,BENEFICIARIO,presencial,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+Que atendimento especial e diferenciado,BENEFICIARIO,email,4,ENCERRADO,MULHER_APOLONIA,2,elogio
+que experiencia linda esse servico,BENEFICIARIO,presencial,4,ENCERRADO,OUTRO,1,elogio
+minha crianca ficou sem medo do dentista,BENEFICIARIO,whatsapp,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+Gente boa e competente so aqui,BENEFICIARIO,whatsapp,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+que cuidado precioso com a gente,BENEFICIARIO,telefone,3,ENCERRADO,OUTRO,2,elogio
+obrigada pela dedicacao de todos,BENEFICIARIO,email,3,ENCERRADO,MULHER_APOLONIA,2,elogio
+que atendimento completo e humanizado,BENEFICIARIO,presencial,4,ENCERRADO,OUTRO,2,elogio
+que orgulho de vcs existirem aqui,BENEFICIARIO,email,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+que voluntarios dedicados obrigada,BENEFICIARIO,telefone,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+meu filho saiu radiante e feliz,BENEFICIARIO,whatsapp,4,ENCERRADO,MULHER_APOLONIA,2,elogio
+que tratamento bonito fizeram,BENEFICIARIO,telefone,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+recebimento caloroso e respeitoso,BENEFICIARIO,whatsapp,4,ENCERRADO,MULHER_APOLONIA,1,elogio
+que sensibilidade da equipe,BENEFICIARIO,telefone,3,ENCERRADO,OUTRO,2,elogio
+nunca vi tanto cuidado em gratuito,BENEFICIARIO,whatsapp,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+que voluntario dedicado e prestativo,BENEFICIARIO,presencial,3,ENCERRADO,OUTRO,2,elogio
+saimos com muito carinho daqui,BENEFICIARIO,email,4,ENCERRADO,OUTRO,1,elogio
+que trabalho de excelencia,BENEFICIARIO,presencial,4,ENCERRADO,MULHER_APOLONIA,2,elogio
+muito bem atendida em todos os detalhes,BENEFICIARIO,email,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+que atendimento com alma e coracao,BENEFICIARIO,whatsapp,4,ENCERRADO,MULHER_APOLONIA,2,elogio
+minha filha ficou sorrindo de orelha a orelha,BENEFICIARIO,presencial,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+que servico extraordinario,BENEFICIARIO,whatsapp,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+que acolhida carinhosa foi essa,BENEFICIARIO,presencial,3,ENCERRADO,OUTRO,2,elogio
+nunca imaginei gostar tanto de ir ao dentista,BENEFICIARIO,presencial,3,ENCERRADO,OUTRO,2,elogio
+que felicidade de encontrar gente assim,BENEFICIARIO,telefone,4,ENCERRADO,MULHER_APOLONIA,2,elogio
+que profissionais magnificos parabens,BENEFICIARIO,presencial,3,ENCERRADO,OUTRO,1,elogio
+minha filha ficou encantada com o dentista,BENEFICIARIO,whatsapp,3,ENCERRADO,OUTRO,1,elogio
+que historia linda de voluntariado,BENEFICIARIO,presencial,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+que servico essencial e lindo,BENEFICIARIO,telefone,3,ENCERRADO,OUTRO,1,elogio
+parabens a cada um de voces,BENEFICIARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+que atencao especial me deram,BENEFICIARIO,email,3,ENCERRADO,MULHER_APOLONIA,2,elogio
+nunca fui tao bem acolhida,BENEFICIARIO,whatsapp,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,elogio
+que projeto transformador incrivel,BENEFICIARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,elogio
+"mto bom o atendimento, to feliz demais",BENEFICIARIO,presencial,3,ENCERRADO,MULHER_APOLONIA,2,elogio
+vcs são os melhores!!,BENEFICIARIO,email,4,ENCERRADO,MULHER_APOLONIA,1,elogio
+otimo servico parabens a todos,BENEFICIARIO,whatsapp,4,ENCERRADO,MULHER_APOLONIA,1,elogio
+"minha filha adorou a consulta, muito obrigada",BENEFICIARIO,email,3,ENCERRADO,OUTRO,1,elogio
+Seria ótimo ter atendimento aos sábados para quem trabalha,BENEFICIARIO,presencial,4,ABERTO,CRIANCA_ADOLESCENTE,3,sugestao
+Sugiro criar um aplicativo para facilitar o agendamento,BENEFICIARIO,telefone,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,sugestao
+Seria bom ter uma sala de espera maior e mais confortável,BENEFICIARIO,whatsapp,4,ENCERRADO,MULHER_APOLONIA,3,sugestao
+Poderiam enviar lembrete por whatsapp um dia antes da consulta,BENEFICIARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,sugestao
+Seria útil ter uma lista de documentos necessários no site,BENEFICIARIO,telefone,3,ABERTO,OUTRO,2,sugestao
+Sugiro atendimento por videochamada para casos de urgência,BENEFICIARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,sugestao
+Seria bom ter brinquedos na sala de espera para as crianças,BENEFICIARIO,whatsapp,3,ENCERRADO,MULHER_APOLONIA,1,sugestao
+Poderiam disponibilizar um canal de atendimento no telegram,BENEFICIARIO,whatsapp,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,sugestao
+Sugiro criar um formulário online mais simples de preencher,BENEFICIARIO,telefone,3,ENCERRADO,MULHER_APOLONIA,3,sugestao
+Seria interessante ter retorno automático após o envio,BENEFICIARIO,presencial,4,ABERTO,MULHER_APOLONIA,1,sugestao
+Poderiam melhorar a comunicação sobre os horários disponíveis,BENEFICIARIO,email,3,ENCERRADO,MULHER_APOLONIA,1,sugestao
+Sugiro adicionar um chat ao vivo no site de vocês,BENEFICIARIO,telefone,4,ABERTO,OUTRO,1,sugestao
+Seria bom ter atendimento em mais bairros da cidade,BENEFICIARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,3,sugestao
+Poderiam criar uma área do usuário para acompanhar o caso,BENEFICIARIO,whatsapp,3,ENCERRADO,CRIANCA_ADOLESCENTE,3,sugestao
+Sugiro enviar um resumo do atendimento por email ao final,BENEFICIARIO,telefone,4,ABERTO,OUTRO,2,sugestao
+Seria útil ter uma linha direta para casos urgentes,BENEFICIARIO,whatsapp,4,ABERTO,CRIANCA_ADOLESCENTE,1,sugestao
+Poderiam ampliar o horário de atendimento para noite,BENEFICIARIO,email,3,ENCERRADO,OUTRO,3,sugestao
+Sugiro ter um voluntário especializado em atender crianças pequenas,BENEFICIARIO,whatsapp,4,ABERTO,MULHER_APOLONIA,2,sugestao
+Seria ótimo ter parceria com escolas para facilitar o acesso,BENEFICIARIO,whatsapp,3,ABERTO,CRIANCA_ADOLESCENTE,3,sugestao
+Poderiam disponibilizar transporte para quem mora longe,BENEFICIARIO,telefone,4,ENCERRADO,MULHER_APOLONIA,3,sugestao
+Sugiro criar um grupo no whatsapp com dicas de saúde bucal,BENEFICIARIO,presencial,4,ENCERRADO,MULHER_APOLONIA,3,sugestao
+Seria bom ter acompanhamento pós-consulta por pelo menos um mês,BENEFICIARIO,whatsapp,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,sugestao
+Poderiam treinar os voluntários para atender casos de ansiedade,BENEFICIARIO,presencial,3,ABERTO,CRIANCA_ADOLESCENTE,3,sugestao
+Sugiro criar um programa de visitas às escolas da região,BENEFICIARIO,email,3,ABERTO,CRIANCA_ADOLESCENTE,1,sugestao
+Seria útil ter um número de emergência fora do horário comercial,BENEFICIARIO,presencial,4,ENCERRADO,CRIANCA_ADOLESCENTE,3,sugestao
+Poderiam oferecer material educativo sobre prevenção bucal,BENEFICIARIO,presencial,3,ENCERRADO,MULHER_APOLONIA,2,sugestao
+Sugiro aumentar a frequência dos atendimentos nos bairros mais distantes,BENEFICIARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,sugestao
+Seria bom ter intérprete de libras disponível no atendimento,BENEFICIARIO,telefone,4,ENCERRADO,MULHER_APOLONIA,3,sugestao
+Poderiam criar um sistema de fila online para evitar espera,BENEFICIARIO,presencial,4,ENCERRADO,CRIANCA_ADOLESCENTE,3,sugestao
+Sugiro disponibilizar os formulários também em papel para quem não tem internet,BENEFICIARIO,email,3,ENCERRADO,MULHER_APOLONIA,2,sugestao
+Seria interessante ter parcerias com creches e berçários,BENEFICIARIO,presencial,3,ABERTO,CRIANCA_ADOLESCENTE,3,sugestao
+Poderiam criar um programa de fidelização para casos de longo prazo,BENEFICIARIO,telefone,3,ABERTO,MULHER_APOLONIA,2,sugestao
+Sugiro criar uma newsletter mensal com novidades do projeto,BENEFICIARIO,email,3,ABERTO,CRIANCA_ADOLESCENTE,3,sugestao
+Seria bom ter mais opções de canal para enviar documentos,BENEFICIARIO,presencial,4,ABERTO,OUTRO,3,sugestao
+Poderiam criar um guia de primeiros socorros bucais para distribuir,BENEFICIARIO,presencial,4,ABERTO,CRIANCA_ADOLESCENTE,1,sugestao
+Sugiro fazer um evento aberto na comunidade para divulgar o projeto,BENEFICIARIO,email,3,ENCERRADO,MULHER_APOLONIA,2,sugestao
+Seria útil ter um painel online com horários disponíveis em tempo real,BENEFICIARIO,email,4,ABERTO,CRIANCA_ADOLESCENTE,1,sugestao
+Poderiam criar um programa de mentoria para os voluntários novos,BENEFICIARIO,presencial,4,ENCERRADO,MULHER_APOLONIA,1,sugestao
+Sugiro criar um canal específico no youtube com orientações bucais,BENEFICIARIO,email,4,ABERTO,OUTRO,2,sugestao
+Seria bom ter um espaço no site para depoimentos de quem foi atendido,BENEFICIARIO,whatsapp,4,ABERTO,CRIANCA_ADOLESCENTE,2,sugestao
+Poderiam enviar pesquisa de satisfação após cada atendimento,BENEFICIARIO,telefone,3,ABERTO,CRIANCA_ADOLESCENTE,3,sugestao
+Sugiro criar um mapa interativo com os pontos de atendimento,BENEFICIARIO,telefone,4,ENCERRADO,OUTRO,2,sugestao
+Seria interessante ter parceria com farmácias locais para medicamentos,BENEFICIARIO,presencial,4,ABERTO,MULHER_APOLONIA,3,sugestao
+Poderiam criar um grupo de apoio entre as famílias atendidas,BENEFICIARIO,email,3,ABERTO,MULHER_APOLONIA,1,sugestao
+Sugiro que o site tenha versão simplificada para celular mais antigo,BENEFICIARIO,presencial,4,ENCERRADO,OUTRO,1,sugestao
+Seria bom ter um voluntário disponível apenas para dúvidas rápidas,BENEFICIARIO,email,4,ENCERRADO,CRIANCA_ADOLESCENTE,3,sugestao
+Poderiam criar um fluxo mais claro de como funciona o atendimento,BENEFICIARIO,email,4,ENCERRADO,MULHER_APOLONIA,2,sugestao
+Sugiro criar um canal de atendimento exclusivo para adolescentes,BENEFICIARIO,email,3,ENCERRADO,OUTRO,2,sugestao
+Seria útil ter um histórico de atendimentos acessível pelo beneficiário,BENEFICIARIO,whatsapp,3,ABERTO,OUTRO,2,sugestao
+Poderiam criar um programa de reconhecimento para os voluntários mais ativos,BENEFICIARIO,telefone,4,ABERTO,MULHER_APOLONIA,2,sugestao
+Seria ótimo ter atendimento aos sábados para quem trabalha,BENEFICIARIO,presencial,4,ENCERRADO,MULHER_APOLONIA,1,sugestao
+Sugiro criar um aplicativo para facilitar o agendamento,BENEFICIARIO,email,3,ABERTO,MULHER_APOLONIA,1,sugestao
+Seria bom ter uma sala de espera maior e mais confortável,BENEFICIARIO,presencial,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,sugestao
+Poderiam enviar lembrete por whatsapp um dia antes da consulta,BENEFICIARIO,presencial,4,ENCERRADO,CRIANCA_ADOLESCENTE,3,sugestao
+Seria útil ter uma lista de documentos necessários no site,BENEFICIARIO,telefone,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,sugestao
+Sugiro atendimento por videochamada para casos de urgência,BENEFICIARIO,whatsapp,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,sugestao
+Seria bom ter brinquedos na sala de espera para as crianças,BENEFICIARIO,presencial,3,ABERTO,CRIANCA_ADOLESCENTE,1,sugestao
+Poderiam disponibilizar um canal de atendimento no telegram,BENEFICIARIO,telefone,4,ENCERRADO,MULHER_APOLONIA,1,sugestao
+Sugiro criar um formulário online mais simples de preencher,BENEFICIARIO,presencial,3,ENCERRADO,CRIANCA_ADOLESCENTE,3,sugestao
+Seria interessante ter retorno automático após o envio,BENEFICIARIO,email,4,ENCERRADO,OUTRO,3,sugestao
+Poderiam melhorar a comunicação sobre os horários disponíveis,BENEFICIARIO,telefone,3,ABERTO,OUTRO,2,sugestao
+Sugiro adicionar um chat ao vivo no site de vocês,BENEFICIARIO,email,3,ENCERRADO,MULHER_APOLONIA,3,sugestao
+Seria bom ter atendimento em mais bairros da cidade,BENEFICIARIO,email,3,ABERTO,OUTRO,1,sugestao
+Poderiam criar uma área do usuário para acompanhar o caso,BENEFICIARIO,telefone,3,ABERTO,OUTRO,1,sugestao
+Sugiro enviar um resumo do atendimento por email ao final,BENEFICIARIO,whatsapp,4,ENCERRADO,MULHER_APOLONIA,3,sugestao
+Seria útil ter uma linha direta para casos urgentes,BENEFICIARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,3,sugestao
+Poderiam ampliar o horário de atendimento para noite,BENEFICIARIO,presencial,3,ABERTO,OUTRO,1,sugestao
+Sugiro ter um voluntário especializado em atender crianças pequenas,BENEFICIARIO,presencial,4,ENCERRADO,MULHER_APOLONIA,3,sugestao
+Seria ótimo ter parceria com escolas para facilitar o acesso,BENEFICIARIO,email,3,ABERTO,OUTRO,2,sugestao
+Poderiam disponibilizar transporte para quem mora longe,BENEFICIARIO,presencial,3,ABERTO,OUTRO,3,sugestao
+Sugiro criar um grupo no whatsapp com dicas de saúde bucal,BENEFICIARIO,presencial,4,ENCERRADO,OUTRO,1,sugestao
+Seria bom ter acompanhamento pós-consulta por pelo menos um mês,BENEFICIARIO,whatsapp,4,ABERTO,MULHER_APOLONIA,3,sugestao
+Poderiam treinar os voluntários para atender casos de ansiedade,BENEFICIARIO,email,4,ABERTO,CRIANCA_ADOLESCENTE,2,sugestao
+Sugiro criar um programa de visitas às escolas da região,BENEFICIARIO,email,3,ABERTO,MULHER_APOLONIA,3,sugestao
+Seria útil ter um número de emergência fora do horário comercial,BENEFICIARIO,email,4,ABERTO,CRIANCA_ADOLESCENTE,1,sugestao
+Poderiam oferecer material educativo sobre prevenção bucal,BENEFICIARIO,whatsapp,3,ENCERRADO,MULHER_APOLONIA,1,sugestao
+Sugiro aumentar a frequência dos atendimentos nos bairros mais distantes,BENEFICIARIO,whatsapp,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,sugestao
+Seria bom ter intérprete de libras disponível no atendimento,BENEFICIARIO,presencial,4,ABERTO,OUTRO,1,sugestao
+Poderiam criar um sistema de fila online para evitar espera,BENEFICIARIO,presencial,3,ABERTO,CRIANCA_ADOLESCENTE,3,sugestao
+Sugiro disponibilizar os formulários também em papel para quem não tem internet,BENEFICIARIO,whatsapp,4,ENCERRADO,MULHER_APOLONIA,2,sugestao
+Seria interessante ter parcerias com creches e berçários,BENEFICIARIO,presencial,3,ABERTO,CRIANCA_ADOLESCENTE,1,sugestao
+Poderiam criar um programa de fidelização para casos de longo prazo,BENEFICIARIO,email,4,ABERTO,MULHER_APOLONIA,1,sugestao
+Sugiro criar uma newsletter mensal com novidades do projeto,BENEFICIARIO,whatsapp,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,sugestao
+Seria bom ter mais opções de canal para enviar documentos,BENEFICIARIO,whatsapp,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,sugestao
+Poderiam criar um guia de primeiros socorros bucais para distribuir,BENEFICIARIO,email,4,ENCERRADO,CRIANCA_ADOLESCENTE,3,sugestao
+Sugiro fazer um evento aberto na comunidade para divulgar o projeto,BENEFICIARIO,telefone,4,ENCERRADO,OUTRO,2,sugestao
+Seria útil ter um painel online com horários disponíveis em tempo real,BENEFICIARIO,presencial,3,ABERTO,CRIANCA_ADOLESCENTE,3,sugestao
+Poderiam criar um programa de mentoria para os voluntários novos,BENEFICIARIO,presencial,3,ABERTO,CRIANCA_ADOLESCENTE,1,sugestao
+Sugiro criar um canal específico no youtube com orientações bucais,BENEFICIARIO,telefone,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,sugestao
+Seria bom ter um espaço no site para depoimentos de quem foi atendido,BENEFICIARIO,telefone,3,ABERTO,CRIANCA_ADOLESCENTE,3,sugestao
+Poderiam enviar pesquisa de satisfação após cada atendimento,BENEFICIARIO,presencial,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,sugestao
+Sugiro criar um mapa interativo com os pontos de atendimento,BENEFICIARIO,presencial,3,ENCERRADO,MULHER_APOLONIA,3,sugestao
+Seria interessante ter parceria com farmácias locais para medicamentos,BENEFICIARIO,email,4,ABERTO,OUTRO,3,sugestao
+Poderiam criar um grupo de apoio entre as famílias atendidas,BENEFICIARIO,telefone,3,ENCERRADO,OUTRO,3,sugestao
+Sugiro que o site tenha versão simplificada para celular mais antigo,BENEFICIARIO,email,3,ABERTO,MULHER_APOLONIA,2,sugestao
+Seria bom ter um voluntário disponível apenas para dúvidas rápidas,BENEFICIARIO,presencial,4,ENCERRADO,MULHER_APOLONIA,2,sugestao
+Poderiam criar um fluxo mais claro de como funciona o atendimento,BENEFICIARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,3,sugestao
+Sugiro criar um canal de atendimento exclusivo para adolescentes,BENEFICIARIO,presencial,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,sugestao
+Seria útil ter um histórico de atendimentos acessível pelo beneficiário,BENEFICIARIO,email,3,ENCERRADO,OUTRO,1,sugestao
+Poderiam criar um programa de reconhecimento para os voluntários mais ativos,BENEFICIARIO,presencial,4,ENCERRADO,MULHER_APOLONIA,1,sugestao
+podia ter mais horario,BENEFICIARIO,whatsapp,3,ENCERRADO,OUTRO,2,sugestao
+seria bom ter app,BENEFICIARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,3,sugestao
+Podia ter estacionamento,BENEFICIARIO,presencial,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,sugestao
+Precisamos de mais voluntarios,BENEFICIARIO,presencial,3,ENCERRADO,MULHER_APOLONIA,3,sugestao
+seria bom ter wifi la,BENEFICIARIO,email,3,ABERTO,MULHER_APOLONIA,3,sugestao
+deviam mandar lembrete,BENEFICIARIO,whatsapp,3,ENCERRADO,OUTRO,2,sugestao
+pode melhorar a sala de espera,BENEFICIARIO,presencial,4,ABERTO,MULHER_APOLONIA,2,sugestao
+Seria bom ter mais vagas,BENEFICIARIO,presencial,4,ENCERRADO,CRIANCA_ADOLESCENTE,3,sugestao
+precisa de mais dentistas,BENEFICIARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,3,sugestao
+colocassem aviso de horario no site,BENEFICIARIO,email,4,ENCERRADO,OUTRO,3,sugestao
+Um app facilitaria muito,BENEFICIARIO,whatsapp,4,ABERTO,OUTRO,2,sugestao
+colocassem mais cadeiras la,BENEFICIARIO,whatsapp,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,sugestao
+era bom ter video sobre os procedimentos,BENEFICIARIO,presencial,4,ENCERRADO,MULHER_APOLONIA,3,sugestao
+que tal atender por video?,BENEFICIARIO,telefone,4,ENCERRADO,OUTRO,2,sugestao
+Podem adicionar um chat no site,BENEFICIARIO,email,3,ABERTO,MULHER_APOLONIA,1,sugestao
+seria boa ideia um grupo de pais,BENEFICIARIO,whatsapp,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,sugestao
+poderiam abrir filial perto da escola,BENEFICIARIO,telefone,4,ABERTO,MULHER_APOLONIA,3,sugestao
+seria interessante ter mais canais,BENEFICIARIO,telefone,3,ABERTO,CRIANCA_ADOLESCENTE,2,sugestao
+deviam ter mais dias disponiveis,BENEFICIARIO,telefone,3,ABERTO,CRIANCA_ADOLESCENTE,3,sugestao
+Podiam ter um numero de emergencia,BENEFICIARIO,telefone,4,ABERTO,OUTRO,1,sugestao
+uma lista de docs ajudaria muito,BENEFICIARIO,email,3,ENCERRADO,OUTRO,1,sugestao
+seria bom ter cadastro online,BENEFICIARIO,presencial,3,ABERTO,MULHER_APOLONIA,2,sugestao
+adicionar mais pontos de atendimento,BENEFICIARIO,presencial,4,ABERTO,CRIANCA_ADOLESCENTE,3,sugestao
+seria util ter instrucoes pos consulta,BENEFICIARIO,whatsapp,4,ENCERRADO,OUTRO,2,sugestao
+tinha que ter retorno automatico,BENEFICIARIO,email,3,ABERTO,MULHER_APOLONIA,1,sugestao
+podia ter atendimento na creche,BENEFICIARIO,presencial,4,ABERTO,OUTRO,3,sugestao
+seria bom ter dicas de saude bucal,BENEFICIARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,sugestao
+deviam mandar foto do dentista antes,BENEFICIARIO,presencial,4,ENCERRADO,MULHER_APOLONIA,2,sugestao
+precisa de sala de espera infantil,BENEFICIARIO,email,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,sugestao
+Era bom ter pesquisa de satisfacao,BENEFICIARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,sugestao
+podia ter atividades pras criancas esperando,BENEFICIARIO,presencial,3,ENCERRADO,OUTRO,3,sugestao
+tem que melhorar o site,BENEFICIARIO,telefone,4,ENCERRADO,OUTRO,1,sugestao
+seria bom ter consulta domiciliar,BENEFICIARIO,email,4,ABERTO,CRIANCA_ADOLESCENTE,2,sugestao
+devia ter guia de primeiros socorros,BENEFICIARIO,presencial,4,ABERTO,MULHER_APOLONIA,1,sugestao
+era legal ter tutorial de como agendar,BENEFICIARIO,email,3,ENCERRADO,OUTRO,1,sugestao
+precisam de espaco maior,BENEFICIARIO,email,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,sugestao
+colocar o endereco no google maps,BENEFICIARIO,presencial,3,ABERTO,OUTRO,1,sugestao
+podia ter um chatbot pra tirar duvida,BENEFICIARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,sugestao
+melhorar o formulario online,BENEFICIARIO,telefone,4,ENCERRADO,MULHER_APOLONIA,2,sugestao
+seria otimo ter mais voluntarios,BENEFICIARIO,email,4,ABERTO,OUTRO,3,sugestao
+deviam ter dias fixos de atendimento,BENEFICIARIO,whatsapp,3,ENCERRADO,OUTRO,2,sugestao
+seria bom avisar quando tiver vaga,BENEFICIARIO,presencial,3,ENCERRADO,MULHER_APOLONIA,2,sugestao
+podiam ter mais opcoes de canal de contato,BENEFICIARIO,email,3,ABERTO,OUTRO,1,sugestao
+Deviam ter mais dias de atendimento,BENEFICIARIO,presencial,4,ABERTO,CRIANCA_ADOLESCENTE,3,sugestao
+seria bom ter atendimento domiciliar,BENEFICIARIO,whatsapp,4,ABERTO,CRIANCA_ADOLESCENTE,3,sugestao
+Colocassem mais informacoes no site,BENEFICIARIO,presencial,3,ABERTO,OUTRO,1,sugestao
+seria util ter um numero de urgencia 24h,BENEFICIARIO,presencial,4,ABERTO,CRIANCA_ADOLESCENTE,1,sugestao
+deveriam ter mais voluntarios,BENEFICIARIO,email,4,ENCERRADO,OUTRO,3,sugestao
+seria bom ter atendimento via instagram,BENEFICIARIO,telefone,4,ABERTO,MULHER_APOLONIA,3,sugestao
+Podiam ter sala especifica para crianca,BENEFICIARIO,telefone,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,sugestao
+seria otimo ter mais unidades,BENEFICIARIO,presencial,3,ENCERRADO,MULHER_APOLONIA,3,sugestao
+tinha que ter area de lazer para criancas,BENEFICIARIO,whatsapp,3,ABERTO,MULHER_APOLONIA,2,sugestao
+podiam ter retorno automatico por wpp,BENEFICIARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,3,sugestao
+melhorar o processo de agendamento,BENEFICIARIO,whatsapp,3,ABERTO,OUTRO,2,sugestao
+deveriam simplificar o formulario,BENEFICIARIO,telefone,4,ENCERRADO,OUTRO,1,sugestao
+era bom ter tutorial de uso do site,BENEFICIARIO,whatsapp,4,ABERTO,CRIANCA_ADOLESCENTE,1,sugestao
+colocassem confirmacao automatica por email,BENEFICIARIO,email,4,ABERTO,MULHER_APOLONIA,2,sugestao
+seria util ter chatbot no site,BENEFICIARIO,presencial,4,ABERTO,OUTRO,2,sugestao
+podiam ter FAQ com duvidas frequentes,BENEFICIARIO,telefone,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,sugestao
+seria bom ter atendimento em libras,BENEFICIARIO,whatsapp,4,ENCERRADO,CRIANCA_ADOLESCENTE,3,sugestao
+era legal ter mapa do percurso ate o local,BENEFICIARIO,presencial,4,ABERTO,CRIANCA_ADOLESCENTE,2,sugestao
+deveriam ter materiais educativos,BENEFICIARIO,presencial,4,ENCERRADO,MULHER_APOLONIA,2,sugestao
+ter uma linha de atendimento exclusiva,BENEFICIARIO,presencial,3,ABERTO,OUTRO,2,sugestao
+seria bom ter acompanhamento digital,BENEFICIARIO,presencial,4,ENCERRADO,MULHER_APOLONIA,3,sugestao
+podiam ter programa de prevencao bucal,BENEFICIARIO,email,3,ABERTO,MULHER_APOLONIA,1,sugestao
+era bom ter dentista especialista em crianca,BENEFICIARIO,whatsapp,4,ENCERRADO,OUTRO,2,sugestao
+deviam ter parceria com escolas,BENEFICIARIO,email,3,ABERTO,CRIANCA_ADOLESCENTE,2,sugestao
+seria otimo ter visita as comunidades,BENEFICIARIO,whatsapp,3,ABERTO,MULHER_APOLONIA,3,sugestao
+podiam ter mais pontos de coleta de docs,BENEFICIARIO,telefone,4,ENCERRADO,OUTRO,3,sugestao
+seria bom ter um canal no telegram,BENEFICIARIO,presencial,3,ABERTO,MULHER_APOLONIA,2,sugestao
+era legal ter grupo de pais no whatsapp,BENEFICIARIO,presencial,4,ENCERRADO,MULHER_APOLONIA,1,sugestao
+deveriam criar um programa de saude bucal,BENEFICIARIO,whatsapp,4,ABERTO,MULHER_APOLONIA,1,sugestao
+podiam enviar dicas de higiene bucal,BENEFICIARIO,telefone,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,sugestao
+era bom ter mais vagas por dia,BENEFICIARIO,telefone,3,ABERTO,CRIANCA_ADOLESCENTE,1,sugestao
+deviam ter atendimento prioritario pra idosos,BENEFICIARIO,whatsapp,3,ABERTO,MULHER_APOLONIA,1,sugestao
+seria bom ter avaliacao pos atendimento,BENEFICIARIO,presencial,3,ENCERRADO,CRIANCA_ADOLESCENTE,3,sugestao
+podiam ter parceria com ubs da regiao,BENEFICIARIO,email,3,ABERTO,CRIANCA_ADOLESCENTE,1,sugestao
+era legal ter video explicando o atendimento,BENEFICIARIO,whatsapp,4,ENCERRADO,MULHER_APOLONIA,3,sugestao
+seria util ter notificacoes de vaga disponivel,BENEFICIARIO,whatsapp,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,sugestao
+deveriam melhorar o site mobile,BENEFICIARIO,email,4,ENCERRADO,MULHER_APOLONIA,2,sugestao
+podiam ter indicacao de onibus e metro,BENEFICIARIO,whatsapp,4,ABERTO,CRIANCA_ADOLESCENTE,2,sugestao
+era bom ter mais canais de comunicacao,BENEFICIARIO,email,4,ABERTO,MULHER_APOLONIA,2,sugestao
+deviam ter um programa de fidelizacao,BENEFICIARIO,email,4,ENCERRADO,OUTRO,1,sugestao
+seria bom ter historico de consultas online,BENEFICIARIO,telefone,4,ENCERRADO,OUTRO,2,sugestao
+podiam ter lista de espera online,BENEFICIARIO,presencial,3,ENCERRADO,OUTRO,3,sugestao
+era legal criar um clube de saude bucal,BENEFICIARIO,telefone,3,ENCERRADO,OUTRO,1,sugestao
+seria bom ter mais recursos disponiveis,BENEFICIARIO,presencial,4,ABERTO,MULHER_APOLONIA,2,sugestao
+deviam criar um portal do beneficiario,BENEFICIARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,3,sugestao
+seria util ter um numero unico de contato,BENEFICIARIO,email,4,ENCERRADO,MULHER_APOLONIA,3,sugestao
+podiam ter servico de traducao,BENEFICIARIO,whatsapp,3,ENCERRADO,MULHER_APOLONIA,2,sugestao
+era bom ter mais informacoes no wpp,BENEFICIARIO,whatsapp,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,sugestao
+deviam ter parcerias com farmacias,BENEFICIARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,sugestao
+seria bom ter kit higiene bucal,BENEFICIARIO,presencial,3,ENCERRADO,OUTRO,3,sugestao
+podiam ter mais eventos na comunidade,BENEFICIARIO,whatsapp,3,ENCERRADO,OUTRO,3,sugestao
+era legal ter manual do beneficiario,BENEFICIARIO,whatsapp,3,ABERTO,MULHER_APOLONIA,1,sugestao
+seria bom ter mais vagas no horario da noite,BENEFICIARIO,presencial,3,ABERTO,OUTRO,1,sugestao
+podiam ter programa de orientacao nutricional,BENEFICIARIO,telefone,3,ENCERRADO,MULHER_APOLONIA,2,sugestao
+era bom ter botao de emergencia no app,BENEFICIARIO,email,4,ENCERRADO,MULHER_APOLONIA,2,sugestao
+deviam ter agenda publica de atendimentos,BENEFICIARIO,telefone,4,ABERTO,CRIANCA_ADOLESCENTE,3,sugestao
+seria util ter canal exclusivo de agendamento,BENEFICIARIO,telefone,4,ABERTO,MULHER_APOLONIA,1,sugestao
+podiam ter voluntario dedicado a crianca,BENEFICIARIO,presencial,3,ABERTO,CRIANCA_ADOLESCENTE,3,sugestao
+era bom ter apoio psicologico junto ao dentario,BENEFICIARIO,whatsapp,4,ENCERRADO,MULHER_APOLONIA,2,sugestao
+seria bom ter carta de servicos impresso,BENEFICIARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,3,sugestao
+podiam ter pagina de depoimentos no site,BENEFICIARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,3,sugestao
+era legal divulgar o servico em escolas,BENEFICIARIO,whatsapp,3,ABERTO,CRIANCA_ADOLESCENTE,2,sugestao
+deviam ter convencio com a prefeitura,BENEFICIARIO,whatsapp,4,ENCERRADO,MULHER_APOLONIA,2,sugestao
+seria bom ter mais instrutores de higiene,BENEFICIARIO,telefone,3,ABERTO,OUTRO,1,sugestao
+podiam ter ficha de encaminhamento medico,BENEFICIARIO,whatsapp,3,ABERTO,CRIANCA_ADOLESCENTE,2,sugestao
+era bom ter mais feedback do tratamento,BENEFICIARIO,email,4,ENCERRADO,CRIANCA_ADOLESCENTE,3,sugestao
+seria util ter protocolo de urgencia divulgado,BENEFICIARIO,whatsapp,4,ABERTO,CRIANCA_ADOLESCENTE,2,sugestao
+podiam ter espaco de descanso pra mes,BENEFICIARIO,email,4,ABERTO,CRIANCA_ADOLESCENTE,3,sugestao
+era bom ter boletim informativo mensal,BENEFICIARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,sugestao
+deviam ter parceria com transporte publico,BENEFICIARIO,presencial,4,ENCERRADO,OUTRO,2,sugestao
+seria util ter lista de espera unificada,BENEFICIARIO,email,4,ABERTO,MULHER_APOLONIA,2,sugestao
+podiam ter atendimento em creches,BENEFICIARIO,whatsapp,3,ABERTO,MULHER_APOLONIA,1,sugestao
+era legal ter programa de escovacao em grupo,BENEFICIARIO,telefone,3,ENCERRADO,MULHER_APOLONIA,3,sugestao
+seria bom ter lembrete de consulta por sms,BENEFICIARIO,whatsapp,3,ENCERRADO,MULHER_APOLONIA,1,sugestao
+deviam ter mapa dos pontos de atendimento,BENEFICIARIO,whatsapp,4,ABERTO,MULHER_APOLONIA,3,sugestao
+podiam ter atendimento no parque,BENEFICIARIO,telefone,3,ABERTO,CRIANCA_ADOLESCENTE,2,sugestao
+era bom ter parceria com hospitais regionais,BENEFICIARIO,email,3,ENCERRADO,OUTRO,3,sugestao
+seria util ter acompanhamento via email,BENEFICIARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,3,sugestao
+podiam ter treinamento online para pacientes,BENEFICIARIO,telefone,4,ABERTO,OUTRO,2,sugestao
+era legal ter canal de voluntariado no site,BENEFICIARIO,whatsapp,3,ENCERRADO,OUTRO,3,sugestao
+seria bom ter blog de saude bucal,BENEFICIARIO,whatsapp,3,ABERTO,CRIANCA_ADOLESCENTE,1,sugestao
+deviam ter suporte fora do horario comercial,BENEFICIARIO,email,4,ENCERRADO,CRIANCA_ADOLESCENTE,3,sugestao
+podiam ter aviso de nova vaga por zap,BENEFICIARIO,whatsapp,3,ENCERRADO,CRIANCA_ADOLESCENTE,3,sugestao
+era bom ter parceria com ong local,BENEFICIARIO,email,3,ABERTO,MULHER_APOLONIA,3,sugestao
+seria util ter formulario pre atendimento online,BENEFICIARIO,telefone,3,ABERTO,OUTRO,2,sugestao
+podiam ter guia de procedimentos,BENEFICIARIO,presencial,4,ENCERRADO,MULHER_APOLONIA,1,sugestao
+era bom ter newsletter de saude,BENEFICIARIO,presencial,4,ABERTO,OUTRO,2,sugestao
+deviam ter feedback individual pos consulta,BENEFICIARIO,telefone,4,ABERTO,CRIANCA_ADOLESCENTE,1,sugestao
+seria bom ter parceria com educacao,BENEFICIARIO,presencial,4,ENCERRADO,MULHER_APOLONIA,2,sugestao
+podiam ter convenio com assistencia social,BENEFICIARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,3,sugestao
+era legal ter espaco de leitura na espera,BENEFICIARIO,email,3,ABERTO,MULHER_APOLONIA,3,sugestao
+seria bom ter atendimento em feriados,BENEFICIARIO,whatsapp,4,ENCERRADO,CRIANCA_ADOLESCENTE,3,sugestao
+era bom ter convenio com transporte,BENEFICIARIO,email,3,ABERTO,OUTRO,3,sugestao
+seria bom ter sala de alleitamento,BENEFICIARIO,whatsapp,4,ABERTO,OUTRO,2,sugestao
+podiam ter protocolo claro de urgencias,BENEFICIARIO,presencial,4,ABERTO,CRIANCA_ADOLESCENTE,1,sugestao
+era legal criar app de monitoramento,BENEFICIARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,sugestao
+deviam ter mais voluntarios formados,BENEFICIARIO,email,3,ABERTO,OUTRO,1,sugestao
+seria otimo ter parceria com secretaria de saude,BENEFICIARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,3,sugestao
+podiam ter reuniao de pais periodicamente,BENEFICIARIO,presencial,4,ENCERRADO,MULHER_APOLONIA,1,sugestao
+era bom ter atendimento itinerante,BENEFICIARIO,whatsapp,4,ENCERRADO,CRIANCA_ADOLESCENTE,3,sugestao
+deviam ter helpdesk disponivel,BENEFICIARIO,telefone,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,sugestao
+seria util ter agenda compartilhada online,BENEFICIARIO,whatsapp,4,ENCERRADO,OUTRO,3,sugestao
+podiam ter mais dias de plantao,BENEFICIARIO,presencial,4,ENCERRADO,CRIANCA_ADOLESCENTE,3,sugestao
+era bom ter suporte emocional disponivel,BENEFICIARIO,whatsapp,3,ENCERRADO,CRIANCA_ADOLESCENTE,3,sugestao
+deviam ter mais atividades preventivas,BENEFICIARIO,presencial,3,ABERTO,CRIANCA_ADOLESCENTE,1,sugestao
+seria bom ter canal de contato para pais,BENEFICIARIO,whatsapp,3,ENCERRADO,OUTRO,1,sugestao
+podiam ter cadastro simplificado,BENEFICIARIO,email,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,sugestao
+era legal ter sorteio de consultas,BENEFICIARIO,telefone,3,ENCERRADO,MULHER_APOLONIA,2,sugestao
+deviam ter espaco para bebes,BENEFICIARIO,telefone,3,ABERTO,OUTRO,2,sugestao
+seria bom ter ficha de acompanhamento impresso,BENEFICIARIO,presencial,3,ENCERRADO,CRIANCA_ADOLESCENTE,3,sugestao
+podiam ter recursos pedagogicos,BENEFICIARIO,email,4,ABERTO,CRIANCA_ADOLESCENTE,3,sugestao
+era bom ter laboratorio proximo,BENEFICIARIO,presencial,3,ABERTO,MULHER_APOLONIA,1,sugestao
+deviam ter plano de tratamento escrito,BENEFICIARIO,telefone,4,ENCERRADO,MULHER_APOLONIA,2,sugestao
+seria util ter cartilha de higiene bucal,BENEFICIARIO,telefone,3,ABERTO,CRIANCA_ADOLESCENTE,3,sugestao
+podiam ter acesso a historico pelo celular,BENEFICIARIO,email,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,sugestao
+era bom ter rede de parceiros ampliada,BENEFICIARIO,whatsapp,3,ENCERRADO,MULHER_APOLONIA,2,sugestao
+deviam ter programa de prevencao escolar,BENEFICIARIO,telefone,4,ABERTO,MULHER_APOLONIA,1,sugestao
+seria bom ter mais divulgacao do projeto,BENEFICIARIO,whatsapp,3,ABERTO,CRIANCA_ADOLESCENTE,3,sugestao
+podiam ter fila prioritaria online,BENEFICIARIO,presencial,4,ABERTO,CRIANCA_ADOLESCENTE,1,sugestao
+era legal ter painel de espera digital,BENEFICIARIO,whatsapp,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,sugestao
+deviam ter sistema de avaliacao simples,BENEFICIARIO,whatsapp,4,ENCERRADO,OUTRO,1,sugestao
+seria bom ter canal direto com o dentista,BENEFICIARIO,email,3,ABERTO,CRIANCA_ADOLESCENTE,1,sugestao
+podiam ter plano terapeutico compartilhado,BENEFICIARIO,presencial,4,ENCERRADO,OUTRO,2,sugestao
+era bom ter registro do tratamento em pdf,BENEFICIARIO,email,3,ABERTO,CRIANCA_ADOLESCENTE,1,sugestao
+deviam ter material sobre higiene pra crianca,BENEFICIARIO,whatsapp,3,ENCERRADO,CRIANCA_ADOLESCENTE,3,sugestao
+seria bom ter atendimento de segunda a segunda,BENEFICIARIO,telefone,3,ABERTO,CRIANCA_ADOLESCENTE,3,sugestao
+podiam ter triagem online antes da consulta,BENEFICIARIO,whatsapp,4,ABERTO,MULHER_APOLONIA,3,sugestao
+era legal ter programa de radio sobre saude,BENEFICIARIO,telefone,3,ABERTO,MULHER_APOLONIA,1,sugestao
+deviam ter link direto pra agendar no site,BENEFICIARIO,whatsapp,4,ENCERRADO,OUTRO,1,sugestao
+seria bom ter grupo de whatsapp de suporte,BENEFICIARIO,whatsapp,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,sugestao
+podiam ter kits de higiene bucal doados,BENEFICIARIO,whatsapp,4,ABERTO,MULHER_APOLONIA,1,sugestao
+era bom ter instrucoes pos procedimento por escrito,BENEFICIARIO,presencial,3,ABERTO,MULHER_APOLONIA,3,sugestao
+deviam ter parceria com pedagogos,BENEFICIARIO,email,3,ABERTO,OUTRO,1,sugestao
+seria util ter hotline de tiragem de duvida,BENEFICIARIO,telefone,4,ENCERRADO,MULHER_APOLONIA,2,sugestao
+podiam ter mais cursos pro voluntarios,BENEFICIARIO,presencial,4,ABERTO,OUTRO,2,sugestao
+era bom ter boletim de saude das criancas,BENEFICIARIO,whatsapp,3,ABERTO,CRIANCA_ADOLESCENTE,1,sugestao
+deviam ter mais eventos em comunidades,BENEFICIARIO,presencial,4,ABERTO,OUTRO,1,sugestao
+seria bom ter parceria com ong de infancia,BENEFICIARIO,telefone,4,ABERTO,CRIANCA_ADOLESCENTE,1,sugestao
+podiam ter avaliacao de saude bucal anual,BENEFICIARIO,email,4,ABERTO,OUTRO,1,sugestao
+era legal ter kit de cuidados pos consulta,BENEFICIARIO,email,4,ENCERRADO,OUTRO,2,sugestao
+deviam ter consultores de saude bucal,BENEFICIARIO,whatsapp,3,ABERTO,OUTRO,2,sugestao
+seria bom ter parceria com defensoria publica,BENEFICIARIO,telefone,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,sugestao
+podiam ter registro em prontuario eletronico,BENEFICIARIO,telefone,4,ENCERRADO,MULHER_APOLONIA,1,sugestao
+era bom ter servico de orientacao nutricional,BENEFICIARIO,whatsapp,4,ENCERRADO,OUTRO,3,sugestao
+deviam ter mais unidades moveis de atendimento,BENEFICIARIO,whatsapp,3,ABERTO,OUTRO,2,sugestao
+seria util ter prontuario impresso disponivel,BENEFICIARIO,whatsapp,3,ENCERRADO,CRIANCA_ADOLESCENTE,3,sugestao
+podiam ter parceria com ubs proximas,BENEFICIARIO,telefone,3,ABERTO,CRIANCA_ADOLESCENTE,2,sugestao
+era bom ter mais esclarecimentos ao final,BENEFICIARIO,presencial,3,ENCERRADO,OUTRO,2,sugestao
+deviam ter espaco de recreacao na espera,BENEFICIARIO,presencial,3,ABERTO,OUTRO,1,sugestao
+seria bom ter cronograma de atendimento publico,BENEFICIARIO,whatsapp,4,ENCERRADO,MULHER_APOLONIA,2,sugestao
+podiam ter painel com informacoes no local,BENEFICIARIO,presencial,3,ABERTO,OUTRO,1,sugestao
+era legal ter programa de apadrinhamento,BENEFICIARIO,telefone,3,ENCERRADO,OUTRO,2,sugestao
+deviam ter canal de sugestoes do beneficiario,BENEFICIARIO,telefone,3,ENCERRADO,CRIANCA_ADOLESCENTE,3,sugestao
+seria bom ter farmacia social conveniada,BENEFICIARIO,email,4,ENCERRADO,CRIANCA_ADOLESCENTE,3,sugestao
+podia ter mais horario disponivel no app,BENEFICIARIO,presencial,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,sugestao
+seria bom manda lembrete de consulta no zap,BENEFICIARIO,telefone,4,ABERTO,CRIANCA_ADOLESCENTE,2,sugestao
+sugiro ter atendimento noturno tbm,BENEFICIARIO,presencial,4,ENCERRADO,OUTRO,3,sugestao
+"Minha filha está com muita dor de dente, precisa de ajuda hoje",BENEFICIARIO,telefone,1,ABERTO,MULHER_APOLONIA,4,urgencia
+"Preciso de atendimento urgente, meu filho não para de chorar de dor",BENEFICIARIO,whatsapp,1,SOLICITADO,CRIANCA_ADOLESCENTE,5,urgencia
+"Situação crítica, minha menina não consegue comer de tanta dor",BENEFICIARIO,email,2,SOLICITADO,MULHER_APOLONIA,4,urgencia
+"Urgente, meu filho está com o rosto inchado e com febre",BENEFICIARIO,telefone,2,ABERTO,CRIANCA_ADOLESCENTE,5,urgencia
+"Preciso de socorro agora, minha filha está sofrendo muito",BENEFICIARIO,whatsapp,2,SOLICITADO,OUTRO,4,urgencia
+"Não aguenta mais de dor, precisamos de ajuda com urgência",BENEFICIARIO,telefone,1,SOLICITADO,MULHER_APOLONIA,4,urgencia
+"Dor insuportável, meu filho não dormiu a noite toda",BENEFICIARIO,email,2,ABERTO,OUTRO,5,urgencia
+"Caso urgente, criança com infecção na boca e febre alta",BENEFICIARIO,telefone,2,SOLICITADO,OUTRO,4,urgencia
+"Preciso de atendimento hoje, está em situação crítica de dor",BENEFICIARIO,telefone,1,SOLICITADO,MULHER_APOLONIA,4,urgencia
+"Minha menina está em pânico de dor, por favor me ajudem",BENEFICIARIO,email,1,ABERTO,MULHER_APOLONIA,5,urgencia
+"Urgentíssimo, o dente do meu filho quebrou e está sangrando",BENEFICIARIO,whatsapp,1,ABERTO,MULHER_APOLONIA,5,urgencia
+"Meu filho caiu e bateu os dentes, está com sangramento",BENEFICIARIO,email,2,ABERTO,CRIANCA_ADOLESCENTE,4,urgencia
+"Preciso de ajuda hoje mesmo, é grave",BENEFICIARIO,whatsapp,1,ABERTO,MULHER_APOLONIA,5,urgencia
+"Situação de emergência bucal, dente infeccionado com pus",BENEFICIARIO,whatsapp,1,SOLICITADO,MULHER_APOLONIA,5,urgencia
 Criança com dor insuportável há mais de 24 horas,BENEFICIARIO,whatsapp,1,ABERTO,CRIANCA_ADOLESCENTE,4,urgencia
-Meu filho não consegue falar direito de tanta dor,BENEFICIARIO,presencial,2,SOLICITADO,OUTRO,4,urgencia
-"Urgente, possível fratura no dente após acidente",BENEFICIARIO,whatsapp,2,SOLICITADO,OUTRO,4,urgencia
-"Febre alta e inchaço no rosto, pode ser infecção grave",BENEFICIARIO,email,2,ABERTO,OUTRO,5,urgencia
-"Meu filho está com a bochecha inchada desde ontem, é urgente",BENEFICIARIO,telefone,1,ABERTO,MULHER_APOLONIA,5,urgencia
-"Dor de dente com febre há dois dias, preciso de ajuda rápido",BENEFICIARIO,email,2,SOLICITADO,CRIANCA_ADOLESCENTE,4,urgencia
-"Criança não consegue dormir de dor, preciso de atendimento agora",BENEFICIARIO,whatsapp,1,ABERTO,OUTRO,4,urgencia
-"Urgente, meu filho engoliu parte de um dente quebrado",BENEFICIARIO,presencial,2,ABERTO,OUTRO,5,urgencia
-"Preciso de ajuda imediata, criança com sangramento na boca",BENEFICIARIO,whatsapp,1,SOLICITADO,CRIANCA_ADOLESCENTE,5,urgencia
-"Situação grave, criança com abscesso dentário e muita dor",BENEFICIARIO,whatsapp,2,SOLICITADO,CRIANCA_ADOLESCENTE,5,urgencia
-"Meu filho está com inchaço no pescoço, preciso de socorro",BENEFICIARIO,whatsapp,1,ABERTO,CRIANCA_ADOLESCENTE,5,urgencia
-"Urgente, dente de leite caiu antes do tempo e está sangrando",BENEFICIARIO,email,1,ABERTO,CRIANCA_ADOLESCENTE,5,urgencia
-Criança com dor insuportável no dente do siso que está nascendo,BENEFICIARIO,telefone,1,SOLICITADO,CRIANCA_ADOLESCENTE,5,urgencia
-"Preciso de alguém hoje, minha filha não consegue comer nada",BENEFICIARIO,telefone,1,ABERTO,MULHER_APOLONIA,4,urgencia
-"Emergência, fratura no maxilar após queda",BENEFICIARIO,telefone,1,ABERTO,MULHER_APOLONIA,5,urgencia
-Meu filho tem 4 anos e está em desespero de dor,BENEFICIARIO,telefone,2,ABERTO,CRIANCA_ADOLESCENTE,4,urgencia
-"Urgente, criança com dor e calafrios, pode ser infecção grave",BENEFICIARIO,presencial,2,SOLICITADO,MULHER_APOLONIA,5,urgencia
-"Preciso de consulta emergencial hoje, caso muito sério",BENEFICIARIO,presencial,2,ABERTO,MULHER_APOLONIA,5,urgencia
-Minha filha tem febre há 3 dias junto com dor de dente,BENEFICIARIO,presencial,2,SOLICITADO,MULHER_APOLONIA,5,urgencia
-"Dente trincado após acidente, está com dor intensa",BENEFICIARIO,email,2,SOLICITADO,CRIANCA_ADOLESCENTE,4,urgencia
-"Urgente por favor, a situação piorou muito esta noite",BENEFICIARIO,presencial,2,ABERTO,MULHER_APOLONIA,4,urgencia
-Sangramento que não para há mais de uma hora,BENEFICIARIO,whatsapp,1,ABERTO,CRIANCA_ADOLESCENTE,5,urgencia
-Meu filho está se recusando a comer de tanta dor,BENEFICIARIO,whatsapp,2,SOLICITADO,CRIANCA_ADOLESCENTE,4,urgencia
-Criança com inchaço visível na bochecha desde esta manhã,BENEFICIARIO,email,1,ABERTO,MULHER_APOLONIA,5,urgencia
-"Preciso de ajuda agora, não pode esperar",BENEFICIARIO,telefone,2,ABERTO,OUTRO,4,urgencia
-"Caso grave, criança com dor e febre há mais de dois dias",BENEFICIARIO,email,2,SOLICITADO,MULHER_APOLONIA,5,urgencia
-"Urgentíssimo, minha filha está chorando sem parar",BENEFICIARIO,telefone,1,ABERTO,OUTRO,5,urgencia
-"Infecção na gengiva com pus, preciso de atendimento hoje",BENEFICIARIO,whatsapp,2,ABERTO,MULHER_APOLONIA,5,urgencia
-"Meu filho bateu o dente e ele ficou torto, emergência",BENEFICIARIO,telefone,1,ABERTO,CRIANCA_ADOLESCENTE,5,urgencia
-"Preciso de resposta urgente, situação piorou de ontem pra hoje",BENEFICIARIO,telefone,1,SOLICITADO,OUTRO,4,urgencia
-Criança com dor muito forte no rosto e no ouvido,BENEFICIARIO,whatsapp,1,ABERTO,MULHER_APOLONIA,4,urgencia
-"Urgente, meu filho não consegue abrir a boca direito",BENEFICIARIO,telefone,1,ABERTO,CRIANCA_ADOLESCENTE,5,urgencia
-"Preciso de socorro, minha filha está chorando de dor há horas",BENEFICIARIO,telefone,2,SOLICITADO,CRIANCA_ADOLESCENTE,4,urgencia
-"Dor de dente com inchaço, febre e cheiro ruim na boca",BENEFICIARIO,telefone,1,SOLICITADO,OUTRO,4,urgencia
-"Meu filho está com o rosto deformado de inchaço, socorro",BENEFICIARIO,telefone,1,ABERTO,CRIANCA_ADOLESCENTE,5,urgencia
-"Caso gravíssimo, preciso de atendimento urgente agora",BENEFICIARIO,email,1,ABERTO,CRIANCA_ADOLESCENTE,5,urgencia
-Confirmo minha consulta para amanhã às 14h,BENEFICIARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,informativo
-"Preciso remarcar minha consulta do dia 15, por favor",VOLUNTARIO,email,3,ABERTO,MULHER_APOLONIA,3,informativo
-Gostaria de saber o horário de funcionamento de vocês,VOLUNTARIO,telefone,4,EM_ATENDIMENTO,MULHER_APOLONIA,2,informativo
-Quais documentos preciso levar para o primeiro atendimento,VOLUNTARIO,telefone,3,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,2,informativo
-"Minha filha já foi atendida, obrigada, estamos bem",VOLUNTARIO,whatsapp,4,EM_ATENDIMENTO,OUTRO,1,informativo
-Confirmo presença no atendimento de quarta-feira,BENEFICIARIO,presencial,3,ENCERRADO,OUTRO,3,informativo
-Quero cancelar o agendamento da próxima semana,BENEFICIARIO,whatsapp,4,EM_ATENDIMENTO,OUTRO,3,informativo
-Gostaria de saber se vocês atendem crianças menores de 2 anos,BENEFICIARIO,email,4,EM_ATENDIMENTO,MULHER_APOLONIA,2,informativo
-Recebi o contato de vocês por indicação de uma amiga,VOLUNTARIO,email,4,ENCERRADO,OUTRO,3,informativo
-Estou enviando os documentos solicitados na última consulta,BENEFICIARIO,email,4,ABERTO,MULHER_APOLONIA,1,informativo
-Apenas informando que chegamos ao endereço indicado,VOLUNTARIO,telefone,4,EM_ATENDIMENTO,OUTRO,2,informativo
-Quero confirmar o endereço do atendimento presencial,BENEFICIARIO,whatsapp,3,ABERTO,MULHER_APOLONIA,1,informativo
-Vou precisar remarcar para a semana que vem,VOLUNTARIO,whatsapp,4,ABERTO,MULHER_APOLONIA,2,informativo
-Pode confirmar se meu caso foi recebido pelo sistema,BENEFICIARIO,email,3,EM_ATENDIMENTO,OUTRO,3,informativo
-Enviando retorno sobre o tratamento iniciado na semana passada,VOLUNTARIO,telefone,3,ENCERRADO,CRIANCA_ADOLESCENTE,3,informativo
-Gostaria de atualizar meu número de telefone no cadastro,BENEFICIARIO,presencial,3,ENCERRADO,MULHER_APOLONIA,1,informativo
-Preciso saber se posso levar o irmão mais novo também,BENEFICIARIO,presencial,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,informativo
-Informando que a consulta de hoje foi realizada com sucesso,BENEFICIARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,informativo
-Quero saber se já tem vaga disponível para este mês,VOLUNTARIO,presencial,4,ABERTO,MULHER_APOLONIA,1,informativo
-Estou enviando foto do dente conforme solicitado pelo dentista,VOLUNTARIO,whatsapp,3,ABERTO,MULHER_APOLONIA,2,informativo
-"Meu filho já tomou o remédio indicado, está melhorando",VOLUNTARIO,whatsapp,4,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,3,informativo
-Apenas avisando que vamos chegar 20 minutos atrasados,BENEFICIARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,informativo
-Pode me passar o nome do dentista que vai me atender,BENEFICIARIO,presencial,4,ENCERRADO,OUTRO,1,informativo
-Confirmo que recebi o email com as instruções,BENEFICIARIO,email,4,ABERTO,CRIANCA_ADOLESCENTE,3,informativo
-Gostaria de saber sobre o acompanhamento após o tratamento,BENEFICIARIO,presencial,3,ENCERRADO,OUTRO,2,informativo
-Preciso de um declaração de atendimento para a escola,VOLUNTARIO,email,4,ENCERRADO,MULHER_APOLONIA,2,informativo
-"Informando que meu telefone mudou, o novo é outro número",BENEFICIARIO,email,4,ENCERRADO,OUTRO,3,informativo
-Pode me informar quanto tempo dura a consulta inicial,BENEFICIARIO,telefone,3,EM_ATENDIMENTO,OUTRO,3,informativo
-Quero saber se vocês atendem no período da tarde,VOLUNTARIO,whatsapp,4,EM_ATENDIMENTO,MULHER_APOLONIA,3,informativo
-Estou confirmando os dados do cadastro que vocês me pediram,BENEFICIARIO,telefone,4,ABERTO,OUTRO,1,informativo
-"Recebi a confirmação da consulta, estarei presente",VOLUNTARIO,email,3,ABERTO,CRIANCA_ADOLESCENTE,3,informativo
-Preciso de informação sobre como funciona o tratamento completo,VOLUNTARIO,email,4,ABERTO,CRIANCA_ADOLESCENTE,1,informativo
-Vou levar a carteirinha de saúde conforme solicitado,VOLUNTARIO,whatsapp,4,EM_ATENDIMENTO,OUTRO,1,informativo
-Gostaria de saber se o atendimento é gratuito mesmo,BENEFICIARIO,email,3,ENCERRADO,MULHER_APOLONIA,2,informativo
-Tenho dúvida sobre quantas consultas são necessárias,BENEFICIARIO,presencial,4,ABERTO,OUTRO,2,informativo
-Pode me indicar o ponto de ônibus mais próximo do local,BENEFICIARIO,whatsapp,4,EM_ATENDIMENTO,MULHER_APOLONIA,3,informativo
-Quero atualizar o email de contato no meu cadastro,VOLUNTARIO,telefone,3,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,1,informativo
-Recebi a ligação de vocês e estou retornando o contato,BENEFICIARIO,whatsapp,4,ABERTO,MULHER_APOLONIA,2,informativo
-Enviando os exames pedidos pelo dentista na última visita,BENEFICIARIO,presencial,4,EM_ATENDIMENTO,OUTRO,2,informativo
-Preciso saber se é necessário estar em jejum para a consulta,VOLUNTARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,3,informativo
-Informando que o tratamento foi concluído com sucesso,BENEFICIARIO,telefone,3,ABERTO,OUTRO,2,informativo
-Vou precisar de uma segunda via da declaração de atendimento,VOLUNTARIO,presencial,4,ENCERRADO,OUTRO,2,informativo
-Pode confirmar se o whatsapp é o canal correto para enviar documentos,VOLUNTARIO,whatsapp,4,EM_ATENDIMENTO,OUTRO,2,informativo
-Estou aguardando o retorno sobre meu agendamento,BENEFICIARIO,email,3,ENCERRADO,MULHER_APOLONIA,3,informativo
+Meu filho não consegue falar direito de tanta dor,BENEFICIARIO,email,1,SOLICITADO,CRIANCA_ADOLESCENTE,4,urgencia
+"Urgente, possível fratura no dente após acidente",BENEFICIARIO,telefone,1,ABERTO,MULHER_APOLONIA,5,urgencia
+"Febre alta e inchaço no rosto, pode ser infecção grave",BENEFICIARIO,presencial,1,ABERTO,MULHER_APOLONIA,4,urgencia
+"Meu filho está com a bochecha inchada desde ontem, é urgente",BENEFICIARIO,whatsapp,2,ABERTO,CRIANCA_ADOLESCENTE,5,urgencia
+"Dor de dente com febre há dois dias, preciso de ajuda rápido",BENEFICIARIO,telefone,1,SOLICITADO,OUTRO,4,urgencia
+"Criança não consegue dormir de dor, preciso de atendimento agora",BENEFICIARIO,presencial,1,SOLICITADO,CRIANCA_ADOLESCENTE,4,urgencia
+"Urgente, meu filho engoliu parte de um dente quebrado",BENEFICIARIO,whatsapp,1,SOLICITADO,OUTRO,5,urgencia
+"Preciso de ajuda imediata, criança com sangramento na boca",BENEFICIARIO,telefone,1,ABERTO,OUTRO,5,urgencia
+"Situação grave, criança com abscesso dentário e muita dor",BENEFICIARIO,email,2,SOLICITADO,CRIANCA_ADOLESCENTE,5,urgencia
+"Meu filho está com inchaço no pescoço, preciso de socorro",BENEFICIARIO,email,1,ABERTO,OUTRO,4,urgencia
+"Urgente, dente de leite caiu antes do tempo e está sangrando",BENEFICIARIO,presencial,2,ABERTO,CRIANCA_ADOLESCENTE,4,urgencia
+Criança com dor insuportável no dente do siso que está nascendo,BENEFICIARIO,presencial,2,ABERTO,OUTRO,5,urgencia
+"Preciso de alguém hoje, minha filha não consegue comer nada",BENEFICIARIO,telefone,1,SOLICITADO,OUTRO,5,urgencia
+"Emergência, fratura no maxilar após queda",BENEFICIARIO,whatsapp,1,SOLICITADO,MULHER_APOLONIA,4,urgencia
+Meu filho tem 4 anos e está em desespero de dor,BENEFICIARIO,email,1,ABERTO,CRIANCA_ADOLESCENTE,4,urgencia
+"Urgente, criança com dor e calafrios, pode ser infecção grave",BENEFICIARIO,presencial,2,ABERTO,MULHER_APOLONIA,5,urgencia
+"Preciso de consulta emergencial hoje, caso muito sério",BENEFICIARIO,presencial,2,ABERTO,OUTRO,4,urgencia
+Minha filha tem febre há 3 dias junto com dor de dente,BENEFICIARIO,email,2,SOLICITADO,MULHER_APOLONIA,4,urgencia
+"Dente trincado após acidente, está com dor intensa",BENEFICIARIO,telefone,2,SOLICITADO,MULHER_APOLONIA,4,urgencia
+"Urgente por favor, a situação piorou muito esta noite",BENEFICIARIO,whatsapp,2,SOLICITADO,OUTRO,4,urgencia
+Sangramento que não para há mais de uma hora,BENEFICIARIO,telefone,1,SOLICITADO,CRIANCA_ADOLESCENTE,4,urgencia
+Meu filho está se recusando a comer de tanta dor,BENEFICIARIO,email,1,ABERTO,CRIANCA_ADOLESCENTE,5,urgencia
+Criança com inchaço visível na bochecha desde esta manhã,BENEFICIARIO,telefone,2,SOLICITADO,OUTRO,4,urgencia
+"Preciso de ajuda agora, não pode esperar",BENEFICIARIO,telefone,1,SOLICITADO,OUTRO,4,urgencia
+"Caso grave, criança com dor e febre há mais de dois dias",BENEFICIARIO,telefone,2,ABERTO,CRIANCA_ADOLESCENTE,5,urgencia
+"Urgentíssimo, minha filha está chorando sem parar",BENEFICIARIO,presencial,1,ABERTO,CRIANCA_ADOLESCENTE,4,urgencia
+"Infecção na gengiva com pus, preciso de atendimento hoje",BENEFICIARIO,whatsapp,2,SOLICITADO,OUTRO,4,urgencia
+"Meu filho bateu o dente e ele ficou torto, emergência",BENEFICIARIO,email,1,ABERTO,CRIANCA_ADOLESCENTE,4,urgencia
+"Preciso de resposta urgente, situação piorou de ontem pra hoje",BENEFICIARIO,telefone,2,ABERTO,OUTRO,4,urgencia
+Criança com dor muito forte no rosto e no ouvido,BENEFICIARIO,presencial,2,SOLICITADO,MULHER_APOLONIA,4,urgencia
+"Urgente, meu filho não consegue abrir a boca direito",BENEFICIARIO,email,1,ABERTO,MULHER_APOLONIA,5,urgencia
+"Preciso de socorro, minha filha está chorando de dor há horas",BENEFICIARIO,email,2,SOLICITADO,CRIANCA_ADOLESCENTE,5,urgencia
+"Dor de dente com inchaço, febre e cheiro ruim na boca",BENEFICIARIO,presencial,2,ABERTO,OUTRO,5,urgencia
+"Meu filho está com o rosto deformado de inchaço, socorro",BENEFICIARIO,email,1,SOLICITADO,OUTRO,4,urgencia
+"Caso gravíssimo, preciso de atendimento urgente agora",BENEFICIARIO,telefone,2,SOLICITADO,MULHER_APOLONIA,4,urgencia
+"Minha filha está com muita dor de dente, precisa de ajuda hoje",BENEFICIARIO,presencial,1,SOLICITADO,OUTRO,4,urgencia
+"Preciso de atendimento urgente, meu filho não para de chorar de dor",BENEFICIARIO,whatsapp,2,ABERTO,CRIANCA_ADOLESCENTE,4,urgencia
+"Situação crítica, minha menina não consegue comer de tanta dor",BENEFICIARIO,telefone,1,ABERTO,CRIANCA_ADOLESCENTE,5,urgencia
+"Urgente, meu filho está com o rosto inchado e com febre",BENEFICIARIO,presencial,1,ABERTO,CRIANCA_ADOLESCENTE,5,urgencia
+"Preciso de socorro agora, minha filha está sofrendo muito",BENEFICIARIO,telefone,2,ABERTO,OUTRO,4,urgencia
+"Não aguenta mais de dor, precisamos de ajuda com urgência",BENEFICIARIO,email,2,SOLICITADO,MULHER_APOLONIA,4,urgencia
+"Dor insuportável, meu filho não dormiu a noite toda",BENEFICIARIO,email,1,ABERTO,OUTRO,5,urgencia
+"Caso urgente, criança com infecção na boca e febre alta",BENEFICIARIO,presencial,1,ABERTO,MULHER_APOLONIA,4,urgencia
+"Preciso de atendimento hoje, está em situação crítica de dor",BENEFICIARIO,whatsapp,1,ABERTO,MULHER_APOLONIA,5,urgencia
+"Minha menina está em pânico de dor, por favor me ajudem",BENEFICIARIO,email,2,ABERTO,OUTRO,5,urgencia
+"Urgentíssimo, o dente do meu filho quebrou e está sangrando",BENEFICIARIO,email,2,SOLICITADO,MULHER_APOLONIA,5,urgencia
+"Meu filho caiu e bateu os dentes, está com sangramento",BENEFICIARIO,email,2,SOLICITADO,CRIANCA_ADOLESCENTE,5,urgencia
+"Preciso de ajuda hoje mesmo, é grave",BENEFICIARIO,telefone,1,SOLICITADO,MULHER_APOLONIA,4,urgencia
+"Situação de emergência bucal, dente infeccionado com pus",BENEFICIARIO,telefone,2,ABERTO,MULHER_APOLONIA,5,urgencia
+Criança com dor insuportável há mais de 24 horas,BENEFICIARIO,email,1,ABERTO,MULHER_APOLONIA,4,urgencia
+Meu filho não consegue falar direito de tanta dor,BENEFICIARIO,telefone,1,ABERTO,CRIANCA_ADOLESCENTE,4,urgencia
+"Urgente, possível fratura no dente após acidente",BENEFICIARIO,whatsapp,2,ABERTO,CRIANCA_ADOLESCENTE,4,urgencia
+"Febre alta e inchaço no rosto, pode ser infecção grave",BENEFICIARIO,telefone,1,ABERTO,CRIANCA_ADOLESCENTE,4,urgencia
+"Meu filho está com a bochecha inchada desde ontem, é urgente",BENEFICIARIO,email,1,ABERTO,OUTRO,4,urgencia
+"Dor de dente com febre há dois dias, preciso de ajuda rápido",BENEFICIARIO,presencial,2,SOLICITADO,MULHER_APOLONIA,5,urgencia
+"Criança não consegue dormir de dor, preciso de atendimento agora",BENEFICIARIO,presencial,2,SOLICITADO,MULHER_APOLONIA,5,urgencia
+"Urgente, meu filho engoliu parte de um dente quebrado",BENEFICIARIO,email,2,SOLICITADO,CRIANCA_ADOLESCENTE,5,urgencia
+"Preciso de ajuda imediata, criança com sangramento na boca",BENEFICIARIO,telefone,2,SOLICITADO,OUTRO,5,urgencia
+"Situação grave, criança com abscesso dentário e muita dor",BENEFICIARIO,whatsapp,1,ABERTO,MULHER_APOLONIA,5,urgencia
+"Meu filho está com inchaço no pescoço, preciso de socorro",BENEFICIARIO,telefone,1,SOLICITADO,MULHER_APOLONIA,5,urgencia
+"Urgente, dente de leite caiu antes do tempo e está sangrando",BENEFICIARIO,presencial,2,ABERTO,OUTRO,4,urgencia
+Criança com dor insuportável no dente do siso que está nascendo,BENEFICIARIO,presencial,1,ABERTO,CRIANCA_ADOLESCENTE,4,urgencia
+"Preciso de alguém hoje, minha filha não consegue comer nada",BENEFICIARIO,whatsapp,2,ABERTO,MULHER_APOLONIA,5,urgencia
+"Emergência, fratura no maxilar após queda",BENEFICIARIO,presencial,2,SOLICITADO,CRIANCA_ADOLESCENTE,4,urgencia
+Meu filho tem 4 anos e está em desespero de dor,BENEFICIARIO,presencial,2,SOLICITADO,CRIANCA_ADOLESCENTE,5,urgencia
+"Urgente, criança com dor e calafrios, pode ser infecção grave",BENEFICIARIO,whatsapp,2,ABERTO,CRIANCA_ADOLESCENTE,5,urgencia
+"Preciso de consulta emergencial hoje, caso muito sério",BENEFICIARIO,telefone,1,ABERTO,OUTRO,4,urgencia
+Minha filha tem febre há 3 dias junto com dor de dente,BENEFICIARIO,whatsapp,1,SOLICITADO,MULHER_APOLONIA,4,urgencia
+"Dente trincado após acidente, está com dor intensa",BENEFICIARIO,telefone,1,ABERTO,CRIANCA_ADOLESCENTE,5,urgencia
+"Urgente por favor, a situação piorou muito esta noite",BENEFICIARIO,presencial,2,SOLICITADO,OUTRO,4,urgencia
+Sangramento que não para há mais de uma hora,BENEFICIARIO,whatsapp,2,ABERTO,MULHER_APOLONIA,4,urgencia
+Meu filho está se recusando a comer de tanta dor,BENEFICIARIO,whatsapp,2,ABERTO,CRIANCA_ADOLESCENTE,5,urgencia
+Criança com inchaço visível na bochecha desde esta manhã,BENEFICIARIO,telefone,2,ABERTO,OUTRO,4,urgencia
+"Preciso de ajuda agora, não pode esperar",BENEFICIARIO,whatsapp,1,ABERTO,CRIANCA_ADOLESCENTE,4,urgencia
+"Caso grave, criança com dor e febre há mais de dois dias",BENEFICIARIO,presencial,2,ABERTO,CRIANCA_ADOLESCENTE,5,urgencia
+"Urgentíssimo, minha filha está chorando sem parar",BENEFICIARIO,telefone,1,SOLICITADO,CRIANCA_ADOLESCENTE,4,urgencia
+"Infecção na gengiva com pus, preciso de atendimento hoje",BENEFICIARIO,presencial,1,ABERTO,CRIANCA_ADOLESCENTE,5,urgencia
+"Meu filho bateu o dente e ele ficou torto, emergência",BENEFICIARIO,whatsapp,1,SOLICITADO,OUTRO,5,urgencia
+"Preciso de resposta urgente, situação piorou de ontem pra hoje",BENEFICIARIO,presencial,1,ABERTO,OUTRO,5,urgencia
+Criança com dor muito forte no rosto e no ouvido,BENEFICIARIO,email,2,SOLICITADO,OUTRO,5,urgencia
+"Urgente, meu filho não consegue abrir a boca direito",BENEFICIARIO,whatsapp,2,ABERTO,CRIANCA_ADOLESCENTE,4,urgencia
+"Preciso de socorro, minha filha está chorando de dor há horas",BENEFICIARIO,email,1,ABERTO,OUTRO,5,urgencia
+"Dor de dente com inchaço, febre e cheiro ruim na boca",BENEFICIARIO,presencial,1,ABERTO,MULHER_APOLONIA,4,urgencia
+"Meu filho está com o rosto deformado de inchaço, socorro",BENEFICIARIO,email,2,SOLICITADO,CRIANCA_ADOLESCENTE,5,urgencia
+"Caso gravíssimo, preciso de atendimento urgente agora",BENEFICIARIO,whatsapp,1,ABERTO,CRIANCA_ADOLESCENTE,5,urgencia
+socorro meu filho ta com muita dor,BENEFICIARIO,whatsapp,2,SOLICITADO,OUTRO,5,urgencia
+dor demais preciso de ajuda ja,BENEFICIARIO,email,1,SOLICITADO,MULHER_APOLONIA,5,urgencia
+Urgente por favor!!!,BENEFICIARIO,presencial,1,SOLICITADO,MULHER_APOLONIA,5,urgencia
+minha filha ta chorando de dor,BENEFICIARIO,whatsapp,2,ABERTO,OUTRO,4,urgencia
+meu filho ta com febre e inchaço,BENEFICIARIO,whatsapp,1,ABERTO,MULHER_APOLONIA,5,urgencia
+dor insuportavel socorro,BENEFICIARIO,email,1,SOLICITADO,OUTRO,4,urgencia
+Preciso de ajuda urgente hoje,BENEFICIARIO,email,2,ABERTO,CRIANCA_ADOLESCENTE,5,urgencia
+nao aguenta mais de dor,BENEFICIARIO,presencial,2,SOLICITADO,CRIANCA_ADOLESCENTE,5,urgencia
+crianca com dor forte na boca,BENEFICIARIO,email,2,ABERTO,CRIANCA_ADOLESCENTE,4,urgencia
+socorro preciso de atendimento,BENEFICIARIO,telefone,2,ABERTO,MULHER_APOLONIA,5,urgencia
+meu filho ta com muito inchaço,BENEFICIARIO,presencial,1,ABERTO,CRIANCA_ADOLESCENTE,5,urgencia
+emergencia bucal agora,BENEFICIARIO,email,2,SOLICITADO,MULHER_APOLONIA,4,urgencia
+dente sangrado nao para,BENEFICIARIO,presencial,1,SOLICITADO,OUTRO,4,urgencia
+crianca com febre e dor horrivel,BENEFICIARIO,presencial,2,SOLICITADO,OUTRO,5,urgencia
+preciso atendiemento urgente,BENEFICIARIO,whatsapp,2,ABERTO,OUTRO,5,urgencia
+meu filho ta em desespero,BENEFICIARIO,whatsapp,2,ABERTO,MULHER_APOLONIA,4,urgencia
+e grave precisa de ajuda rapido,BENEFICIARIO,presencial,2,ABERTO,CRIANCA_ADOLESCENTE,4,urgencia
+minha menina ta sofrendo muito,BENEFICIARIO,telefone,2,ABERTO,CRIANCA_ADOLESCENTE,5,urgencia
+Dente torto sangrado urgente,BENEFICIARIO,presencial,2,SOLICITADO,OUTRO,4,urgencia
+ta muito grave nao aguenta mais,BENEFICIARIO,presencial,1,ABERTO,OUTRO,4,urgencia
+crianca com abscesso pedindo ajuda,BENEFICIARIO,whatsapp,2,ABERTO,CRIANCA_ADOLESCENTE,4,urgencia
+meu filho ta mal precisa urgente,BENEFICIARIO,whatsapp,2,SOLICITADO,CRIANCA_ADOLESCENTE,5,urgencia
+nao dorme de dor ha dois dias,BENEFICIARIO,telefone,2,SOLICITADO,OUTRO,4,urgencia
+Crianca com sangramento urgente,BENEFICIARIO,whatsapp,1,SOLICITADO,MULHER_APOLONIA,5,urgencia
+bochecha inchada feve muito urgente,BENEFICIARIO,whatsapp,1,SOLICITADO,OUTRO,5,urgencia
+socorro ela ta chorando la em casa,BENEFICIARIO,email,2,SOLICITADO,CRIANCA_ADOLESCENTE,4,urgencia
+nao consigo parar o sangramneto,BENEFICIARIO,whatsapp,2,SOLICITADO,MULHER_APOLONIA,4,urgencia
+preciso hoje senao fica pior,BENEFICIARIO,telefone,2,SOLICITADO,MULHER_APOLONIA,4,urgencia
+minha filha ta em colapso de dor,BENEFICIARIO,whatsapp,1,SOLICITADO,OUTRO,5,urgencia
+dente quebrado acidente agora a pouco,BENEFICIARIO,whatsapp,2,ABERTO,MULHER_APOLONIA,4,urgencia
+e crianca de 3 anos com dor forte,BENEFICIARIO,whatsapp,1,ABERTO,CRIANCA_ADOLESCENTE,4,urgencia
+ela ta com pus na gengiva socorro,BENEFICIARIO,presencial,2,SOLICITADO,OUTRO,4,urgencia
+nao consigo nem dar agua de tanta dor,BENEFICIARIO,presencial,1,ABERTO,CRIANCA_ADOLESCENTE,4,urgencia
+Infeccao boca crianca urgentissimo,BENEFICIARIO,telefone,2,SOLICITADO,MULHER_APOLONIA,5,urgencia
+meu filho caiu bateu os dente ta sangrando,BENEFICIARIO,whatsapp,1,ABERTO,CRIANCA_ADOLESCENTE,5,urgencia
+dor desde ontem crianca ta piorando,BENEFICIARIO,email,2,ABERTO,MULHER_APOLONIA,4,urgencia
+preciso atendimento emergencia hoje,BENEFICIARIO,presencial,2,ABERTO,OUTRO,5,urgencia
+crianca nao consegue comer de dor,BENEFICIARIO,email,1,SOLICITADO,MULHER_APOLONIA,4,urgencia
+ta com febre alta e a boca inchada,BENEFICIARIO,email,1,SOLICITADO,CRIANCA_ADOLESCENTE,5,urgencia
+e urgente preciso de dentista agora,BENEFICIARIO,whatsapp,2,ABERTO,MULHER_APOLONIA,5,urgencia
+nao sei o q fazer ta com muita dor,BENEFICIARIO,email,2,SOLICITADO,MULHER_APOLONIA,5,urgencia
+Sangramento e dor muita urgente,BENEFICIARIO,email,2,ABERTO,OUTRO,5,urgencia
+minha filha esta piorando rapido,BENEFICIARIO,telefone,2,SOLICITADO,CRIANCA_ADOLESCENTE,5,urgencia
+situacao critica precisamos de ajuda,BENEFICIARIO,presencial,1,ABERTO,CRIANCA_ADOLESCENTE,4,urgencia
+meu filho ta muito mal com dor,BENEFICIARIO,presencial,1,ABERTO,MULHER_APOLONIA,4,urgencia
+preciso de socorro hoje mesmo,BENEFICIARIO,telefone,2,SOLICITADO,MULHER_APOLONIA,4,urgencia
+ela ta com febre e dor muito forte,BENEFICIARIO,presencial,2,ABERTO,OUTRO,5,urgencia
+crianca em colapso de dor socorro,BENEFICIARIO,email,1,SOLICITADO,OUTRO,4,urgencia
+urgente preciso agora,BENEFICIARIO,whatsapp,2,ABERTO,OUTRO,4,urgencia
+dente sangando sem parar,BENEFICIARIO,email,2,SOLICITADO,MULHER_APOLONIA,5,urgencia
+meu filho nao para de chorar,BENEFICIARIO,presencial,2,ABERTO,CRIANCA_ADOLESCENTE,4,urgencia
+infeccao no dente e febre,BENEFICIARIO,whatsapp,2,ABERTO,OUTRO,4,urgencia
+e urgente por favor,BENEFICIARIO,whatsapp,2,SOLICITADO,MULHER_APOLONIA,4,urgencia
+bochecha inchada nao consigo dormir,BENEFICIARIO,presencial,1,SOLICITADO,MULHER_APOLONIA,5,urgencia
+crianca chorando de dor ha horas,BENEFICIARIO,presencial,1,SOLICITADO,CRIANCA_ADOLESCENTE,4,urgencia
+preciso de medico urgente bucal,BENEFICIARIO,telefone,1,ABERTO,MULHER_APOLONIA,5,urgencia
+situacao piorou muito preciso de ajuda,BENEFICIARIO,whatsapp,2,SOLICITADO,CRIANCA_ADOLESCENTE,4,urgencia
+sangramento e pus na gengiva urgente,BENEFICIARIO,email,2,ABERTO,MULHER_APOLONIA,4,urgencia
+dente quebrado e sangrando muito,BENEFICIARIO,telefone,1,SOLICITADO,MULHER_APOLONIA,5,urgencia
+crianca com dor intensa no ouvido e dente,BENEFICIARIO,presencial,2,ABERTO,OUTRO,5,urgencia
+preciso de atendimento hoje sem falta,BENEFICIARIO,whatsapp,1,ABERTO,CRIANCA_ADOLESCENTE,4,urgencia
+situacao critica com abscesso,BENEFICIARIO,presencial,1,ABERTO,MULHER_APOLONIA,5,urgencia
+nao consigo nem comer de dor,BENEFICIARIO,whatsapp,2,SOLICITADO,OUTRO,4,urgencia
+Urgente crianca bateu dente e sangrou,BENEFICIARIO,email,1,ABERTO,CRIANCA_ADOLESCENTE,4,urgencia
+socorro a bochecha inchada feio,BENEFICIARIO,telefone,1,ABERTO,CRIANCA_ADOLESCENTE,5,urgencia
+meu filho ta com pus e febre ha 2 dias,BENEFICIARIO,telefone,1,ABERTO,OUTRO,4,urgencia
+crianca com dor insuportavel socorro,BENEFICIARIO,email,2,ABERTO,MULHER_APOLONIA,4,urgencia
+preciso de ajuda nao aguenta mais,BENEFICIARIO,presencial,1,SOLICITADO,CRIANCA_ADOLESCENTE,4,urgencia
+dente infeccionado situacao grave,BENEFICIARIO,email,2,ABERTO,MULHER_APOLONIA,4,urgencia
+ela nao come nao dorme de dor,BENEFICIARIO,email,2,ABERTO,OUTRO,5,urgencia
+socorro minha crianca ta muito mal,BENEFICIARIO,telefone,1,ABERTO,CRIANCA_ADOLESCENTE,4,urgencia
+urgente precisamos hoje mesmo,BENEFICIARIO,email,1,ABERTO,MULHER_APOLONIA,5,urgencia
+dor muito forte crianca nao consola,BENEFICIARIO,presencial,1,ABERTO,CRIANCA_ADOLESCENTE,5,urgencia
+rosto inchado febre e dor e urgente,BENEFICIARIO,whatsapp,2,ABERTO,OUTRO,4,urgencia
+crianca caiu bateu os dentes urgente,BENEFICIARIO,telefone,2,SOLICITADO,OUTRO,4,urgencia
+nao aguenta a dor precisa de socorro,BENEFICIARIO,whatsapp,2,ABERTO,OUTRO,4,urgencia
+inflamacao grave na boca crianca,BENEFICIARIO,telefone,2,SOLICITADO,CRIANCA_ADOLESCENTE,4,urgencia
+crianca com trauma dental urgente,BENEFICIARIO,email,2,ABERTO,MULHER_APOLONIA,5,urgencia
+preciso de atendimento nao pode esperar,BENEFICIARIO,telefone,2,SOLICITADO,CRIANCA_ADOLESCENTE,4,urgencia
+minha filha ta com a boca sangrando,BENEFICIARIO,presencial,1,SOLICITADO,OUTRO,5,urgencia
+e critica a situacao dela socorro,BENEFICIARIO,telefone,2,SOLICITADO,MULHER_APOLONIA,4,urgencia
+urgentissimo nao sei o q fazer,BENEFICIARIO,telefone,2,SOLICITADO,OUTRO,4,urgencia
+crianca com calafrio e dor no dente,BENEFICIARIO,whatsapp,1,ABERTO,OUTRO,5,urgencia
+o inchaço ta se espalhando preciso de ajuda,BENEFICIARIO,telefone,2,ABERTO,CRIANCA_ADOLESCENTE,5,urgencia
+ela ta em desespero de dor socorro,BENEFICIARIO,email,1,SOLICITADO,MULHER_APOLONIA,5,urgencia
+emergencia dental crianca 5 anos,BENEFICIARIO,telefone,2,ABERTO,CRIANCA_ADOLESCENTE,4,urgencia
+nao pode esperar e muito grave,BENEFICIARIO,whatsapp,2,SOLICITADO,OUTRO,4,urgencia
+boca sangrando muito nao sei o q fazer,BENEFICIARIO,whatsapp,1,SOLICITADO,CRIANCA_ADOLESCENTE,5,urgencia
+pus no dente crianca precisa urgente,BENEFICIARIO,whatsapp,1,ABERTO,CRIANCA_ADOLESCENTE,5,urgencia
+ela ta com febre alta desde ontem,BENEFICIARIO,email,2,ABERTO,CRIANCA_ADOLESCENTE,5,urgencia
+crianca recusando comer beber de dor,BENEFICIARIO,presencial,1,ABERTO,MULHER_APOLONIA,4,urgencia
+preciso urgente consulta emergencial,BENEFICIARIO,whatsapp,2,ABERTO,OUTRO,5,urgencia
+meu filho ta com o rosto muito inchado,BENEFICIARIO,telefone,2,SOLICITADO,MULHER_APOLONIA,4,urgencia
+crianca com dor nas costas e no dente,BENEFICIARIO,telefone,2,ABERTO,CRIANCA_ADOLESCENTE,4,urgencia
+nao consegue abrir a boca de dor,BENEFICIARIO,whatsapp,1,SOLICITADO,MULHER_APOLONIA,5,urgencia
+socorro e muito urgente mesmo,BENEFICIARIO,email,1,ABERTO,OUTRO,4,urgencia
+ela ta chorando desde madrugada,BENEFICIARIO,email,1,SOLICITADO,OUTRO,4,urgencia
+dente infeccionado crianca pequena urgente,BENEFICIARIO,email,2,ABERTO,MULHER_APOLONIA,4,urgencia
+crianca vomitou de tanta dor,BENEFICIARIO,email,1,SOLICITADO,CRIANCA_ADOLESCENTE,5,urgencia
+preciso do dentista hoje mesmo urgente,BENEFICIARIO,telefone,1,ABERTO,MULHER_APOLONIA,5,urgencia
+Urgente situacao piorou na ultima hora,BENEFICIARIO,presencial,1,SOLICITADO,OUTRO,5,urgencia
+meu filho ta com a gengiva com pus,BENEFICIARIO,whatsapp,1,ABERTO,MULHER_APOLONIA,5,urgencia
+socoro crianca ta passando mal,BENEFICIARIO,whatsapp,1,SOLICITADO,OUTRO,4,urgencia
+dor horrivel desde sexta socorro,BENEFICIARIO,telefone,1,ABERTO,MULHER_APOLONIA,4,urgencia
+crianca com trauma nos dentes urgente,BENEFICIARIO,whatsapp,1,ABERTO,OUTRO,5,urgencia
+nao para de sangrar desde hoje cedo,BENEFICIARIO,whatsapp,1,ABERTO,MULHER_APOLONIA,5,urgencia
+e grave demais preciso de socorro hj,BENEFICIARIO,telefone,2,ABERTO,OUTRO,5,urgencia
+preciso urgente e e crianca pequena,BENEFICIARIO,whatsapp,1,ABERTO,MULHER_APOLONIA,4,urgencia
+dor intensa meu filho ta em pânico,BENEFICIARIO,whatsapp,2,ABERTO,CRIANCA_ADOLESCENTE,5,urgencia
+crianca pequena com dente infeccionado,BENEFICIARIO,telefone,1,ABERTO,CRIANCA_ADOLESCENTE,4,urgencia
+socorro dente ta caindo e sangrando,BENEFICIARIO,email,2,SOLICITADO,CRIANCA_ADOLESCENTE,4,urgencia
+precisamos de ajuda nao pode esperar,BENEFICIARIO,whatsapp,1,ABERTO,OUTRO,4,urgencia
+minha filha nao dorme ha 2 noites,BENEFICIARIO,telefone,2,ABERTO,CRIANCA_ADOLESCENTE,4,urgencia
+urgente bochecha inchada crianca,BENEFICIARIO,email,1,SOLICITADO,MULHER_APOLONIA,4,urgencia
+dor fortissima preciso agora mesmo,BENEFICIARIO,telefone,1,SOLICITADO,OUTRO,5,urgencia
+socorram minha crianca ta muito mal,BENEFICIARIO,email,2,ABERTO,MULHER_APOLONIA,5,urgencia
+e critica precisa de ajuda hj,BENEFICIARIO,whatsapp,1,SOLICITADO,OUTRO,4,urgencia
+Crianca com abscesso urgente socorro,BENEFICIARIO,telefone,2,ABERTO,CRIANCA_ADOLESCENTE,4,urgencia
+dor desde a madrugada nao para,BENEFICIARIO,presencial,1,ABERTO,CRIANCA_ADOLESCENTE,4,urgencia
+meu filho ta com febre e dor juntos,BENEFICIARIO,telefone,2,SOLICITADO,CRIANCA_ADOLESCENTE,5,urgencia
+urgentissimo crianca precisa de socorro,BENEFICIARIO,presencial,2,ABERTO,OUTRO,5,urgencia
+nao para de chorar de dor desde ontem,BENEFICIARIO,presencial,1,ABERTO,MULHER_APOLONIA,4,urgencia
+inchaço enorme no rosto e febre alta,BENEFICIARIO,presencial,1,SOLICITADO,OUTRO,5,urgencia
+crianca em crise de dor agora,BENEFICIARIO,presencial,2,ABERTO,CRIANCA_ADOLESCENTE,4,urgencia
+e emergencia bucal crianca,BENEFICIARIO,presencial,1,SOLICITADO,OUTRO,4,urgencia
+preciso de dentista urgente hoje,BENEFICIARIO,email,2,ABERTO,OUTRO,4,urgencia
+sangramento bucal que nao cessa,BENEFICIARIO,email,2,SOLICITADO,CRIANCA_ADOLESCENTE,4,urgencia
+meu filho ta com dor fortissima socorro,BENEFICIARIO,presencial,2,ABERTO,OUTRO,4,urgencia
+Urgente nao aguenta de dor,BENEFICIARIO,telefone,2,ABERTO,MULHER_APOLONIA,4,urgencia
+crianca com inflamacao no rosto urgente,BENEFICIARIO,whatsapp,1,SOLICITADO,MULHER_APOLONIA,4,urgencia
+dente fraturado urgente crianca,BENEFICIARIO,email,2,ABERTO,CRIANCA_ADOLESCENTE,5,urgencia
+crianca com calafrio e abscesso bucal,BENEFICIARIO,email,2,ABERTO,OUTRO,5,urgencia
+preciso de socorro urgente agora mesmo,BENEFICIARIO,whatsapp,1,SOLICITADO,MULHER_APOLONIA,4,urgencia
+e grave e crianca de 4 anos,BENEFICIARIO,telefone,2,ABERTO,CRIANCA_ADOLESCENTE,5,urgencia
+sangrou muito e nao parou ainda,BENEFICIARIO,email,1,ABERTO,OUTRO,5,urgencia
+minha filha ta desidratada de tanto choro,BENEFICIARIO,telefone,1,SOLICITADO,MULHER_APOLONIA,4,urgencia
+urgente crianca com pus e febre,BENEFICIARIO,presencial,2,ABERTO,MULHER_APOLONIA,4,urgencia
+a dor piorou muito nas ultimas horas,BENEFICIARIO,email,1,ABERTO,MULHER_APOLONIA,5,urgencia
+crianca com trauma dental socorro,BENEFICIARIO,whatsapp,2,ABERTO,MULHER_APOLONIA,5,urgencia
+meu filho ta sem conseguir falar direito,BENEFICIARIO,email,1,SOLICITADO,MULHER_APOLONIA,4,urgencia
+ela nao quer nem tomar agua de dor,BENEFICIARIO,whatsapp,2,SOLICITADO,CRIANCA_ADOLESCENTE,4,urgencia
+precisa de atendimento emergencial hoje,BENEFICIARIO,telefone,1,SOLICITADO,OUTRO,4,urgencia
+urgente situacao que nao pode esperar,BENEFICIARIO,telefone,2,SOLICITADO,CRIANCA_ADOLESCENTE,4,urgencia
+inchaço espalhando no pescoco urgente,BENEFICIARIO,presencial,2,SOLICITADO,MULHER_APOLONIA,5,urgencia
+crianca nao come beber nem dormir de dor,BENEFICIARIO,email,2,ABERTO,OUTRO,4,urgencia
+socorro e critica a situacao,BENEFICIARIO,telefone,1,ABERTO,MULHER_APOLONIA,5,urgencia
+dente quebrado sangrando crianca precisa ajuda,BENEFICIARIO,telefone,1,SOLICITADO,OUTRO,5,urgencia
+crianca com calafrio dor febre e pus,BENEFICIARIO,telefone,1,SOLICITADO,MULHER_APOLONIA,4,urgencia
+precisa de socorro imediato nao aguenta,BENEFICIARIO,email,2,ABERTO,MULHER_APOLONIA,4,urgencia
+e urgente o inchaço ta crescendo,BENEFICIARIO,telefone,2,ABERTO,CRIANCA_ADOLESCENTE,5,urgencia
+dente infectado crianca urgentissimo,BENEFICIARIO,presencial,2,ABERTO,OUTRO,5,urgencia
+socorro e muito grave precisa hoje,BENEFICIARIO,telefone,2,SOLICITADO,CRIANCA_ADOLESCENTE,5,urgencia
+meu filho ta com a bochecha piorando,BENEFICIARIO,whatsapp,1,SOLICITADO,CRIANCA_ADOLESCENTE,5,urgencia
+crianca ta em sofrimento intenso socorro,BENEFICIARIO,whatsapp,1,ABERTO,MULHER_APOLONIA,4,urgencia
+preciso do dentista agora nao pode esperar,BENEFICIARIO,presencial,1,ABERTO,MULHER_APOLONIA,5,urgencia
+urgente ela ta com muita febre e dor,BENEFICIARIO,email,2,ABERTO,CRIANCA_ADOLESCENTE,5,urgencia
+socorro crianca com infeccao bucal agora,BENEFICIARIO,whatsapp,1,ABERTO,OUTRO,4,urgencia
+dor insuportavel preciso de ajuda hoje,BENEFICIARIO,whatsapp,2,ABERTO,CRIANCA_ADOLESCENTE,5,urgencia
+urgente inflamacao no pescoco crianca,BENEFICIARIO,presencial,1,ABERTO,MULHER_APOLONIA,5,urgencia
+minha filha ta chorando sem parar de dor,BENEFICIARIO,presencial,2,SOLICITADO,MULHER_APOLONIA,4,urgencia
+crianca com trauma e sangramento urgente,BENEFICIARIO,email,2,ABERTO,MULHER_APOLONIA,5,urgencia
+e urgente crianca nao aguenta mais,BENEFICIARIO,telefone,2,ABERTO,CRIANCA_ADOLESCENTE,4,urgencia
+ela ta com febre alta e inchaço agora,BENEFICIARIO,whatsapp,2,ABERTO,OUTRO,5,urgencia
+crianca ta inconsolavel de tanta dor,BENEFICIARIO,whatsapp,1,ABERTO,OUTRO,5,urgencia
+urgente dente de leite infeccionado crianca,BENEFICIARIO,telefone,2,SOLICITADO,CRIANCA_ADOLESCENTE,4,urgencia
+preciso de atendimento imediato agora,BENEFICIARIO,whatsapp,1,SOLICITADO,MULHER_APOLONIA,5,urgencia
+meu filho ta com o rosto muito ruim,BENEFICIARIO,whatsapp,2,ABERTO,CRIANCA_ADOLESCENTE,4,urgencia
+situacao piorando rapido urgente socorro,BENEFICIARIO,telefone,1,SOLICITADO,OUTRO,5,urgencia
+crianca com sangramento que nao cessa,BENEFICIARIO,telefone,1,ABERTO,MULHER_APOLONIA,4,urgencia
+ela ta em desespero preciso de ajuda,BENEFICIARIO,telefone,2,SOLICITADO,OUTRO,4,urgencia
+dente exposto e sangrando urgente hoje,BENEFICIARIO,email,1,SOLICITADO,MULHER_APOLONIA,4,urgencia
+preciso de consulta emergencial sem falta,BENEFICIARIO,telefone,2,SOLICITADO,MULHER_APOLONIA,5,urgencia
+crianca vomitando de dor no dente,BENEFICIARIO,telefone,2,SOLICITADO,MULHER_APOLONIA,4,urgencia
+urgentissimo inchaço no rosto crianca,BENEFICIARIO,telefone,2,ABERTO,OUTRO,4,urgencia
+precisa atendimento imediato nao pode esperar,BENEFICIARIO,presencial,2,ABERTO,MULHER_APOLONIA,5,urgencia
+meu filho ta com o pescoço inchado urgente,BENEFICIARIO,whatsapp,1,SOLICITADO,OUTRO,5,urgencia
+crianca com abscessos urgente socorro,BENEFICIARIO,presencial,1,SOLICITADO,MULHER_APOLONIA,4,urgencia
+febre alta e inchaço bucal urgentissimo,BENEFICIARIO,whatsapp,1,SOLICITADO,OUTRO,4,urgencia
+minha filha ta em choque de dor,BENEFICIARIO,telefone,1,SOLICITADO,CRIANCA_ADOLESCENTE,5,urgencia
+ta com mta dor,BENEFICIARIO,whatsapp,1,SOLICITADO,OUTRO,4,urgencia
+socorro,BENEFICIARIO,email,1,SOLICITADO,OUTRO,4,urgencia
+dor demais ajuda,BENEFICIARIO,presencial,2,SOLICITADO,MULHER_APOLONIA,5,urgencia
+preciso agora,BENEFICIARIO,telefone,1,ABERTO,MULHER_APOLONIA,5,urgencia
+urgente!!,BENEFICIARIO,telefone,2,SOLICITADO,OUTRO,5,urgencia
+criança com dor forte,BENEFICIARIO,whatsapp,1,SOLICITADO,MULHER_APOLONIA,5,urgencia
+nao aguento a dor,BENEFICIARIO,telefone,1,ABERTO,MULHER_APOLONIA,5,urgencia
+minha filha ta choraando mto precisa de consulta hj,BENEFICIARIO,presencial,2,ABERTO,CRIANCA_ADOLESCENTE,4,urgencia
+dor insuportavel nao tenho mais como aguentar socorro,BENEFICIARIO,telefone,2,SOLICITADO,MULHER_APOLONIA,4,urgencia
+meu filho n para de chora de dor desde ontem to desesperada,BENEFICIARIO,whatsapp,2,SOLICITADO,CRIANCA_ADOLESCENTE,5,urgencia
+inchaço na gengiva ta enorme e com febre precisa urgente,BENEFICIARIO,whatsapp,1,ABERTO,MULHER_APOLONIA,5,urgencia
+ta muito mal precisamo de ajuda rapido pf,BENEFICIARIO,whatsapp,2,ABERTO,OUTRO,4,urgencia
+vc pode me atende hj?? ta com muita dor,BENEFICIARIO,telefone,2,ABERTO,OUTRO,5,urgencia
+criança com febre e dor dente muito ruim,BENEFICIARIO,whatsapp,1,SOLICITADO,OUTRO,5,urgencia
+preciso de consulta de emergencia hj,BENEFICIARIO,email,1,ABERTO,CRIANCA_ADOLESCENTE,4,urgencia
+nao to conseguindo comer de tanta dor,BENEFICIARIO,telefone,2,SOLICITADO,CRIANCA_ADOLESCENTE,4,urgencia
+minha mae ta com dor fortissima precisa de ajuda urgente,BENEFICIARIO,telefone,2,SOLICITADO,OUTRO,5,urgencia
+abcesso dentario preciso de atendimento hoje,BENEFICIARIO,whatsapp,2,SOLICITADO,MULHER_APOLONIA,4,urgencia
+tem algum dentista disponível agora ta muito mal,BENEFICIARIO,email,2,ABERTO,CRIANCA_ADOLESCENTE,4,urgencia
+dor de dente 3 dias to no limite me ajuda,BENEFICIARIO,whatsapp,1,ABERTO,MULHER_APOLONIA,4,urgencia
+filho gritando de dor preciso de alguem agora,BENEFICIARIO,whatsapp,1,ABERTO,MULHER_APOLONIA,4,urgencia
+Confirmo minha consulta para amanhã às 14h,VOLUNTARIO,whatsapp,4,ENCERRADO,CRIANCA_ADOLESCENTE,3,informativo
+"Preciso remarcar minha consulta do dia 15, por favor",VOLUNTARIO,telefone,4,ABERTO,OUTRO,2,informativo
+Gostaria de saber o horário de funcionamento de vocês,BENEFICIARIO,whatsapp,3,ABERTO,OUTRO,1,informativo
+Quais documentos preciso levar para o primeiro atendimento,VOLUNTARIO,email,4,ENCERRADO,OUTRO,1,informativo
+"Minha filha já foi atendida, obrigada, estamos bem",BENEFICIARIO,telefone,4,ABERTO,MULHER_APOLONIA,1,informativo
+Confirmo presença no atendimento de quarta-feira,VOLUNTARIO,presencial,4,EM_ATENDIMENTO,MULHER_APOLONIA,2,informativo
+Quero cancelar o agendamento da próxima semana,BENEFICIARIO,email,3,EM_ATENDIMENTO,OUTRO,2,informativo
+Gostaria de saber se vocês atendem crianças menores de 2 anos,BENEFICIARIO,email,4,EM_ATENDIMENTO,OUTRO,3,informativo
+Recebi o contato de vocês por indicação de uma amiga,VOLUNTARIO,email,3,EM_ATENDIMENTO,OUTRO,2,informativo
+Estou enviando os documentos solicitados na última consulta,BENEFICIARIO,telefone,3,EM_ATENDIMENTO,OUTRO,3,informativo
+Apenas informando que chegamos ao endereço indicado,VOLUNTARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,informativo
+Quero confirmar o endereço do atendimento presencial,BENEFICIARIO,whatsapp,4,ABERTO,OUTRO,3,informativo
+Vou precisar remarcar para a semana que vem,VOLUNTARIO,presencial,3,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,1,informativo
+Pode confirmar se meu caso foi recebido pelo sistema,VOLUNTARIO,email,3,ABERTO,MULHER_APOLONIA,1,informativo
+Enviando retorno sobre o tratamento iniciado na semana passada,VOLUNTARIO,whatsapp,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,informativo
+Gostaria de atualizar meu número de telefone no cadastro,BENEFICIARIO,presencial,3,ABERTO,OUTRO,2,informativo
+Preciso saber se posso levar o irmão mais novo também,BENEFICIARIO,telefone,3,ABERTO,MULHER_APOLONIA,1,informativo
+Informando que a consulta de hoje foi realizada com sucesso,BENEFICIARIO,telefone,4,ABERTO,OUTRO,1,informativo
+Quero saber se já tem vaga disponível para este mês,BENEFICIARIO,whatsapp,4,ABERTO,OUTRO,1,informativo
+Estou enviando foto do dente conforme solicitado pelo dentista,BENEFICIARIO,whatsapp,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,informativo
+"Meu filho já tomou o remédio indicado, está melhorando",BENEFICIARIO,presencial,4,ABERTO,MULHER_APOLONIA,1,informativo
+Apenas avisando que vamos chegar 20 minutos atrasados,VOLUNTARIO,presencial,3,ABERTO,CRIANCA_ADOLESCENTE,2,informativo
+Pode me passar o nome do dentista que vai me atender,VOLUNTARIO,whatsapp,3,ENCERRADO,MULHER_APOLONIA,1,informativo
+Confirmo que recebi o email com as instruções,BENEFICIARIO,email,3,ENCERRADO,OUTRO,2,informativo
+Gostaria de saber sobre o acompanhamento após o tratamento,BENEFICIARIO,whatsapp,3,ENCERRADO,OUTRO,1,informativo
+Preciso de um declaração de atendimento para a escola,VOLUNTARIO,email,3,EM_ATENDIMENTO,OUTRO,2,informativo
+"Informando que meu telefone mudou, o novo é outro número",VOLUNTARIO,presencial,4,EM_ATENDIMENTO,OUTRO,1,informativo
+Pode me informar quanto tempo dura a consulta inicial,VOLUNTARIO,presencial,3,ABERTO,CRIANCA_ADOLESCENTE,1,informativo
+Quero saber se vocês atendem no período da tarde,VOLUNTARIO,email,3,ABERTO,MULHER_APOLONIA,3,informativo
+Estou confirmando os dados do cadastro que vocês me pediram,VOLUNTARIO,presencial,3,ENCERRADO,MULHER_APOLONIA,1,informativo
+"Recebi a confirmação da consulta, estarei presente",BENEFICIARIO,telefone,3,EM_ATENDIMENTO,MULHER_APOLONIA,3,informativo
+Preciso de informação sobre como funciona o tratamento completo,BENEFICIARIO,email,4,ENCERRADO,OUTRO,2,informativo
+Vou levar a carteirinha de saúde conforme solicitado,BENEFICIARIO,telefone,4,ENCERRADO,MULHER_APOLONIA,3,informativo
+Gostaria de saber se o atendimento é gratuito mesmo,VOLUNTARIO,email,4,ABERTO,CRIANCA_ADOLESCENTE,3,informativo
+Tenho dúvida sobre quantas consultas são necessárias,VOLUNTARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,informativo
+Pode me indicar o ponto de ônibus mais próximo do local,VOLUNTARIO,email,3,ABERTO,MULHER_APOLONIA,3,informativo
+Quero atualizar o email de contato no meu cadastro,VOLUNTARIO,email,4,ABERTO,OUTRO,1,informativo
+Recebi a ligação de vocês e estou retornando o contato,BENEFICIARIO,presencial,4,ABERTO,OUTRO,3,informativo
+Enviando os exames pedidos pelo dentista na última visita,VOLUNTARIO,whatsapp,3,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,2,informativo
+Preciso saber se é necessário estar em jejum para a consulta,BENEFICIARIO,presencial,3,ENCERRADO,OUTRO,1,informativo
+Informando que o tratamento foi concluído com sucesso,VOLUNTARIO,email,4,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,1,informativo
+Vou precisar de uma segunda via da declaração de atendimento,VOLUNTARIO,email,4,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,1,informativo
+Pode confirmar se o whatsapp é o canal correto para enviar documentos,BENEFICIARIO,email,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,informativo
+Estou aguardando o retorno sobre meu agendamento,BENEFICIARIO,email,4,EM_ATENDIMENTO,MULHER_APOLONIA,3,informativo
 Preciso de informação sobre o protocolo de atendimento de vocês,BENEFICIARIO,presencial,3,EM_ATENDIMENTO,MULHER_APOLONIA,2,informativo
-Apenas atualizando que minha filha está se recuperando bem,VOLUNTARIO,telefone,4,ABERTO,CRIANCA_ADOLESCENTE,3,informativo
-Gostaria de saber se aceita plano de saúde ou apenas SUS,BENEFICIARIO,email,4,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,2,informativo
-Confirmo que estarei no endereço correto na hora marcada,BENEFICIARIO,telefone,4,ABERTO,OUTRO,3,informativo
-Preciso de orientações sobre cuidados pós-consulta,BENEFICIARIO,email,4,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,3,informativo
-Estou retornando o contato conforme combinado anteriormente,VOLUNTARIO,presencial,4,ABERTO,MULHER_APOLONIA,1,informativo
+Apenas atualizando que minha filha está se recuperando bem,VOLUNTARIO,telefone,4,ENCERRADO,MULHER_APOLONIA,2,informativo
+Gostaria de saber se aceita plano de saúde ou apenas SUS,VOLUNTARIO,whatsapp,4,EM_ATENDIMENTO,MULHER_APOLONIA,1,informativo
+Confirmo que estarei no endereço correto na hora marcada,BENEFICIARIO,telefone,4,ENCERRADO,MULHER_APOLONIA,1,informativo
+Preciso de orientações sobre cuidados pós-consulta,BENEFICIARIO,email,3,ABERTO,MULHER_APOLONIA,2,informativo
+Estou retornando o contato conforme combinado anteriormente,BENEFICIARIO,telefone,4,ENCERRADO,MULHER_APOLONIA,2,informativo
+Confirmo minha consulta para amanhã às 14h,BENEFICIARIO,whatsapp,3,ENCERRADO,OUTRO,3,informativo
+"Preciso remarcar minha consulta do dia 15, por favor",VOLUNTARIO,presencial,4,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,1,informativo
+Gostaria de saber o horário de funcionamento de vocês,VOLUNTARIO,presencial,3,ABERTO,OUTRO,2,informativo
+Quais documentos preciso levar para o primeiro atendimento,VOLUNTARIO,whatsapp,3,ENCERRADO,OUTRO,1,informativo
+"Minha filha já foi atendida, obrigada, estamos bem",VOLUNTARIO,presencial,4,EM_ATENDIMENTO,MULHER_APOLONIA,1,informativo
+Confirmo presença no atendimento de quarta-feira,VOLUNTARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,3,informativo
+Quero cancelar o agendamento da próxima semana,VOLUNTARIO,whatsapp,4,EM_ATENDIMENTO,MULHER_APOLONIA,3,informativo
+Gostaria de saber se vocês atendem crianças menores de 2 anos,BENEFICIARIO,email,3,EM_ATENDIMENTO,OUTRO,3,informativo
+Recebi o contato de vocês por indicação de uma amiga,BENEFICIARIO,telefone,3,ABERTO,MULHER_APOLONIA,3,informativo
+Estou enviando os documentos solicitados na última consulta,BENEFICIARIO,telefone,3,ENCERRADO,OUTRO,1,informativo
+Apenas informando que chegamos ao endereço indicado,BENEFICIARIO,whatsapp,3,ENCERRADO,OUTRO,1,informativo
+Quero confirmar o endereço do atendimento presencial,BENEFICIARIO,email,3,EM_ATENDIMENTO,OUTRO,1,informativo
+Vou precisar remarcar para a semana que vem,BENEFICIARIO,email,4,ENCERRADO,MULHER_APOLONIA,2,informativo
+Pode confirmar se meu caso foi recebido pelo sistema,BENEFICIARIO,presencial,4,ENCERRADO,OUTRO,3,informativo
+Enviando retorno sobre o tratamento iniciado na semana passada,VOLUNTARIO,telefone,3,ABERTO,CRIANCA_ADOLESCENTE,1,informativo
+Gostaria de atualizar meu número de telefone no cadastro,VOLUNTARIO,telefone,3,ABERTO,CRIANCA_ADOLESCENTE,3,informativo
+Preciso saber se posso levar o irmão mais novo também,BENEFICIARIO,telefone,4,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,3,informativo
+Informando que a consulta de hoje foi realizada com sucesso,BENEFICIARIO,presencial,4,ENCERRADO,OUTRO,3,informativo
+Quero saber se já tem vaga disponível para este mês,VOLUNTARIO,email,3,ABERTO,OUTRO,3,informativo
+Estou enviando foto do dente conforme solicitado pelo dentista,BENEFICIARIO,telefone,3,EM_ATENDIMENTO,MULHER_APOLONIA,1,informativo
+"Meu filho já tomou o remédio indicado, está melhorando",VOLUNTARIO,presencial,4,ABERTO,MULHER_APOLONIA,3,informativo
+Apenas avisando que vamos chegar 20 minutos atrasados,VOLUNTARIO,telefone,3,EM_ATENDIMENTO,OUTRO,3,informativo
+Pode me passar o nome do dentista que vai me atender,VOLUNTARIO,email,4,ENCERRADO,OUTRO,1,informativo
+Confirmo que recebi o email com as instruções,VOLUNTARIO,whatsapp,3,ABERTO,OUTRO,3,informativo
+Gostaria de saber sobre o acompanhamento após o tratamento,BENEFICIARIO,whatsapp,4,EM_ATENDIMENTO,MULHER_APOLONIA,3,informativo
+Preciso de um declaração de atendimento para a escola,BENEFICIARIO,presencial,3,ABERTO,OUTRO,2,informativo
+"Informando que meu telefone mudou, o novo é outro número",VOLUNTARIO,email,3,ABERTO,CRIANCA_ADOLESCENTE,2,informativo
+Pode me informar quanto tempo dura a consulta inicial,VOLUNTARIO,email,4,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,3,informativo
+Quero saber se vocês atendem no período da tarde,BENEFICIARIO,telefone,3,EM_ATENDIMENTO,MULHER_APOLONIA,2,informativo
+Estou confirmando os dados do cadastro que vocês me pediram,BENEFICIARIO,presencial,4,EM_ATENDIMENTO,MULHER_APOLONIA,1,informativo
+"Recebi a confirmação da consulta, estarei presente",BENEFICIARIO,email,3,ABERTO,MULHER_APOLONIA,2,informativo
+Preciso de informação sobre como funciona o tratamento completo,VOLUNTARIO,email,4,ENCERRADO,OUTRO,2,informativo
+Vou levar a carteirinha de saúde conforme solicitado,VOLUNTARIO,presencial,3,EM_ATENDIMENTO,MULHER_APOLONIA,1,informativo
+Gostaria de saber se o atendimento é gratuito mesmo,VOLUNTARIO,presencial,4,ENCERRADO,MULHER_APOLONIA,2,informativo
+Tenho dúvida sobre quantas consultas são necessárias,BENEFICIARIO,telefone,4,ABERTO,OUTRO,3,informativo
+Pode me indicar o ponto de ônibus mais próximo do local,VOLUNTARIO,presencial,3,ABERTO,OUTRO,3,informativo
+Quero atualizar o email de contato no meu cadastro,BENEFICIARIO,telefone,3,ABERTO,MULHER_APOLONIA,1,informativo
+Recebi a ligação de vocês e estou retornando o contato,BENEFICIARIO,telefone,3,ABERTO,OUTRO,3,informativo
+Enviando os exames pedidos pelo dentista na última visita,BENEFICIARIO,email,4,ENCERRADO,CRIANCA_ADOLESCENTE,3,informativo
+Preciso saber se é necessário estar em jejum para a consulta,VOLUNTARIO,whatsapp,3,EM_ATENDIMENTO,MULHER_APOLONIA,1,informativo
+Informando que o tratamento foi concluído com sucesso,BENEFICIARIO,email,3,EM_ATENDIMENTO,MULHER_APOLONIA,3,informativo
+Vou precisar de uma segunda via da declaração de atendimento,VOLUNTARIO,email,4,ENCERRADO,MULHER_APOLONIA,2,informativo
+Pode confirmar se o whatsapp é o canal correto para enviar documentos,VOLUNTARIO,email,4,ENCERRADO,CRIANCA_ADOLESCENTE,3,informativo
+Estou aguardando o retorno sobre meu agendamento,BENEFICIARIO,email,3,ENCERRADO,OUTRO,2,informativo
+Preciso de informação sobre o protocolo de atendimento de vocês,VOLUNTARIO,presencial,3,EM_ATENDIMENTO,MULHER_APOLONIA,3,informativo
+Apenas atualizando que minha filha está se recuperando bem,VOLUNTARIO,whatsapp,4,ABERTO,CRIANCA_ADOLESCENTE,1,informativo
+Gostaria de saber se aceita plano de saúde ou apenas SUS,VOLUNTARIO,email,4,ENCERRADO,MULHER_APOLONIA,2,informativo
+Confirmo que estarei no endereço correto na hora marcada,BENEFICIARIO,presencial,3,ENCERRADO,MULHER_APOLONIA,2,informativo
+Preciso de orientações sobre cuidados pós-consulta,BENEFICIARIO,telefone,3,EM_ATENDIMENTO,MULHER_APOLONIA,1,informativo
+Estou retornando o contato conforme combinado anteriormente,VOLUNTARIO,email,4,EM_ATENDIMENTO,OUTRO,2,informativo
+confirmo a consulta,BENEFICIARIO,whatsapp,3,ENCERRADO,OUTRO,3,informativo
+vou la amanha,VOLUNTARIO,whatsapp,3,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,2,informativo
+ok recebido obrigada,BENEFICIARIO,email,3,ABERTO,MULHER_APOLONIA,3,informativo
+tudo certo com o agendamento,VOLUNTARIO,presencial,3,ENCERRADO,MULHER_APOLONIA,3,informativo
+quais documentos levo?,BENEFICIARIO,telefone,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,informativo
+q hora e o atendimento?,VOLUNTARIO,whatsapp,4,EM_ATENDIMENTO,OUTRO,1,informativo
+qual o endereco mesmo?,VOLUNTARIO,whatsapp,4,ABERTO,OUTRO,2,informativo
+vcs atendem sabado?,BENEFICIARIO,presencial,3,ABERTO,OUTRO,2,informativo
+quero remarcar,VOLUNTARIO,telefone,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,informativo
+vou chegar atrasada uns 10 min,VOLUNTARIO,whatsapp,3,ABERTO,CRIANCA_ADOLESCENTE,1,informativo
+posso levar meu outro filho junto?,VOLUNTARIO,telefone,3,ABERTO,MULHER_APOLONIA,2,informativo
+o servico e gratuito ne?,BENEFICIARIO,email,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,informativo
+to mandando os documentos,VOLUNTARIO,telefone,4,ENCERRADO,MULHER_APOLONIA,1,informativo
+chegamos,VOLUNTARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,informativo
+receberam minha mensagem?,VOLUNTARIO,presencial,4,ABERTO,MULHER_APOLONIA,3,informativo
+ja fiz o cadastro,VOLUNTARIO,email,3,EM_ATENDIMENTO,MULHER_APOLONIA,3,informativo
+confirma meu horario por favor,VOLUNTARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,3,informativo
+qual o numero de vcs?,BENEFICIARIO,whatsapp,3,ABERTO,MULHER_APOLONIA,1,informativo
+vcs tem vaga essa semana?,BENEFICIARIO,whatsapp,3,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,2,informativo
+mandei os exames,VOLUNTARIO,telefone,3,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,1,informativo
+preciso cancelar a consulta,BENEFICIARIO,email,4,ABERTO,CRIANCA_ADOLESCENTE,1,informativo
+como funciona o atendimento?,VOLUNTARIO,presencial,3,ABERTO,OUTRO,1,informativo
+tem vaga ainda?,BENEFICIARIO,presencial,4,EM_ATENDIMENTO,OUTRO,1,informativo
+oi boa tarde quero agendar,BENEFICIARIO,email,4,ENCERRADO,MULHER_APOLONIA,3,informativo
+vcs atendem crianca de 1 ano?,BENEFICIARIO,whatsapp,3,ABERTO,CRIANCA_ADOLESCENTE,1,informativo
+estou retornando a ligacao,BENEFICIARIO,presencial,3,EM_ATENDIMENTO,MULHER_APOLONIA,2,informativo
+meu tel mudou o novo e esse aqui,BENEFICIARIO,whatsapp,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,informativo
+vou levar o cartao de saude,BENEFICIARIO,email,4,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,3,informativo
+ta tudo certo com o tratamento,BENEFICIARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,3,informativo
+preciso de declaracao de atendimento,VOLUNTARIO,telefone,3,EM_ATENDIMENTO,OUTRO,1,informativo
+posso ir de manha?,BENEFICIARIO,presencial,4,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,1,informativo
+e de graca esse servico?,VOLUNTARIO,whatsapp,4,ENCERRADO,CRIANCA_ADOLESCENTE,3,informativo
+ok estarei la,BENEFICIARIO,email,4,ABERTO,OUTRO,1,informativo
+como faz pra agendar pela primeira vez?,BENEFICIARIO,email,3,ABERTO,OUTRO,2,informativo
+qual onibus pega pra chegar?,VOLUNTARIO,whatsapp,3,EM_ATENDIMENTO,MULHER_APOLONIA,3,informativo
+quero atualizar meu email,BENEFICIARIO,telefone,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,informativo
+minha filha ta bem obrigada,VOLUNTARIO,email,3,ABERTO,CRIANCA_ADOLESCENTE,3,informativo
+recebi o email confirmo sim,VOLUNTARIO,email,4,EM_ATENDIMENTO,MULHER_APOLONIA,1,informativo
+quantas consultas sao necessarias?,BENEFICIARIO,presencial,3,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,1,informativo
+preciso de segunda via do comprovante,BENEFICIARIO,telefone,3,ABERTO,CRIANCA_ADOLESCENTE,3,informativo
+oi to aqui no local,VOLUNTARIO,telefone,4,ENCERRADO,OUTRO,3,informativo
+enviando foto do dente,BENEFICIARIO,email,3,EM_ATENDIMENTO,MULHER_APOLONIA,2,informativo
+q horario tem disponivel essa semana?,BENEFICIARIO,whatsapp,3,EM_ATENDIMENTO,MULHER_APOLONIA,1,informativo
+posso remarcar pra depois de amanha?,BENEFICIARIO,presencial,4,ABERTO,MULHER_APOLONIA,1,informativo
+vcs aceitam crianca de 18 meses?,BENEFICIARIO,presencial,3,EM_ATENDIMENTO,OUTRO,2,informativo
+qual e o canal certo pra mandar doc?,VOLUNTARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,informativo
+o atendimento e somente presencial?,VOLUNTARIO,presencial,4,ABERTO,OUTRO,2,informativo
+preciso de informacao sobre o tratamento,VOLUNTARIO,email,4,ENCERRADO,CRIANCA_ADOLESCENTE,3,informativo
+quero saber sobre o proximo passo,VOLUNTARIO,presencial,4,ENCERRADO,OUTRO,2,informativo
+Confirmo presenca amanha,BENEFICIARIO,whatsapp,3,EM_ATENDIMENTO,OUTRO,2,informativo
+vou enviar o exame em seguida,VOLUNTARIO,email,4,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,2,informativo
+o meu cadastro foi concluido?,VOLUNTARIO,presencial,4,EM_ATENDIMENTO,OUTRO,3,informativo
+to aqui no local aguardando,VOLUNTARIO,whatsapp,3,EM_ATENDIMENTO,OUTRO,1,informativo
+pode confirmar o horario de hoje?,BENEFICIARIO,telefone,4,ABERTO,CRIANCA_ADOLESCENTE,2,informativo
+vou so confirmar minha presenca,BENEFICIARIO,email,3,ENCERRADO,MULHER_APOLONIA,3,informativo
+recebi a confirmacao obrigada,VOLUNTARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,informativo
+ja enviei todos os documentos,BENEFICIARIO,email,4,ENCERRADO,MULHER_APOLONIA,1,informativo
+quero saber se posso ir sabado,BENEFICIARIO,presencial,3,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,2,informativo
+meu filho ta bem obrigada,BENEFICIARIO,whatsapp,4,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,3,informativo
+o tratamento ta andando bem,VOLUNTARIO,email,4,ENCERRADO,MULHER_APOLONIA,1,informativo
+preciso do comprovante de atendimento,BENEFICIARIO,presencial,3,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,2,informativo
+esta e minha primeira vez como vai funcionar,BENEFICIARIO,telefone,4,ENCERRADO,OUTRO,3,informativo
+Podem confirmar que receberam os docs?,VOLUNTARIO,whatsapp,4,ENCERRADO,MULHER_APOLONIA,3,informativo
+posso trazer minha vizinha junto?,VOLUNTARIO,telefone,4,EM_ATENDIMENTO,MULHER_APOLONIA,1,informativo
+vcs atendem quem mora em outro bairro?,VOLUNTARIO,whatsapp,4,ENCERRADO,OUTRO,1,informativo
+ok estarei la no horario combinado,VOLUNTARIO,whatsapp,4,ABERTO,CRIANCA_ADOLESCENTE,3,informativo
+tenho que faltar posso remarcar?,BENEFICIARIO,presencial,3,ABERTO,MULHER_APOLONIA,1,informativo
+qual e o tempo de espera normalmente?,BENEFICIARIO,whatsapp,3,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,3,informativo
+meu cadastro foi atualizado?,VOLUNTARIO,telefone,4,ENCERRADO,MULHER_APOLONIA,1,informativo
+Oi to retornando o contato,BENEFICIARIO,presencial,3,ABERTO,CRIANCA_ADOLESCENTE,2,informativo
+pode me passar o numero do dentista?,VOLUNTARIO,email,4,ABERTO,OUTRO,3,informativo
+meu filho ja tomou todos os remedios,VOLUNTARIO,whatsapp,4,ENCERRADO,MULHER_APOLONIA,3,informativo
+o atendimento pode ser feito de tarde?,BENEFICIARIO,presencial,3,ABERTO,OUTRO,2,informativo
+preciso do relatorio do atendimento,VOLUNTARIO,whatsapp,3,ABERTO,CRIANCA_ADOLESCENTE,1,informativo
+recebi o resultado pode confirmar?,BENEFICIARIO,email,4,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,3,informativo
+vou atrasar uns 15 min avisando antes,BENEFICIARIO,email,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,informativo
+posso agendar mais de uma crianca?,BENEFICIARIO,whatsapp,3,EM_ATENDIMENTO,MULHER_APOLONIA,1,informativo
+qual o nome do responsavel pelo meu caso?,BENEFICIARIO,email,3,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,2,informativo
+vcs fazem atendimento fora da cidade?,BENEFICIARIO,email,4,ENCERRADO,CRIANCA_ADOLESCENTE,3,informativo
+o retorno e automatico ou manual?,VOLUNTARIO,whatsapp,3,ABERTO,CRIANCA_ADOLESCENTE,3,informativo
+ja confirmei meu agendamento sim,BENEFICIARIO,presencial,3,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,2,informativo
+pode me dar mais detalhes do proximo passo?,VOLUNTARIO,whatsapp,3,ABERTO,MULHER_APOLONIA,2,informativo
+preciso do historico das consultas,BENEFICIARIO,whatsapp,4,EM_ATENDIMENTO,MULHER_APOLONIA,3,informativo
+posso mudar o horario dessa semana?,VOLUNTARIO,email,4,ABERTO,CRIANCA_ADOLESCENTE,2,informativo
+quando sai o resultado do exame?,VOLUNTARIO,whatsapp,3,ENCERRADO,OUTRO,3,informativo
+estou enviando o formulario preenchido,BENEFICIARIO,telefone,3,ENCERRADO,CRIANCA_ADOLESCENTE,3,informativo
+qual e o endereco exato do local?,BENEFICIARIO,presencial,4,ENCERRADO,MULHER_APOLONIA,1,informativo
+tem atendimento disponivel essa semana?,BENEFICIARIO,whatsapp,3,ENCERRADO,MULHER_APOLONIA,1,informativo
+posso ligar pra confirmar o horario?,BENEFICIARIO,presencial,4,ABERTO,MULHER_APOLONIA,2,informativo
+qual o horario de funcionamento sabado?,VOLUNTARIO,email,3,ENCERRADO,OUTRO,2,informativo
+ok recebi a confirmacao,VOLUNTARIO,presencial,3,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,2,informativo
+posso agdar com menos de 24h?,VOLUNTARIO,presencial,3,EM_ATENDIMENTO,OUTRO,3,informativo
+vou levar os exames antigos tambem,VOLUNTARIO,presencial,4,ENCERRADO,OUTRO,3,informativo
+quero saber se meu caso foi aceito,BENEFICIARIO,telefone,3,EM_ATENDIMENTO,OUTRO,3,informativo
+q documentos sao necessarios novamente?,BENEFICIARIO,email,3,ABERTO,OUTRO,2,informativo
+preciso confirmar a proxima consulta,VOLUNTARIO,email,4,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,1,informativo
+o tratamento ja encerrou ou tem mais?,BENEFICIARIO,telefone,4,EM_ATENDIMENTO,OUTRO,2,informativo
+vcs tem atendimento em julho?,BENEFICIARIO,telefone,3,EM_ATENDIMENTO,MULHER_APOLONIA,2,informativo
+precisaria de outro horario mais cedo,BENEFICIARIO,email,4,ABERTO,OUTRO,2,informativo
+enviando o laudo conforme solicitado,VOLUNTARIO,email,4,ENCERRADO,MULHER_APOLONIA,1,informativo
+ok confirmei tudo,BENEFICIARIO,email,4,EM_ATENDIMENTO,OUTRO,3,informativo
+vou chegar mais cedo ta bom?,BENEFICIARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,3,informativo
+tenho duvida sobre o retorno pos consulta,VOLUNTARIO,whatsapp,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,informativo
+pode me avisar quando tiver vaga?,VOLUNTARIO,email,3,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,2,informativo
+preciso de informacao sobre o tratamento completo,VOLUNTARIO,telefone,3,ABERTO,OUTRO,2,informativo
+vou enviar foto do dente em seguida,BENEFICIARIO,whatsapp,4,ENCERRADO,MULHER_APOLONIA,1,informativo
+recebi o horario confirmado,VOLUNTARIO,whatsapp,3,ABERTO,CRIANCA_ADOLESCENTE,3,informativo
+preciso de orientacao sobre cuidados em casa,VOLUNTARIO,telefone,3,ENCERRADO,CRIANCA_ADOLESCENTE,3,informativo
+Quero confirmar minha vaga para amanha,VOLUNTARIO,presencial,3,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,2,informativo
+ja fiz o cadastro espero o retorno,BENEFICIARIO,presencial,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,informativo
+so queria saber o que levo amanha,VOLUNTARIO,email,3,EM_ATENDIMENTO,MULHER_APOLONIA,2,informativo
+qual e a duracao media do tratamento?,BENEFICIARIO,telefone,3,ABERTO,MULHER_APOLONIA,3,informativo
+preciso de retorno sobre meu agendamento,VOLUNTARIO,presencial,4,EM_ATENDIMENTO,OUTRO,3,informativo
+minha filha vai bem no tratamento obrigada,BENEFICIARIO,whatsapp,3,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,3,informativo
+to enviando os documentos solicitados,BENEFICIARIO,whatsapp,4,EM_ATENDIMENTO,MULHER_APOLONIA,1,informativo
+posso levar a crianca sem agendamento?,VOLUNTARIO,email,4,ENCERRADO,OUTRO,1,informativo
+vcs tem vaga pra crianca especial?,BENEFICIARIO,email,3,ABERTO,OUTRO,2,informativo
+o local e de facil acesso?,VOLUNTARIO,email,3,ENCERRADO,OUTRO,3,informativo
+quero saber como e o primeiro atendimento,VOLUNTARIO,email,4,ABERTO,OUTRO,2,informativo
+posso vir com meu bebe de colo?,VOLUNTARIO,email,3,ENCERRADO,OUTRO,3,informativo
+vcs tem lista de espera?,BENEFICIARIO,presencial,3,ENCERRADO,OUTRO,3,informativo
+qual e o tempo medio de espera la?,VOLUNTARIO,telefone,4,ABERTO,MULHER_APOLONIA,3,informativo
+minha filha foi bem e mando o resultado,BENEFICIARIO,telefone,3,ABERTO,CRIANCA_ADOLESCENTE,1,informativo
+preciso saber se faço exame antes,VOLUNTARIO,presencial,4,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,3,informativo
+Confirmo minha presenca amanha cedo,VOLUNTARIO,whatsapp,4,ENCERRADO,MULHER_APOLONIA,2,informativo
+pode me dizer os documentos corretos?,BENEFICIARIO,whatsapp,4,ABERTO,CRIANCA_ADOLESCENTE,1,informativo
+o que faco se chegar atrasada?,BENEFICIARIO,telefone,4,ENCERRADO,MULHER_APOLONIA,3,informativo
+vou enviar o formulario ainda hoje,BENEFICIARIO,email,3,ABERTO,OUTRO,3,informativo
+ja atualizei o cadastro por email,VOLUNTARIO,whatsapp,4,ABERTO,MULHER_APOLONIA,3,informativo
+vcs atendem pelo sus ou particular?,VOLUNTARIO,email,4,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,2,informativo
+preciso saber o valor das consultas,VOLUNTARIO,email,3,ENCERRADO,OUTRO,2,informativo
+o que faco pra primeiro atendimento?,BENEFICIARIO,telefone,4,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,2,informativo
+confirmei a consulta pelo email,VOLUNTARIO,presencial,3,ABERTO,OUTRO,3,informativo
+recebi a instrucoes obrigada vou seguir,BENEFICIARIO,email,4,ENCERRADO,OUTRO,1,informativo
+preciso do nome completo do dentista,VOLUNTARIO,whatsapp,4,EM_ATENDIMENTO,MULHER_APOLONIA,1,informativo
+quero saber quais sao as especialidades,VOLUNTARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,informativo
+o tratamento inclui retorno?,VOLUNTARIO,presencial,3,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,2,informativo
+quero informacoes sobre o inicio do tratamento,BENEFICIARIO,email,3,ENCERRADO,OUTRO,2,informativo
+enviei os exames pelo email,VOLUNTARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,informativo
+ja fiz meu cadastro aguardo contato,BENEFICIARIO,telefone,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,informativo
+pode confirmar recebimento da foto?,BENEFICIARIO,presencial,4,EM_ATENDIMENTO,MULHER_APOLONIA,1,informativo
+preciso de orientacao sobre higiene pos tratamento,VOLUNTARIO,presencial,4,EM_ATENDIMENTO,OUTRO,1,informativo
+vou levar o cartao de vacinacao junto,BENEFICIARIO,telefone,4,ABERTO,OUTRO,3,informativo
+tenho interesse em conhecer o projeto,BENEFICIARIO,presencial,3,EM_ATENDIMENTO,OUTRO,2,informativo
+como funciona o encaminhamento?,VOLUNTARIO,telefone,3,ABERTO,OUTRO,1,informativo
+preciso de informacao para indicar um amigo,BENEFICIARIO,presencial,3,EM_ATENDIMENTO,OUTRO,2,informativo
+Poderia enviar o formulario de novo?,VOLUNTARIO,presencial,4,ENCERRADO,MULHER_APOLONIA,3,informativo
+enviando foto do local de dor conforme pedido,VOLUNTARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,3,informativo
+ok ja entendi como funciona obrigada,VOLUNTARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,informativo
+qual e o protocolo para casos especiais?,VOLUNTARIO,whatsapp,4,EM_ATENDIMENTO,MULHER_APOLONIA,2,informativo
+vou trazer a certidao de nascimento,VOLUNTARIO,email,4,ABERTO,CRIANCA_ADOLESCENTE,2,informativo
+pode me dizer qual e o canal oficial?,VOLUNTARIO,email,4,ABERTO,CRIANCA_ADOLESCENTE,1,informativo
+ja entrei no site mas nao encontrei horario,VOLUNTARIO,email,3,ABERTO,MULHER_APOLONIA,1,informativo
+vcs tem retorno digital do tratamento?,VOLUNTARIO,whatsapp,4,EM_ATENDIMENTO,OUTRO,3,informativo
+posso enviar doc por foto pelo zap?,BENEFICIARIO,presencial,4,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,2,informativo
+preciso de confirmacao do meu caso,VOLUNTARIO,presencial,3,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,2,informativo
+vou chegar cedo pra garantir o horario,VOLUNTARIO,whatsapp,4,ENCERRADO,MULHER_APOLONIA,1,informativo
+o agendamento e feito por qual canal?,BENEFICIARIO,presencial,4,EM_ATENDIMENTO,OUTRO,2,informativo
+preciso do relatorio pra escola da minha filha,BENEFICIARIO,whatsapp,4,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,3,informativo
+quero saber se precisa de indicacao,VOLUNTARIO,whatsapp,4,ABERTO,OUTRO,1,informativo
+confirmo minha presenca no proximo retorno,VOLUNTARIO,email,4,ABERTO,MULHER_APOLONIA,2,informativo
+pode me enviar o numero pra emergencia?,VOLUNTARIO,presencial,4,EM_ATENDIMENTO,MULHER_APOLONIA,1,informativo
+preciso de orientacoes gerais do servico,VOLUNTARIO,email,4,ENCERRADO,CRIANCA_ADOLESCENTE,1,informativo
+vou levar cartao do sus conforme pedido,VOLUNTARIO,whatsapp,3,EM_ATENDIMENTO,MULHER_APOLONIA,3,informativo
+quero me inscrever como beneficiaria,BENEFICIARIO,presencial,3,ENCERRADO,OUTRO,1,informativo
+posso agendar a consulta de retorno?,VOLUNTARIO,whatsapp,4,ENCERRADO,MULHER_APOLONIA,3,informativo
+qual e o periodo de funcionamento?,BENEFICIARIO,email,4,ABERTO,CRIANCA_ADOLESCENTE,3,informativo
+preciso de informacoes basicas do servico,VOLUNTARIO,whatsapp,3,EM_ATENDIMENTO,OUTRO,1,informativo
+recebi o lembrete e vou comparecer,BENEFICIARIO,email,3,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,1,informativo
+vou enviar os docs antes de amanha,BENEFICIARIO,presencial,3,ENCERRADO,MULHER_APOLONIA,3,informativo
+ja recebi o retorno obrigada,BENEFICIARIO,whatsapp,3,ENCERRADO,OUTRO,1,informativo
+quero saber sobre o processo de tratamento,VOLUNTARIO,telefone,4,EM_ATENDIMENTO,MULHER_APOLONIA,3,informativo
+confirmo presenca para a semana que vem,VOLUNTARIO,presencial,3,ENCERRADO,OUTRO,1,informativo
+qual e a duracao do tratamento completo?,BENEFICIARIO,whatsapp,4,ENCERRADO,CRIANCA_ADOLESCENTE,3,informativo
+vou trazer toda documentacao necessaria,VOLUNTARIO,email,3,ABERTO,OUTRO,1,informativo
+confirmo consulta amanhã,VOLUNTARIO,telefone,3,ENCERRADO,OUTRO,3,informativo
+vou chegar 10 min atrasado,BENEFICIARIO,email,4,ENCERRADO,CRIANCA_ADOLESCENTE,2,informativo
+cancelar consulta,VOLUNTARIO,presencial,3,EM_ATENDIMENTO,OUTRO,1,informativo
+quero remarcar,BENEFICIARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,informativo
+docs enviados,VOLUNTARIO,whatsapp,4,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,3,informativo
+oi queria sabe se vcs atendem no sabado,BENEFICIARIO,telefone,4,ENCERRADO,CRIANCA_ADOLESCENTE,3,informativo
+vou precisar cancela minha consulta de quinta pq surgiu algo,VOLUNTARIO,presencial,4,ABERTO,CRIANCA_ADOLESCENTE,3,informativo
+boa tarde preciso remarcar minha cnsulta do dia 20 pf,VOLUNTARIO,telefone,4,ENCERRADO,MULHER_APOLONIA,3,informativo
+oii consigo agendar consulta pra essa semana?,BENEFICIARIO,telefone,3,ABERTO,CRIANCA_ADOLESCENTE,2,informativo
+manda o endereço pf nao to achando,VOLUNTARIO,presencial,3,ABERTO,CRIANCA_ADOLESCENTE,2,informativo
+qual o horario de funcionameto de vcs?,BENEFICIARIO,telefone,4,EM_ATENDIMENTO,MULHER_APOLONIA,3,informativo
+posso leva meu filho menor de 1 ano?,VOLUNTARIO,telefone,3,ABERTO,CRIANCA_ADOLESCENTE,3,informativo
+"tenho conv odonto, vcs aceita?",VOLUNTARIO,telefone,3,ENCERRADO,OUTRO,3,informativo
+to enviando os docuemntos q pediram,VOLUNTARIO,telefone,4,EM_ATENDIMENTO,OUTRO,3,informativo
+preciso do comprovante de atendimento,VOLUNTARIO,email,3,ENCERRADO,MULHER_APOLONIA,2,informativo
+"não vou consegui ir na consulta de hj, pode remarcar?",VOLUNTARIO,email,3,EM_ATENDIMENTO,CRIANCA_ADOLESCENTE,3,informativo
+boa tarde minha consulta e que horas amanha?,VOLUNTARIO,presencial,3,EM_ATENDIMENTO,OUTRO,3,informativo
+como faz pra agendar pelo whats?,BENEFICIARIO,telefone,3,ABERTO,MULHER_APOLONIA,2,informativo
+vcs ficam abertos no feriado?,VOLUNTARIO,presencial,3,ENCERRADO,CRIANCA_ADOLESCENTE,1,informativo
+ja fui la hoje de manha mas nao tinha ninguem,VOLUNTARIO,whatsapp,4,ABERTO,CRIANCA_ADOLESCENTE,1,informativo
+to mandando a foto do cartao do plano,BENEFICIARIO,email,4,ABERTO,MULHER_APOLONIA,3,informativo
+minha filha eh paciente de vcs como faz pra marcar retorno?,VOLUNTARIO,whatsapp,3,EM_ATENDIMENTO,MULHER_APOLONIA,3,informativo
+preciso do laudo da ultima consulta pra medico,VOLUNTARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,3,informativo
+confirmo presença na terca as 9h,VOLUNTARIO,presencial,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,informativo
+posso ir sem agendamento?,BENEFICIARIO,email,3,ENCERRADO,CRIANCA_ADOLESCENTE,2,informativo
