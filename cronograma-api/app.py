@@ -279,9 +279,9 @@ def alterar_tarefa(id_tarefa):
         if status_norm in ["Pendente"]:
             status_norm = "Pendente"
         elif status_norm in ["Concluido", "Concluida", "Concluído", "Concluída"]:
-            status_norm = "Concluído"
+            status_norm = "Concluido"
         else:
-            raise ValidacaoError("Status inválido. Use: ['Pendente', 'Concluído']")
+            raise ValidacaoError("Status inválido. Use: ['Pendente', 'Concluido']")
 
         conn = get_connection()
         cursor = conn.cursor()

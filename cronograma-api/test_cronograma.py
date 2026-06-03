@@ -113,7 +113,7 @@ class TestCronogramaAPI(unittest.TestCase):
 
         # Garante que salvou o status normalizado para "Concluído"
         args, kwargs = mock_cursor.execute.call_args_list[-1] # Pega a chamada do UPDATE
-        self.assertEqual(args[1][4], "Concluído") # Quinto elemento (STATUS) deve ser "Concluído"
+        self.assertEqual(args[1][4], "Concluido") # Quinto elemento (STATUS) deve ser "Concluido"
 
     @patch('app.get_connection')
     def test_alterar_tarefa_nao_encontrada(self, mock_get_connection):
@@ -153,7 +153,7 @@ class TestCronogramaAPI(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         data = response.get_json()
         self.assertEqual(data["erro"], "VALIDACAO")
-        self.assertIn("Status inválido. Use: ['Pendente', 'Concluído']", data["mensagem"])
+        self.assertIn("Status inválido. Use: ['Pendente', 'Concluido']", data["mensagem"])
 
     @patch('app.get_connection')
     def test_excluir_tarefa_sucesso(self, mock_get_connection):
