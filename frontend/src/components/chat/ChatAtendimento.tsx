@@ -31,6 +31,14 @@ function ChatAtendimento({ atendimentoId, enviadoPor }: ChatAtendimentoProps) {
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState('');
 
+  // Ref síncrona para rastrear IDs de mensagens já exibidas.
+  // Usamos um ref (e não o state) porque o state é assíncrono —
+  // quando duas mensagens WebSocket chegam quase ao mesmo tempo,
+  // o React pode ainda não ter aplicado o state da primeira quando
+  // a segunda chega, fazendo o check "prev.some()" falhar.
+  // O ref é atualizado instantaneamente, evitando duplicatas.
+  const seenIdsRef = useRef<Set<number>>(new Set());
+
   const mensagensOrdenadas = useMemo(
       () =>
           [...mensagens].sort((a, b) => {
@@ -56,7 +64,11 @@ function ChatAtendimento({ atendimentoId, enviadoPor }: ChatAtendimentoProps) {
         }
 
         try {
-          setMensagens(await mensagensService.getMensagensAtendimento(atendimentoId));
+          const msgs = await mensagensService.getMensagensAtendimento(atendimentoId);
+          // Sincroniza o ref com todos os IDs carregados do servidor
+          const novosIds = new Set<number>(msgs.map(m => m.id));
+          seenIdsRef.current = novosIds;
+          setMensagens(msgs);
         } catch (error) {
           setErro(error instanceof Error ? error.message : 'Nao foi possivel carregar as mensagens.');
         } finally {
@@ -104,10 +116,13 @@ function ChatAtendimento({ atendimentoId, enviadoPor }: ChatAtendimentoProps) {
         try {
           console.log('[WebSocket] Mensagem recebida:', event.data);
           const msg = JSON.parse(event.data) as Mensagem;
-          setMensagens((prev) => {
-            if (prev.some(m => m.id === msg.id)) return prev;
-            return [...prev, msg];
-          });
+          // Verifica de forma SÍNCRONA se já vimos essa mensagem.
+          // Diferente do state (que é assíncrono), o ref atualiza na hora,
+          // então mesmo que 2 WebSockets recebam a mesma msg ao mesmo tempo,
+          // o segundo já vai ver o ID no Set e pular.
+          if (seenIdsRef.current.has(msg.id)) return;
+          seenIdsRef.current.add(msg.id);
+          setMensagens((prev) => [...prev, msg]);
         } catch (e) {
           console.error('[WebSocket] Erro ao fazer parse:', e);
         }
