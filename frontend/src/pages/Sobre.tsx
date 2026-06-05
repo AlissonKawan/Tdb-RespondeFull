@@ -48,7 +48,7 @@ function Sobre() {
         description="O TDB Responde e um MVP desenvolvido para centralizar comunicacao, priorizar demandas e apoiar voluntarios da Turma do Bem com uma experiencia digital mais clara."
       />
 
-      <Section tone="white">
+      <Section tone="white" className="reveal">
         <Card className="p-8">
           <SectionHeader title="O que e o TDB Responde?" />
           <div className="grid gap-6 text-lg leading-8 text-[#475569] lg:grid-cols-2">
@@ -62,7 +62,7 @@ function Sobre() {
         </Card>
       </Section>
 
-      <Section tone="blue">
+      <Section tone="blue" className="reveal">
         <SectionHeader
           eyebrow="Desafios"
           title="O problema que orientou o produto"
@@ -81,7 +81,7 @@ function Sobre() {
         </div>
       </Section>
 
-      <Section tone="white">
+      <Section tone="white" className="reveal">
         <SectionHeader
           eyebrow="Solucao"
           title="Como o TDB Responde resolve"
@@ -98,7 +98,7 @@ function Sobre() {
         </div>
       </Section>
 
-      <Section tone="blue">
+      <Section tone="blue" className="reveal">
         <SectionHeader title="Como funciona" align="center" />
         <div className="mx-auto max-w-4xl space-y-4">
           {flow.map(([step, title, desc]) => (
@@ -115,7 +115,7 @@ function Sobre() {
         </div>
       </Section>
 
-      <Section tone="white">
+      <Section tone="white" className="reveal">
         <SectionHeader title="Pontos principais" align="center" />
         <div className="mx-auto flex max-w-4xl flex-wrap justify-center gap-3">
           {pillars.map((item) => (
@@ -126,7 +126,7 @@ function Sobre() {
         </div>
       </Section>
 
-      <Section tone="base">
+      <Section tone="base" className="reveal">
         <Card className="flex flex-col gap-6 p-8 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">Colaborar</p>

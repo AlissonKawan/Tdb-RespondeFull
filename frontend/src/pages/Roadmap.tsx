@@ -66,7 +66,7 @@ function Roadmap() {
         description="Uma solucao digital para reduzir dispersao, acelerar triagem e preservar contexto em atendimentos sociais sensiveis."
       />
 
-      <Section tone="white">
+      <Section tone="white" className="reveal">
         <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
           <div>
             <SectionHeader
@@ -85,7 +85,7 @@ function Roadmap() {
         </div>
       </Section>
 
-      <Section tone="blue">
+      <Section tone="blue" className="reveal">
         <SectionHeader
           eyebrow="Por que ajuda"
           title="O problema deixa de ser invisivel"
@@ -101,7 +101,7 @@ function Roadmap() {
         </p>
       </Section>
 
-      <Section tone="white">
+      <Section tone="white" className="reveal">
         <SectionHeader
           eyebrow="Quem e afetado"
           title="Dois grupos precisam de resposta rapida e cuidadosa"
@@ -127,7 +127,7 @@ function Roadmap() {
         </div>
       </Section>
 
-      <Section tone="blue">
+      <Section tone="blue" className="reveal">
         <SectionHeader
           eyebrow="Como funciona"
           title="Da primeira mensagem ate a resposta acompanhada"
@@ -147,7 +147,7 @@ function Roadmap() {
         </div>
       </Section>
 
-      <Section tone="white">
+      <Section tone="white" className="reveal">
         <Card className="flex flex-col gap-6 bg-gradient-to-br from-[#1E3A8A] to-[#2563EB] p-8 text-white md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-xs font-bold uppercase tracking-widest text-blue-100">Resultado esperado</p>

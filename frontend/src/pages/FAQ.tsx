@@ -53,7 +53,7 @@ function FAQ() {
         align="center"
       />
 
-      <Section tone="white">
+      <Section tone="white" className="reveal">
         <div className="mx-auto max-w-4xl space-y-4">
           {faqs.map((faq, index) => (
             <Card key={faq.question} className="overflow-hidden">
@@ -75,7 +75,7 @@ function FAQ() {
         </div>
       </Section>
 
-      <Section tone="blue" className="border-t border-[#E2E8F0]">
+      <Section tone="blue" className="border-t border-[#E2E8F0] reveal">
         <div className="text-center">
           <p className="mb-4 text-[#475569]">Ainda tem duvidas?</p>
           <Button href="/contato" size="large">Entre em contato</Button>

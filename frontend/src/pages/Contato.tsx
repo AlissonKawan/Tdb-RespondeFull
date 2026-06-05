@@ -31,7 +31,7 @@ function Contato() {
         description="Envie uma mensagem para saber mais sobre o projeto, compartilhar duvidas ou conversar sobre colaboracao."
       />
 
-      <Section tone="white">
+      <Section tone="white" className="reveal">
         <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr]">
           <div className="space-y-4">
             <Card className="p-6">

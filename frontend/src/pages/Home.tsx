@@ -78,30 +78,6 @@ function Home() {
     return () => window.clearTimeout(timer);
   }, []);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('active');
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      {
-        threshold: 0.05,
-        rootMargin: '0px 0px -40px 0px'
-      }
-    );
-
-    const elements = document.querySelectorAll('.reveal');
-    elements.forEach((el) => observer.observe(el));
-
-    return () => {
-      elements.forEach((el) => observer.unobserve(el));
-    };
-  }, []);
-
   return (
     <div>
       <section className="relative overflow-hidden border-b border-[#E2E8F0] bg-[linear-gradient(135deg,#F8FAFC_0%,#EFF6FF_48%,#FFFFFF_100%)]">

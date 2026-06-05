@@ -50,7 +50,7 @@ function Integrantes() {
         description="Pessoas responsaveis pela criacao, evolucao e apresentacao do TDB Responde."
       />
 
-      <Section tone="white">
+      <Section tone="white" className="reveal">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {members.map((member) => (
             <TeamMemberCard key={member.name} {...member} />
@@ -58,7 +58,7 @@ function Integrantes() {
         </div>
       </Section>
 
-      <Section tone="blue">
+      <Section tone="blue" className="reveal">
         <Card className="flex flex-col gap-6 p-8 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">Contato</p>
