@@ -78,6 +78,30 @@ function Home() {
     return () => window.clearTimeout(timer);
   }, []);
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('active');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        threshold: 0.05,
+        rootMargin: '0px 0px -40px 0px'
+      }
+    );
+
+    const elements = document.querySelectorAll('.reveal');
+    elements.forEach((el) => observer.observe(el));
+
+    return () => {
+      elements.forEach((el) => observer.unobserve(el));
+    };
+  }, []);
+
   return (
     <div>
       <section className="relative overflow-hidden border-b border-[#E2E8F0] bg-[linear-gradient(135deg,#F8FAFC_0%,#EFF6FF_48%,#FFFFFF_100%)]">
@@ -115,7 +139,7 @@ function Home() {
 
       <section className="border-b border-[#E2E8F0] bg-white py-16">
         <Container className="max-w-7xl">
-          <div className="mb-8 max-w-2xl">
+          <div className="mb-8 max-w-2xl reveal">
             <p className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">Beneficios</p>
             <h2 className="mt-2 text-3xl font-bold text-[#0F172A] sm:text-4xl">Por que TDB Responde?</h2>
             <p className="mt-3 text-base leading-7 text-[#475569]">
@@ -125,14 +149,15 @@ function Home() {
 
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
             {features.map((feature, index) => (
-              <FeatureCard
-                key={feature.title}
-                icon={feature.icon}
-                title={feature.title}
-                description={feature.description}
-                destaque={index === 0}
-                tone={feature.tone}
-              />
+              <div key={feature.title} className="reveal">
+                <FeatureCard
+                  icon={feature.icon}
+                  title={feature.title}
+                  description={feature.description}
+                  destaque={index === 0}
+                  tone={feature.tone}
+                />
+              </div>
             ))}
           </div>
         </Container>
@@ -140,11 +165,11 @@ function Home() {
 
       <section className="border-b border-[#E2E8F0] bg-gradient-to-b from-[#F8FAFC] to-blue-50/60 py-16">
         <Container className="grid max-w-7xl gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
-          <div>
+          <div className="reveal">
             <p className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">Missao</p>
             <h2 className="mt-2 text-3xl font-bold text-[#0F172A]">Tecnologia para acolher melhor</h2>
           </div>
-          <div className="rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-sm">
+          <div className="rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-sm reveal">
             <p className="text-lg leading-8 text-[#475569]">
               Transformar o atendimento da <strong className="text-[#0F172A]">Turma do Bem</strong> em uma
               experiencia mais rapida, eficiente e humana, unindo organizacao operacional e empatia em um unico sistema.
@@ -157,7 +182,7 @@ function Home() {
       </section>
 
       <section className="bg-white py-16">
-        <Container className="flex max-w-7xl flex-col gap-6 rounded-2xl border border-blue-100 bg-gradient-to-br from-[#1E3A8A] to-[#2563EB] p-6 shadow-xl shadow-blue-950/15 md:flex-row md:items-center md:justify-between">
+        <Container className="flex max-w-7xl flex-col gap-6 rounded-2xl border border-blue-100 bg-gradient-to-br from-[#1E3A8A] to-[#2563EB] p-6 shadow-xl shadow-blue-950/15 md:flex-row md:items-center md:justify-between reveal">
           <div>
             <p className="text-xs font-bold uppercase tracking-widest text-blue-100">Proximo passo</p>
             <h2 className="mt-2 text-3xl font-bold text-white">Pronto para comecar?</h2>
