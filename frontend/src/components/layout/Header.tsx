@@ -14,7 +14,7 @@ function Header() {
           <img
             src="/img/logo-header.png"
             alt="TDB Responde"
-            className="h-[90px] w-auto object-contain lg:h-[110px]"
+            className="h-[64px] w-auto object-contain md:h-[80px] lg:h-[110px]"
           />
 
           <div className="hidden border-l border-slate-200 pl-4 md:block">
