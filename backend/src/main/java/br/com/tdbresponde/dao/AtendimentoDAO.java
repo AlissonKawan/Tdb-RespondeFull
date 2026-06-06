@@ -344,6 +344,7 @@ public class AtendimentoDAO {
                 pessoa.setTelefone(rs.getString("PESSOA_TEL"));
                 pessoa.setEmail(rs.getString("PESSOA_EMAIL"));
                 pessoa.setContaId(rs.getInt("PESSOA_CONTA"));
+                pessoa.setTipo(rs.getString("PESSOA_TIPO"));
                 a.setPessoaAtendida(pessoa);
             } catch (SQLException e) {}
         }

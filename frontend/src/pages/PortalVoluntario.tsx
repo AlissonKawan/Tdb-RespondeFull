@@ -14,6 +14,7 @@ import { voluntariosService } from '../services/voluntariosService';
 import { mensagensService } from '../services/mensagensService';
 import type { AtendimentoApi } from '../types/AtendimentoApi';
 import { useAuth } from '../context/useAuth';
+import { classificarMensagemIA, type CanalIA, type ClassificarMensagemIAResponse, type TipoPessoaIA } from '../services/iaService';
 
 type Aba = 'solicitados' | 'meus';
 
@@ -48,6 +49,43 @@ function sortAtendimentos(a: AtendimentoApi, b: AtendimentoApi) {
   return dateB - dateA; // Descending
 }
 
+function obterEstiloCategoriaIA(categoria?: string) {
+  const estilos: Record<string, { card: string; badge: string; text: string; dot: string }> = {
+    urgencia: {
+      card: 'border-rose-200 bg-rose-50/80',
+      badge: 'bg-rose-100 text-rose-800',
+      text: 'text-rose-900',
+      dot: 'bg-rose-500',
+    },
+    elogio: {
+      card: 'border-emerald-200 bg-emerald-50/80',
+      badge: 'bg-emerald-100 text-emerald-800',
+      text: 'text-emerald-900',
+      dot: 'bg-emerald-500',
+    },
+    reclamacao: {
+      card: 'border-orange-200 bg-orange-50/80',
+      badge: 'bg-orange-100 text-orange-800',
+      text: 'text-orange-900',
+      dot: 'bg-orange-500',
+    },
+    sugestao: {
+      card: 'border-blue-200 bg-blue-50/80',
+      badge: 'bg-blue-100 text-blue-800',
+      text: 'text-blue-900',
+      dot: 'bg-blue-500',
+    },
+    informativo: {
+      card: 'border-slate-200 bg-slate-50/80',
+      badge: 'bg-slate-100 text-slate-700',
+      text: 'text-slate-900',
+      dot: 'bg-slate-500',
+    },
+  };
+
+  return estilos[categoria ?? ''] ?? estilos.informativo;
+}
+
 function AtendimentoCard({ atendimento, onAssumir, assumindo, assumirBloqueado, hasNovaMensagem }: {
   atendimento: AtendimentoApi;
   onAssumir?: (id: number) => void;
@@ -56,6 +94,65 @@ function AtendimentoCard({ atendimento, onAssumir, assumindo, assumirBloqueado, 
   hasNovaMensagem?: boolean;
 }) {
   const navigate = useNavigate();
+  const [classificacaoIA, setClassificacaoIA] = useState<ClassificarMensagemIAResponse | null>(null);
+  const [carregandoIA, setCarregandoIA] = useState(false);
+
+  useEffect(() => {
+    if (atendimento.status !== 'ABERTO' || atendimento.voluntarioId || !onAssumir) {
+      return;
+    }
+
+    const descricao = atendimento.descricao?.trim();
+    if (!descricao || descricao.length < 15) {
+      return;
+    }
+
+    let active = true;
+    setCarregandoIA(true);
+
+    // Normalização do canal
+    const canalOriginal = (atendimento.canalOrigem?.nome ?? atendimento.canal ?? '').toLowerCase();
+    let canalIA: CanalIA = 'whatsapp';
+    if (canalOriginal.includes('whatsapp') || canalOriginal.includes('whats')) canalIA = 'whatsapp';
+    else if (canalOriginal.includes('telefone')) canalIA = 'telefone';
+    else if (canalOriginal.includes('email') || canalOriginal.includes('e-mail')) canalIA = 'email';
+    else if (canalOriginal.includes('presencial')) canalIA = 'presencial';
+
+    // Normalização de prioridade
+    const prioridadeOriginal = Number(atendimento.prioridade) || 3;
+    let prioridadeIA = 3;
+    if (prioridadeOriginal <= 1) prioridadeIA = 1;
+    else if (prioridadeOriginal === 2) prioridadeIA = 2;
+
+    // Tipo de pessoa e gravidade
+    const tipoPessoa: TipoPessoaIA = (atendimento.tipoPessoa === 'CRIANCA_ADOLESCENTE' || atendimento.tipoPessoa === 'MULHER_APOLONIA')
+      ? atendimento.tipoPessoa
+      : 'OUTRO';
+    const gravidade = atendimento.gravidade ?? 3;
+
+    classificarMensagemIA({
+      conteudo: descricao,
+      enviado_por: 'BENEFICIARIO',
+      canal: canalIA,
+      prioridade_atendimento: prioridadeIA,
+      status_atendimento: 'ABERTO',
+      tipo_pessoa: tipoPessoa,
+      gravidade: gravidade,
+    }).then((resultado) => {
+      if (active) {
+        setClassificacaoIA(resultado);
+        setCarregandoIA(false);
+      }
+    }).catch(() => {
+      if (active) {
+        setCarregandoIA(false);
+      }
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [atendimento, onAssumir]);
 
   return (
     <Card className="p-4 md:p-6 transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-950/10">
@@ -74,6 +171,25 @@ function AtendimentoCard({ atendimento, onAssumir, assumindo, assumirBloqueado, 
               <p><strong className="text-[#0F172A]">Última Atividade:</strong> {atendimento.dataAtualizacao ?? atendimento.dataCriacao ?? atendimento.dataAbertura}</p>
             )}
           </div>
+          {onAssumir && (carregandoIA || classificacaoIA) && (
+            <div className="mt-3 flex items-center gap-2">
+              {carregandoIA && (
+                <span className="text-xs text-slate-500 animate-pulse flex items-center gap-1">
+                  <svg className="animate-spin -ml-1 mr-1.5 h-3 w-3 text-slate-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Classificando com IA...
+                </span>
+              )}
+              {!carregandoIA && classificacaoIA && (
+                <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ${obterEstiloCategoriaIA(classificacaoIA.categoria_prevista).badge}`}>
+                  <span className={`h-1.5 w-1.5 rounded-full ${obterEstiloCategoriaIA(classificacaoIA.categoria_prevista).dot}`} />
+                  Sugestão IA: {classificacaoIA.categoria_prevista.toUpperCase()} ({Math.round(classificacaoIA.confianca * 100)}%)
+                </span>
+              )}
+            </div>
+          )}
         </div>
         <div className="flex flex-wrap gap-2">
           {onAssumir && (

@@ -49,7 +49,10 @@ public class AtendimentoResponse {
                 response.tipoPessoa = "MULHER_APOLONIA";
                 response.gravidade = ((MulherApolonia) atendimento.getPessoaAtendida()).getNivelRisco();
             } else {
-                response.tipoPessoa = "OUTRO";
+                response.tipoPessoa = atendimento.getPessoaAtendida().getTipo();
+                if (response.tipoPessoa == null) {
+                    response.tipoPessoa = "OUTRO";
+                }
                 response.gravidade = 3;
             }
         }

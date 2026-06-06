@@ -9,6 +9,7 @@ public abstract class PessoaAtendida {
     private String telefone;
     private String email;
     private Integer contaId;
+    private String tipo;
 
 
     public PessoaAtendida() {}
@@ -67,6 +68,14 @@ public abstract class PessoaAtendida {
 
     public void setContaId(Integer contaId) {
         this.contaId = contaId;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
     }
 
     @Override
