@@ -103,6 +103,9 @@ public class AtendimentoBO {
         if (atendimento == null) {
             throw new NotFoundException("Atendimento nao encontrado");
         }
+        if (atendimento.getPessoaAtendida() != null) {
+            atendimento.setPessoaAtendida(buscarPessoaCompleta(atendimento.getPessoaAtendida().getId()));
+        }
         return atendimento;
     }
 

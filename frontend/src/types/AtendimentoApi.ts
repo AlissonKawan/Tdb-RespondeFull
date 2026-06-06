@@ -52,6 +52,8 @@ export interface AtendimentoApi {
   horarioEnvioCheckin?: string;
   previsaoCheckin?: StatusCheckin | string;
   confiancaCheckin?: number;
+  tipoPessoa?: TipoPessoaRelato;
+  gravidade?: number;
 }
 
 export interface SolicitarAtendimentoRequest {

@@ -165,7 +165,7 @@ function PortalBeneficiario() {
                     <h3 className="text-lg font-bold text-[#0F172A] truncate">{getPessoa(atendimento)}</h3>
                     <Badge tone="neutral">Atendimento #{atendimento.id}</Badge>
                     {atendimento.status && <Badge tone={statusTone(atendimento.status) as any}>{atendimento.status}</Badge>}
-                    {novasMensagens[atendimento.id] && <Badge tone="danger">Nova</Badge>}
+                    {novasMensagens[atendimento.id] && <Badge tone="danger">Nova Mensagem</Badge>}
                   </div>
                   <div className="mt-3 grid gap-2 text-sm text-[#475569] md:grid-cols-2">
                     <p><strong className="text-[#0F172A]">Prioridade:</strong> {prioridadeLabel(atendimento.prioridade)}</p>

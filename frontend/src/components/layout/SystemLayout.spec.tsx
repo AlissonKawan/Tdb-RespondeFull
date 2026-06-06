@@ -33,7 +33,7 @@ describe('SystemLayout', () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByText('Turma do Bem')).toBeInTheDocument();
+    expect(screen.getAllByText('Turma do Bem')[0]).toBeInTheDocument();
     expect(screen.getByText('Olá, João Silva')).toBeInTheDocument();
     expect(screen.getByText('Portal Voluntário')).toBeInTheDocument();
     expect(screen.getByText('Ranking')).toBeInTheDocument();

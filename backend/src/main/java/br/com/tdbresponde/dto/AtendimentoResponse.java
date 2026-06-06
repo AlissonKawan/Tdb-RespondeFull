@@ -1,6 +1,8 @@
 package br.com.tdbresponde.dto;
 
 import br.com.tdbresponde.model.Atendimento;
+import br.com.tdbresponde.model.CriancaAdolescente;
+import br.com.tdbresponde.model.MulherApolonia;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -27,6 +29,8 @@ public class AtendimentoResponse {
     public LocalDateTime horarioEnvioCheckin;
     public String previsaoCheckin;
     public Double confiancaCheckin;
+    public String tipoPessoa;
+    public Integer gravidade;
 
     public static AtendimentoResponse from(Atendimento atendimento) {
         AtendimentoResponse response = new AtendimentoResponse();
@@ -37,6 +41,17 @@ public class AtendimentoResponse {
             response.pessoaAtendidaNome = atendimento.getPessoaAtendida().getNomeCodificado();
             response.pessoaAtendidaEmail = atendimento.getPessoaAtendida().getEmail();
             response.pessoaAtendidaTelefone = atendimento.getPessoaAtendida().getTelefone();
+            
+            if (atendimento.getPessoaAtendida() instanceof CriancaAdolescente) {
+                response.tipoPessoa = "CRIANCA_ADOLESCENTE";
+                response.gravidade = ((CriancaAdolescente) atendimento.getPessoaAtendida()).getGravidadeBucal();
+            } else if (atendimento.getPessoaAtendida() instanceof MulherApolonia) {
+                response.tipoPessoa = "MULHER_APOLONIA";
+                response.gravidade = ((MulherApolonia) atendimento.getPessoaAtendida()).getNivelRisco();
+            } else {
+                response.tipoPessoa = "OUTRO";
+                response.gravidade = 3;
+            }
         }
         if (atendimento.getVoluntario() != null) {
             response.voluntarioId = atendimento.getVoluntario().getId();

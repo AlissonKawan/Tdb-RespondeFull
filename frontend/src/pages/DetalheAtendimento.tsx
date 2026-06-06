@@ -13,6 +13,7 @@ import { useAuth } from '../context/useAuth';
 import { atendimentoService } from '../services/atendimentoService';
 import { mensagensService } from '../services/mensagensService';
 import type { AtendimentoApi, Mensagem, MensagemRequest } from '../types/AtendimentoApi';
+import { classificarMensagemIA, type CanalIA, type ClassificarMensagemIAResponse, type TipoPessoaIA } from '../services/iaService';
 
 const STATUS_OPTIONS = ['ABERTO', 'EM_ATENDIMENTO', 'ENCERRADO', 'CANCELADO'] as const;
 
@@ -99,6 +100,43 @@ function iaPrevisaoConfig(previsao?: string) {
   return map[previsao] ?? { cor: 'text-slate-700', bg: 'bg-slate-50', border: 'border-slate-200', icone: '?' };
 }
 
+function obterEstiloCategoriaIA(categoria?: string) {
+  const estilos: Record<string, { card: string; badge: string; text: string; dot: string }> = {
+    urgencia: {
+      card: 'border-rose-200 bg-rose-50/80',
+      badge: 'bg-rose-100 text-rose-800',
+      text: 'text-rose-900',
+      dot: 'bg-rose-500',
+    },
+    elogio: {
+      card: 'border-emerald-200 bg-emerald-50/80',
+      badge: 'bg-emerald-100 text-emerald-800',
+      text: 'text-emerald-900',
+      dot: 'bg-emerald-500',
+    },
+    reclamacao: {
+      card: 'border-orange-200 bg-orange-50/80',
+      badge: 'bg-orange-100 text-orange-800',
+      text: 'text-orange-900',
+      dot: 'bg-orange-500',
+    },
+    sugestao: {
+      card: 'border-blue-200 bg-blue-50/80',
+      badge: 'bg-blue-100 text-blue-800',
+      text: 'text-blue-900',
+      dot: 'bg-blue-500',
+    },
+    informativo: {
+      card: 'border-slate-200 bg-slate-50/80',
+      badge: 'bg-slate-100 text-slate-700',
+      text: 'text-slate-900',
+      dot: 'bg-slate-500',
+    },
+  };
+
+  return estilos[categoria ?? ''] ?? estilos.informativo;
+}
+
 function DetalheAtendimento() {
   const { id } = useParams();
   const atendimentoId = Number(id);
@@ -108,6 +146,11 @@ function DetalheAtendimento() {
   const [atendimento, setAtendimento] = useState<AtendimentoApi | null>(null);
   const [mensagens, setMensagens] = useState<Mensagem[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  const [classificacaoIA, setClassificacaoIA] = useState<ClassificarMensagemIAResponse | null>(null);
+  const [carregandoIA, setCarregandoIA] = useState(false);
+  const [erroIA, setErroIA] = useState(false);
+  const [assumindo, setAssumindo] = useState(false);
 
   // Ref síncrona para rastrear IDs de mensagens já exibidas.
   // Usamos um ref (e não o state) porque o state é assíncrono —
@@ -128,6 +171,103 @@ function DetalheAtendimento() {
   const podeAlterar = user?.tipoUsuario === 'VOLUNTARIO' || user?.tipoUsuario === 'ADMIN';
   const remetenteAtual = getSender(user?.tipoUsuario);
   const chatBloqueado = atendimento?.status === 'ENCERRADO' || atendimento?.status === 'CANCELADO';
+
+  const voluntarioId = user?.voluntarioId;
+  const voluntarioSemVinculo = user?.tipoUsuario === 'VOLUNTARIO' && !voluntarioId;
+
+  const assumirEsteAtendimento = async () => {
+    if (!voluntarioId) {
+      setFeedback('Nao foi possivel assumir: sua conta nao possui vinculo de voluntario.');
+      return;
+    }
+
+    setAssumindo(true);
+    setFeedback('');
+    try {
+      await atendimentoService.assumirAtendimento(atendimentoId, voluntarioId);
+      setFeedback('Atendimento assumido com sucesso!');
+      await carregarDados(); // Recarrega os dados do atendimento
+    } catch (error) {
+      setFeedback(error instanceof Error ? error.message : 'Nao foi possivel assumir o atendimento.');
+    } finally {
+      setAssumindo(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!podeAlterar || !atendimento || atendimento.status !== 'ABERTO' || atendimento.voluntarioId) {
+      setClassificacaoIA(null);
+      setCarregandoIA(false);
+      setErroIA(false);
+      return;
+    }
+
+    const descricao = atendimento.descricao?.trim();
+    if (!descricao || descricao.length < 15) {
+      setClassificacaoIA(null);
+      setCarregandoIA(false);
+      setErroIA(false);
+      return;
+    }
+
+    const controller = new AbortController();
+    setCarregandoIA(true);
+    setErroIA(false);
+
+    // Normalização do canal
+    const canalOriginal = (atendimento.canalOrigem?.nome ?? atendimento.canal ?? '').toLowerCase();
+    let canalIA: CanalIA = 'whatsapp';
+    if (canalOriginal.includes('whatsapp') || canalOriginal.includes('whats')) canalIA = 'whatsapp';
+    else if (canalOriginal.includes('telefone')) canalIA = 'telefone';
+    else if (canalOriginal.includes('email') || canalOriginal.includes('e-mail')) canalIA = 'email';
+    else if (canalOriginal.includes('presencial')) canalIA = 'presencial';
+
+    // Normalização de prioridade
+    const prioridadeOriginal = Number(atendimento.prioridade) || 3;
+    let prioridadeIA = 3;
+    if (prioridadeOriginal <= 1) prioridadeIA = 1;
+    else if (prioridadeOriginal === 2) prioridadeIA = 2;
+
+    // Tipo de pessoa e gravidade
+    const tipoPessoa: TipoPessoaIA = (atendimento.tipoPessoa === 'CRIANCA_ADOLESCENTE' || atendimento.tipoPessoa === 'MULHER_APOLONIA')
+      ? atendimento.tipoPessoa
+      : 'OUTRO';
+    const gravidade = atendimento.gravidade ?? 3;
+
+    const timeoutId = window.setTimeout(async () => {
+      try {
+        const resultado = await classificarMensagemIA(
+          {
+            conteudo: descricao,
+            enviado_por: 'BENEFICIARIO',
+            canal: canalIA,
+            prioridade_atendimento: prioridadeIA,
+            status_atendimento: 'ABERTO',
+            tipo_pessoa: tipoPessoa,
+            gravidade: gravidade,
+          },
+          controller.signal,
+        );
+
+        if (controller.signal.aborted) return;
+
+        setClassificacaoIA(resultado);
+        setErroIA(!resultado);
+      } catch (err) {
+        if (controller.signal.aborted) return;
+        setErroIA(true);
+      } finally {
+        if (!controller.signal.aborted) {
+          setCarregandoIA(false);
+        }
+      }
+    }, 500);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+      controller.abort();
+    };
+  }, [atendimento, podeAlterar]);
 
   const carregarDados = async () => {
     if (!Number.isFinite(atendimentoId) || atendimentoId <= 0) {
@@ -432,6 +572,71 @@ function DetalheAtendimento() {
                 <div className="rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm font-semibold text-[#2563EB]">
                   {feedback}
                 </div>
+              )}
+
+              {podeAlterar && atendimento.status === 'ABERTO' && !atendimento.voluntarioId && (
+                <Card className="p-6 border border-blue-200 bg-blue-50/50">
+                  <h2 className="text-xl font-bold text-[#0F172A]">Acolher caso</h2>
+                  <p className="mt-1 text-sm text-[#475569]">Este atendimento está aberto e aguardando um profissional voluntário.</p>
+                  <div className="mt-4">
+                    <Button 
+                      fullWidth 
+                      disabled={assumindo || voluntarioSemVinculo} 
+                      onClick={() => void assumirEsteAtendimento()}
+                    >
+                      {assumindo ? 'Assumindo...' : 'Assumir atendimento'}
+                    </Button>
+                    {voluntarioSemVinculo && (
+                      <p className="mt-2 text-xs text-red-500">Sua conta de voluntário precisa estar vinculada para assumir casos.</p>
+                    )}
+                  </div>
+                </Card>
+              )}
+
+              {podeAlterar && atendimento.status === 'ABERTO' && !atendimento.voluntarioId && (carregandoIA || classificacaoIA || erroIA) && (
+                <Card className={`p-6 border ${obterEstiloCategoriaIA(classificacaoIA?.categoria_prevista).card}`}>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold uppercase tracking-wider ${obterEstiloCategoriaIA(classificacaoIA?.categoria_prevista).badge}`}>
+                        IA: Classificação
+                      </span>
+                      {carregandoIA && (
+                        <span className="text-xs text-slate-500 animate-pulse">Analisando relato...</span>
+                      )}
+                    </div>
+                    
+                    <div>
+                      <h3 className="text-lg font-bold text-[#0F172A]">Sugestão de Categoria</h3>
+                      {carregandoIA && (
+                        <p className="mt-1 text-sm text-[#475569]">Analisando o relato inicial do beneficiário...</p>
+                      )}
+                      {!carregandoIA && erroIA && (
+                        <p className="mt-1 text-sm text-red-600">Falha ao obter classificação da IA.</p>
+                      )}
+                      {!carregandoIA && classificacaoIA && (
+                        <p className="mt-1 text-sm text-[#475569]">
+                          A inteligência artificial analisou o relato original e sugere a categoria abaixo para apoiar a triagem do caso.
+                        </p>
+                      )}
+                    </div>
+
+                    {!carregandoIA && classificacaoIA && (
+                      <div className="grid gap-3 text-sm">
+                        <div className="rounded-xl bg-white/80 p-3 shadow-sm border border-slate-100/50">
+                          <span className="block text-xs font-bold uppercase tracking-wider text-[#64748B]">Categoria Prevista</span>
+                          <span className={`mt-1.5 flex items-center gap-2 text-base font-bold ${obterEstiloCategoriaIA(classificacaoIA.categoria_prevista).text}`}>
+                            <span className={`h-2.5 w-2.5 rounded-full ${obterEstiloCategoriaIA(classificacaoIA.categoria_prevista).dot}`} />
+                            {classificacaoIA.categoria_prevista.toUpperCase()}
+                          </span>
+                        </div>
+                        <div className="rounded-xl bg-white/80 p-3 shadow-sm border border-slate-100/50">
+                          <span className="block text-xs font-bold uppercase tracking-wider text-[#64748B]">Nível de Confiança</span>
+                          <span className="mt-1.5 block text-lg font-extrabold text-[#0F172A]">{Math.round(classificacaoIA.confianca * 100)}%</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </Card>
               )}
 
               {podeAlterar && (

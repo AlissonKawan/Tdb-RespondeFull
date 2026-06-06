@@ -10,7 +10,6 @@ import { Field, Input, Select, Textarea } from '../components/ui/Input';
 import PageHeader from '../components/ui/PageHeader';
 import { useAuth } from '../context/useAuth';
 import { listarCanais } from '../services/canaisService';
-import { classificarMensagemIA, type CanalIA, type ClassificarMensagemIAResponse } from '../services/iaService';
 import { relatarAtendimento } from '../services/relatoAtendimentoService';
 import type { CanalComunicacaoApi, RelatarAtendimentoRequest, TipoPessoaRelato } from '../types/AtendimentoApi';
 
@@ -52,64 +51,6 @@ const initialForm: FormState = {
 
 function toBoolean(value: string) {
   return value === 'true';
-}
-
-function normalizarCanal(nomeCanal?: string): CanalIA {
-  const canal = (nomeCanal ?? '').toLowerCase();
-  if (canal.includes('whatsapp') || canal.includes('whats')) return 'whatsapp';
-  if (canal.includes('telefone')) return 'telefone';
-  if (canal.includes('email') || canal.includes('e-mail')) return 'email';
-  if (canal.includes('presencial')) return 'presencial';
-  return 'whatsapp';
-}
-
-function normalizarPrioridadeParaIA(prioridade: number) {
-  if (prioridade <= 1) return 1;
-  if (prioridade === 2) return 2;
-  return 3;
-}
-
-function calcularGravidade(form: FormState) {
-  if (form.tipoPessoaAtendida === 'CRIANCA_ADOLESCENTE') return Number(form.gravidadeBucal) || 3;
-  if (form.tipoPessoaAtendida === 'MULHER_APOLONIA') return Number(form.nivelRisco) || 3;
-  return Number(form.prioridade) || 3;
-}
-
-function obterEstiloCategoriaIA(categoria?: string) {
-  const estilos: Record<string, { card: string; badge: string; text: string; dot: string }> = {
-    urgencia: {
-      card: 'border-rose-200 bg-rose-50/80',
-      badge: 'bg-rose-100 text-rose-800',
-      text: 'text-rose-900',
-      dot: 'bg-rose-500',
-    },
-    elogio: {
-      card: 'border-emerald-200 bg-emerald-50/80',
-      badge: 'bg-emerald-100 text-emerald-800',
-      text: 'text-emerald-900',
-      dot: 'bg-emerald-500',
-    },
-    reclamacao: {
-      card: 'border-orange-200 bg-orange-50/80',
-      badge: 'bg-orange-100 text-orange-800',
-      text: 'text-orange-900',
-      dot: 'bg-orange-500',
-    },
-    sugestao: {
-      card: 'border-blue-200 bg-blue-50/80',
-      badge: 'bg-blue-100 text-blue-800',
-      text: 'text-blue-900',
-      dot: 'bg-blue-500',
-    },
-    informativo: {
-      card: 'border-slate-200 bg-slate-50/80',
-      badge: 'bg-slate-100 text-slate-700',
-      text: 'text-slate-900',
-      dot: 'bg-slate-500',
-    },
-  };
-
-  return estilos[categoria ?? ''] ?? estilos.informativo;
 }
 
 function montarPayload(form: FormState, idContaBeneficiario?: number): RelatarAtendimentoRequest {
@@ -176,9 +117,6 @@ function SolicitarAtendimento() {
   const [enviando, setEnviando] = useState(false);
   const [sucesso, setSucesso] = useState('');
   const [erro, setErro] = useState('');
-  const [classificacaoIA, setClassificacaoIA] = useState<ClassificarMensagemIAResponse | null>(null);
-  const [carregandoIA, setCarregandoIA] = useState(false);
-  const [erroIA, setErroIA] = useState(false);
 
   useEffect(() => {
     async function carregarCanais() {
@@ -203,59 +141,6 @@ function SolicitarAtendimento() {
     };
     return labels[form.tipoPessoaAtendida];
   }, [form.tipoPessoaAtendida]);
-
-  const canalSelecionado = useMemo(
-    () => canais.find((canal) => String(canal.id) === form.canalComunicacaoId),
-    [canais, form.canalComunicacaoId],
-  );
-
-  useEffect(() => {
-    const descricao = form.descricao.trim();
-
-    if (descricao.length < 15) {
-      setClassificacaoIA(null);
-      setCarregandoIA(false);
-      setErroIA(false);
-      return;
-    }
-
-    const controller = new AbortController();
-    setCarregandoIA(true);
-    setErroIA(false);
-
-    const timeoutId = window.setTimeout(async () => {
-      const resultado = await classificarMensagemIA(
-        {
-          conteudo: descricao,
-          enviado_por: 'BENEFICIARIO',
-          canal: normalizarCanal(canalSelecionado?.nome),
-          prioridade_atendimento: normalizarPrioridadeParaIA(Number(form.prioridade)),
-          status_atendimento: 'ABERTO',
-          tipo_pessoa: form.tipoPessoaAtendida,
-          gravidade: calcularGravidade(form),
-        },
-        controller.signal,
-      );
-
-      if (controller.signal.aborted) return;
-
-      setClassificacaoIA(resultado);
-      setErroIA(!resultado);
-      setCarregandoIA(false);
-    }, 800);
-
-    return () => {
-      window.clearTimeout(timeoutId);
-      controller.abort();
-    };
-  }, [
-    canalSelecionado?.nome,
-    form.descricao,
-    form.gravidadeBucal,
-    form.nivelRisco,
-    form.prioridade,
-    form.tipoPessoaAtendida,
-  ]);
 
   const updateField = (field: keyof FormState, value: string) => {
     setForm((current) => ({ ...current, [field]: value }));
@@ -286,8 +171,6 @@ function SolicitarAtendimento() {
         email: current.email,
         canalComunicacaoId: current.canalComunicacaoId,
       }));
-      setClassificacaoIA(null);
-      setErroIA(false);
     } catch (error) {
       setErro(error instanceof Error ? error.message : 'Nao foi possivel enviar o relato.');
     } finally {
@@ -479,50 +362,6 @@ function SolicitarAtendimento() {
                 placeholder="Conte o que esta acontecendo, quando comecou e qual apoio precisa agora."
               />
             </Field>
-
-            {(carregandoIA || classificacaoIA || erroIA) && (
-              <div className={`rounded-xl border px-5 py-4 ${obterEstiloCategoriaIA(classificacaoIA?.categoria_prevista).card}`}>
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                  <div className="space-y-2">
-                    <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${obterEstiloCategoriaIA(classificacaoIA?.categoria_prevista).badge}`}>
-                      Gerado por IA
-                    </span>
-                    <div>
-                      <h3 className="text-base font-bold text-[#0F172A]">Classificacao automatica do atendimento</h3>
-                      {carregandoIA && (
-                        <p className="mt-1 text-sm font-medium text-[#475569]">Analisando relato com IA...</p>
-                      )}
-                      {!carregandoIA && erroIA && (
-                        <p className="mt-1 text-sm font-medium text-[#475569]">
-                          Nao foi possivel classificar com IA agora. Voce ainda pode enviar o relato normalmente.
-                        </p>
-                      )}
-                      {!carregandoIA && classificacaoIA && (
-                        <p className="mt-1 text-sm text-[#475569]">
-                          Essa classificacao e uma sugestao automatica para apoiar a triagem. O atendimento sera enviado normalmente.
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  {!carregandoIA && classificacaoIA && (
-                    <div className="grid gap-2 text-sm sm:min-w-48">
-                      <div className="rounded-lg bg-white/70 px-3 py-2 shadow-sm">
-                        <span className="block text-xs font-semibold uppercase text-[#64748B]">Categoria prevista</span>
-                        <span className={`mt-1 flex items-center gap-2 font-bold ${obterEstiloCategoriaIA(classificacaoIA.categoria_prevista).text}`}>
-                          <span className={`h-2.5 w-2.5 rounded-full ${obterEstiloCategoriaIA(classificacaoIA.categoria_prevista).dot}`} />
-                          {classificacaoIA.categoria_prevista}
-                        </span>
-                      </div>
-                      <div className="rounded-lg bg-white/70 px-3 py-2 shadow-sm">
-                        <span className="block text-xs font-semibold uppercase text-[#64748B]">Confianca</span>
-                        <span className="mt-1 block font-bold text-[#0F172A]">{Math.round(classificacaoIA.confianca * 100)}%</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
 
             {sucesso && (
               <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800">

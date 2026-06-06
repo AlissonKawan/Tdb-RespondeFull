@@ -81,11 +81,9 @@ function AtendimentoCard({ atendimento, onAssumir, assumindo, assumirBloqueado, 
               {assumindo ? 'Assumindo...' : 'Assumir atendimento'}
             </Button>
           )}
-          {!onAssumir && (
-            <Button variant="secondary" onClick={() => navigate(`/atendimentos/${atendimento.id}`)}>
-              Abrir atendimento
-            </Button>
-          )}
+          <Button variant="secondary" onClick={() => navigate(`/atendimentos/${atendimento.id}`)}>
+            Abrir atendimento
+          </Button>
         </div>
       </div>
     </Card>
