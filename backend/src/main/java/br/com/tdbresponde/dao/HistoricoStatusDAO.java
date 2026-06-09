@@ -55,7 +55,7 @@ public class HistoricoStatusDAO {
 
     // READ por ID
     public HistoricoStatus buscarPorId(int id) {
-        String sql = "SELECT H.*, V.ID AS VOL_ID, V.NOME AS VOL_NOME, V.USUARIO AS VOL_USR " +
+        String sql = "SELECT H.id, H.atendimento_id, H.status_anterior, H.status_novo, H.alterado_por_id, H.data_hora, V.ID AS VOL_ID, V.NOME AS VOL_NOME, V.USUARIO AS VOL_USR " +
                      "FROM historico_status H " +
                      "LEFT JOIN VOLUNTARIO V ON H.alterado_por_id = V.ID " +
                      "WHERE H.id = ?";
@@ -78,7 +78,7 @@ public class HistoricoStatusDAO {
 
     // READ todos os históricos de um atendimento
     public List<HistoricoStatus> buscarPorAtendimento(int atendimentoId) {
-        String sql = "SELECT H.*, V.ID AS VOL_ID, V.NOME AS VOL_NOME, V.USUARIO AS VOL_USR " +
+        String sql = "SELECT H.id, H.atendimento_id, H.status_anterior, H.status_novo, H.alterado_por_id, H.data_hora, V.ID AS VOL_ID, V.NOME AS VOL_NOME, V.USUARIO AS VOL_USR " +
                      "FROM historico_status H " +
                      "LEFT JOIN VOLUNTARIO V ON H.alterado_por_id = V.ID " +
                      "WHERE H.atendimento_id = ? ORDER BY H.data_hora ASC";

@@ -197,7 +197,7 @@ public class VoluntarioDAO {
     }
 
     public List<Voluntario> buscarTopRanking(int limite) {
-        String sql = "SELECT * FROM ( " +
+        String sql = "SELECT " + COLUNAS_VOLUNTARIO + " FROM ( " +
                 "  SELECT " + COLUNAS_VOLUNTARIO + " FROM VOLUNTARIO " +
                 "  WHERE PONTOS_INDICACAO > 0 " +
                 "  ORDER BY PONTOS_INDICACAO DESC " +
