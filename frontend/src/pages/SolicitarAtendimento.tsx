@@ -56,7 +56,7 @@ function toBoolean(value: string) {
 function montarPayload(form: FormState, idContaBeneficiario?: number): RelatarAtendimentoRequest {
   const payload: RelatarAtendimentoRequest = {
     idContaBeneficiario,
-    nomeCodificado: form.nomeCodificado.trim(),
+    nomeCodificado: form.tipoPessoaAtendida === 'MULHER_APOLONIA' ? form.codinome.trim() : form.nomeCodificado.trim(),
     telefone: form.telefone.trim(),
     email: form.email.trim(),
     tipo: form.tipoPessoaAtendida,
@@ -83,10 +83,12 @@ function montarPayload(form: FormState, idContaBeneficiario?: number): RelatarAt
 }
 
 function validar(form: FormState) {
-  if (!form.nomeCodificado.trim()) return 'Informe o nome codificado.';
+  if (form.tipoPessoaAtendida !== 'MULHER_APOLONIA' && !form.nomeCodificado.trim()) {
+    return 'Informe o nome da pessoa atendida.';
+  }
   if (!form.telefone.trim()) return 'Informe um telefone para contato.';
   if (!form.email.trim()) return 'Informe um email para contato.';
-  if (!form.canalComunicacaoId) return 'Escolha um canal de comunicacao.';
+  if (!form.canalComunicacaoId) return 'Erro ao carregar canal de comunicacao.';
   if (!form.descricao.trim() || form.descricao.trim().length < 15) {
     return 'Descreva a situacao com pelo menos 15 caracteres.';
   }
@@ -123,9 +125,16 @@ function SolicitarAtendimento() {
       setCarregandoCanais(true);
       const canaisDisponiveis = await listarCanais();
       setCanais(canaisDisponiveis);
+      
+      const canalWeb = canaisDisponiveis.find(c => 
+        c.nome.toLowerCase().includes('form') || 
+        c.nome.toLowerCase().includes('web') || 
+        c.nome.toLowerCase().includes('sistema')
+      );
+
       setForm((current) => ({
         ...current,
-        canalComunicacaoId: current.canalComunicacaoId || String(canaisDisponiveis[0]?.id ?? ''),
+        canalComunicacaoId: current.canalComunicacaoId || String(canalWeb?.id ?? canaisDisponiveis[0]?.id ?? ''),
       }));
       setCarregandoCanais(false);
     }
@@ -212,13 +221,15 @@ function SolicitarAtendimento() {
 
           <form onSubmit={handleSubmit} className="space-y-8 p-6 sm:p-8">
             <div className="grid gap-5 md:grid-cols-2">
-              <Field label="Nome codificado">
-                <Input
-                  value={form.nomeCodificado}
-                  onChange={(event) => updateField('nomeCodificado', event.target.value)}
-                  placeholder="Ex.: Sol nascente"
-                />
-              </Field>
+              {form.tipoPessoaAtendida !== 'MULHER_APOLONIA' && (
+                <Field label="Nome da pessoa atendida">
+                  <Input
+                    value={form.nomeCodificado}
+                    onChange={(event) => updateField('nomeCodificado', event.target.value)}
+                    placeholder="Ex.: Joao Silva"
+                  />
+                </Field>
+              )}
 
               <Field label="Telefone">
                 <Input
@@ -245,29 +256,6 @@ function SolicitarAtendimento() {
                   <option value="CRIANCA_ADOLESCENTE">Crianca ou adolescente</option>
                   <option value="MULHER_APOLONIA">Mulher Apolonia</option>
                   <option value="OUTRO">Outro</option>
-                </Select>
-              </Field>
-
-              <Field label="Canal de comunicacao">
-                <Select
-                  value={form.canalComunicacaoId}
-                  onChange={(event) => updateField('canalComunicacaoId', event.target.value)}
-                  disabled={carregandoCanais}
-                >
-                  {carregandoCanais && <option value="">Carregando canais...</option>}
-                  {!carregandoCanais && canais.map((canal) => (
-                    <option key={canal.id} value={canal.id}>{canal.nome}</option>
-                  ))}
-                </Select>
-              </Field>
-
-              <Field label="Prioridade">
-                <Select value={form.prioridade} onChange={(event) => updateField('prioridade', event.target.value)}>
-                  <option value="1">1 - Urgente</option>
-                  <option value="2">2 - Alta</option>
-                  <option value="3">3 - Media</option>
-                  <option value="4">4 - Baixa</option>
-                  <option value="5">5 - Acompanhamento</option>
                 </Select>
               </Field>
             </div>
@@ -301,15 +289,6 @@ function SolicitarAtendimento() {
                       onChange={(event) => updateField('escola', event.target.value)}
                       placeholder="Nome da escola"
                     />
-                  </Field>
-                  <Field label="Gravidade bucal">
-                    <Select value={form.gravidadeBucal} onChange={(event) => updateField('gravidadeBucal', event.target.value)}>
-                      <option value="1">1 - Leve</option>
-                      <option value="2">2</option>
-                      <option value="3">3 - Moderada</option>
-                      <option value="4">4</option>
-                      <option value="5">5 - Muito grave</option>
-                    </Select>
                   </Field>
                 </div>
               </div>
@@ -376,7 +355,7 @@ function SolicitarAtendimento() {
             )}
 
             <div className="flex flex-col-reverse gap-3 border-t border-[#E2E8F0] pt-6 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-sm text-[#475569]">Campos de risco e prioridade usam escala de 1 a 5.</p>
+              <p className="text-sm text-[#475569]">Campos de risco usam escala de 1 a 5.</p>
               <Button type="submit" size="large" disabled={enviando || carregandoCanais}>
                 {enviando ? 'Enviando...' : 'Enviar relato'}
               </Button>
