@@ -114,4 +114,33 @@ describe('SolicitarAtendimento', () => {
     expect(payload.canalComunicacaoId).toBe(5); // Detectado Formulario Web na busca automatica do mock
     expect(payload.prioridade).toBe(3); // Default inicial
   });
+
+  it('deve exibir os rotulos corretos para o nivel de risco quando o tipo for Mulher Apolonia', async () => {
+    render(
+      <BrowserRouter>
+        <SolicitarAtendimento />
+      </BrowserRouter>
+    );
+
+    await waitFor(() => {
+      expect(listarCanais).toHaveBeenCalled();
+    });
+
+    // Altera o tipo para Mulher Apolonia
+    const selectTipo = screen.getByLabelText(/Tipo da pessoa atendida/i);
+    fireEvent.change(selectTipo, { target: { value: 'MULHER_APOLONIA' } });
+
+    // Encontra o select de nível de risco
+    const selectRisco = screen.getByLabelText(/Nivel de risco/i) as HTMLSelectElement;
+    expect(selectRisco).toBeInTheDocument();
+
+    const options = Array.from(selectRisco.options).map(opt => opt.textContent);
+    expect(options).toEqual([
+      '1 - Baixo',
+      '2 - Moderado',
+      '3 - Medio',
+      '4 - Alto',
+      '5 - Critico'
+    ]);
+  });
 });

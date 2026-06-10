@@ -162,12 +162,17 @@ public class VoluntarioDAO {
 
             while (rs.next()) {
                 Voluntario voluntario = mapearVoluntario(rs);
-                    carregarEspecialidadesLista(java.util.Collections.singletonList(voluntario));
                 voluntarios.add(voluntario);
             }
 
         } catch (SQLException e) {
             throw new DatabaseException("Erro ao listar voluntarios: " + e.getMessage(), e);
+        }
+
+        try {
+            carregarEspecialidadesLista(voluntarios);
+        } catch (SQLException e) {
+            throw new DatabaseException("Erro ao carregar especialidades dos voluntarios: " + e.getMessage(), e);
         }
 
         return voluntarios;
@@ -185,12 +190,17 @@ public class VoluntarioDAO {
 
             while (rs.next()) {
                 Voluntario voluntario = mapearVoluntario(rs);
-                    carregarEspecialidadesLista(java.util.Collections.singletonList(voluntario));
                 voluntarios.add(voluntario);
             }
 
         } catch (SQLException e) {
             throw new DatabaseException("Erro ao listar voluntarios ativos: " + e.getMessage(), e);
+        }
+
+        try {
+            carregarEspecialidadesLista(voluntarios);
+        } catch (SQLException e) {
+            throw new DatabaseException("Erro ao carregar especialidades dos voluntarios: " + e.getMessage(), e);
         }
 
         return voluntarios;
@@ -213,13 +223,18 @@ public class VoluntarioDAO {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Voluntario voluntario = mapearVoluntario(rs);
-                    carregarEspecialidadesLista(java.util.Collections.singletonList(voluntario));
                     voluntarios.add(voluntario);
                 }
             }
 
         } catch (SQLException e) {
             throw new DatabaseException("Erro ao buscar top ranking: " + e.getMessage(), e);
+        }
+
+        try {
+            carregarEspecialidadesLista(voluntarios);
+        } catch (SQLException e) {
+            throw new DatabaseException("Erro ao carregar especialidades dos voluntarios: " + e.getMessage(), e);
         }
 
         return voluntarios;
@@ -301,12 +316,17 @@ public class VoluntarioDAO {
 
             while (rs.next()) {
                 Voluntario voluntario = mapearVoluntario(rs);
-                    carregarEspecialidadesLista(java.util.Collections.singletonList(voluntario));
                 voluntarios.add(voluntario);
             }
 
         } catch (SQLException e) {
             throw new DatabaseException("Erro ao listar voluntarios pendentes: " + e.getMessage(), e);
+        }
+
+        try {
+            carregarEspecialidadesLista(voluntarios);
+        } catch (SQLException e) {
+            throw new DatabaseException("Erro ao carregar especialidades dos voluntarios: " + e.getMessage(), e);
         }
 
         return voluntarios;

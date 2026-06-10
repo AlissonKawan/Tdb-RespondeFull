@@ -309,10 +309,10 @@ function SolicitarAtendimento() {
                   <Field label="Nivel de risco">
                     <Select value={form.nivelRisco} onChange={(event) => updateField('nivelRisco', event.target.value)}>
                       <option value="1">1 - Baixo</option>
-                      <option value="2">2</option>
+                      <option value="2">2 - Moderado</option>
                       <option value="3">3 - Medio</option>
-                      <option value="4">4</option>
-                      <option value="5">5 - Alto</option>
+                      <option value="4">4 - Alto</option>
+                      <option value="5">5 - Critico</option>
                     </Select>
                   </Field>
                   <Field label="Tem boletim de ocorrencia?">
