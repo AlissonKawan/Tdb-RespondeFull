@@ -11,7 +11,7 @@ import PageHeader from '../components/ui/PageHeader';
 import { useAuth } from '../context/useAuth';
 import { listarCanais } from '../services/canaisService';
 import { relatarAtendimento } from '../services/relatoAtendimentoService';
-import type { CanalComunicacaoApi, RelatarAtendimentoRequest, TipoPessoaRelato } from '../types/AtendimentoApi';
+import type { RelatarAtendimentoRequest, TipoPessoaRelato } from '../types/AtendimentoApi';
 
 type FormState = {
   nomeCodificado: string;
@@ -114,7 +114,6 @@ function SolicitarAtendimento() {
     nomeCodificado: user?.nome ?? '',
     email: user?.email ?? '',
   }));
-  const [canais, setCanais] = useState<CanalComunicacaoApi[]>([]);
   const [carregandoCanais, setCarregandoCanais] = useState(true);
   const [enviando, setEnviando] = useState(false);
   const [sucesso, setSucesso] = useState('');
@@ -124,7 +123,6 @@ function SolicitarAtendimento() {
     async function carregarCanais() {
       setCarregandoCanais(true);
       const canaisDisponiveis = await listarCanais();
-      setCanais(canaisDisponiveis);
       
       const canalWeb = canaisDisponiveis.find(c => 
         c.nome.toLowerCase().includes('form') || 
