@@ -268,6 +268,7 @@ export default function DashboardAdmin() {
                         <th className="px-4 py-3 text-left">Nome</th>
                         <th className="px-4 py-3 text-left">Usuário</th>
                         <th className="px-4 py-3 text-left">Especialidade</th>
+                        <th className="px-4 py-3 text-left">CRO</th>
                         <th className="px-4 py-3 text-left">Disponível</th>
                       </tr>
                     </thead>
@@ -277,6 +278,7 @@ export default function DashboardAdmin() {
                           <td className="px-4 py-3 font-semibold text-slate-800">{vol.nome}</td>
                           <td className="px-4 py-3 text-slate-500">{vol.usuario || 'N/A'}</td>
                           <td className="px-4 py-3"><Badge>{vol.especialidade?.nome || 'N/A'}</Badge></td>
+                          <td className="px-4 py-3 text-slate-500">{vol.cro ? `${vol.cro} (${vol.ufCro || 'N/A'})` : 'N/A'}</td>
                           <td className="px-4 py-3">
                             <Badge tone={vol.disponivel ? 'success' : 'danger'}>{vol.disponivel ? 'Sim' : 'Não'}</Badge>
                           </td>
@@ -337,7 +339,10 @@ export default function DashboardAdmin() {
                       <h3 className="font-bold text-slate-900">{item.nome}</h3>
                       <Badge tone="warning">Pendente</Badge>
                     </div>
-                    <p className="mt-1 text-sm text-slate-500">{item.usuario || 'Sem email'} | {item.especialidade?.nome || 'Sem especialidade'}</p>
+                    <p className="mt-1 text-sm text-slate-500">
+                      {item.usuario || 'Sem email'} | {item.especialidade?.nome || 'Sem especialidade'}
+                      {item.cro && ` | CRO: ${item.cro} (${item.ufCro || 'N/A'})`}
+                    </p>
                     {item.motivoVoluntariado && (
                       <p className="mt-3 text-sm text-slate-600 italic">"{item.motivoVoluntariado}"</p>
                     )}

@@ -13,6 +13,8 @@ export interface VoluntarioApi {
   disponivel: boolean;
   acessoSigilo: boolean;
   codigoIndicacao?: string;
+  cro?: string;
+  ufCro?: string;
 }
 
 export interface VoluntarioRequestApi {

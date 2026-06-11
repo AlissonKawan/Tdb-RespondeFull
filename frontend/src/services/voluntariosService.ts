@@ -14,6 +14,8 @@ export interface Voluntario {
     id: number;
     nome: string;
   };
+  cro?: string;
+  ufCro?: string;
 }
 
 export interface RankingResponse {

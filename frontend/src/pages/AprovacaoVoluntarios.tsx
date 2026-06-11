@@ -98,6 +98,11 @@ function AprovacaoVoluntarios() {
                   <div className="mt-3 grid gap-2 text-sm text-[#475569] md:grid-cols-2">
                     {solicitacao.usuario && <p><strong className="text-[#0F172A]">Contato:</strong> {solicitacao.usuario}</p>}
                     <p><strong className="text-[#0F172A]">Especialidade:</strong> {solicitacao.especialidade?.nome ?? 'Nao informada'}</p>
+                    {solicitacao.cro && (
+                      <p>
+                        <strong className="text-[#0F172A]">Registro Profissional (CRO):</strong> {solicitacao.cro} - {solicitacao.ufCro || 'N/A'}
+                      </p>
+                    )}
                   </div>
                   {solicitacao.motivoVoluntariado && (
                     <p className="mt-4 rounded-xl bg-[#F8FAFC] p-4 text-sm leading-6 text-[#475569]">
