@@ -254,15 +254,38 @@ public class ContaUsuarioBO {
         if (!temEspecialidadeInformada(request)) {
             throw new BusinessException("Especialidade e obrigatoria para cadastro de voluntario.");
         }
-        if (isBlank(request.cro)) {
-            throw new BusinessException("CRO e obrigatorio para cadastro de voluntario.");
+        
+        if (precisaDeCro(request)) {
+            if (isBlank(request.cro)) {
+                throw new BusinessException("CRO e obrigatorio para cadastro de voluntario.");
+            }
+            if (isBlank(request.ufCro)) {
+                throw new BusinessException("UF do CRO e obrigatoria para cadastro de voluntario.");
+            }
+            if (!croService.verificar(request.cro, request.ufCro)) {
+                throw new BusinessException("CRO informado nao foi validado pelo conselho regional.");
+            }
         }
-        if (isBlank(request.ufCro)) {
-            throw new BusinessException("UF do CRO e obrigatoria para cadastro de voluntario.");
+    }
+
+    private boolean precisaDeCro(RegisterRequest request) {
+        List<Integer> ids = new ArrayList<>();
+        if (request.especialidadeIds != null) {
+            ids.addAll(request.especialidadeIds);
         }
-        if (!croService.verificar(request.cro, request.ufCro)) {
-            throw new BusinessException("CRO informado nao foi validado pelo conselho regional.");
+        if (request.especialidadeId != null) {
+            ids.add(request.especialidadeId);
         }
+        for (Integer id : ids.stream().filter(id -> id != null && id > 0).distinct().toList()) {
+            Especialidade esp = especialidadeDAO.buscarPorId(id);
+            if (esp != null && "Odontologia".equalsIgnoreCase(esp.getNome())) {
+                return true;
+            }
+        }
+        if (!isBlank(request.especialidade) && "Odontologia".equalsIgnoreCase(request.especialidade.trim())) {
+            return true;
+        }
+        return false;
     }
 
     private void validarBeneficiario(RegisterRequest request) {

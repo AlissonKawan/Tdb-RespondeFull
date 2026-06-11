@@ -41,6 +41,10 @@ public class VoluntarioCroTest {
         bo.criancaDAO = criancaDAO;
         bo.mulherDAO = mulherDAO;
         bo.croService = croService;
+
+        // Mock default specialty "Odontologia"
+        Especialidade esp = new Especialidade(1, "Desc", "Odontologia");
+        when(especialidadeDAO.buscarPorId(1)).thenReturn(esp);
     }
 
     @Test
@@ -57,7 +61,6 @@ public class VoluntarioCroTest {
         req.ufCro = "SP";
 
         when(contaUsuarioDAO.emailExiste("valido@teste.com")).thenReturn(false);
-        when(especialidadeDAO.buscarPorId(1)).thenReturn(new Especialidade());
         when(croService.verificar("12345", "SP")).thenReturn(true);
 
         doAnswer(invocation -> {
@@ -142,7 +145,6 @@ public class VoluntarioCroTest {
         req.ufCro = "RJ";
 
         when(contaUsuarioDAO.emailExiste("invalido@teste.com")).thenReturn(false);
-        when(especialidadeDAO.buscarPorId(1)).thenReturn(new Especialidade());
         when(croService.verificar("INVALIDO", "RJ")).thenReturn(false);
 
         // Act & Assert
