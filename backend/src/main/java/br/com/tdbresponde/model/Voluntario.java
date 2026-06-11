@@ -122,6 +122,9 @@ public class Voluntario {
     }
 
     public Especialidade getEspecialidade() {
+        if (especialidade == null && especialidades != null && !especialidades.isEmpty()) {
+            return especialidades.get(0);
+        }
         return especialidade;
     }
 

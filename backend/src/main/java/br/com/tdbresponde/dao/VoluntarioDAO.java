@@ -424,6 +424,9 @@ public class VoluntarioDAO {
                                 v.setEspecialidades(new ArrayList<>());
                             }
                             v.getEspecialidades().add(esp);
+                            if (v.getEspecialidade() == null) {
+                                v.setEspecialidade(esp);
+                            }
                             break;
                         }
                     }
