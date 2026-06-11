@@ -21,6 +21,10 @@ public class Voluntario {
     private Integer pontosIndicacao = 0;
     private Integer idVoluntarioIndicador;
 
+    // Campos de validação profissional
+    private String cro;
+    private String ufCro;
+
     public Voluntario() {
     }
 
@@ -177,6 +181,22 @@ public class Voluntario {
         this.idVoluntarioIndicador = idVoluntarioIndicador;
     }
 
+    public String getCro() {
+        return cro;
+    }
+
+    public void setCro(String cro) {
+        this.cro = cro;
+    }
+
+    public String getUfCro() {
+        return ufCro;
+    }
+
+    public void setUfCro(String ufCro) {
+        this.ufCro = ufCro;
+    }
+
     @Override
     public String toString() {
         return "Voluntario{" +
@@ -192,6 +212,8 @@ public class Voluntario {
                 ", codigoIndicacao='" + codigoIndicacao + '\'' +
                 ", pontosIndicacao=" + pontosIndicacao +
                 ", idVoluntarioIndicador=" + idVoluntarioIndicador +
+                ", cro='" + cro + '\'' +
+                ", ufCro='" + ufCro + '\'' +
                 '}';
     }
 }

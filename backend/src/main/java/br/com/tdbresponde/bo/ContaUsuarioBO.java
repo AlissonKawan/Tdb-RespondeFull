@@ -19,6 +19,7 @@ import br.com.tdbresponde.model.MulherApolonia;
 import br.com.tdbresponde.model.TipoUsuario;
 import br.com.tdbresponde.model.Voluntario;
 import br.com.tdbresponde.security.SenhaHasher;
+import br.com.tdbresponde.client.CroVerificationService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -38,6 +39,9 @@ public class ContaUsuarioBO {
 
     @Inject
     VoluntarioDAO voluntarioDAO;
+
+    @Inject
+    CroVerificationService croService;
 
     @Inject
     CriancaAdolescenteDAO criancaDAO;
@@ -170,6 +174,8 @@ public class ContaUsuarioBO {
         voluntario.setStatusAprovacao("PENDENTE");
         voluntario.setMotivoVoluntariado(request.motivoVoluntariado.trim());
         voluntario.setEspecialidades(especialidades);
+        voluntario.setCro(request.cro != null ? request.cro.trim() : null);
+        voluntario.setUfCro(request.ufCro != null ? request.ufCro.trim().toUpperCase() : null);
 
         voluntario.setCodigoIndicacao(java.util.UUID.randomUUID().toString().substring(0, 8).toUpperCase());
 
@@ -247,6 +253,15 @@ public class ContaUsuarioBO {
         }
         if (!temEspecialidadeInformada(request)) {
             throw new BusinessException("Especialidade e obrigatoria para cadastro de voluntario.");
+        }
+        if (isBlank(request.cro)) {
+            throw new BusinessException("CRO e obrigatorio para cadastro de voluntario.");
+        }
+        if (isBlank(request.ufCro)) {
+            throw new BusinessException("UF do CRO e obrigatoria para cadastro de voluntario.");
+        }
+        if (!croService.verificar(request.cro, request.ufCro)) {
+            throw new BusinessException("CRO informado nao foi validado pelo conselho regional.");
         }
     }
 

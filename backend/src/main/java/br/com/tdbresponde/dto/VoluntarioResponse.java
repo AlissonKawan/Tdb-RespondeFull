@@ -17,6 +17,8 @@ public class VoluntarioResponse {
     public Integer idVoluntarioIndicador;
     public EspecialidadeResponse especialidade;
     public java.util.List<EspecialidadeResponse> especialidades;
+    public String cro;
+    public String ufCro;
 
     public static VoluntarioResponse from(Voluntario voluntario) {
         VoluntarioResponse response = new VoluntarioResponse();
@@ -31,6 +33,8 @@ public class VoluntarioResponse {
         response.codigoIndicacao = voluntario.getCodigoIndicacao();
         response.pontosIndicacao = voluntario.getPontosIndicacao();
         response.idVoluntarioIndicador = voluntario.getIdVoluntarioIndicador();
+        response.cro = voluntario.getCro();
+        response.ufCro = voluntario.getUfCro();
         if (voluntario.getEspecialidade() != null) {
             response.especialidade = EspecialidadeResponse.from(voluntario.getEspecialidade());
         }

@@ -21,7 +21,15 @@ interface FormData {
   confirmarSenha: string;
   especialidadeId: number;
   motivoVoluntariado: string;
+  cro: string;
+  ufCro: string;
 }
+
+const UFS = [
+  'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO',
+  'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI',
+  'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'
+];
 
 function CadastroVoluntario() {
   const navigate = useNavigate();
@@ -82,6 +90,8 @@ function CadastroVoluntario() {
         tipoUsuario: 'VOLUNTARIO',
         especialidadeId: data.especialidadeId,
         motivoVoluntariado: data.motivoVoluntariado,
+        cro: data.cro,
+        ufCro: data.ufCro,
         codigoIndicacao,
       });
 
@@ -194,6 +204,31 @@ function CadastroVoluntario() {
                 ))}
               </Select>
             </Field>
+            <div className="grid gap-5 md:grid-cols-2">
+              <Field label="CRO" error={errors.cro?.message}>
+                <Input
+                  {...register('cro', {
+                    required: 'CRO é obrigatório',
+                  })}
+                  placeholder="Ex: 12345"
+                />
+              </Field>
+              <Field label="UF do CRO" error={errors.ufCro?.message}>
+                <Select
+                  defaultValue=""
+                  {...register('ufCro', {
+                    required: 'Selecione o estado do seu CRO',
+                  })}
+                >
+                  <option value="" disabled>Selecione a UF</option>
+                  {UFS.map((uf) => (
+                    <option key={uf} value={uf}>
+                      {uf}
+                    </option>
+                  ))}
+                </Select>
+              </Field>
+            </div>
             <Field label="Motivo do voluntariado" error={errors.motivoVoluntariado?.message}>
               <Textarea
                 rows={5}

@@ -11,4 +11,6 @@ public class VoluntarioRequest {
     public java.util.List<Integer> especialidadeIds;
     public Integer contaId;
     public String motivoVoluntariado;
+    public String cro;
+    public String ufCro;
 }

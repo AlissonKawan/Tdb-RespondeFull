@@ -6,16 +6,16 @@ import br.com.tdbresponde.exception.BusinessException;
 import br.com.tdbresponde.model.ContaUsuario;
 import br.com.tdbresponde.model.Especialidade;
 import br.com.tdbresponde.model.Voluntario;
+import br.com.tdbresponde.client.CroVerificationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import br.com.tdbresponde.client.CroVerificationService;
 import static org.mockito.Mockito.*;
 
-public class VoluntarioIndicacaoTest {
+public class VoluntarioCroTest {
 
     private ContaUsuarioBO bo;
     private VoluntarioDAO voluntarioDAO;
@@ -44,28 +44,22 @@ public class VoluntarioIndicacaoTest {
     }
 
     @Test
-    void deveGerarCodigoEVincularIndicadorCorretamente() {
+    void deveRegistrarVoluntarioComCroValido() {
         // Arrange
         RegisterRequest req = new RegisterRequest();
-        req.nome = "Novo Voluntario";
-        req.email = "novo@teste.com";
+        req.nome = "Dr. Valido";
+        req.email = "valido@teste.com";
         req.senha = "123456";
         req.tipoUsuario = "VOLUNTARIO";
         req.motivoVoluntariado = "Quero muito ajudar pessoas necessitadas.";
         req.especialidadeId = 1;
-        req.codigoIndicacao = "IND_VALIDO";
         req.cro = "12345";
         req.ufCro = "SP";
 
-        when(contaUsuarioDAO.emailExiste("novo@teste.com")).thenReturn(false);
+        when(contaUsuarioDAO.emailExiste("valido@teste.com")).thenReturn(false);
         when(especialidadeDAO.buscarPorId(1)).thenReturn(new Especialidade());
         when(croService.verificar("12345", "SP")).thenReturn(true);
 
-        Voluntario indicador = new Voluntario();
-        indicador.setId(99);
-        when(voluntarioDAO.buscarPorCodigoIndicacao("IND_VALIDO")).thenReturn(indicador);
-
-        // Simulando que o banco gerou um ID para a conta
         doAnswer(invocation -> {
             ContaUsuario conta = invocation.getArgument(0);
             conta.setId(10);
@@ -74,7 +68,6 @@ public class VoluntarioIndicacaoTest {
         
         when(contaUsuarioDAO.buscarPorId(10)).thenReturn(new ContaUsuario());
 
-        // Simulando que o banco gerou um ID para o voluntário
         doAnswer(invocation -> {
             Voluntario vol = invocation.getArgument(0);
             vol.setId(20);
@@ -89,36 +82,74 @@ public class VoluntarioIndicacaoTest {
         verify(voluntarioDAO).inserir(voluntarioCaptor.capture());
 
         Voluntario voluntarioSalvo = voluntarioCaptor.getValue();
-        
-        assertNotNull(voluntarioSalvo.getCodigoIndicacao(), "O codigo de indicacao deve ser gerado");
-        assertEquals(8, voluntarioSalvo.getCodigoIndicacao().length(), "O codigo deve ter 8 caracteres");
-        assertEquals(99, voluntarioSalvo.getIdVoluntarioIndicador(), "O ID do voluntario indicador deve ser vinculado");
+        assertEquals("12345", voluntarioSalvo.getCro());
+        assertEquals("SP", voluntarioSalvo.getUfCro());
     }
 
     @Test
-    void deveLancarExcecaoSeCodigoIndicacaoForInvalido() {
+    void deveLancarExcecaoQuandoCroForNulo() {
         // Arrange
         RegisterRequest req = new RegisterRequest();
-        req.nome = "Novo Voluntario";
-        req.email = "novo@teste.com";
+        req.nome = "Dr. Sem Cro";
+        req.email = "semcro@teste.com";
         req.senha = "123456";
         req.tipoUsuario = "VOLUNTARIO";
         req.motivoVoluntariado = "Quero muito ajudar pessoas necessitadas.";
         req.especialidadeId = 1;
-        req.codigoIndicacao = "INVALIDO";
-        req.cro = "12345";
+        req.cro = null;
         req.ufCro = "SP";
-
-        when(contaUsuarioDAO.emailExiste("novo@teste.com")).thenReturn(false);
-        when(especialidadeDAO.buscarPorId(1)).thenReturn(new Especialidade());
-        when(croService.verificar("12345", "SP")).thenReturn(true);
-        when(voluntarioDAO.buscarPorCodigoIndicacao("INVALIDO")).thenReturn(null);
 
         // Act & Assert
         BusinessException exception = assertThrows(BusinessException.class, () -> {
             bo.registrar(req);
         });
 
-        assertEquals("Codigo de indicacao invalido.", exception.getMessage());
+        assertEquals("CRO e obrigatorio para cadastro de voluntario.", exception.getMessage());
+    }
+
+    @Test
+    void deveLancarExcecaoQuandoUfCroForNulo() {
+        // Arrange
+        RegisterRequest req = new RegisterRequest();
+        req.nome = "Dr. Sem UF";
+        req.email = "semuf@teste.com";
+        req.senha = "123456";
+        req.tipoUsuario = "VOLUNTARIO";
+        req.motivoVoluntariado = "Quero muito ajudar pessoas necessitadas.";
+        req.especialidadeId = 1;
+        req.cro = "12345";
+        req.ufCro = null;
+
+        // Act & Assert
+        BusinessException exception = assertThrows(BusinessException.class, () -> {
+            bo.registrar(req);
+        });
+
+        assertEquals("UF do CRO e obrigatoria para cadastro de voluntario.", exception.getMessage());
+    }
+
+    @Test
+    void deveLancarExcecaoQuandoCroForInvalido() {
+        // Arrange
+        RegisterRequest req = new RegisterRequest();
+        req.nome = "Dr. Invalido";
+        req.email = "invalido@teste.com";
+        req.senha = "123456";
+        req.tipoUsuario = "VOLUNTARIO";
+        req.motivoVoluntariado = "Quero muito ajudar pessoas necessitadas.";
+        req.especialidadeId = 1;
+        req.cro = "INVALIDO";
+        req.ufCro = "RJ";
+
+        when(contaUsuarioDAO.emailExiste("invalido@teste.com")).thenReturn(false);
+        when(especialidadeDAO.buscarPorId(1)).thenReturn(new Especialidade());
+        when(croService.verificar("INVALIDO", "RJ")).thenReturn(false);
+
+        // Act & Assert
+        BusinessException exception = assertThrows(BusinessException.class, () -> {
+            bo.registrar(req);
+        });
+
+        assertEquals("CRO informado nao foi validado pelo conselho regional.", exception.getMessage());
     }
 }

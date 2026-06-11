@@ -23,4 +23,7 @@ public class RegisterRequest {
     public String especialidade;
     public java.util.List<Integer> especialidadeIds;
     public String codigoIndicacao;
+
+    public String cro;
+    public String ufCro;
 }

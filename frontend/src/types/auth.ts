@@ -11,6 +11,8 @@ export interface RegisterPayload {
   tipoPessoaAtendida?: TipoPessoaAtendida;
   tipoBeneficiario?: TipoPessoaAtendida;
   codigoIndicacao?: string;
+  cro?: string;
+  ufCro?: string;
 }
 
 export type RegisterRequest = RegisterPayload;
