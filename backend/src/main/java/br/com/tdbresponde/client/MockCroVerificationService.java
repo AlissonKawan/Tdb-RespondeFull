@@ -1,8 +1,5 @@
 package br.com.tdbresponde.client;
 
-import jakarta.enterprise.context.ApplicationScoped;
-
-@ApplicationScoped
 public class MockCroVerificationService implements CroVerificationService {
 
     @Override
