@@ -109,6 +109,10 @@ public class ContaUsuarioBO {
         return voluntario != null ? voluntario.getId() : null;
     }
 
+    public Voluntario buscarVoluntarioPorContaId(int contaId) {
+        return voluntarioDAO.buscarPorContaId(contaId);
+    }
+
     public Integer buscarBeneficiarioIdDaConta(int contaId) {
         CriancaAdolescente crianca = criancaDAO.buscarPorContaId(contaId);
         if (crianca != null) {

@@ -29,15 +29,23 @@ public class AuthResource {
 
         Integer voluntarioId = null;
         Integer beneficiarioId = null;
+        String statusCro = null;
 
         if (conta.getTipoUsuario() == TipoUsuario.VOLUNTARIO) {
-            voluntarioId = bo.buscarVoluntarioIdDaConta(conta.getId());
+            br.com.tdbresponde.model.Voluntario voluntario = bo.buscarVoluntarioPorContaId(conta.getId());
+            if (voluntario != null) {
+                voluntarioId = voluntario.getId();
+                statusCro = voluntario.getStatusCro();
+            }
         } else if (conta.getTipoUsuario() == TipoUsuario.BENEFICIARIO) {
             beneficiarioId = bo.buscarBeneficiarioIdDaConta(conta.getId());
         }
 
+        AuthUserResponse authRes = AuthUserResponse.from(conta, voluntarioId, beneficiarioId);
+        authRes.statusCro = statusCro;
+
         return Response.status(Response.Status.CREATED)
-                .entity(AuthUserResponse.from(conta, voluntarioId, beneficiarioId))
+                .entity(authRes)
                 .build();
     }
 
@@ -48,13 +56,21 @@ public class AuthResource {
 
         Integer voluntarioId = null;
         Integer beneficiarioId = null;
+        String statusCro = null;
 
         if (conta.getTipoUsuario() == TipoUsuario.VOLUNTARIO) {
-            voluntarioId = bo.buscarVoluntarioIdDaConta(conta.getId());
+            br.com.tdbresponde.model.Voluntario voluntario = bo.buscarVoluntarioPorContaId(conta.getId());
+            if (voluntario != null) {
+                voluntarioId = voluntario.getId();
+                statusCro = voluntario.getStatusCro();
+            }
         } else if (conta.getTipoUsuario() == TipoUsuario.BENEFICIARIO) {
             beneficiarioId = bo.buscarBeneficiarioIdDaConta(conta.getId());
         }
 
-        return Response.ok(AuthUserResponse.from(conta, voluntarioId, beneficiarioId)).build();
+        AuthUserResponse authRes = AuthUserResponse.from(conta, voluntarioId, beneficiarioId);
+        authRes.statusCro = statusCro;
+
+        return Response.ok(authRes).build();
     }
 }

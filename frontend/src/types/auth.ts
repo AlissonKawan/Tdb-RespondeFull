@@ -33,4 +33,5 @@ export interface AuthUser {
   voluntarioId?: number;
   beneficiarioId?: number;
   pessoaAtendidaId?: number;
+  statusCro?: string;
 }

@@ -86,7 +86,7 @@ function CadastroVoluntario() {
     setLoading(true);
 
     try {
-      await registerAccount({
+      const response = await registerAccount({
         nome: data.nome,
         email: data.email,
         senha: data.senha,
@@ -98,8 +98,19 @@ function CadastroVoluntario() {
         codigoIndicacao,
       });
 
-      setSucesso('Solicitacao enviada com sucesso. Aguarde a aprovacao de um voluntario responsavel para acessar o portal.');
-      window.setTimeout(() => navigate('/login'), 3500);
+      if (isOdontologia) {
+        if (response?.statusCro === 'VALIDADO') {
+          setSucesso('Solicitação enviada com sucesso! Seu CRO foi validado automaticamente pelo portal do governo. Aguarde a aprovação de um voluntário responsável para acessar o portal.');
+        } else if (response?.statusCro === 'FALHA_INTEGRACAO') {
+          setSucesso('Solicitação enviada com sucesso! O sistema não conseguiu identificar automaticamente o seu CRO no portal do governo (instabilidade/CAPTCHA), por isso ele será analisado manualmente por um responsável. Aguarde a aprovação.');
+        } else {
+          setSucesso('Solicitação enviada com sucesso. Aguarde a aprovação de um voluntário responsável para acessar o portal.');
+        }
+      } else {
+        setSucesso('Solicitação enviada com sucesso. Aguarde a aprovação de um voluntário responsável para acessar o portal.');
+      }
+
+      window.setTimeout(() => navigate('/login'), 6000);
     } catch (error) {
       setErro(errorMessage(error));
     } finally {

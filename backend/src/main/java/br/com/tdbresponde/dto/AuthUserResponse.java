@@ -15,6 +15,7 @@ public class AuthUserResponse {
 
     public Integer voluntarioId;
     public Integer beneficiarioId;
+    public String statusCro;
 
     public static AuthUserResponse from(ContaUsuario conta) {
         AuthUserResponse response = new AuthUserResponse();
