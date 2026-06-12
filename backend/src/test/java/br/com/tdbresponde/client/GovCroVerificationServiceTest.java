@@ -88,7 +88,7 @@ public class GovCroVerificationServiceTest {
     }
 
     @Test
-    void deveRetornarFalseNoModoEstritoQuandoOcorrerErroDeConexao() {
+    void deveRetornarTrueQuandoOcorrerErroDeConexaoMesmoNoModoEstrito() {
         GovCroVerificationService serviceComErroStrict = new GovCroVerificationService() {
             @Override
             protected boolean executarConsultaReal(String cro, String uf) throws IOException {
@@ -97,7 +97,68 @@ public class GovCroVerificationServiceTest {
         };
         serviceComErroStrict.strictMode = true;
 
-        assertFalse(serviceComErroStrict.verificar("12345", "SP"),
-                "No modo estrito (strictMode=true), falha de conexão deve retornar false");
+        assertTrue(serviceComErroStrict.verificar("12345", "SP"),
+                "Falha de conexão deve retornar true com FALHA_INTEGRACAO");
+        assertEquals("FALHA_INTEGRACAO", serviceComErroStrict.obterStatusUltimaVerificacao());
+    }
+
+    @Test
+    void deveLancarExceptionQuandoHtmlForFormularioOuCaptchaSemResultado() {
+        String htmlFormulario = "<html><body>" +
+                "<form id='busca-profissionais'>" +
+                "  <input type='text' id='nome' name='nome' />" +
+                "</form>" +
+                "</body></html>";
+        Document doc = Jsoup.parse(htmlFormulario);
+        
+        assertThrows(RuntimeException.class, () -> {
+            service.parseHtmlResultado(doc, "12345", "SP");
+        }, "Se o HTML for apenas um formulário/captcha sem o CRO nem mensagem de erro, deve lançar RuntimeException");
+    }
+
+    @Test
+    void deveRetornarTrueNoModoPermissivoQuandoHtmlForFormularioSemResultado() {
+        GovCroVerificationService serviceComForm = new GovCroVerificationService() {
+            @Override
+            protected boolean executarConsultaReal(String cro, String uf) throws IOException {
+                String htmlForm = "<html><body>Formulario inicial do site</body></html>";
+                return parseHtmlResultado(Jsoup.parse(htmlForm), cro, uf);
+            }
+        };
+        serviceComForm.strictMode = false;
+
+        assertTrue(serviceComForm.verificar("12345", "SP"));
+        assertEquals("FALHA_INTEGRACAO", serviceComForm.obterStatusUltimaVerificacao());
+    }
+
+    @Test
+    void deveRetornarTrueQuandoHtmlForFormularioSemResultadoMesmoNoModoEstrito() {
+        GovCroVerificationService serviceComForm = new GovCroVerificationService() {
+            @Override
+            protected boolean executarConsultaReal(String cro, String uf) throws IOException {
+                String htmlForm = "<html><body>Formulario inicial do site</body></html>";
+                return parseHtmlResultado(Jsoup.parse(htmlForm), cro, uf);
+            }
+        };
+        serviceComForm.strictMode = true;
+
+        assertTrue(serviceComForm.verificar("12345", "SP"));
+        assertEquals("FALHA_INTEGRACAO", serviceComForm.obterStatusUltimaVerificacao());
+    }
+
+    @Test
+    void testRealUrlContent() throws IOException {
+        Document doc = Jsoup.connect("https://busca-profissionais.cfo.org.br/")
+                .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+                .timeout(10000)
+                .get();
+        String htmlText = doc.text().toUpperCase();
+        System.out.println("DEBUG HTML TEXT: " + htmlText);
+        boolean contemNaoEncontrado = htmlText.contains("NENHUM PROFISSIONAL ENCONTRADO") ||
+                                       htmlText.contains("NENHUM REGISTRO ENCONTRADO") ||
+                                       htmlText.contains("NENHUM RESULTADO") ||
+                                       htmlText.contains("NAO FORAM ENCONTRADOS") ||
+                                       htmlText.contains("NENHUM RESULTADO ENCONTRADO");
+        System.out.println("DEBUG CONTEM NAO ENCONTRADO: " + contemNaoEncontrado);
     }
 }

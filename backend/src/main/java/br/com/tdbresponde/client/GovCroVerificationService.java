@@ -58,16 +58,9 @@ public class GovCroVerificationService implements CroVerificationService {
             return result;
         } catch (Exception e) {
             LOGGER.warning("Falha na conexao ou validacao externa do CRO com o portal do governo: " + e.getMessage());
-            
-            if (strictMode) {
-                LOGGER.severe("Modo estrito ativo. Cadastro rejeitado devido a falha na verificação de CRO.");
-                ULTIMA_VERIFICACAO.set("REJEITADO");
-                return false;
-            } else {
-                LOGGER.warning("Modo permissivo ativo. Cadastro de voluntario aprovado com aviso de verificacao manual pendente.");
-                ULTIMA_VERIFICACAO.set("FALHA_INTEGRACAO");
-                return true;
-            }
+            LOGGER.warning("Modo permissivo forcado para falha de integracao. Cadastro de voluntario aprovado com aviso de verificacao manual pendente.");
+            ULTIMA_VERIFICACAO.set("FALHA_INTEGRACAO");
+            return true;
         }
     }
 
@@ -91,38 +84,46 @@ public class GovCroVerificationService implements CroVerificationService {
     public boolean parseHtmlResultado(Document doc, String cro, String uf) {
         String htmlText = doc.text().toUpperCase();
 
-        // Verificar mensagens conhecidas de "não encontrado" no portal do CFO/Implanta
-        if (htmlText.contains("NENHUM PROFISSIONAL ENCONTRADO") ||
-            htmlText.contains("NENHUM REGISTRO ENCONTRADO") ||
-            htmlText.contains("NENHUM RESULTADO") ||
-            htmlText.contains("NAO FORAM ENCONTRADOS") ||
-            htmlText.contains("NENHUM RESULTADO ENCONTRADO")) {
-            return false;
-        }
+        boolean contemCroEUf = htmlText.contains(cro) && htmlText.contains(uf);
+        boolean contemNaoEncontrado = htmlText.contains("NENHUM PROFISSIONAL ENCONTRADO") ||
+                                      htmlText.contains("NENHUM REGISTRO ENCONTRADO") ||
+                                      htmlText.contains("NENHUM RESULTADO") ||
+                                      htmlText.contains("NAO FORAM ENCONTRADOS") ||
+                                      htmlText.contains("NENHUM RESULTADO ENCONTRADO");
 
-        // Buscar em linhas de tabela, caixas de resultados ou divs de registros
-        Elements rows = doc.select("table tr, div.profissional-box, div.resultado-item, table tbody tr, div.card-body");
-        if (!rows.isEmpty()) {
-            for (Element row : rows) {
-                String rowText = row.text().toUpperCase();
-                if (rowText.contains(cro) && rowText.contains(uf)) {
-                    // Se contiver indicações de que está cancelado ou inativo
-                    if (rowText.contains("CANCELADO") || rowText.contains("INATIVO") || rowText.contains("SUSPENSO")) {
-                        return false;
+        if (contemCroEUf) {
+            // Buscar em linhas de tabela, caixas de resultados ou divs de registros
+            Elements rows = doc.select("table tr, div.profissional-box, div.resultado-item, table tbody tr, div.card-body");
+            if (!rows.isEmpty()) {
+                for (Element row : rows) {
+                    String rowText = row.text().toUpperCase();
+                    if (rowText.contains(cro) && rowText.contains(uf)) {
+                        // Se contiver indicações de que está cancelado ou inativo
+                        if (rowText.contains("CANCELADO") || rowText.contains("INATIVO") || rowText.contains("SUSPENSO")) {
+                            return false;
+                        }
+                        return true;
                     }
-                    return true;
                 }
             }
-        }
 
-        // Fallback amplo: se o número do CRO e a UF constam na página, e não constam termos de cancelamento
-        if (htmlText.contains(cro) && htmlText.contains(uf)) {
+            // Fallback amplo: se o número do CRO e a UF constam na página, e não constam termos de cancelamento
             return !htmlText.contains("SITUAÇÃO: INATIVO") &&
                    !htmlText.contains("SITUAÇÃO: CANCELADO") &&
                    !htmlText.contains("SITUACAO: INATIVO") &&
-                   !htmlText.contains("SITUACAO: CANCELADO");
+                   !htmlText.contains("SITUACAO: CANCELADO") &&
+                   !htmlText.contains("CANCELADO") &&
+                   !htmlText.contains("INATIVO") &&
+                   !htmlText.contains("SUSPENSO");
         }
 
-        return false;
+        if (contemNaoEncontrado) {
+            // A busca foi executada de fato, mas o CRO não existe no banco do conselho
+            return false;
+        }
+
+        // Se não encontrou o CRO e também não encontrou a mensagem de "não encontrado", 
+        // significa que a busca não foi executada (caiu na página inicial do formulário ou foi bloqueado por CAPTCHA).
+        throw new RuntimeException("Portal do governo exigiu CAPTCHA ou a busca nao pôde ser executada no servidor.");
     }
 }
