@@ -16,6 +16,7 @@ export interface Voluntario {
   };
   cro?: string;
   ufCro?: string;
+  statusCro?: string;
 }
 
 export interface RankingResponse {

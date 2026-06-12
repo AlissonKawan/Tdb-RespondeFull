@@ -19,6 +19,7 @@ public class VoluntarioResponse {
     public java.util.List<EspecialidadeResponse> especialidades;
     public String cro;
     public String ufCro;
+    public String statusCro;
 
     public static VoluntarioResponse from(Voluntario voluntario) {
         VoluntarioResponse response = new VoluntarioResponse();
@@ -35,6 +36,7 @@ public class VoluntarioResponse {
         response.idVoluntarioIndicador = voluntario.getIdVoluntarioIndicador();
         response.cro = voluntario.getCro();
         response.ufCro = voluntario.getUfCro();
+        response.statusCro = voluntario.getStatusCro();
         if (voluntario.getEspecialidade() != null) {
             response.especialidade = EspecialidadeResponse.from(voluntario.getEspecialidade());
         }

@@ -18,7 +18,7 @@ import java.util.List;
 public class VoluntarioDAO {
 
     private static final String COLUNAS_VOLUNTARIO =
-            "ID, NOME, USUARIO, SENHA, ACESSO_SIGILO, DISPONIVEL, ID_CONTA, STATUS_APROVACAO, MOTIVO_VOLUNTARIADO, CODIGO_INDICACAO, PONTOS_INDICACAO, ID_VOLUNTARIO_INDICADOR, CRO, UF_CRO";
+            "ID, NOME, USUARIO, SENHA, ACESSO_SIGILO, DISPONIVEL, ID_CONTA, STATUS_APROVACAO, MOTIVO_VOLUNTARIADO, CODIGO_INDICACAO, PONTOS_INDICACAO, ID_VOLUNTARIO_INDICADOR, CRO, UF_CRO, STATUS_CRO";
 
     @Inject
     DataSource dataSource;
@@ -36,8 +36,8 @@ public class VoluntarioDAO {
 
     public void inserir(Connection conn, Voluntario voluntario) throws SQLException {
         String sql = "INSERT INTO VOLUNTARIO " +
-                "(NOME, USUARIO, SENHA, ACESSO_SIGILO, DISPONIVEL, ID_CONTA, STATUS_APROVACAO, MOTIVO_VOLUNTARIADO, CODIGO_INDICACAO, PONTOS_INDICACAO, ID_VOLUNTARIO_INDICADOR, CRO, UF_CRO) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "(NOME, USUARIO, SENHA, ACESSO_SIGILO, DISPONIVEL, ID_CONTA, STATUS_APROVACAO, MOTIVO_VOLUNTARIADO, CODIGO_INDICACAO, PONTOS_INDICACAO, ID_VOLUNTARIO_INDICADOR, CRO, UF_CRO, STATUS_CRO) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql, new String[] { "ID" })) {
             stmt.setString(1, voluntario.getNome());
@@ -63,6 +63,7 @@ public class VoluntarioDAO {
             }
             stmt.setString(12, voluntario.getCro());
             stmt.setString(13, voluntario.getUfCro());
+            stmt.setString(14, voluntario.getStatusCro());
             stmt.executeUpdate();
 
             try (ResultSet rs = stmt.getGeneratedKeys()) {
@@ -243,7 +244,7 @@ public class VoluntarioDAO {
 
     public void atualizar(Voluntario voluntario) {
         String sql = "UPDATE VOLUNTARIO SET NOME = ?, USUARIO = ?, SENHA = ?, " +
-                "ACESSO_SIGILO = ?, DISPONIVEL = ?, ID_CONTA = ?, STATUS_APROVACAO = ?, MOTIVO_VOLUNTARIADO = ?, CODIGO_INDICACAO = ?, PONTOS_INDICACAO = ?, ID_VOLUNTARIO_INDICADOR = ?, CRO = ?, UF_CRO = ?" +
+                "ACESSO_SIGILO = ?, DISPONIVEL = ?, ID_CONTA = ?, STATUS_APROVACAO = ?, MOTIVO_VOLUNTARIADO = ?, CODIGO_INDICACAO = ?, PONTOS_INDICACAO = ?, ID_VOLUNTARIO_INDICADOR = ?, CRO = ?, UF_CRO = ?, STATUS_CRO = ? " +
                 "WHERE ID = ?";
 
         Connection conn = null;
@@ -278,7 +279,8 @@ public class VoluntarioDAO {
 
                 stmt.setString(12, voluntario.getCro());
                 stmt.setString(13, voluntario.getUfCro());
-                stmt.setInt(14, voluntario.getId());
+                stmt.setString(14, voluntario.getStatusCro());
+                stmt.setInt(15, voluntario.getId());
                 stmt.executeUpdate();
             }
 
@@ -386,6 +388,7 @@ public class VoluntarioDAO {
         }
         voluntario.setCro(rs.getString("CRO"));
         voluntario.setUfCro(rs.getString("UF_CRO"));
+        voluntario.setStatusCro(rs.getString("STATUS_CRO"));
         return voluntario;
     }
 

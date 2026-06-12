@@ -176,6 +176,11 @@ public class ContaUsuarioBO {
         voluntario.setEspecialidades(especialidades);
         voluntario.setCro(request.cro != null ? request.cro.trim() : null);
         voluntario.setUfCro(request.ufCro != null ? request.ufCro.trim().toUpperCase() : null);
+        if (precisaDeCro(request)) {
+            voluntario.setStatusCro(croService.obterStatusUltimaVerificacao());
+        } else {
+            voluntario.setStatusCro(null);
+        }
 
         voluntario.setCodigoIndicacao(java.util.UUID.randomUUID().toString().substring(0, 8).toUpperCase());
 

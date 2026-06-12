@@ -9,4 +9,14 @@ public interface CroVerificationService {
      * @return true se o registro for válido/ativo, false caso contrário
      */
     boolean verificar(String cro, String uf);
+
+    /**
+     * Retorna o status de validacao detalhado da ultima chamada a verificar().
+     * Valores comuns: "VALIDADO", "FALHA_INTEGRACAO"
+     * 
+     * @return O status de validacao
+     */
+    default String obterStatusUltimaVerificacao() {
+        return "VALIDADO";
+    }
 }

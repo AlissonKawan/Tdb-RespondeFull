@@ -14,6 +14,8 @@ public class GovCroVerificationService implements CroVerificationService {
     String verificationUrl;
     boolean strictMode;
 
+    private static final ThreadLocal<String> ULTIMA_VERIFICACAO = ThreadLocal.withInitial(() -> "VALIDADO");
+
     public GovCroVerificationService() {
         this.verificationUrl = "https://busca-profissionais.cfo.org.br/";
         this.strictMode = false;
@@ -27,6 +29,7 @@ public class GovCroVerificationService implements CroVerificationService {
     @Override
     public boolean verificar(String cro, String uf) {
         if (cro == null || cro.trim().isEmpty() || uf == null || uf.trim().isEmpty()) {
+            ULTIMA_VERIFICACAO.set("REJEITADO");
             return false;
         }
 
@@ -34,28 +37,43 @@ public class GovCroVerificationService implements CroVerificationService {
         String ufLimpa = uf.trim().toUpperCase();
 
         if (croLimpo.isEmpty() || ufLimpa.length() != 2) {
+            ULTIMA_VERIFICACAO.set("REJEITADO");
             return false;
         }
 
         // Manter retrocompatibilidade com regras de testes mock
         if ("000000".equals(croLimpo) || "INVALIDO".equalsIgnoreCase(cro)) {
+            ULTIMA_VERIFICACAO.set("REJEITADO");
             return false;
         }
 
         try {
             LOGGER.info("Iniciando consulta real de CRO: " + croLimpo + " UF: " + ufLimpa);
-            return executarConsultaReal(croLimpo, ufLimpa);
+            boolean result = executarConsultaReal(croLimpo, ufLimpa);
+            if (result) {
+                ULTIMA_VERIFICACAO.set("VALIDADO");
+            } else {
+                ULTIMA_VERIFICACAO.set("REJEITADO");
+            }
+            return result;
         } catch (Exception e) {
             LOGGER.warning("Falha na conexao ou validacao externa do CRO com o portal do governo: " + e.getMessage());
             
             if (strictMode) {
                 LOGGER.severe("Modo estrito ativo. Cadastro rejeitado devido a falha na verificação de CRO.");
+                ULTIMA_VERIFICACAO.set("REJEITADO");
                 return false;
             } else {
                 LOGGER.warning("Modo permissivo ativo. Cadastro de voluntario aprovado com aviso de verificacao manual pendente.");
+                ULTIMA_VERIFICACAO.set("FALHA_INTEGRACAO");
                 return true;
             }
         }
+    }
+
+    @Override
+    public String obterStatusUltimaVerificacao() {
+        return ULTIMA_VERIFICACAO.get();
     }
 
     protected boolean executarConsultaReal(String cro, String uf) throws IOException {

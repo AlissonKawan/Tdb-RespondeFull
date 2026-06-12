@@ -62,6 +62,7 @@ public class VoluntarioCroTest {
 
         when(contaUsuarioDAO.emailExiste("valido@teste.com")).thenReturn(false);
         when(croService.verificar("12345", "SP")).thenReturn(true);
+        when(croService.obterStatusUltimaVerificacao()).thenReturn("VALIDADO");
 
         doAnswer(invocation -> {
             ContaUsuario conta = invocation.getArgument(0);
@@ -87,6 +88,54 @@ public class VoluntarioCroTest {
         Voluntario voluntarioSalvo = voluntarioCaptor.getValue();
         assertEquals("12345", voluntarioSalvo.getCro());
         assertEquals("SP", voluntarioSalvo.getUfCro());
+        assertEquals("VALIDADO", voluntarioSalvo.getStatusCro());
+    }
+
+    @Test
+    void deveRegistrarVoluntarioComStatusFalhaIntegracaoQuandoServicoFalhar() {
+        // Arrange
+        RegisterRequest req = new RegisterRequest();
+        req.nome = "Dr. Falha Conexao";
+        req.email = "falha@teste.com";
+        req.senha = "123456";
+        req.tipoUsuario = "VOLUNTARIO";
+        req.motivoVoluntariado = "Quero muito ajudar pessoas necessitadas.";
+        req.especialidadeId = 1;
+        req.cro = "12345";
+        req.ufCro = "SP";
+
+        when(contaUsuarioDAO.emailExiste("falha@teste.com")).thenReturn(false);
+        when(croService.verificar("12345", "SP")).thenReturn(true);
+        when(croService.obterStatusUltimaVerificacao()).thenReturn("FALHA_INTEGRACAO");
+
+        doAnswer(invocation -> {
+            ContaUsuario conta = invocation.getArgument(0);
+            conta.setId(11);
+            return null;
+        }).when(contaUsuarioDAO).cadastrarConta(any(ContaUsuario.class));
+        
+        when(contaUsuarioDAO.buscarPorId(11)).thenReturn(new ContaUsuario());
+
+        doAnswer(invocation -> {
+            Voluntario vol = invocation.getArgument(0);
+            vol.setId(21);
+            return null;
+        }).when(voluntarioDAO).inserir(any(Voluntario.class));
+
+        // Act
+        bo.registrar(req);
+
+        // Assert
+        ArgumentCaptor<Voluntario> voluntarioCaptor = ArgumentCaptor.forClass(Voluntario.class);
+        verify(voluntarioDAO, atLeastOnce()).inserir(voluntarioCaptor.capture());
+
+        Voluntario voluntarioSalvo = voluntarioCaptor.getAllValues().stream()
+                .filter(v -> "Dr. Falha Conexao".equals(v.getNome()))
+                .findFirst().orElseThrow();
+
+        assertEquals("12345", voluntarioSalvo.getCro());
+        assertEquals("SP", voluntarioSalvo.getUfCro());
+        assertEquals("FALHA_INTEGRACAO", voluntarioSalvo.getStatusCro());
     }
 
     @Test

@@ -15,6 +15,7 @@ export interface VoluntarioApi {
   codigoIndicacao?: string;
   cro?: string;
   ufCro?: string;
+  statusCro?: string;
 }
 
 export interface VoluntarioRequestApi {

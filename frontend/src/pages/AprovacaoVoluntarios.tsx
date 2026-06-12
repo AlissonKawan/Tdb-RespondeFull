@@ -99,9 +99,33 @@ function AprovacaoVoluntarios() {
                     {solicitacao.usuario && <p><strong className="text-[#0F172A]">Contato:</strong> {solicitacao.usuario}</p>}
                     <p><strong className="text-[#0F172A]">Especialidade:</strong> {solicitacao.especialidade?.nome ?? 'Nao informada'}</p>
                     {solicitacao.cro && (
-                      <p>
-                        <strong className="text-[#0F172A]">Registro Profissional (CRO):</strong> {solicitacao.cro} - {solicitacao.ufCro || 'N/A'}
-                      </p>
+                      <div className="flex flex-col gap-1">
+                        <p>
+                          <strong className="text-[#0F172A]">Registro Profissional (CRO):</strong> {solicitacao.cro} - {solicitacao.ufCro || 'N/A'}
+                        </p>
+                        {solicitacao.statusCro === 'VALIDADO' && (
+                          <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full w-fit mt-1 border border-emerald-100">
+                            <svg className="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path></svg>
+                            Validado automaticamente pelo portal do governo
+                          </span>
+                        )}
+                        {solicitacao.statusCro === 'FALHA_INTEGRACAO' && (
+                          <span className="inline-flex items-start gap-1.5 text-xs font-semibold text-amber-700 bg-amber-50 px-2.5 py-1.5 rounded-lg w-fit mt-1 border border-amber-200 leading-normal max-w-lg">
+                            <svg className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                            <span>
+                              <strong>Aviso do Robô:</strong> Não foi possível validar no portal do governo (CAPTCHA / instabilidade). Por favor, <strong>valide manualmente</strong> este registro.
+                            </span>
+                          </span>
+                        )}
+                        {solicitacao.statusCro === 'REJEITADO' && (
+                          <span className="inline-flex items-start gap-1.5 text-xs font-semibold text-rose-700 bg-rose-50 px-2.5 py-1.5 rounded-lg w-fit mt-1 border border-rose-200 leading-normal max-w-lg">
+                            <svg className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                            <span>
+                              <strong>Aviso do Robô:</strong> A verificação de registro indicou que este CRO é <strong>inválido ou inativo</strong> no portal do conselho.
+                            </span>
+                          </span>
+                        )}
+                      </div>
                     )}
                   </div>
                   {solicitacao.motivoVoluntariado && (
