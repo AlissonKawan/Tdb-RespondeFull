@@ -28,4 +28,11 @@ public class ContatoResource {
         List<MensagemContato> mensagens = bo.listar();
         return Response.ok(mensagens).build();
     }
+
+    @PUT
+    @Path("/reclassificar")
+    public Response reclassificarTodas() {
+        bo.reclassificarTodas();
+        return Response.ok("{\"mensagem\": \"Mensagens reclassificadas com sucesso!\"}").build();
+    }
 }

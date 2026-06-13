@@ -77,4 +77,19 @@ public class MensagemContatoDAO {
 
         return mensagens;
     }
+
+    public void atualizarClassificacao(int id, String classificacao) {
+        String sql = "UPDATE T_MENSAGEM_CONTATO SET CLASSIFICACAO_IA = ? WHERE ID_MENSAGEM_CONTATO = ?";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, classificacao);
+            stmt.setInt(2, id);
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new DatabaseException("Erro ao atualizar classificacao: " + e.getMessage(), e);
+        }
+    }
 }

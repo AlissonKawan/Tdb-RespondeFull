@@ -67,4 +67,27 @@ public class ContatoBO {
     public List<MensagemContato> listar() {
         return dao.listar();
     }
+
+    public void reclassificarTodas() {
+        List<MensagemContato> mensagens = dao.listar();
+        for (MensagemContato mensagem : mensagens) {
+            try {
+                PredictRequest predictRequest = new PredictRequest();
+                predictRequest.conteudo = mensagem.getMensagem();
+                predictRequest.enviadoPor = "BENEFICIARIO";
+                predictRequest.canal = "email";
+                predictRequest.prioridadeAtendimento = 3;
+                predictRequest.statusAtendimento = "SOLICITADO";
+                predictRequest.tipoPessoa = "OUTRO";
+                predictRequest.gravidade = 3;
+
+                PredictResponse predictResponse = classificadorService.classificar(predictRequest);
+                if (predictResponse != null && predictResponse.categoriaPrevista != null) {
+                    dao.atualizarClassificacao(mensagem.getId(), predictResponse.categoriaPrevista);
+                }
+            } catch (Exception e) {
+                LOGGER.warning("Falha ao reclassificar mensagem ID " + mensagem.getId() + ": " + e.getMessage());
+            }
+        }
+    }
 }
