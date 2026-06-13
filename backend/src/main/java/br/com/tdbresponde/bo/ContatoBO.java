@@ -43,9 +43,9 @@ public class ContatoBO {
             PredictRequest predictRequest = new PredictRequest();
             predictRequest.conteudo = mensagem.getMensagem();
             predictRequest.enviadoPor = "BENEFICIARIO"; // padrão de remetente genérico
-            predictRequest.canal = "site"; // canal de origem
+            predictRequest.canal = "email"; // canal de origem válido
             predictRequest.prioridadeAtendimento = 3;
-            predictRequest.statusAtendimento = "NOVO";
+            predictRequest.statusAtendimento = "SOLICITADO";
             predictRequest.tipoPessoa = "OUTRO";
             predictRequest.gravidade = 3;
 
