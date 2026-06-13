@@ -6,6 +6,8 @@ import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import { Field, Input, Textarea } from '../components/ui/Input';
 import PageHeader from '../components/ui/PageHeader';
+import { contatoService } from '../services/contatoService';
+import { ApiError } from '../services/apiClient';
 
 interface FormData {
   nome: string;
@@ -15,12 +17,28 @@ interface FormData {
 
 function Contato() {
   const [enviado, setEnviado] = useState(false);
+  const [erro, setErro] = useState('');
+  const [loading, setLoading] = useState(false);
   const { register, handleSubmit, formState: { errors }, reset } = useForm<FormData>();
 
-  const onSubmit = () => {
-    setEnviado(true);
-    reset();
-    window.setTimeout(() => setEnviado(false), 3000);
+  const onSubmit = async (data: FormData) => {
+    setEnviado(false);
+    setErro('');
+    setLoading(true);
+    try {
+      await contatoService.enviarMensagem(data);
+      setEnviado(true);
+      reset();
+      window.setTimeout(() => setEnviado(false), 5000);
+    } catch (error) {
+      if (error instanceof ApiError) {
+        setErro(error.message);
+      } else {
+        setErro('Ocorreu um erro ao enviar sua mensagem. Tente novamente mais tarde.');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -57,6 +75,11 @@ function Contato() {
                 Mensagem enviada com sucesso.
               </div>
             )}
+            {erro && (
+              <div className="mb-5 rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-semibold text-[#DC2626]">
+                {erro}
+              </div>
+            )}
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               <Field label="Nome" error={errors.nome?.message}>
                 <Input {...register('nome', { required: 'Digite seu nome completo' })} placeholder="Seu nome" />
@@ -78,7 +101,9 @@ function Contato() {
                   placeholder="Como podemos ajudar?"
                 />
               </Field>
-              <Button type="submit" size="large" fullWidth>Enviar mensagem</Button>
+              <Button type="submit" disabled={loading} size="large" fullWidth>
+                {loading ? 'Enviando...' : 'Enviar mensagem'}
+              </Button>
             </form>
           </Card>
         </div>

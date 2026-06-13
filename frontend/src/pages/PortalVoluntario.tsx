@@ -15,8 +15,9 @@ import { mensagensService } from '../services/mensagensService';
 import type { AtendimentoApi } from '../types/AtendimentoApi';
 import { useAuth } from '../context/useAuth';
 import { classificarMensagemIA, type CanalIA, type ClassificarMensagemIAResponse, type TipoPessoaIA } from '../services/iaService';
+import { contatoService, type MensagemContatoResponse } from '../services/contatoService';
 
-type Aba = 'solicitados' | 'meus';
+type Aba = 'solicitados' | 'meus' | 'contatos';
 
 function getPessoa(atendimento: AtendimentoApi) {
   return atendimento.pessoaAtendidaNome
@@ -94,65 +95,6 @@ function AtendimentoCard({ atendimento, onAssumir, assumindo, assumirBloqueado, 
   hasNovaMensagem?: boolean;
 }) {
   const navigate = useNavigate();
-  const [classificacaoIA, setClassificacaoIA] = useState<ClassificarMensagemIAResponse | null>(null);
-  const [carregandoIA, setCarregandoIA] = useState(false);
-
-  useEffect(() => {
-    if (atendimento.status !== 'ABERTO' || atendimento.voluntarioId || !onAssumir) {
-      return;
-    }
-
-    const descricao = atendimento.descricao?.trim();
-    if (!descricao || descricao.length < 15) {
-      return;
-    }
-
-    let active = true;
-    setCarregandoIA(true);
-
-    // Normalização do canal
-    const canalOriginal = (atendimento.canalOrigem?.nome ?? atendimento.canal ?? '').toLowerCase();
-    let canalIA: CanalIA = 'whatsapp';
-    if (canalOriginal.includes('whatsapp') || canalOriginal.includes('whats')) canalIA = 'whatsapp';
-    else if (canalOriginal.includes('telefone')) canalIA = 'telefone';
-    else if (canalOriginal.includes('email') || canalOriginal.includes('e-mail')) canalIA = 'email';
-    else if (canalOriginal.includes('presencial')) canalIA = 'presencial';
-
-    // Normalização de prioridade
-    const prioridadeOriginal = Number(atendimento.prioridade) || 3;
-    let prioridadeIA = 3;
-    if (prioridadeOriginal <= 1) prioridadeIA = 1;
-    else if (prioridadeOriginal === 2) prioridadeIA = 2;
-
-    // Tipo de pessoa e gravidade
-    const tipoPessoa: TipoPessoaIA = (atendimento.tipoPessoa === 'CRIANCA_ADOLESCENTE' || atendimento.tipoPessoa === 'MULHER_APOLONIA')
-      ? atendimento.tipoPessoa
-      : 'OUTRO';
-    const gravidade = atendimento.gravidade ?? 3;
-
-    classificarMensagemIA({
-      conteudo: descricao,
-      enviado_por: 'BENEFICIARIO',
-      canal: canalIA,
-      prioridade_atendimento: prioridadeIA,
-      status_atendimento: 'ABERTO',
-      tipo_pessoa: tipoPessoa,
-      gravidade: gravidade,
-    }).then((resultado) => {
-      if (active) {
-        setClassificacaoIA(resultado);
-        setCarregandoIA(false);
-      }
-    }).catch(() => {
-      if (active) {
-        setCarregandoIA(false);
-      }
-    });
-
-    return () => {
-      active = false;
-    };
-  }, [atendimento, onAssumir]);
 
   return (
     <Card className="p-4 md:p-6 transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-950/10">
@@ -171,25 +113,6 @@ function AtendimentoCard({ atendimento, onAssumir, assumindo, assumirBloqueado, 
               <p><strong className="text-[#0F172A]">Última Atividade:</strong> {atendimento.dataAtualizacao ?? atendimento.dataCriacao ?? atendimento.dataAbertura}</p>
             )}
           </div>
-          {onAssumir && (carregandoIA || classificacaoIA) && (
-            <div className="mt-3 flex items-center gap-2">
-              {carregandoIA && (
-                <span className="text-xs text-slate-500 animate-pulse flex items-center gap-1">
-                  <svg className="animate-spin -ml-1 mr-1.5 h-3 w-3 text-slate-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Classificando com IA...
-                </span>
-              )}
-              {!carregandoIA && classificacaoIA && (
-                <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ${obterEstiloCategoriaIA(classificacaoIA.categoria_prevista).badge}`}>
-                  <span className={`h-1.5 w-1.5 rounded-full ${obterEstiloCategoriaIA(classificacaoIA.categoria_prevista).dot}`} />
-                  Sugestão IA: {classificacaoIA.categoria_prevista.toUpperCase()} ({Math.round(classificacaoIA.confianca * 100)}%)
-                </span>
-              )}
-            </div>
-          )}
         </div>
         <div className="flex flex-wrap gap-2">
           {onAssumir && (
@@ -212,11 +135,14 @@ function PortalVoluntario() {
   const [aba, setAba] = useState<Aba>('solicitados');
   const [solicitados, setSolicitados] = useState<AtendimentoApi[]>([]);
   const [meusAtendimentos, setMeusAtendimentos] = useState<AtendimentoApi[]>([]);
+  const [contatos, setContatos] = useState<MensagemContatoResponse[]>([]);
   const [novasMensagens, setNovasMensagens] = useState<Record<number, boolean>>({});
   const [loadingSolicitados, setLoadingSolicitados] = useState(true);
   const [loadingMeus, setLoadingMeus] = useState(true);
+  const [loadingContatos, setLoadingContatos] = useState(true);
   const [erroSolicitados, setErroSolicitados] = useState('');
   const [erroMeus, setErroMeus] = useState('');
+  const [erroContatos, setErroContatos] = useState('');
   const [feedback, setFeedback] = useState('');
   const [assumindoId, setAssumindoId] = useState<number | null>(null);
   const [codigoIndicacao, setCodigoIndicacao] = useState<string>('');
@@ -270,6 +196,18 @@ function PortalVoluntario() {
     }
   };
 
+  const carregarContatos = async () => {
+    setLoadingContatos(true);
+    try {
+      const data = await contatoService.listarMensagens();
+      setContatos(data);
+    } catch (error) {
+      setErroContatos('Erro ao carregar contatos.');
+    } finally {
+      setLoadingContatos(false);
+    }
+  };
+
   useEffect(() => {
     async function carregarDadosDoPortal() {
       if (!user) return;
@@ -292,6 +230,7 @@ function PortalVoluntario() {
 
       await Promise.all([
         carregarMeus(user.voluntarioId),
+        carregarContatos(),
         voluntariosService.buscarPorId(user.voluntarioId).then(vol => {
           if (vol.codigoIndicacao) setCodigoIndicacao(vol.codigoIndicacao);
         }).catch(err => console.error('Erro ao buscar codigo de indicacao', err))
@@ -388,6 +327,7 @@ function PortalVoluntario() {
             <div className="flex flex-wrap gap-2">
               <Button variant={aba === 'solicitados' ? 'primary' : 'secondary'} onClick={() => setAba('solicitados')}>Atendimentos solicitados</Button>
               <Button variant={aba === 'meus' ? 'primary' : 'secondary'} onClick={() => setAba('meus')}>Meus atendimentos</Button>
+              <Button variant={aba === 'contatos' ? 'primary' : 'secondary'} onClick={() => setAba('contatos')}>Mensagens de Contato</Button>
             </div>
           </Card>
 
@@ -483,6 +423,39 @@ function PortalVoluntario() {
             <div className="grid gap-4">
               {!loadingMeus && !erroMeus && meusAtendimentos.map((atendimento) => (
                 <AtendimentoCard key={atendimento.id} atendimento={atendimento} hasNovaMensagem={novasMensagens[atendimento.id]} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {aba === 'contatos' && (
+          <div>
+            <SectionHeader title="Mensagens de Contato" description="Mensagens recebidas pelo formulário de contato do site com classificação automática da IA." />
+            {loadingContatos && <LoadingState title="Carregando mensagens..." />}
+            {erroContatos && <ErrorState title="Erro ao carregar mensagens" description={erroContatos} />}
+            {!loadingContatos && !erroContatos && contatos.length === 0 && (
+              <EmptyState title="Nenhuma mensagem de contato recebida." />
+            )}
+            <div className="grid gap-4">
+              {!loadingContatos && !erroContatos && contatos.map((contato) => (
+                <Card key={contato.id} className="p-4 md:p-6 transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-950/10">
+                  <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="text-lg font-bold text-[#0F172A]">{contato.nome}</h3>
+                        <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ${obterEstiloCategoriaIA(contato.classificacaoIA).badge}`}>
+                          <span className={`h-1.5 w-1.5 rounded-full ${obterEstiloCategoriaIA(contato.classificacaoIA).dot}`} />
+                          IA: {contato.classificacaoIA.toUpperCase()}
+                        </span>
+                      </div>
+                      <div className="mt-3 text-sm text-[#475569]">
+                        <p><strong className="text-[#0F172A]">E-mail:</strong> {contato.email}</p>
+                        <p><strong className="text-[#0F172A]">Data:</strong> {new Date(contato.dataEnvio).toLocaleString()}</p>
+                        <p className="mt-2 text-slate-800 whitespace-pre-wrap">{contato.mensagem}</p>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
               ))}
             </div>
           </div>
