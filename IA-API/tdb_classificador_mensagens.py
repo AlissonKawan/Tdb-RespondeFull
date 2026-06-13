@@ -1703,15 +1703,6 @@ preprocessor = ColumnTransformer(transformers=[
     ("texto",      TfidfVectorizer(max_features=1500, ngram_range=(1, 2),
                                    strip_accents="unicode", lowercase=True,
                                    stop_words=stopwords_pt), feat_texto),
-
-    # Para colunas categóricas: aplica OneHotEncoder
-    # handle_unknown="ignore": se aparecer um valor novo na predição, ignora sem dar erro
-    ("categorico", OneHotEncoder(handle_unknown="ignore"), feat_cat),
-
-    # Para colunas numéricas: aplica StandardScaler
-    # Normaliza os números para média 0 e desvio padrão 1
-    # Isso evita que "gravidade 5" pese mais que "prioridade 4" só pelo valor
-    ("numerico",   StandardScaler(), feat_num),
 ])
 
 print("Pipeline de pré-processamento configurada!")
@@ -1906,13 +1897,8 @@ if melhor_nome in ["Random Forest", "XGBoost"]:
     tfidf_nomes = prep_final.named_transformers_["texto"].get_feature_names_out()
 
     # Recupera os nomes das features geradas pelo OneHotEncoder (ex: canal_whatsapp)
-    ohe_nomes = prep_final.named_transformers_["categorico"].get_feature_names_out()
-
-    # Converte a lista de features numéricas para array numpy
-    num_nomes = np.array(feat_num)
-
     # Junta todos os nomes de features em um único array
-    todos_nomes = np.concatenate([tfidf_nomes, ohe_nomes, num_nomes])
+    todos_nomes = tfidf_nomes
 
     # Pega os valores de importância de cada feature do modelo
     importancias = clf_final.feature_importances_
