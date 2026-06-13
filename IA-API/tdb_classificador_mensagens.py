@@ -1812,7 +1812,7 @@ ax.bar_label(bars2, fmt="%.3f", padding=3)     # Mostra o valor em cima de cada 
 
 plt.tight_layout()                             # Ajusta o layout para não cortar nada
 plt.savefig("comparacao_modelos.png", dpi=150) # Salva o gráfico em arquivo PNG
-plt.show()                                     # Exibe o gráfico na tela
+# plt.show()                                     # Exibe o gráfico na tela
 print("Gráfico salvo: comparacao_modelos.png")
 
 
@@ -1877,7 +1877,7 @@ ax.set_ylabel("Real")     # Rótulo do eixo Y
 
 plt.tight_layout()
 plt.savefig("matriz_confusao.png", dpi=150)  # Salva o gráfico
-plt.show()
+# plt.show()
 print("Gráfico salvo: matriz_confusao.png")
 
 
@@ -1914,7 +1914,7 @@ if melhor_nome in ["Random Forest", "XGBoost"]:
     ax.set_xlabel("Importância")
     plt.tight_layout()
     plt.savefig("importancia_features.png", dpi=150)
-    plt.show()
+    # plt.show()
     print("Gráfico salvo: importancia_features.png")
 else:
     # Regressão Logística e SVM não têm feature_importances_
