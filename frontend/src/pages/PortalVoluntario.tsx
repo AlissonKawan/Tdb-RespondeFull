@@ -14,7 +14,6 @@ import { voluntariosService } from '../services/voluntariosService';
 import { mensagensService } from '../services/mensagensService';
 import type { AtendimentoApi } from '../types/AtendimentoApi';
 import { useAuth } from '../context/useAuth';
-import { classificarMensagemIA, type CanalIA, type ClassificarMensagemIAResponse, type TipoPessoaIA } from '../services/iaService';
 import { contatoService, type MensagemContatoResponse } from '../services/contatoService';
 
 type Aba = 'solicitados' | 'meus' | 'contatos';
