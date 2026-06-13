@@ -29,6 +29,7 @@ const SolicitarAtendimento = React.lazy(() => import('./pages/SolicitarAtendimen
 const DetalheAtendimento = React.lazy(() => import('./pages/DetalheAtendimento'));
 const RankingVoluntarios = React.lazy(() => import('./pages/RankingVoluntarios'));
 const Cronograma = React.lazy(() => import('./pages/Cronograma'));
+const MensagensContato = React.lazy(() => import('./pages/MensagensContato'));
 
 function App() {
   return (
@@ -161,6 +162,15 @@ function App() {
                 element={
                   <ProtectedRoute allowedRoles={['VOLUNTARIO', 'ADMIN']}>
                     <RankingVoluntarios />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/mensagens-contato"
+                element={
+                  <ProtectedRoute allowedRoles={['VOLUNTARIO', 'ADMIN']}>
+                    <MensagensContato />
                   </ProtectedRoute>
                 }
               />

@@ -79,6 +79,13 @@ export default function SystemLayout() {
               >
                 Ranking
               </Link>
+              <Link 
+                to="/mensagens-contato" 
+                onClick={() => setIsSidebarOpen(false)}
+                className={`block px-4 py-2 rounded transition-colors ${location.pathname === '/mensagens-contato' ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-700 hover:bg-slate-50'}`}
+              >
+                Mensagens de Contato
+              </Link>
             </>
           )}
           

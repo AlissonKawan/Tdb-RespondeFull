@@ -14,9 +14,8 @@ import { voluntariosService } from '../services/voluntariosService';
 import { mensagensService } from '../services/mensagensService';
 import type { AtendimentoApi } from '../types/AtendimentoApi';
 import { useAuth } from '../context/useAuth';
-import { contatoService, type MensagemContatoResponse } from '../services/contatoService';
 
-type Aba = 'solicitados' | 'meus' | 'contatos';
+type Aba = 'solicitados' | 'meus';
 
 function getPessoa(atendimento: AtendimentoApi) {
   return atendimento.pessoaAtendidaNome
@@ -49,42 +48,6 @@ function sortAtendimentos(a: AtendimentoApi, b: AtendimentoApi) {
   return dateB - dateA; // Descending
 }
 
-function obterEstiloCategoriaIA(categoria?: string) {
-  const estilos: Record<string, { card: string; badge: string; text: string; dot: string }> = {
-    urgencia: {
-      card: 'border-rose-200 bg-rose-50/80',
-      badge: 'bg-rose-100 text-rose-800',
-      text: 'text-rose-900',
-      dot: 'bg-rose-500',
-    },
-    elogio: {
-      card: 'border-emerald-200 bg-emerald-50/80',
-      badge: 'bg-emerald-100 text-emerald-800',
-      text: 'text-emerald-900',
-      dot: 'bg-emerald-500',
-    },
-    reclamacao: {
-      card: 'border-orange-200 bg-orange-50/80',
-      badge: 'bg-orange-100 text-orange-800',
-      text: 'text-orange-900',
-      dot: 'bg-orange-500',
-    },
-    sugestao: {
-      card: 'border-blue-200 bg-blue-50/80',
-      badge: 'bg-blue-100 text-blue-800',
-      text: 'text-blue-900',
-      dot: 'bg-blue-500',
-    },
-    informativo: {
-      card: 'border-slate-200 bg-slate-50/80',
-      badge: 'bg-slate-100 text-slate-700',
-      text: 'text-slate-900',
-      dot: 'bg-slate-500',
-    },
-  };
-
-  return estilos[categoria ?? ''] ?? estilos.informativo;
-}
 
 function AtendimentoCard({ atendimento, onAssumir, assumindo, assumirBloqueado, hasNovaMensagem }: {
   atendimento: AtendimentoApi;
@@ -134,14 +97,11 @@ function PortalVoluntario() {
   const [aba, setAba] = useState<Aba>('solicitados');
   const [solicitados, setSolicitados] = useState<AtendimentoApi[]>([]);
   const [meusAtendimentos, setMeusAtendimentos] = useState<AtendimentoApi[]>([]);
-  const [contatos, setContatos] = useState<MensagemContatoResponse[]>([]);
   const [novasMensagens, setNovasMensagens] = useState<Record<number, boolean>>({});
   const [loadingSolicitados, setLoadingSolicitados] = useState(true);
   const [loadingMeus, setLoadingMeus] = useState(true);
-  const [loadingContatos, setLoadingContatos] = useState(true);
   const [erroSolicitados, setErroSolicitados] = useState('');
   const [erroMeus, setErroMeus] = useState('');
-  const [erroContatos, setErroContatos] = useState('');
   const [feedback, setFeedback] = useState('');
   const [assumindoId, setAssumindoId] = useState<number | null>(null);
   const [codigoIndicacao, setCodigoIndicacao] = useState<string>('');
@@ -195,18 +155,6 @@ function PortalVoluntario() {
     }
   };
 
-  const carregarContatos = async () => {
-    setLoadingContatos(true);
-    try {
-      const data = await contatoService.listarMensagens();
-      setContatos(data);
-    } catch (error) {
-      setErroContatos('Erro ao carregar contatos.');
-    } finally {
-      setLoadingContatos(false);
-    }
-  };
-
   useEffect(() => {
     async function carregarDadosDoPortal() {
       if (!user) return;
@@ -229,7 +177,6 @@ function PortalVoluntario() {
 
       await Promise.all([
         carregarMeus(user.voluntarioId),
-        carregarContatos(),
         voluntariosService.buscarPorId(user.voluntarioId).then(vol => {
           if (vol.codigoIndicacao) setCodigoIndicacao(vol.codigoIndicacao);
         }).catch(err => console.error('Erro ao buscar codigo de indicacao', err))
@@ -326,7 +273,6 @@ function PortalVoluntario() {
             <div className="flex flex-wrap gap-2">
               <Button variant={aba === 'solicitados' ? 'primary' : 'secondary'} onClick={() => setAba('solicitados')}>Atendimentos solicitados</Button>
               <Button variant={aba === 'meus' ? 'primary' : 'secondary'} onClick={() => setAba('meus')}>Meus atendimentos</Button>
-              <Button variant={aba === 'contatos' ? 'primary' : 'secondary'} onClick={() => setAba('contatos')}>Mensagens de Contato</Button>
             </div>
           </Card>
 
@@ -422,39 +368,6 @@ function PortalVoluntario() {
             <div className="grid gap-4">
               {!loadingMeus && !erroMeus && meusAtendimentos.map((atendimento) => (
                 <AtendimentoCard key={atendimento.id} atendimento={atendimento} hasNovaMensagem={novasMensagens[atendimento.id]} />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {aba === 'contatos' && (
-          <div>
-            <SectionHeader title="Mensagens de Contato" description="Mensagens recebidas pelo formulário de contato do site com classificação automática da IA." />
-            {loadingContatos && <LoadingState title="Carregando mensagens..." />}
-            {erroContatos && <ErrorState title="Erro ao carregar mensagens" description={erroContatos} />}
-            {!loadingContatos && !erroContatos && contatos.length === 0 && (
-              <EmptyState title="Nenhuma mensagem de contato recebida." />
-            )}
-            <div className="grid gap-4">
-              {!loadingContatos && !erroContatos && contatos.map((contato) => (
-                <Card key={contato.id} className="p-4 md:p-6 transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-950/10">
-                  <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                    <div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="text-lg font-bold text-[#0F172A]">{contato.nome}</h3>
-                        <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ${obterEstiloCategoriaIA(contato.classificacaoIA).badge}`}>
-                          <span className={`h-1.5 w-1.5 rounded-full ${obterEstiloCategoriaIA(contato.classificacaoIA).dot}`} />
-                          IA: {contato.classificacaoIA.toUpperCase()}
-                        </span>
-                      </div>
-                      <div className="mt-3 text-sm text-[#475569]">
-                        <p><strong className="text-[#0F172A]">E-mail:</strong> {contato.email}</p>
-                        <p><strong className="text-[#0F172A]">Data:</strong> {new Date(contato.dataEnvio).toLocaleString()}</p>
-                        <p className="mt-2 text-slate-800 whitespace-pre-wrap">{contato.mensagem}</p>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
               ))}
             </div>
           </div>

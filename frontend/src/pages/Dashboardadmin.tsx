@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 import { voluntariosService, type Voluntario } from '../services/voluntariosService';
 import { atendimentoService } from '../services/atendimentoService';
-import { contatoService, type MensagemContatoResponse } from '../services/contatoService';
 import { usuarioService } from '../services/usuarioService';
 import type { VoluntarioApi } from '../types/api';
 import type { AtendimentoApi } from '../types/AtendimentoApi';
@@ -17,7 +16,7 @@ import { Field, Input, Select, Textarea } from '../components/ui/Input';
 import SectionTitle from '../components/ui/SectionTitle';
 import StatCard from '../components/ui/StatCard';
 
-type Aba = 'dashboard' | 'atendimentos' | 'novo' | 'voluntarios' | 'beneficiarios' | 'inscricoes' | 'contatos';
+type Aba = 'dashboard' | 'atendimentos' | 'novo' | 'voluntarios' | 'beneficiarios' | 'inscricoes';
 
 export default function DashboardAdmin() {
   const { user, logout } = useAuth();
@@ -30,7 +29,6 @@ export default function DashboardAdmin() {
   const [voluntarios, setVoluntarios] = useState<VoluntarioApi[]>([]);
   const [beneficiarios, setBeneficiarios] = useState<AuthUser[]>([]);
   const [inscricoes, setInscricoes] = useState<Voluntario[]>([]);
-  const [contatos, setContatos] = useState<MensagemContatoResponse[]>([]);
 
   // States de UI
   const [loading, setLoading] = useState(true);
@@ -56,21 +54,18 @@ export default function DashboardAdmin() {
         atends, 
         vols, 
         users, 
-        pends,
-        msgs
+        pends
       ] = await Promise.all([
         atendimentoService.listarTodos().catch(() => []),
         voluntariosService.listar().catch(() => []),
         usuarioService.listar().catch(() => []),
-        voluntariosService.listarPendentes().catch(() => []),
-        contatoService.listarMensagens().catch(() => [])
+        voluntariosService.listarPendentes().catch(() => [])
       ]);
 
       setAtendimentos(atends);
       setVoluntarios(vols);
       setBeneficiarios(users.filter(u => u.tipoUsuario === 'BENEFICIARIO'));
       setInscricoes(pends);
-      setContatos(msgs);
     } catch (e) {
       setErro('Ocorreu um erro ao carregar os dados. Verifique a conexão com o servidor.');
     } finally {
@@ -154,7 +149,6 @@ export default function DashboardAdmin() {
     ['voluntarios', 'Voluntários'],
     ['beneficiarios', 'Beneficiários'],
     ['inscricoes', inscricoes.length ? `Inscrições (${inscricoes.length})` : 'Inscrições'],
-    ['contatos', 'Contatos (IA)'],
   ];
 
   if (loading) return <div className="p-10"><LoadingState title="Carregando sistema..." /></div>;
@@ -356,30 +350,6 @@ export default function DashboardAdmin() {
                   <div className="flex gap-2">
                     <Button size="sm" onClick={() => aprovarInscricao(item.id)}>Aprovar</Button>
                     <Button size="sm" variant="danger" onClick={() => rejeitarInscricao(item.id)}>Rejeitar</Button>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-        )}
-
-        {aba === 'contatos' && (
-          <div className="space-y-4">
-            <SectionTitle title="Mensagens de Contato" description="Mensagens recebidas pelo site classificadas com IA." />
-            {contatos.length === 0 ? <EmptyState title="Nenhuma mensagem recebida." /> : contatos.map((item) => (
-              <Card key={item.id} className="p-5">
-                <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="font-bold text-slate-900">{item.nome}</h3>
-                      <Badge tone={item.classificacaoIA === 'urgencia' ? 'danger' : item.classificacaoIA === 'elogio' ? 'success' : item.classificacaoIA === 'reclamacao' ? 'warning' : 'info'}>
-                        IA: {item.classificacaoIA.toUpperCase()}
-                      </Badge>
-                    </div>
-                    <p className="mt-1 text-sm text-slate-500">
-                      E-mail: {item.email} | Data: {new Date(item.dataEnvio).toLocaleString()}
-                    </p>
-                    <p className="mt-3 text-sm text-slate-600 whitespace-pre-wrap">{item.mensagem}</p>
                   </div>
                 </div>
               </Card>
