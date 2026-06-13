@@ -228,12 +228,15 @@ def predict():
 
         # ── Retorno da resposta ──────────────────────────────────────────────
 
+        # Fix SVM predict vs predict_proba divergence by forcing the highest probability
+        categoria_max_prob = max(prob_dict, key=prob_dict.get)
+
         # Retorna o JSON com o resultado da classificação
         # max(probabilidades) pega a maior probabilidade — é o índice de confiança
         return jsonify({
-            "categoria_prevista": categoria,                              # Ex: "urgencia"
+            "categoria_prevista": categoria_max_prob,                    # Usando a classe com maior prob
             "probabilidades":     prob_dict,                             # Ex: {"urgencia": 0.84, ...}
-            "confianca":          round(float(max(probabilidades)), 4)   # Ex: 0.84
+            "confianca":          prob_dict[categoria_max_prob]          # Ex: 0.84
         }), 200  # Código HTTP 200 = sucesso
 
     # ── Tratamento de erros ──────────────────────────────────────────────────
@@ -285,10 +288,13 @@ def predict_checkin():
             for cls, prob in zip(classes, probabilidades)
         }
 
+        # Fix predict vs predict_proba divergence
+        pred_cat_max = max(prob_dict, key=prob_dict.get)
+
         return jsonify({
-            "previsao_checkin": pred_cat,
+            "previsao_checkin": pred_cat_max,
             "probabilidades": prob_dict,
-            "confianca": round(float(max(probabilidades)), 4)
+            "confianca": prob_dict[pred_cat_max]
         }), 200
 
     except Exception as e:
