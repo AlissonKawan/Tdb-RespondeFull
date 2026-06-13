@@ -90,4 +90,8 @@ public class ContatoBO {
             }
         }
     }
+
+    public void apagarTodasMensagens() {
+        dao.apagarTodos();
+    }
 }

@@ -35,4 +35,11 @@ public class ContatoResource {
         bo.reclassificarTodas();
         return Response.ok("{\"mensagem\": \"Mensagens reclassificadas com sucesso!\"}").build();
     }
+
+    @DELETE
+    @Path("/todas")
+    public Response apagarTodas() {
+        bo.apagarTodasMensagens();
+        return Response.ok("{\"mensagem\": \"Todas as mensagens de contato foram apagadas com sucesso!\"}").build();
+    }
 }

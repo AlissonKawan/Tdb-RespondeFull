@@ -92,4 +92,14 @@ public class MensagemContatoDAO {
             throw new DatabaseException("Erro ao atualizar classificacao: " + e.getMessage(), e);
         }
     }
+
+    public void apagarTodos() {
+        String sql = "DELETE FROM T_MENSAGEM_CONTATO";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new DatabaseException("Erro ao apagar todas as mensagens: " + e.getMessage(), e);
+        }
+    }
 }
