@@ -431,7 +431,12 @@ function DetalheAtendimento() {
         enviadoPor: remetenteAtual,
       });
       seenIdsRef.current.add(novaMensagem.id);
-      setMensagens((atuais) => atuais.map(m => m.id === tempId ? novaMensagem : m));
+      setMensagens((atuais) => {
+        if (atuais.some(m => m.id === novaMensagem.id)) {
+          return atuais.filter(m => m.id !== tempId);
+        }
+        return atuais.map(m => m.id === tempId ? novaMensagem : m);
+      });
     } catch (error) {
       setFeedback(error instanceof Error ? error.message : 'Não foi possível enviar a mensagem.');
       setConteudo(texto); // Restaura o texto
