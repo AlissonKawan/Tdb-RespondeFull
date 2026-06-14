@@ -9,6 +9,7 @@ import Container from '../components/ui/Container';
 import { Field, Input, Select, Textarea } from '../components/ui/Input';
 import PageHeader from '../components/ui/PageHeader';
 import { useAuth } from '../context/useAuth';
+import { useConfirm } from '../hooks/useConfirm';
 import { listarCanais } from '../services/canaisService';
 import { relatarAtendimento } from '../services/relatoAtendimentoService';
 import type { RelatarAtendimentoRequest, TipoPessoaRelato } from '../types/AtendimentoApi';
@@ -106,9 +107,10 @@ function validar(form: FormState) {
   return '';
 }
 
-function SolicitarAtendimento() {
+export default function SolicitarAtendimento() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { confirm, ConfirmModal } = useConfirm();
   const [form, setForm] = useState<FormState>(() => ({
     ...initialForm,
     nomeCodificado: user?.nome ?? '',
@@ -164,25 +166,33 @@ function SolicitarAtendimento() {
       return;
     }
 
-    setEnviando(true);
-    setErro('');
-    setSucesso('');
+    confirm({
+      title: 'Enviar Solicitação',
+      message: 'Confirma o envio desta solicitação de atendimento?',
+      confirmText: 'Enviar',
+      tone: 'primary',
+      onConfirm: async () => {
+        setEnviando(true);
+        setErro('');
+        setSucesso('');
 
-    try {
-      await relatarAtendimento(montarPayload(form, user?.id));
-      setSucesso('Relato enviado com sucesso. Aguarde um voluntário assumir o atendimento.');
-      setForm((current) => ({
-        ...initialForm,
-        nomeCodificado: current.nomeCodificado,
-        telefone: current.telefone,
-        email: current.email,
-        canalComunicacaoId: current.canalComunicacaoId,
-      }));
-    } catch (error) {
-      setErro(error instanceof Error ? error.message : 'Nao foi possivel enviar o relato.');
-    } finally {
-      setEnviando(false);
-    }
+        try {
+          await relatarAtendimento(montarPayload(form, user?.id));
+          setSucesso('Relato enviado com sucesso. Aguarde um voluntário assumir o atendimento.');
+          setForm((current) => ({
+            ...initialForm,
+            nomeCodificado: current.nomeCodificado,
+            telefone: current.telefone,
+            email: current.email,
+            canalComunicacaoId: current.canalComunicacaoId,
+          }));
+        } catch (error) {
+          setErro(error instanceof Error ? error.message : 'Nao foi possivel enviar o relato.');
+        } finally {
+          setEnviando(false);
+        }
+      }
+    });
   };
 
   return (
@@ -195,7 +205,15 @@ function SolicitarAtendimento() {
             </button>
             <p className="mt-1 text-sm text-[#475569]">Sessao de {user?.nome}</p>
           </div>
-          <Button variant="secondary" onClick={() => { logout(); navigate('/login'); }}>Sair</Button>
+          <Button variant="secondary" onClick={() => {
+            confirm({
+              title: 'Sair da conta',
+              message: 'Tem certeza que deseja encerrar a sua sessão?',
+              confirmText: 'Sair',
+              tone: 'danger',
+              onConfirm: () => { logout(); navigate('/login'); }
+            });
+          }}>Sair</Button>
         </Container>
       </header>
 
@@ -361,8 +379,8 @@ function SolicitarAtendimento() {
           </form>
         </Card>
       </Section>
+      <ConfirmModal />
     </PageShell>
   );
 }
 
-export default SolicitarAtendimento;

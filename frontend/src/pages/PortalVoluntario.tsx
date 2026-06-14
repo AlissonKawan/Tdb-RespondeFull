@@ -14,6 +14,7 @@ import { voluntariosService } from '../services/voluntariosService';
 import { mensagensService } from '../services/mensagensService';
 import type { AtendimentoApi } from '../types/AtendimentoApi';
 import { useAuth } from '../context/useAuth';
+import { useConfirm } from '../hooks/useConfirm';
 
 type Aba = 'solicitados' | 'meus';
 
@@ -94,6 +95,7 @@ function AtendimentoCard({ atendimento, onAssumir, assumindo, assumirBloqueado, 
 function PortalVoluntario() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { confirm, ConfirmModal } = useConfirm();
   const [aba, setAba] = useState<Aba>('solicitados');
   const [solicitados, setSolicitados] = useState<AtendimentoApi[]>([]);
   const [meusAtendimentos, setMeusAtendimentos] = useState<AtendimentoApi[]>([]);
@@ -229,6 +231,16 @@ function PortalVoluntario() {
     }
   };
 
+  const assumirComConfirmacao = (id: number) => {
+    confirm({
+      title: 'Assumir Atendimento',
+      message: 'Você tem certeza que deseja assumir a responsabilidade por este atendimento?',
+      confirmText: 'Assumir',
+      tone: 'primary',
+      onConfirm: () => assumir(id)
+    });
+  };
+
   return (
     <PageShell>
       <header className="border-b border-[#E2E8F0] bg-white/90 backdrop-blur-xl">
@@ -248,7 +260,15 @@ function PortalVoluntario() {
               </svg>
               Ranking de Indicações
             </Button>
-            <Button variant="secondary" onClick={() => { logout(); navigate('/login'); }}>Sair</Button>
+            <Button variant="secondary" onClick={() => {
+              confirm({
+                title: 'Sair da conta',
+                message: 'Tem certeza que deseja encerrar a sua sessão?',
+                confirmText: 'Sair',
+                tone: 'danger',
+                onConfirm: () => { logout(); navigate('/login'); }
+              });
+            }}>Sair</Button>
           </div>
         </Container>
       </header>
@@ -345,7 +365,7 @@ function PortalVoluntario() {
                 <AtendimentoCard
                   key={atendimento.id}
                   atendimento={atendimento}
-                  onAssumir={assumir}
+                  onAssumir={assumirComConfirmacao}
                   assumirBloqueado={voluntarioSemVinculo}
                   assumindo={assumindoId === atendimento.id}
                 />
@@ -370,6 +390,7 @@ function PortalVoluntario() {
           </div>
         )}
       </Section>
+      <ConfirmModal />
     </PageShell>
   );
 }

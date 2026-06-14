@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
+import { useConfirm } from '../hooks/useConfirm';
 import { voluntariosService, type Voluntario } from '../services/voluntariosService';
 import { atendimentoService } from '../services/atendimentoService';
 import { usuarioService } from '../services/usuarioService';
@@ -21,6 +22,7 @@ type Aba = 'dashboard' | 'atendimentos' | 'novo' | 'voluntarios' | 'beneficiario
 export default function DashboardAdmin() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { confirm, ConfirmModal } = useConfirm();
 
   const [aba, setAba] = useState<Aba>('dashboard');
   
@@ -161,7 +163,15 @@ export default function DashboardAdmin() {
             <h1 className="mt-2 text-3xl font-black text-[#0F172A]">Painel do Administrador</h1>
             <p className="text-sm text-[#475569]">Logado como {user?.nome}</p>
           </div>
-          <Button variant="secondary" onClick={() => { logout(); navigate('/login'); }}>
+          <Button variant="secondary" onClick={() => {
+            confirm({
+              title: 'Sair da conta',
+              message: 'Tem certeza que deseja encerrar a sua sessão?',
+              confirmText: 'Sair',
+              tone: 'danger',
+              onConfirm: () => { logout(); navigate('/login'); }
+            });
+          }}>
             Sair
           </Button>
         </Container>
@@ -213,7 +223,14 @@ export default function DashboardAdmin() {
                         <p className="mt-1 text-sm text-slate-500">Canal: {item.canal || 'Padrão'} | Criado em {new Date(item.dataCriacao || '').toLocaleDateString()}</p>
                         <p className="mt-1 text-sm text-slate-600">Responsável: {item.nomeVoluntario || 'Não atribuído'}</p>
                       </div>
-                      <Select value={item.status || 'ABERTO'} onChange={(e) => mudarStatusAtendimento(item.id, e.target.value)} className="md:w-48">
+                      <Select value={item.status || 'ABERTO'} onChange={(e) => {
+                        const novoStatus = e.target.value;
+                        confirm({
+                          title: 'Alterar Status',
+                          message: `Deseja realmente alterar o status deste atendimento para ${novoStatus}?`,
+                          onConfirm: () => mudarStatusAtendimento(item.id, novoStatus)
+                        });
+                      }} className="md:w-48">
                         <option value="ABERTO">ABERTO</option>
                         <option value="EM_ATENDIMENTO">EM ATENDIMENTO</option>
                         <option value="ENCERRADO">ENCERRADO</option>
@@ -348,8 +365,24 @@ export default function DashboardAdmin() {
                     )}
                   </div>
                   <div className="flex gap-2">
-                    <Button size="sm" onClick={() => aprovarInscricao(item.id)}>Aprovar</Button>
-                    <Button size="sm" variant="danger" onClick={() => rejeitarInscricao(item.id)}>Rejeitar</Button>
+                    <Button size="sm" onClick={() => {
+                      confirm({
+                        title: 'Aprovar Voluntário',
+                        message: 'Deseja aprovar a inscrição deste voluntário?',
+                        confirmText: 'Aprovar',
+                        tone: 'primary',
+                        onConfirm: () => aprovarInscricao(item.id)
+                      });
+                    }}>Aprovar</Button>
+                    <Button size="sm" variant="danger" onClick={() => {
+                      confirm({
+                        title: 'Rejeitar Inscrição',
+                        message: 'Deseja rejeitar e excluir esta inscrição?',
+                        confirmText: 'Rejeitar',
+                        tone: 'danger',
+                        onConfirm: () => rejeitarInscricao(item.id)
+                      });
+                    }}>Rejeitar</Button>
                   </div>
                 </div>
               </Card>
@@ -358,6 +391,7 @@ export default function DashboardAdmin() {
         )}
 
       </Container>
+      <ConfirmModal />
     </div>
   );
 }

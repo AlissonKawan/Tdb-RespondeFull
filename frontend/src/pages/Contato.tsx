@@ -8,6 +8,7 @@ import { Field, Input, Textarea } from '../components/ui/Input';
 import PageHeader from '../components/ui/PageHeader';
 import { contatoService } from '../services/contatoService';
 import { ApiError } from '../services/apiClient';
+import { useConfirm } from '../hooks/useConfirm';
 
 interface FormData {
   nome: string;
@@ -16,29 +17,38 @@ interface FormData {
 }
 
 function Contato() {
+  const { confirm, ConfirmModal } = useConfirm();
   const [enviado, setEnviado] = useState(false);
   const [erro, setErro] = useState('');
   const [loading, setLoading] = useState(false);
   const { register, handleSubmit, formState: { errors }, reset } = useForm<FormData>();
 
   const onSubmit = async (data: FormData) => {
-    setEnviado(false);
-    setErro('');
-    setLoading(true);
-    try {
-      await contatoService.enviarMensagem(data);
-      setEnviado(true);
-      reset();
-      window.setTimeout(() => setEnviado(false), 5000);
-    } catch (error) {
-      if (error instanceof ApiError) {
-        setErro(error.message);
-      } else {
-        setErro('Ocorreu um erro ao enviar sua mensagem. Tente novamente mais tarde.');
+    confirm({
+      title: 'Enviar Mensagem',
+      message: 'Deseja realmente enviar esta mensagem para a equipe?',
+      confirmText: 'Enviar',
+      tone: 'primary',
+      onConfirm: async () => {
+        setEnviado(false);
+        setErro('');
+        setLoading(true);
+        try {
+          await contatoService.enviarMensagem(data);
+          setEnviado(true);
+          reset();
+          window.setTimeout(() => setEnviado(false), 5000);
+        } catch (error) {
+          if (error instanceof ApiError) {
+            setErro(error.message);
+          } else {
+            setErro('Ocorreu um erro ao enviar sua mensagem. Tente novamente mais tarde.');
+          }
+        } finally {
+          setLoading(false);
+        }
       }
-    } finally {
-      setLoading(false);
-    }
+    });
   };
 
   return (
@@ -108,6 +118,7 @@ function Contato() {
           </Card>
         </div>
       </Section>
+      <ConfirmModal />
     </PageShell>
   );
 }
