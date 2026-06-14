@@ -9,6 +9,7 @@ import Badge from '../components/ui/Badge';
 import PageHeader from '../components/ui/PageHeader';
 import { EmptyState, ErrorState, LoadingState } from '../components/ui/FeedbackState';
 import { useAuth } from '../context/useAuth';
+import { useConfirm } from '../hooks/useConfirm';
 import { cronogramaService } from '../services/cronogramaService';
 import type { TarefaCronograma } from '../services/cronogramaService';
 
@@ -79,6 +80,7 @@ function formatarData(dataStr?: string) {
 
 export default function Cronograma() {
   const { user } = useAuth();
+  const { confirm, ConfirmModal } = useConfirm();
   const [tarefas, setTarefas] = useState<TarefaCronograma[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -119,95 +121,106 @@ export default function Cronograma() {
     if (!user?.voluntarioId) return;
 
     const acao = tarefaEmEdicao ? 'editar' : 'criar';
-    if (!confirm(`Deseja realmente ${acao} esta tarefa no seu cronograma?`)) {
-      return;
-    }
+    confirm({
+      title: tarefaEmEdicao ? 'Editar Tarefa' : 'Criar Tarefa',
+      message: `Deseja realmente ${acao} esta tarefa no seu cronograma?`,
+      confirmText: tarefaEmEdicao ? 'Editar' : 'Criar',
+      tone: 'primary',
+      onConfirm: async () => {
+        try {
+          let diaCalculado = 'Segunda-feira'; // Fallback
+          if (data.data_atividade) {
+            const [ano, mes, dia] = data.data_atividade.split('-');
+            if (ano && mes && dia) {
+              const date = new Date(Number(ano), Number(mes) - 1, Number(dia), 12, 0, 0);
+              const diasSemanaMap = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+              diaCalculado = diasSemanaMap[date.getDay()];
+            }
+          }
 
-    try {
-      let diaCalculado = 'Segunda-feira'; // Fallback
-      if (data.data_atividade) {
-        const [ano, mes, dia] = data.data_atividade.split('-');
-        if (ano && mes && dia) {
-          const date = new Date(Number(ano), Number(mes) - 1, Number(dia), 12, 0, 0);
-          const diasSemanaMap = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
-          diaCalculado = diasSemanaMap[date.getDay()];
+          const payload = { 
+            id_tarefa: tarefaEmEdicao?.id_tarefa,
+            id_voluntario: user.voluntarioId,
+            tipo: data.tipo,
+            titulo: data.titulo,
+            descricao: data.descricao,
+            data_atividade: data.data_atividade,
+            dia_semana: normalizeParaBackend(diaCalculado),
+            prioridade: normalizeParaBackend(data.prioridade),
+            status: data.status ? normalizeParaBackend(data.status) : 'Pendente'
+          };
+          if (tarefaEmEdicao?.id_tarefa) {
+            await cronogramaService.atualizarTarefa(tarefaEmEdicao.id_tarefa, payload);
+          } else {
+            await cronogramaService.criarTarefa(payload);
+          }
+          setModalOpen(false);
+          reset();
+          setTarefaEmEdicao(null);
+          await carregarTarefas();
+        } catch (err) {
+          console.error('Erro na API:', err);
+          if (err instanceof Error) {
+            const errorDetails = (err as any).details;
+            if (errorDetails) {
+              alert(`Erro ao salvar: ${err.message}\nDetalhes: ${JSON.stringify(errorDetails)}`);
+            } else {
+              alert(err.message);
+            }
+          } else {
+            alert('Erro ao salvar tarefa');
+          }
         }
       }
-
-      const payload = { 
-        id_tarefa: tarefaEmEdicao?.id_tarefa,
-        id_voluntario: user.voluntarioId,
-        tipo: data.tipo,
-        titulo: data.titulo,
-        descricao: data.descricao,
-        data_atividade: data.data_atividade,
-        dia_semana: normalizeParaBackend(diaCalculado),
-        prioridade: normalizeParaBackend(data.prioridade),
-        status: data.status ? normalizeParaBackend(data.status) : 'Pendente'
-      };
-      if (tarefaEmEdicao?.id_tarefa) {
-        await cronogramaService.atualizarTarefa(tarefaEmEdicao.id_tarefa, payload);
-      } else {
-        await cronogramaService.criarTarefa(payload);
-      }
-      setModalOpen(false);
-      reset();
-      setTarefaEmEdicao(null);
-      await carregarTarefas();
-    } catch (err) {
-      console.error('Erro na API:', err);
-      if (err instanceof Error) {
-        const errorDetails = (err as any).details;
-        if (errorDetails) {
-          alert(`Erro ao salvar: ${err.message}\nDetalhes: ${JSON.stringify(errorDetails)}`);
-        } else {
-          alert(err.message);
-        }
-      } else {
-        alert('Erro ao salvar tarefa');
-      }
-    }
+    });
   };
 
   const excluirTarefa = async (id: number) => {
-    if (!confirm('Deseja realmente excluir esta tarefa?')) return;
-    try {
-      await cronogramaService.excluirTarefa(id);
-      await carregarTarefas();
-    } catch (err) {
-      alert(err instanceof Error ? err.message : 'Erro ao excluir');
-    }
+    confirm({
+      title: 'Excluir Tarefa',
+      message: 'Deseja realmente excluir esta tarefa?',
+      confirmText: 'Excluir',
+      tone: 'danger',
+      onConfirm: async () => {
+        try {
+          await cronogramaService.excluirTarefa(id);
+          await carregarTarefas();
+        } catch (err) {
+          alert(err instanceof Error ? err.message : 'Erro ao excluir');
+        }
+      }
+    });
   };
 
   const confirmarTarefa = async (tarefa: TarefaCronograma) => {
-    if (!confirm('Deseja confirmar que esta tarefa foi realizada?')) return;
-    try {
-      const payload = {
-        id_tarefa: tarefa.id_tarefa,
-        id_voluntario: user?.voluntarioId || tarefa.id_voluntario,
-        tipo: tarefa.tipo,
-        titulo: tarefa.titulo,
-        descricao: tarefa.descricao,
-        data_atividade: tarefa.data_atividade,
-        status: 'Concluido',
-        dia_semana: normalizeParaBackend(tarefa.dia_semana),
-        prioridade: normalizeParaBackend(tarefa.prioridade || 'Média')
-      };
-      await cronogramaService.atualizarTarefa(tarefa.id_tarefa!, payload);
-      await carregarTarefas();
-    } catch (err) {
-      console.error('Erro na API:', err);
-      if (err instanceof Error) {
-        const errorDetails = (err as any).details;
-        if (errorDetails) {
-          alert(`Erro ao confirmar: ${err.message}\nDetalhes: ${JSON.stringify(errorDetails)}`);
-        } else {
-          alert(err.message);
+    confirm({
+      title: 'Confirmar Tarefa',
+      message: 'Deseja confirmar que esta tarefa foi realizada?',
+      confirmText: 'Confirmar',
+      tone: 'success',
+      onConfirm: async () => {
+        try {
+          const payload = {
+            id_tarefa: tarefa.id_tarefa,
+            id_voluntario: user?.voluntarioId || tarefa.id_voluntario,
+            tipo: tarefa.tipo,
+            titulo: tarefa.titulo,
+            descricao: tarefa.descricao,
+            data_atividade: tarefa.data_atividade,
+            status: 'Concluido',
+            dia_semana: normalizeParaBackend(tarefa.dia_semana),
+            prioridade: normalizeParaBackend(tarefa.prioridade || 'Média')
+          };
+          if (tarefa.id_tarefa) {
+            await cronogramaService.atualizarTarefa(tarefa.id_tarefa, payload);
+            await carregarTarefas();
+          }
+        } catch (err) {
+          console.error(err);
+          alert('Erro ao confirmar tarefa');
         }
-      } else {
-        alert('Erro ao confirmar tarefa');
       }
-    }
+    });
   };
 
   const abrirModalNova = () => {
@@ -405,6 +418,7 @@ export default function Cronograma() {
           </div>
         </div>
       )}
+      <ConfirmModal />
     </PageShell>
   );
 }
