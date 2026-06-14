@@ -2,8 +2,8 @@ package br.com.tdbresponde.config;
 
 import br.com.tdbresponde.dto.CheckinPrevisaoResponse;
 import br.com.tdbresponde.model.Atendimento;
-import br.com.tdbresponde.model.CriancaAdolescente;
-import br.com.tdbresponde.model.MulherApolonia;
+import br.com.tdbresponde.model.Mensagem;
+import br.com.tdbresponde.dao.MensagemDAO;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -13,43 +13,75 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
- * Cliente HTTP para consumir a API Python de Inteligência Artificial.
- * Chama o endpoint /predict_checkin e retorna a previsão de comparecimento.
+ * Cliente HTTP para consumir a API do Google Gemini.
+ * Envia o histórico real de mensagens para o LLM classificar a probabilidade de comparecimento.
  */
 @ApplicationScoped
 public class IaClient {
 
-    @ConfigProperty(name = "ia.api.url", defaultValue = "http://localhost:5000")
-    String iaApiUrl;
+    @ConfigProperty(name = "gemini.api.key", defaultValue = "SUA_CHAVE_GEMINI_AQUI")
+    String geminiApiKey;
 
     private final HttpClient httpClient = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(3))
             .build();
 
+    @Inject
+    MensagemDAO mensagemDAO;
+
+    @Inject
+    com.fasterxml.jackson.databind.ObjectMapper objectMapper;
+
     /**
-     * Consulta a IA para prever o resultado do check-in de um atendimento.
-     * Em caso de erro de conexão ou timeout, retorna null sem lançar exceção,
-     * garantindo que o sistema principal continue funcionando mesmo sem a IA.
+     * Consulta o Gemini para interpretar o histórico de chat e prever o check-in.
      */
     public CheckinPrevisaoResponse preverCheckin(Atendimento atendimento) {
         try {
-            String tipoPessoa = resolverTipoPessoa(atendimento);
-            String canal = resolverCanal(atendimento);
-            int gravidade = resolverGravidade(atendimento);
-            int risco = resolverRisco(atendimento);
-            int prioridade = atendimento.getPrioridade() > 0 ? atendimento.getPrioridade() : 3;
-            String statusAtendimento = atendimento.getStatus() != null ? atendimento.getStatus() : "ABERTO";
+            // 1. Puxar as mensagens do atendimento
+            List<Mensagem> mensagens = mensagemDAO.buscarPorAtendimento(atendimento.getId());
+            if (mensagens == null || mensagens.isEmpty()) {
+                System.out.println("[IaClient] Nenhuma mensagem encontrada para o atendimento " + atendimento.getId());
+                return null;
+            }
 
-            String body = String.format(
-                "{\"tipo_pessoa\":\"%s\",\"canal\":\"%s\",\"gravidade\":%d,\"risco\":%d,\"prioridade\":%d,\"status_atendimento\":\"%s\"}",
-                tipoPessoa, canal, gravidade, risco, prioridade, statusAtendimento
-            );
+            // 2. Montar histórico de texto
+            String historico = mensagens.stream()
+                .map(m -> "[" + m.getEnviadoPor() + "]: " + m.getConteudo())
+                .collect(Collectors.joining("\n"));
 
+            // 3. Montar o Prompt inteligente
+            String prompt = "Você é um assistente da ONG Turma do Bem. Sua função é ler a conversa abaixo e descobrir se o paciente confirmou presença na consulta (check-in).\n\n" +
+                            "Responda EXCLUSIVAMENTE com um JSON válido neste exato formato:\n" +
+                            "{\"previsao_checkin\": \"CONFIRMADO\" | \"NAO_COMPARECERA\" | \"REAGENDAMENTO_SOLICITADO\" | \"SEM_RESPOSTA\", \"confianca\": 0.95}\n\n" +
+                            "Regras:\n" +
+                            "- Se o beneficiário confirmou ou disse 'sim', retorne CONFIRMADO.\n" +
+                            "- Se ele disse que não pode ir ou vai faltar, retorne NAO_COMPARECERA.\n" +
+                            "- Se ele pediu para mudar dia/horário, retorne REAGENDAMENTO_SOLICITADO.\n" +
+                            "- Se não houve resposta clara, retorne SEM_RESPOSTA.\n\n" +
+                            "Histórico de mensagens:\n" + historico;
+
+            // 4. Estruturar o JSON pro Gemini
+            com.fasterxml.jackson.databind.node.ObjectNode rootNode = objectMapper.createObjectNode();
+            com.fasterxml.jackson.databind.node.ArrayNode contentsArray = rootNode.putArray("contents");
+            com.fasterxml.jackson.databind.node.ObjectNode contentItem = contentsArray.addObject();
+            com.fasterxml.jackson.databind.node.ArrayNode partsArray = contentItem.putArray("parts");
+            partsArray.addObject().put("text", prompt);
+            
+            com.fasterxml.jackson.databind.node.ObjectNode configNode = rootNode.putObject("generationConfig");
+            configNode.put("responseMimeType", "application/json");
+
+            String body = objectMapper.writeValueAsString(rootNode);
+
+            String urlComChave = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + geminiApiKey;
+
+            // 5. Enviar request
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(iaApiUrl + "/predict_checkin"))
-                    .timeout(Duration.ofSeconds(3))
+                    .uri(URI.create(urlComChave))
+                    .timeout(Duration.ofSeconds(10))
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(body))
                     .build();
@@ -57,68 +89,40 @@ public class IaClient {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() == 200) {
-                return parsearResposta(response.body());
+                return parsearRespostaGemini(response.body());
+            } else {
+                System.out.println("[IaClient] Erro da API Gemini: " + response.statusCode() + " - " + response.body());
             }
 
         } catch (Exception e) {
-            // IA offline ou indisponível — falha silenciosa para não impactar o sistema principal
-            System.out.println("[IaClient] IA indisponivel: " + e.toString());
+            System.out.println("[IaClient] IA indisponivel ou falha na integração: " + e.toString());
         }
 
         return null;
     }
 
-    /** Extrai o tipo de pessoa a partir do objeto Atendimento. */
-    private String resolverTipoPessoa(Atendimento atendimento) {
-        if (atendimento.getPessoaAtendida() instanceof MulherApolonia) return "MULHER_APOLONIA";
-        if (atendimento.getPessoaAtendida() instanceof CriancaAdolescente) return "CRIANCA_ADOLESCENTE";
-        return "OUTRO";
-    }
-
-    /** Normaliza o nome do canal para o formato aceito pela API Python. */
-    private String resolverCanal(Atendimento atendimento) {
-        if (atendimento.getCanalOrigem() == null || atendimento.getCanalOrigem().getNome() == null) {
-            return "sistema_web";
-        }
-        String nome = atendimento.getCanalOrigem().getNome().toLowerCase();
-        if (nome.contains("whatsapp")) return "whatsapp";
-        if (nome.contains("email"))    return "email";
-        if (nome.contains("presencial")) return "presencial";
-        return "sistema_web";
-    }
-
-    /** Retorna a gravidade bucal se for criança/adolescente, 0 caso contrário. */
-    private int resolverGravidade(Atendimento atendimento) {
-        if (atendimento.getPessoaAtendida() instanceof CriancaAdolescente ca) {
-            return ca.getGravidadeBucal();
-        }
-        return 0;
-    }
-
-    /** Retorna o nível de risco se for mulher Apolônia, 0 caso contrário. */
-    private int resolverRisco(Atendimento atendimento) {
-        if (atendimento.getPessoaAtendida() instanceof MulherApolonia ma) {
-            return ma.getNivelRisco();
-        }
-        return 0;
-    }
-
-    @Inject
-    com.fasterxml.jackson.databind.ObjectMapper objectMapper;
-
     /**
-     * Faz parsing da resposta JSON usando o ObjectMapper do Quarkus (Jackson).
-     * Exemplo de resposta: {"previsao_checkin":"CONFIRMADO","confianca":0.66,...}
+     * Faz parsing da resposta do Gemini que já devolve JSON puro no texto.
      */
-    private CheckinPrevisaoResponse parsearResposta(String json) {
+    private CheckinPrevisaoResponse parsearRespostaGemini(String json) {
         try {
             com.fasterxml.jackson.databind.JsonNode root = objectMapper.readTree(json);
-            String previsao = root.has("previsao_checkin") ? root.get("previsao_checkin").asText() : null;
-            double confianca = root.has("confianca") ? root.get("confianca").asDouble() : 0.0;
-            return new CheckinPrevisaoResponse(previsao, confianca);
+            if (root.has("candidates") && root.get("candidates").isArray() && root.get("candidates").size() > 0) {
+                String text = root.get("candidates").get(0)
+                        .get("content").get("parts").get(0)
+                        .get("text").asText();
+                
+                // O Gemini devolveu o JSON interno conforme solicitado
+                com.fasterxml.jackson.databind.JsonNode innerRoot = objectMapper.readTree(text);
+                String previsao = innerRoot.has("previsao_checkin") ? innerRoot.get("previsao_checkin").asText() : "SEM_RESPOSTA";
+                double confianca = innerRoot.has("confianca") ? innerRoot.get("confianca").asDouble() : 0.0;
+                
+                System.out.println("[IaClient] Gemini concluiu! Status: " + previsao + " | Confiança: " + confianca);
+                return new CheckinPrevisaoResponse(previsao, confianca);
+            }
         } catch (Exception e) {
-            System.out.println("[IaClient] Erro ao fazer parse da resposta JSON: " + e.getMessage());
-            return null;
+            System.out.println("[IaClient] Erro ao parsear resposta do Gemini: " + e.getMessage());
         }
+        return null;
     }
 }
