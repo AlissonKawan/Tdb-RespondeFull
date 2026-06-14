@@ -172,7 +172,7 @@ function DetalheAtendimento() {
   const [erro, setErro] = useState('');
   const [feedback, setFeedback] = useState('');
   const [conteudo, setConteudo] = useState('');
-  const [enviando, setEnviando] = useState(false);
+
   const [salvando, setSalvando] = useState(false);
   const [salvandoCheckin, setSalvandoCheckin] = useState(false);
   const [statusEdit, setStatusEdit] = useState('ABERTO');
@@ -410,22 +410,32 @@ function DetalheAtendimento() {
     event.preventDefault();
     if (!conteudo.trim() || chatBloqueado) return;
 
-    setEnviando(true);
+    const texto = conteudo.trim();
+    setConteudo('');
     setFeedback('');
+
+    const tempId = -Date.now() - Math.floor(Math.random() * 1000);
+    const mensagemOtimista: Mensagem = {
+      id: tempId,
+      atendimentoId,
+      conteudo: texto,
+      enviadoPor: remetenteAtual,
+      dataHora: new Date().toISOString()
+    };
+
+    setMensagens((atuais) => [...atuais, mensagemOtimista]);
+
     try {
       const novaMensagem = await mensagensService.enviarMensagem(atendimentoId, {
-        conteudo: conteudo.trim(),
+        conteudo: texto,
         enviadoPor: remetenteAtual,
       });
-      if (!seenIdsRef.current.has(novaMensagem.id)) {
-        seenIdsRef.current.add(novaMensagem.id);
-        setMensagens((atuais) => [...atuais, novaMensagem]);
-      }
-      setConteudo('');
+      seenIdsRef.current.add(novaMensagem.id);
+      setMensagens((atuais) => atuais.map(m => m.id === tempId ? novaMensagem : m));
     } catch (error) {
       setFeedback(error instanceof Error ? error.message : 'Não foi possível enviar a mensagem.');
-    } finally {
-      setEnviando(false);
+      setConteudo(texto); // Restaura o texto
+      setMensagens((atuais) => atuais.filter(m => m.id !== tempId)); // Remove a otimista
     }
   };
 
@@ -578,13 +588,13 @@ function DetalheAtendimento() {
                       rows={4}
                       value={conteudo}
                       onChange={(event) => setConteudo(event.target.value)}
-                      disabled={chatBloqueado || enviando}
+                      disabled={chatBloqueado}
                       placeholder="Escreva sua mensagem..."
                     />
                   </Field>
                   <div className="mt-4 flex justify-end">
-                    <Button type="submit" disabled={chatBloqueado || enviando || !conteudo.trim()}>
-                      {enviando ? 'Enviando...' : 'Enviar mensagem'}
+                    <Button type="submit" disabled={chatBloqueado || !conteudo.trim()}>
+                      Enviar mensagem
                     </Button>
                   </div>
                 </form>
