@@ -234,10 +234,7 @@ function PortalVoluntario() {
       <header className="border-b border-[#E2E8F0] bg-white/90 backdrop-blur-xl">
         <Container className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <button onClick={() => navigate('/')} className="text-sm font-semibold text-[#2563EB] hover:text-[#1E3A8A]">
-              Voltar para o site
-            </button>
-            <p className="mt-1 text-sm text-[#475569]">Sessão de {user?.nome}</p>
+            <p className="text-sm text-[#475569]">Sessão de {user?.nome}</p>
           </div>
           <div className="flex gap-2">
             <Button variant="secondary" onClick={() => navigate('/ranking')}>
