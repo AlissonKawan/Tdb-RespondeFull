@@ -5,6 +5,7 @@ import { useConfirm } from '../hooks/useConfirm';
 import { voluntariosService, type Voluntario } from '../services/voluntariosService';
 import { atendimentoService } from '../services/atendimentoService';
 import { usuarioService } from '../services/usuarioService';
+import { formatStatusLabel } from '../utils/formatters';
 import type { VoluntarioApi } from '../types/api';
 import type { AtendimentoApi } from '../types/AtendimentoApi';
 import type { AuthUser } from '../types/auth';
@@ -218,7 +219,7 @@ export default function DashboardAdmin() {
                       <div>
                         <div className="flex flex-wrap items-center gap-2">
                           <h3 className="font-bold text-slate-900">#{item.id} {item.pessoaAtendidaNome || item.beneficiarioNome || 'Sem Nome'}</h3>
-                          <Badge tone={item.status === 'ENCERRADO' ? 'success' : item.status === 'ABERTO' ? 'info' : 'warning'}>{item.status}</Badge>
+                          <Badge tone={item.status === 'ENCERRADO' ? 'success' : item.status === 'ABERTO' ? 'info' : 'warning'}>{formatStatusLabel(item.status)}</Badge>
                         </div>
                         <p className="mt-1 text-sm text-slate-500">Canal: {item.canal || 'Padrão'} | Criado em {new Date(item.dataCriacao || '').toLocaleDateString()}</p>
                         <p className="mt-1 text-sm text-slate-600">Responsável: {item.nomeVoluntario || 'Não atribuído'}</p>

@@ -12,6 +12,7 @@ import SectionHeader from '../components/ui/SectionHeader';
 import { useAuth } from '../context/useAuth';
 import { atendimentoService } from '../services/atendimentoService';
 import { mensagensService } from '../services/mensagensService';
+import { formatStatusLabel } from '../utils/formatters';
 import type { AtendimentoApi } from '../types/AtendimentoApi';
 
 function statusTone(status?: string) {
@@ -161,7 +162,7 @@ function PortalBeneficiario() {
                   <div className="flex flex-wrap items-center gap-2">
                     <h3 className="text-lg font-bold text-[#0F172A] truncate">{getPessoa(atendimento)}</h3>
                     <Badge tone="neutral">Atendimento #{atendimento.id}</Badge>
-                    {atendimento.status && <Badge tone={statusTone(atendimento.status) as any}>{atendimento.status}</Badge>}
+                    {atendimento.status && <Badge tone={statusTone(atendimento.status) as any}>{formatStatusLabel(atendimento.status)}</Badge>}
                     {novasMensagens[atendimento.id] && <Badge tone="danger">Nova Mensagem</Badge>}
                   </div>
                   <div className="mt-3 grid gap-2 text-sm text-[#475569] md:grid-cols-2">

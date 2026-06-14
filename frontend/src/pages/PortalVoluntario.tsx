@@ -15,6 +15,7 @@ import { mensagensService } from '../services/mensagensService';
 import type { AtendimentoApi } from '../types/AtendimentoApi';
 import { useAuth } from '../context/useAuth';
 import { useConfirm } from '../hooks/useConfirm';
+import { formatStatusLabel } from '../utils/formatters';
 
 type Aba = 'solicitados' | 'meus';
 
@@ -65,7 +66,7 @@ function AtendimentoCard({ atendimento, onAssumir, assumindo, assumirBloqueado, 
         <div>
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="text-lg font-bold text-[#0F172A]">{getPessoa(atendimento)}</h3>
-            {atendimento.status && <Badge tone={statusTone(atendimento.status) as any}>{atendimento.status}</Badge>}
+            {atendimento.status && <Badge tone={statusTone(atendimento.status) as any}>{formatStatusLabel(atendimento.status)}</Badge>}
             {hasNovaMensagem && <Badge tone="danger">Nova Mensagem</Badge>}
           </div>
           <div className="mt-3 grid gap-2 text-sm text-[#475569] md:grid-cols-2">
