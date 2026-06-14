@@ -10,6 +10,7 @@ import { ErrorState, LoadingState } from '../components/ui/FeedbackState';
 import { Field, Select, Textarea } from '../components/ui/Input';
 import PageHeader from '../components/ui/PageHeader';
 import { useAuth } from '../context/useAuth';
+import { useConfirm } from '../hooks/useConfirm';
 import { atendimentoService } from '../services/atendimentoService';
 import { mensagensService } from '../services/mensagensService';
 import type { AtendimentoApi, Mensagem, MensagemRequest } from '../types/AtendimentoApi';
@@ -142,6 +143,7 @@ function DetalheAtendimento() {
   const atendimentoId = Number(id);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { confirm, ConfirmModal } = useConfirm();
 
   const [atendimento, setAtendimento] = useState<AtendimentoApi | null>(null);
   const [mensagens, setMensagens] = useState<Mensagem[]>([]);
@@ -467,7 +469,15 @@ function DetalheAtendimento() {
             </button>
             <p className="mt-1 text-sm text-[#475569]">Sessao de {user?.nome}</p>
           </div>
-          <Button variant="secondary" onClick={() => { logout(); navigate('/login'); }}>Sair</Button>
+          <Button variant="secondary" onClick={() => {
+            confirm({
+              title: 'Sair da conta',
+              message: 'Tem certeza que deseja encerrar a sua sessão?',
+              confirmText: 'Sair',
+              tone: 'danger',
+              onConfirm: () => { logout(); navigate('/login'); }
+            });
+          }}>Sair</Button>
         </Container>
       </header>
 
@@ -663,7 +673,15 @@ function DetalheAtendimento() {
                       </Select>
                     </Field>
 
-                    <Button fullWidth disabled={salvando} onClick={() => void salvarAtendimento(false)}>
+                    <Button fullWidth disabled={salvando} onClick={() => {
+                      confirm({
+                        title: 'Salvar Alterações',
+                        message: 'Deseja confirmar as alterações feitas neste atendimento?',
+                        confirmText: 'Salvar',
+                        tone: 'primary',
+                        onConfirm: () => salvarAtendimento(false)
+                      });
+                    }}>
                       {salvando ? 'Salvando...' : 'Salvar alteracoes'}
                     </Button>
 
@@ -671,7 +689,15 @@ function DetalheAtendimento() {
                       fullWidth
                       variant="danger"
                       disabled={salvando || atendimento.status === 'ENCERRADO'}
-                      onClick={() => void salvarAtendimento(true)}
+                      onClick={() => {
+                        confirm({
+                          title: 'Encerrar Atendimento',
+                          message: 'Tem certeza que deseja encerrar este atendimento? Ele ficará como somente leitura e não será possível enviar novas mensagens.',
+                          confirmText: 'Encerrar',
+                          tone: 'danger',
+                          onConfirm: () => salvarAtendimento(true)
+                        });
+                      }}
                     >
                       Encerrar atendimento
                     </Button>
@@ -768,6 +794,7 @@ function DetalheAtendimento() {
           </div>
         )}
       </Section>
+      <ConfirmModal />
     </PageShell>
   );
 }
