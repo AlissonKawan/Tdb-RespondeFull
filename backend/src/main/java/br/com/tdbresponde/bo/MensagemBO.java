@@ -61,9 +61,6 @@ public class MensagemBO {
         validar(mensagem);
         mensagemDAO.inserir(mensagem);
         
-        // Atualiza a data de atualizacao do atendimento para subir para o topo da lista
-        atendimentoBO.atualizarDataAtualizacao(mensagem.getAtendimento().getId());
-        
         // Broadcast the new message to active WebSocket sessions
         try {
             br.com.tdbresponde.dto.MensagemResponse response = br.com.tdbresponde.dto.MensagemResponse.from(mensagem);

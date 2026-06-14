@@ -124,10 +124,6 @@ public class AtendimentoBO {
         return atendimento;
     }
 
-    public void atualizarDataAtualizacao(int id) {
-        atendimentoDAO.atualizarDataAtualizacao(id);
-    }
-
     public Atendimento solicitar(SolicitarAtendimentoRequest request) {
         validarSolicitacao(request);
 
