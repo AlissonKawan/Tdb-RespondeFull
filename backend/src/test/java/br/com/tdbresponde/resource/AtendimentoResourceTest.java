@@ -80,16 +80,7 @@ class AtendimentoResourceTest {
         atendimentoMock.setStatus("ABERTO");
         atendimentoMock.setPrioridade(1);
 
-        when(bo.buscarPorIdComPrevisao(eq(atendimentoId), any())).thenAnswer(invocation -> {
-            br.com.tdbresponde.dto.CheckinPrevisaoResponse[] holder = invocation.getArgument(1);
-            if (holder != null && holder.length > 0) {
-                br.com.tdbresponde.dto.CheckinPrevisaoResponse previsao = new br.com.tdbresponde.dto.CheckinPrevisaoResponse();
-                previsao.previsaoCheckin = "CONFIRMADO";
-                previsao.confiancaCheckin = 0.95;
-                holder[0] = previsao;
-            }
-            return atendimentoMock;
-        });
+        when(bo.buscarPorId(atendimentoId)).thenReturn(atendimentoMock);
 
         // Act
         Response response = resource.buscarPorId(atendimentoId);
@@ -99,8 +90,29 @@ class AtendimentoResourceTest {
         br.com.tdbresponde.dto.AtendimentoResponse responseDto = (br.com.tdbresponde.dto.AtendimentoResponse) response.getEntity();
         assertEquals(atendimentoId, responseDto.id);
         assertEquals("ABERTO", responseDto.status);
-        assertEquals("CONFIRMADO", responseDto.previsaoCheckin);
 
-        verify(bo, times(1)).buscarPorIdComPrevisao(eq(atendimentoId), any());
+        verify(bo, times(1)).buscarPorId(atendimentoId);
+    }
+
+    @Test
+    void deveBuscarPrevisaoIAComSucesso() {
+        // Arrange
+        int atendimentoId = 49;
+        br.com.tdbresponde.dto.CheckinPrevisaoResponse previsaoMock = new br.com.tdbresponde.dto.CheckinPrevisaoResponse();
+        previsaoMock.previsaoCheckin = "CONFIRMADO";
+        previsaoMock.confiancaCheckin = 0.95;
+
+        when(bo.preverCheckinIA(atendimentoId)).thenReturn(previsaoMock);
+
+        // Act
+        Response response = resource.buscarPrevisaoIA(atendimentoId);
+
+        // Assert
+        assertEquals(200, response.getStatus());
+        br.com.tdbresponde.dto.CheckinPrevisaoResponse responseDto = (br.com.tdbresponde.dto.CheckinPrevisaoResponse) response.getEntity();
+        assertEquals("CONFIRMADO", responseDto.previsaoCheckin);
+        assertEquals(0.95, responseDto.confiancaCheckin);
+
+        verify(bo, times(1)).preverCheckinIA(atendimentoId);
     }
 }
