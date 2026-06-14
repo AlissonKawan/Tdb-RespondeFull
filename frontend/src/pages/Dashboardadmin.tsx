@@ -5,7 +5,7 @@ import { useConfirm } from '../hooks/useConfirm';
 import { voluntariosService, type Voluntario } from '../services/voluntariosService';
 import { atendimentoService } from '../services/atendimentoService';
 import { usuarioService } from '../services/usuarioService';
-import { formatStatusLabel } from '../utils/formatters';
+import { formatStatusLabel, formatDate } from '../utils/formatters';
 import type { VoluntarioApi } from '../types/api';
 import type { AtendimentoApi } from '../types/AtendimentoApi';
 import type { AuthUser } from '../types/auth';
@@ -221,7 +221,7 @@ export default function DashboardAdmin() {
                           <h3 className="font-bold text-slate-900">#{item.id} {item.pessoaAtendidaNome || item.beneficiarioNome || 'Sem Nome'}</h3>
                           <Badge tone={item.status === 'ENCERRADO' ? 'success' : item.status === 'ABERTO' ? 'info' : 'warning'}>{formatStatusLabel(item.status)}</Badge>
                         </div>
-                        <p className="mt-1 text-sm text-slate-500">Canal: {item.canal || 'Padrão'} | Criado em {new Date(item.dataCriacao || '').toLocaleDateString()}</p>
+                        <p className="mt-1 text-sm text-slate-500">Canal: {item.canal || 'Padrão'} | Criado em {formatDate(item.dataCriacao)}</p>
                         <p className="mt-1 text-sm text-slate-600">Responsável: {item.nomeVoluntario || 'Não atribuído'}</p>
                       </div>
                       <Select value={item.status || 'ABERTO'} onChange={(e) => {
@@ -332,7 +332,7 @@ export default function DashboardAdmin() {
                           <td className="px-4 py-3 font-semibold text-slate-800">#{ben.id}</td>
                           <td className="px-4 py-3 text-slate-800">{ben.nome}</td>
                           <td className="px-4 py-3 text-slate-500">{ben.email}</td>
-                          <td className="px-4 py-3 text-slate-500">{new Date(ben.dataCriacao || '').toLocaleDateString()}</td>
+                          <td className="px-4 py-3 text-slate-500">{formatDate(ben.dataCriacao)}</td>
                           <td className="px-4 py-3">
                             <Badge tone={ben.ativo ? 'success' : 'danger'}>{ben.ativo ? 'Ativo' : 'Inativo'}</Badge>
                           </td>

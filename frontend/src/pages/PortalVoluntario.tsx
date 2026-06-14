@@ -15,7 +15,7 @@ import { mensagensService } from '../services/mensagensService';
 import type { AtendimentoApi } from '../types/AtendimentoApi';
 import { useAuth } from '../context/useAuth';
 import { useConfirm } from '../hooks/useConfirm';
-import { formatStatusLabel } from '../utils/formatters';
+import { formatStatusLabel, formatDate } from '../utils/formatters';
 
 type Aba = 'solicitados' | 'meus';
 
@@ -74,7 +74,7 @@ function AtendimentoCard({ atendimento, onAssumir, assumindo, assumirBloqueado, 
             {atendimento.canal && <p><strong className="text-[#0F172A]">Canal:</strong> {atendimento.canal}</p>}
             {atendimento.prioridade && <p><strong className="text-[#0F172A]">Prioridade:</strong> {atendimento.prioridade}</p>}
             {(atendimento.dataAtualizacao || atendimento.dataCriacao || atendimento.dataAbertura) && (
-              <p><strong className="text-[#0F172A]">Última Atividade:</strong> {atendimento.dataAtualizacao ?? atendimento.dataCriacao ?? atendimento.dataAbertura}</p>
+              <p><strong className="text-[#0F172A]">Última Atividade:</strong> {formatDate(atendimento.dataAtualizacao ?? atendimento.dataCriacao ?? atendimento.dataAbertura)}</p>
             )}
           </div>
         </div>
