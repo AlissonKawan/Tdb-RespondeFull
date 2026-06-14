@@ -27,7 +27,7 @@ function AprovacaoVoluntarios() {
     try {
       setSolicitacoes(await voluntariosService.listarPendentes());
     } catch (error) {
-      setErro(error instanceof Error ? error.message : 'Nao foi possivel carregar as solicitacoes.');
+      setErro(error instanceof Error ? error.message : 'Não foi possível carregar as solicitações.');
     } finally {
       setLoading(false);
     }
@@ -41,12 +41,12 @@ function AprovacaoVoluntarios() {
     setAprovandoId(id);
     setFeedback('');
     try {
-      if (!user) throw new Error('Usuario logado nao encontrado');
+      if (!user) throw new Error('Usuário logado não encontrado');
       await voluntariosService.aprovar(id, { aprovadorId: user.id });
       setFeedback('Solicitacao aprovada com sucesso.');
       await carregar();
     } catch (error) {
-      setFeedback(error instanceof Error ? error.message : 'Nao foi possivel aprovar a solicitacao.');
+      setFeedback(error instanceof Error ? error.message : 'Não foi possível aprovar a solicitação.');
     } finally {
       setAprovandoId(null);
     }
@@ -68,7 +68,7 @@ function AprovacaoVoluntarios() {
 
       <PageHeader
         eyebrow="Voluntariado"
-        title="Solicitacoes de novos voluntarios"
+        title="Solicitações de novos voluntários"
         description="Analise os pedidos recebidos e libere o acesso apenas para pessoas aprovadas."
       />
 
@@ -83,7 +83,7 @@ function AprovacaoVoluntarios() {
         {loading && <LoadingState title="Carregando solicitacoes..." />}
         {erro && <ErrorState title="Erro ao carregar solicitacoes" description={erro} />}
         {!loading && !erro && solicitacoes.length === 0 && (
-          <EmptyState title="Nenhuma inscrição pendente no momento." description="Quando alguem solicitar cadastro como voluntario, o pedido aparecera aqui." />
+          <EmptyState title="Nenhuma inscrição pendente no momento." description="Quando alguém solicitar cadastro como voluntário, o pedido aparecerá aqui." />
         )}
 
         <div className="grid gap-4">
@@ -97,7 +97,7 @@ function AprovacaoVoluntarios() {
                   </div>
                   <div className="mt-3 grid gap-2 text-sm text-[#475569] md:grid-cols-2">
                     {solicitacao.usuario && <p><strong className="text-[#0F172A]">Contato:</strong> {solicitacao.usuario}</p>}
-                    <p><strong className="text-[#0F172A]">Especialidade:</strong> {solicitacao.especialidade?.nome ?? 'Nao informada'}</p>
+                    <p><strong className="text-[#0F172A]">Especialidade:</strong> {solicitacao.especialidade?.nome ?? 'Não informada'}</p>
                     {solicitacao.cro && (
                       <div className="flex flex-col gap-1">
                         <p>
@@ -135,7 +135,7 @@ function AprovacaoVoluntarios() {
                   )}
                 </div>
                 <Button disabled={aprovandoId === solicitacao.id} onClick={() => aprovar(solicitacao.id)}>
-                  {aprovandoId === solicitacao.id ? 'Aprovando...' : 'Aprovar voluntario'}
+                  {aprovandoId === solicitacao.id ? 'Aprovando...' : 'Aprovar voluntário'}
                 </Button>
               </div>
             </Card>

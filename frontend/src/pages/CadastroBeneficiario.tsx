@@ -30,10 +30,10 @@ function CadastroBeneficiario() {
     if (error instanceof ApiError) {
       if (error.status === 409) return 'Este e-mail ja esta cadastrado.';
       if (error.status === 400) return error.message || 'Confira os dados do cadastro.';
-      if (error.status === 0) return 'Nao foi possivel conectar ao servidor.';
+      if (error.status === 0) return 'Não foi possível conectar ao servidor.';
       return error.message;
     }
-    return 'Nao foi possivel criar o cadastro.';
+    return 'Não foi possível criar o cadastro.';
   };
 
   const onSubmit = async (data: FormData) => {

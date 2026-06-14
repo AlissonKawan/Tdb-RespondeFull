@@ -187,7 +187,7 @@ export default function SolicitarAtendimento() {
             canalComunicacaoId: current.canalComunicacaoId,
           }));
         } catch (error) {
-          setErro(error instanceof Error ? error.message : 'Nao foi possivel enviar o relato.');
+          setErro(error instanceof Error ? error.message : 'Não foi possível enviar o relato.');
         } finally {
           setEnviando(false);
         }

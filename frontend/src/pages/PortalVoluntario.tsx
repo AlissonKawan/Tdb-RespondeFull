@@ -166,7 +166,7 @@ function PortalVoluntario() {
 
       if (user.tipoUsuario !== 'VOLUNTARIO') {
         setLoadingMeus(false);
-        setErroMeus('Esta area e exclusiva para voluntarios.');
+        setErroMeus('Esta área é exclusiva para voluntários.');
         return;
       }
 
@@ -174,7 +174,7 @@ function PortalVoluntario() {
         setLoadingMeus(false);
         setErroMeus('');
         setMeusAtendimentos([]);
-        setFeedback('Sua conta de voluntario esta sem vinculo de voluntario. Voce pode visualizar os atendimentos, mas ainda nao pode assumir casos.');
+        setFeedback('Sua conta de voluntário está sem vínculo de voluntário. Você pode visualizar os atendimentos, mas ainda não pode assumir casos.');
         return;
       }
 
@@ -193,7 +193,7 @@ function PortalVoluntario() {
     if (!user) return;
 
     if (!user.voluntarioId) {
-      setFeedback('Nao foi possivel assumir atendimento: sua conta ainda nao possui cadastro de voluntario vinculado.');
+      setFeedback('Não foi possível assumir o atendimento: sua conta ainda não possui cadastro de voluntário vinculado.');
       return;
     }
 
@@ -213,7 +213,7 @@ function PortalVoluntario() {
       setFeedback(
         error instanceof Error
           ? error.message
-          : 'Nao foi possivel assumir atendimento.',
+          : 'Não foi possível assumir o atendimento.',
       );
     } finally {
       setAssumindoId(null);

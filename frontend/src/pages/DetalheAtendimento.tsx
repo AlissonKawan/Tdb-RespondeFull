@@ -26,7 +26,7 @@ function statusTone(status?: string) {
 }
 
 function formatDate(value?: string | null) {
-  if (!value) return 'Nao informada';
+  if (!value) return 'Não informada';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
   return date.toLocaleString('pt-BR');
@@ -39,7 +39,7 @@ function labelStatus(status?: string) {
     ENCERRADO: 'Encerrado',
     CANCELADO: 'Cancelado',
   };
-  return status ? labels[status] ?? status : 'Nao informado';
+  return status ? labels[status] ?? status : 'Não informado';
 }
 
 function labelPrioridade(prioridade?: string | number) {
@@ -50,7 +50,7 @@ function labelPrioridade(prioridade?: string | number) {
     '4': '4 - Baixa',
     '5': '5 - Acompanhamento',
   };
-  return prioridade === undefined ? 'Nao informada' : labels[String(prioridade)] ?? String(prioridade);
+  return prioridade === undefined ? 'Não informada' : labels[String(prioridade)] ?? String(prioridade);
 }
 
 function getSender(tipoUsuario?: string): MensagemRequest['enviadoPor'] {
@@ -63,7 +63,7 @@ function InfoItem({ label, value }: { label: string; value?: string | number | n
   return (
     <div>
       <p className="text-xs font-bold uppercase tracking-widest text-[#64748B]">{label}</p>
-      <p className="mt-1 break-words text-sm font-semibold text-[#0F172A]">{value || 'Nao informado'}</p>
+      <p className="mt-1 break-words text-sm font-semibold text-[#0F172A]">{value || 'Não informado'}</p>
     </div>
   );
 }
@@ -79,14 +79,14 @@ function normalizarTelefone(tel?: string) {
 
 function labelStatusCheckin(status?: string) {
   const labels: Record<string, string> = {
-    NAO_ENVIADO: 'Nao enviado',
-    AGUARDANDO_RESPOSTA: 'Aguardando resposta',
+    NAO_ENVIADO: 'Não enviado',
+    ENVIADO: 'Enviado',
     CONFIRMADO: 'Confirmado',
-    NAO_COMPARECERA: 'Nao comparecera',
+    NAO_COMPARECERA: 'Não comparecerá',
     REAGENDAMENTO_SOLICITADO: 'Reagendamento solicitado',
     SEM_RESPOSTA: 'Sem resposta',
   };
-  return status ? labels[status] ?? status : 'Nao enviado';
+  return status ? labels[status] ?? status : 'Não enviado';
 }
 
 function iaPrevisaoConfig(previsao?: string) {
@@ -187,7 +187,7 @@ function DetalheAtendimento() {
 
   const assumirEsteAtendimento = async () => {
     if (!voluntarioId) {
-      setFeedback('Nao foi possivel assumir: sua conta nao possui vinculo de voluntario.');
+      setFeedback('Não foi possível assumir: sua conta não possui vínculo de voluntário.');
       return;
     }
 
@@ -198,7 +198,7 @@ function DetalheAtendimento() {
       setFeedback('Atendimento assumido com sucesso!');
       await carregarDados(); // Recarrega os dados do atendimento
     } catch (error) {
-      setFeedback(error instanceof Error ? error.message : 'Nao foi possivel assumir o atendimento.');
+      setFeedback(error instanceof Error ? error.message : 'Não foi possível assumir o atendimento.');
     } finally {
       setAssumindo(false);
     }
@@ -299,12 +299,12 @@ function DetalheAtendimento() {
       setStatusEdit(dadosAtendimento.status ?? 'ABERTO');
       setPrioridadeEdit(String(dadosAtendimento.prioridade ?? 3));
 
-      // Busca a previsao de checkin em background para nao travar a tela
+      // Busca a previsao de checkin em background para não travar a tela
       atendimentoService.preverCheckinIA(atendimentoId).then(previsao => {
         setAtendimento(prev => prev ? { ...prev, ...previsao } : prev);
       }).catch(() => {});
     } catch (error) {
-      let msgErro = 'Nao foi possivel carregar os detalhes deste atendimento. Tente novamente mais tarde.';
+      let msgErro = 'Não foi possível carregar os detalhes deste atendimento. Tente novamente mais tarde.';
       if (error instanceof Error) {
         if (error.message.includes('Error injecting') || error.message.includes('Internal Server Error') || error.message.includes('500')) {
           msgErro = 'Houve uma falha interna no servidor ao carregar este atendimento. A equipe tecnica ja foi notificada.';
@@ -403,7 +403,7 @@ function DetalheAtendimento() {
     atendimento?.pessoaAtendidaNome
       ?? atendimento?.beneficiarioNome
       ?? atendimento?.pacienteNome
-      ?? (atendimento?.pessoaAtendidaId ? `Pessoa #${atendimento.pessoaAtendidaId}` : 'Nao informada')
+      ?? (atendimento?.pessoaAtendidaId ? `Pessoa #${atendimento.pessoaAtendidaId}` : 'Não informada')
   ), [atendimento]);
 
   const enviarMensagem = async (event: FormEvent<HTMLFormElement>) => {
@@ -423,7 +423,7 @@ function DetalheAtendimento() {
       }
       setConteudo('');
     } catch (error) {
-      setFeedback(error instanceof Error ? error.message : 'Nao foi possivel enviar a mensagem.');
+      setFeedback(error instanceof Error ? error.message : 'Não foi possível enviar a mensagem.');
     } finally {
       setEnviando(false);
     }
@@ -445,7 +445,7 @@ function DetalheAtendimento() {
       setPrioridadeEdit(String(atualizado.prioridade ?? prioridadeEdit));
       setFeedback(encerrar ? 'Atendimento encerrado com sucesso.' : 'Atendimento atualizado com sucesso.');
     } catch (error) {
-      setFeedback(error instanceof Error ? error.message : 'Nao foi possivel atualizar o atendimento.');
+      setFeedback(error instanceof Error ? error.message : 'Não foi possível atualizar o atendimento.');
     } finally {
       setSalvando(false);
     }
@@ -466,7 +466,7 @@ function DetalheAtendimento() {
         window.open(`https://wa.me/${telefone}?text=${msg}`, '_blank');
       }
     } catch (error) {
-      setFeedback(error instanceof Error ? error.message : 'Nao foi possivel atualizar o check-in.');
+      setFeedback(error instanceof Error ? error.message : 'Não foi possível atualizar o check-in.');
     } finally {
       setSalvandoCheckin(false);
     }
@@ -502,7 +502,7 @@ function DetalheAtendimento() {
 
       <Section tone="white">
         {loading && <LoadingState title="Carregando atendimento..." />}
-        {erro && <ErrorState title="Nao foi possivel abrir o atendimento" description={erro} />}
+        {erro && <ErrorState title="Não foi possível abrir o atendimento" description={erro} />}
 
         {!loading && !erro && atendimento && (
           <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
@@ -525,7 +525,7 @@ function DetalheAtendimento() {
                   <InfoItem label="Data de abertura" value={formatDate(atendimento.dataAbertura ?? atendimento.dataCriacao)} />
                   <InfoItem label="Data de encerramento" value={atendimento.dataEncerramento ? formatDate(atendimento.dataEncerramento) : 'Em aberto'} />
                   <InfoItem label="Canal" value={atendimento.canalOrigem?.nome ?? atendimento.canal} />
-                  <InfoItem label="Voluntario responsavel" value={atendimento.nomeVoluntario ?? atendimento.voluntario?.nome ?? 'Aguardando voluntario'} />
+                  <InfoItem label="Voluntário responsável" value={atendimento.nomeVoluntario ?? atendimento.voluntario?.nome ?? 'Aguardando voluntário'} />
                   <InfoItem label="Pessoa atendida" value={pessoaAtendida} />
                   <InfoItem label="Email da pessoa" value={atendimento.pessoaAtendidaEmail} />
                   <InfoItem label="Telefone da pessoa" value={atendimento.pessoaAtendidaTelefone} />
@@ -666,7 +666,7 @@ function DetalheAtendimento() {
               {podeAlterar && (
                 <Card className="p-6">
                   <h2 className="text-xl font-bold text-[#0F172A]">Acoes do atendimento</h2>
-                  <p className="mt-1 text-sm text-[#475569]">Somente voluntarios e administradores podem alterar estes campos.</p>
+                  <p className="mt-1 text-sm text-[#475569]">Somente voluntários e administradores podem alterar estes campos.</p>
 
                   <div className="mt-5 space-y-4">
                     <Field label="Status">
@@ -759,7 +759,7 @@ function DetalheAtendimento() {
                     </Button>
 
                     {!atendimento.pessoaAtendidaTelefone && (
-                      <p className="text-xs text-red-500">Telefone nao preenchido para abrir WhatsApp.</p>
+                      <p className="text-xs text-red-500">Telefone não preenchido para abrir WhatsApp.</p>
                     )}
 
                     <div className="grid grid-cols-2 gap-2 mt-4">
@@ -775,7 +775,7 @@ function DetalheAtendimento() {
                         disabled={salvandoCheckin}
                         onClick={() => void handleAlterarCheckin('NAO_COMPARECERA')}
                       >
-                        Nao vai
+                        Não vai
                       </Button>
                       <Button
                         variant="secondary"

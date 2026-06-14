@@ -39,26 +39,26 @@ const featureIcons = {
 const features = [
   {
     icon: featureIcons.agile,
-    title: 'Mais agil',
-    description: 'Atendimentos reunidos em um fluxo unico para reduzir espera e perda de contexto.',
+    title: 'Mais ágil',
+    description: 'Atendimentos reunidos em um fluxo único para reduzir espera e perda de contexto.',
     tone: 'blue' as const,
   },
   {
     icon: featureIcons.care,
     title: 'Mais acolhedor',
-    description: 'Historico e mensagens organizadas para que cada pessoa seja atendida com cuidado.',
+    description: 'Histórico e mensagens organizadas para que cada pessoa seja atendida com cuidado.',
     tone: 'sky' as const,
   },
   {
     icon: featureIcons.connected,
     title: 'Canais integrados',
-    description: 'WhatsApp, e-mail e redes sociais aparecem como uma operacao centralizada.',
+    description: 'WhatsApp, e-mail e redes sociais aparecem como uma operação centralizada.',
     tone: 'orange' as const,
   },
   {
     icon: featureIcons.organized,
-    title: 'Gestao clara',
-    description: 'Status, prioridades e voluntarios ficam visiveis para orientar a proxima acao.',
+    title: 'Gestão clara',
+    description: 'Status, prioridades e voluntários ficam visíveis para orientar a próxima ação.',
     tone: 'slate' as const,
   },
 ];
@@ -87,24 +87,24 @@ function Home() {
         <Container className="relative grid max-w-7xl gap-10 py-16 lg:grid-cols-[1.04fr_0.86fr] lg:items-center">
           <div className="max-w-3xl">
             <span className="inline-flex rounded-full border border-blue-100 bg-white/85 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[#2563EB] shadow-sm backdrop-blur">
-              Visitas a plataforma: {visitas}
+              Visitas à plataforma: {visitas}
             </span>
 
             <h1 className="mt-6 text-4xl font-black tracking-tight text-[#0F172A] sm:text-5xl lg:text-6xl">
               Atendimento social com{' '}
               <span className="bg-gradient-to-r from-[#1E3A8A] via-[#2563EB] to-[#60A5FA] bg-clip-text text-transparent">
-                inteligencia operacional
+                inteligência operacional
               </span>
             </h1>
 
             <p className="mt-5 max-w-2xl text-lg leading-8 text-[#475569]">
-              O TDB Responde centraliza conversas, prioridades e historico para ajudar voluntarios
+              O TDB Responde centraliza conversas, prioridades e histórico para ajudar voluntários
               a responder com mais velocidade, clareza e acolhimento.
             </p>
 
             <div className="mt-7 flex flex-wrap gap-3">
               <Button href="/login" size="large">Acessar sistema</Button>
-              <Button href="/quero-ser-voluntario" variant="secondary" size="large">Quero ser voluntario</Button>
+              <Button href="/quero-ser-voluntario" variant="secondary" size="large">Quero ser voluntário</Button>
               <Button href="/sobre" variant="ghost" size="large">Conhecer projeto</Button>
             </div>
           </div>
@@ -116,10 +116,10 @@ function Home() {
       <section className="border-b border-[#E2E8F0] bg-white py-16">
         <Container className="max-w-7xl">
           <div className="mb-8 max-w-2xl reveal">
-            <p className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">Beneficios</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">Benefícios</p>
             <h2 className="mt-2 text-3xl font-bold text-[#0F172A] sm:text-4xl">Por que TDB Responde?</h2>
             <p className="mt-3 text-base leading-7 text-[#475569]">
-              Uma camada simples e profissional para transformar mensagens dispersas em atendimento acompanhavel.
+              Uma camada simples e profissional para transformar mensagens dispersas em atendimento acompanhável.
             </p>
           </div>
 
@@ -142,16 +142,16 @@ function Home() {
       <section className="border-b border-[#E2E8F0] bg-gradient-to-b from-[#F8FAFC] to-blue-50/60 py-16">
         <Container className="grid max-w-7xl gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
           <div className="reveal">
-            <p className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">Missao</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">Missão</p>
             <h2 className="mt-2 text-3xl font-bold text-[#0F172A]">Tecnologia para acolher melhor</h2>
           </div>
           <div className="rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-sm reveal">
             <p className="text-lg leading-8 text-[#475569]">
               Transformar o atendimento da <strong className="text-[#0F172A]">Turma do Bem</strong> em uma
-              experiencia mais rapida, eficiente e humana, unindo organizacao operacional e empatia em um unico sistema.
+              experiência mais rápida, eficiente e humana, unindo organização operacional e empatia em um único sistema.
             </p>
             <p className="mt-4 font-bold text-[#2563EB]">
-              Tudo isso para servir melhor quem mais precisa.
+              Tudo isso para servir melhor a quem mais precisa.
             </p>
           </div>
         </Container>
@@ -160,10 +160,10 @@ function Home() {
       <section className="bg-white py-16">
         <Container className="flex max-w-7xl flex-col gap-6 rounded-2xl border border-blue-100 bg-gradient-to-br from-[#1E3A8A] to-[#2563EB] p-6 shadow-xl shadow-blue-950/15 md:flex-row md:items-center md:justify-between reveal">
           <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-blue-100">Proximo passo</p>
-            <h2 className="mt-2 text-3xl font-bold text-white">Pronto para comecar?</h2>
+            <p className="text-xs font-bold uppercase tracking-widest text-blue-100">Próximo passo</p>
+            <h2 className="mt-2 text-3xl font-bold text-white">Pronto para começar?</h2>
             <p className="mt-3 max-w-2xl text-blue-100">
-              Acesse o sistema, conheca o projeto ou fale com a equipe para entender como o TDB Responde organiza o atendimento.
+              Acesse o sistema, conheça o projeto ou fale com a equipe para entender como o TDB Responde organiza o atendimento.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">

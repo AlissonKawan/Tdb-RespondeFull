@@ -72,7 +72,7 @@ function Roadmap() {
             <SectionHeader
               eyebrow="Impacto"
               title="Menos mensagens perdidas, mais continuidade no cuidado"
-              description="O valor da solucao nao esta em criar mais uma tela, mas em transformar canais separados em um fluxo operacional simples, visivel e rastreavel."
+              description="O valor da solução não está em criar mais uma tela, mas em transformar canais separados em um fluxo operacional simples, visível e rastreável."
             />
             <div className="flex flex-wrap gap-2">
               <Badge tone="info">Triagem centralizada</Badge>
@@ -97,7 +97,7 @@ function Roadmap() {
           ))}
         </div>
         <p className="mt-4 text-sm text-[#475569]">
-          Indicadores visuais de demonstracao do MVP. Eles representam o desenho da solucao e nao dados reais da ONG.
+          Indicadores visuais de demonstração do MVP. Eles representam o desenho da solução e não dados reais da ONG.
         </p>
       </Section>
 
@@ -153,7 +153,7 @@ function Roadmap() {
             <p className="text-xs font-bold uppercase tracking-widest text-blue-100">Resultado esperado</p>
             <h2 className="mt-2 text-3xl font-black">Uma operacao mais clara para quem cuida</h2>
             <p className="mt-3 max-w-2xl text-blue-100">
-              A plataforma nao substitui o acolhimento humano. Ela remove ruido operacional para que a equipe consiga responder melhor.
+              A plataforma não substitui o acolhimento humano. Ela remove ruído operacional para que a equipe consiga responder melhor.
             </p>
           </div>
           <Button href="/cadastro-voluntario" variant="secondary" size="large">

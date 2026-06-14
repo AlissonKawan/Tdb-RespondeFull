@@ -37,15 +37,15 @@ function Login() {
         normalizedMessage.includes('pendente') ||
         normalizedMessage.includes('aprov')
       ) {
-        return 'Sua solicitacao ainda esta em analise. Aguarde a aprovacao para acessar o portal.';
+        return 'Sua solicitação ainda está em análise. Aguarde a aprovação para acessar o portal.';
       }
-      if (error.status === 404) return 'Conta nao encontrada.';
+      if (error.status === 404) return 'Conta não encontrada.';
       if (error.status === 401) return 'Senha incorreta.';
-      if (error.status === 403) return 'Sua solicitacao ainda esta em analise. Aguarde a aprovacao para acessar o portal.';
-      if (error.status === 0) return 'Nao foi possivel conectar ao servidor.';
+      if (error.status === 403) return 'Sua solicitação ainda está em análise. Aguarde a aprovação para acessar o portal.';
+      if (error.status === 0) return 'Não foi possível conectar ao servidor.';
       return error.message;
     }
-    return 'Nao foi possivel entrar. Tente novamente.';
+    return 'Não foi possível entrar. Tente novamente.';
   };
 
   const onSubmit = async (data: LoginRequest) => {
@@ -55,13 +55,13 @@ function Login() {
       const loggedUser = await login(data);
       if (loggedUser.tipoUsuario !== aba && loggedUser.tipoUsuario !== 'ADMIN') {
         logout();
-        setErro(`Esta conta nao pertence ao acesso de ${aba === 'BENEFICIARIO' ? 'beneficiario' : 'voluntario'}. Selecione a aba correta para entrar.`);
+        setErro(`Esta conta não pertence ao acesso de ${aba === 'BENEFICIARIO' ? 'beneficiário' : 'voluntário'}. Selecione a aba correta para entrar.`);
         return;
       }
 
       if (!loggedUser.ativo) {
         logout();
-        setErro('Sua solicitacao ainda esta em analise. Aguarde a aprovacao para acessar o portal.');
+        setErro('Sua solicitação ainda está em análise. Aguarde a aprovação para acessar o portal.');
         return;
       }
 
@@ -100,7 +100,7 @@ function Login() {
                   aba === 'BENEFICIARIO' ? 'bg-white text-[#2563EB] shadow-sm' : 'text-[#475569] hover:text-[#0F172A]'
                 }`}
               >
-                Beneficiario
+                Beneficiário
               </button>
               <button
                 type="button"
@@ -109,18 +109,18 @@ function Login() {
                   aba === 'VOLUNTARIO' ? 'bg-white text-[#2563EB] shadow-sm' : 'text-[#475569] hover:text-[#0F172A]'
                 }`}
               >
-                Voluntario
+                Voluntário
               </button>
             </div>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               <div>
                 <h2 className="text-2xl font-bold text-[#0F172A]">
-                  {aba === 'BENEFICIARIO' ? 'Acesso do beneficiario' : 'Acesso do voluntario'}
+                  {aba === 'BENEFICIARIO' ? 'Acesso do beneficiário' : 'Acesso do voluntário'}
                 </h2>
                 <p className="mt-2 text-sm leading-6 text-[#475569]">
                   {aba === 'BENEFICIARIO'
-                    ? 'Acompanhe seus atendimentos e converse com o dentista responsavel.'
-                    : 'Veja seus atendimentos, chamados abertos e solicitacoes de novos voluntarios.'}
+                    ? 'Acompanhe seus atendimentos e converse com o dentista responsável.'
+                    : 'Veja seus atendimentos, chamados abertos e solicitações de novos voluntários.'}
                 </p>
               </div>
               <Field label="E-mail" error={errors.email?.message}>
@@ -128,7 +128,7 @@ function Login() {
                   type="email"
                   {...register('email', {
                     required: 'Digite seu e-mail',
-                    pattern: { value: /^\S+@\S+$/i, message: 'E-mail invalido' },
+                    pattern: { value: /^\S+@\S+$/i, message: 'E-mail inválido' },
                   })}
                   placeholder="voce@email.com"
                   autoComplete="email"
@@ -139,14 +139,14 @@ function Login() {
                   type="password"
                   {...register('senha', {
                     required: 'Digite sua senha',
-                    minLength: { value: 6, message: 'Senha minima de 6 caracteres' },
+                    minLength: { value: 6, message: 'Senha mínima de 6 caracteres' },
                   })}
                   placeholder="Digite sua senha"
                   autoComplete="current-password"
                 />
               </Field>
               <Button type="submit" disabled={loading} size="large" fullWidth>
-                {loading ? 'Entrando...' : `Entrar como ${aba === 'BENEFICIARIO' ? 'beneficiario' : 'voluntario'}`}
+                {loading ? 'Entrando...' : `Entrar como ${aba === 'BENEFICIARIO' ? 'beneficiário' : 'voluntário'}`}
               </Button>
             </form>
           </Card>
@@ -155,14 +155,14 @@ function Login() {
             <p className="text-xs font-bold uppercase tracking-widest text-blue-100">Conta nova</p>
             <h2 className="mt-3 text-3xl font-black">Precisa de acesso?</h2>
             <p className="mt-4 leading-7 text-blue-100">
-              Beneficiarios podem acompanhar seus atendimentos. Voluntarios enviam uma solicitacao e aguardam aprovacao.
+              Beneficiários podem acompanhar seus atendimentos. Voluntários enviam uma solicitação e aguardam aprovação.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button href="/quero-ser-voluntario" variant="secondary" size="large">
                 Solicitar voluntariado
               </Button>
               <Button href="/cadastro-beneficiario" variant="ghost" size="large" className="bg-white/10 text-white hover:bg-white/15 hover:text-white">
-                Criar conta beneficiario
+                Criar conta de beneficiário
               </Button>
             </div>
           </Card>

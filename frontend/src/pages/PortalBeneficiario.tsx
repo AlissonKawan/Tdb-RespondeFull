@@ -101,7 +101,7 @@ function PortalBeneficiario() {
           setNovasMensagens(prev => ({ ...prev, ...unreadMap }));
         })();
       } catch (error) {
-        setErro(error instanceof Error ? error.message : 'Nao foi possivel carregar seus atendimentos.');
+        setErro(error instanceof Error ? error.message : 'Não foi possível carregar seus atendimentos.');
         setLoading(false);
       }
     }
@@ -149,7 +149,7 @@ function PortalBeneficiario() {
         {erro && <ErrorState title="Erro ao carregar dados" description={erro} />}
         {!loading && !erro && atendimentos.length === 0 && (
           <EmptyState
-            title="Voce ainda nao possui atendimentos."
+            title="Você ainda não possui atendimentos."
             description="Clique em Solicitar atendimento para abrir um novo pedido."
           />
         )}

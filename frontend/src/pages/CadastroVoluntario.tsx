@@ -74,10 +74,10 @@ function CadastroVoluntario() {
     if (error instanceof ApiError) {
       if (error.status === 409) return 'Este e-mail ja esta cadastrado.';
       if (error.status === 400) return error.message || 'Confira os dados da solicitacao.';
-      if (error.status === 0) return 'Nao foi possivel conectar ao servidor.';
+      if (error.status === 0) return 'Não foi possível conectar ao servidor.';
       return error.message;
     }
-    return 'Nao foi possivel enviar a solicitacao.';
+    return 'Não foi possível enviar a solicitação.';
   };
 
   const onSubmit = async (data: FormData) => {
@@ -122,7 +122,7 @@ function CadastroVoluntario() {
     <PageShell>
       <PageHeader
         eyebrow="Voluntariado"
-        title="Solicitar cadastro como voluntario"
+        title="Solicitar cadastro como voluntário"
         description="Envie sua solicitacao para analise. O acesso ao portal so sera liberado apos aprovacao."
       />
 
@@ -130,7 +130,7 @@ function CadastroVoluntario() {
         <SectionHeader
           eyebrow="Como funciona"
           title="Sua conta nasce pendente"
-          description="Sua solicitacao sera analisada por um voluntario responsavel. Depois da aprovacao, o login sera liberado."
+          description="Sua solicitação será analisada por um voluntário responsável. Depois da aprovação, o login será liberado."
         />
         <div className="grid gap-6 md:grid-cols-3">
           {[
@@ -249,7 +249,7 @@ function CadastroVoluntario() {
               <Textarea
                 rows={5}
                 {...register('motivoVoluntariado', {
-                  required: 'Conte seu motivo para ser voluntario',
+                  required: 'Conte seu motivo para ser voluntário',
                   minLength: { value: 20, message: 'Minimo 20 caracteres' },
                 })}
                 placeholder="Quero contribuir com atendimento odontologico para pessoas que precisam."
