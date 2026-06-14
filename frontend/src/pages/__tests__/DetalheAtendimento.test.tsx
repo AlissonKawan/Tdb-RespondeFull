@@ -120,7 +120,7 @@ describe('DetalheAtendimento - Deduplicação de Mensagens', () => {
 
     // Espera sumir a tela de loading
     await waitFor(() => {
-      expect(screen.getByText('Atendimento #1')).toBeInTheDocument();
+      expect(screen.getByText('Detalhes do Atendimento')).toBeInTheDocument();
     });
 
     expect(screen.getByText('Olá Maria, em que posso ajudar?')).toBeInTheDocument();
@@ -142,7 +142,7 @@ describe('DetalheAtendimento - Deduplicação de Mensagens', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Atendimento #1')).toBeInTheDocument();
+      expect(screen.getByText('Detalhes do Atendimento')).toBeInTheDocument();
     });
 
     // Simula a chegada de uma nova mensagem via WebSocket
@@ -199,7 +199,7 @@ describe('DetalheAtendimento - Deduplicação de Mensagens', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Atendimento #1')).toBeInTheDocument();
+      expect(screen.getByText('Detalhes do Atendimento')).toBeInTheDocument();
     });
 
     // Digita e clica para enviar

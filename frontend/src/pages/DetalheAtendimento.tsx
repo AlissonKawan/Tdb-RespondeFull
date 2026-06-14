@@ -480,7 +480,7 @@ function DetalheAtendimento() {
             <button onClick={() => navigate(-1)} className="text-sm font-semibold text-[#2563EB] hover:text-[#1E3A8A]">
               Voltar
             </button>
-            <p className="mt-1 text-sm text-[#475569]">Sessao de {user?.nome}</p>
+            <p className="mt-1 text-sm text-[#475569]">Sessão de {user?.nome}</p>
           </div>
           <Button variant="secondary" onClick={() => {
             confirm({
@@ -496,8 +496,8 @@ function DetalheAtendimento() {
 
       <PageHeader
         eyebrow="Atendimento"
-        title={`Atendimento ${id ?? ''}`}
-        description="Acompanhe status, responsavel e mensagens deste atendimento."
+        title={atendimento ? `Atendimento de ${pessoaAtendida}` : 'Carregando detalhes...'}
+        description="Acompanhe status, responsável e mensagens deste atendimento."
       />
 
       <Section tone="white">
