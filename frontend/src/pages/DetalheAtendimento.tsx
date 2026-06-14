@@ -172,7 +172,8 @@ function DetalheAtendimento() {
   const [erro, setErro] = useState('');
   const [feedback, setFeedback] = useState('');
   const [conteudo, setConteudo] = useState('');
-
+  const isSubmittingRef = useRef(false);
+  
   const [salvando, setSalvando] = useState(false);
   const [salvandoCheckin, setSalvandoCheckin] = useState(false);
   const [statusEdit, setStatusEdit] = useState('ABERTO');
@@ -408,7 +409,10 @@ function DetalheAtendimento() {
 
   const enviarMensagem = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!conteudo.trim() || chatBloqueado) return;
+    if (!conteudo.trim() || chatBloqueado || isSubmittingRef.current) return;
+
+    isSubmittingRef.current = true;
+    setTimeout(() => { isSubmittingRef.current = false; }, 500);
 
     const texto = conteudo.trim();
     setConteudo('');
