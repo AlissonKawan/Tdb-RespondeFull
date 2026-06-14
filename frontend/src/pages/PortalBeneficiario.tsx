@@ -161,7 +161,6 @@ function PortalBeneficiario() {
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <h3 className="text-lg font-bold text-[#0F172A] truncate">{getPessoa(atendimento)}</h3>
-                    <Badge tone="neutral">Atendimento #{atendimento.id}</Badge>
                     {atendimento.status && <Badge tone={statusTone(atendimento.status) as any}>{formatStatusLabel(atendimento.status)}</Badge>}
                     {novasMensagens[atendimento.id] && <Badge tone="danger">Nova Mensagem</Badge>}
                   </div>

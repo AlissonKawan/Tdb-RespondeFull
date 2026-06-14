@@ -511,7 +511,7 @@ function DetalheAtendimento() {
                 <div className="flex flex-col gap-4 border-b border-[#E2E8F0] pb-5 sm:flex-row sm:items-start sm:justify-between">
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
-                      <h2 className="text-2xl font-bold text-[#0F172A]">Atendimento #{atendimento.id}</h2>
+                      <h2 className="text-2xl font-bold text-[#0F172A]">Detalhes do Atendimento</h2>
                       <Badge tone={statusTone(atendimento.status)}>{labelStatus(atendimento.status)}</Badge>
                     </div>
                     <p className="mt-3 max-w-3xl text-sm leading-6 text-[#475569]">

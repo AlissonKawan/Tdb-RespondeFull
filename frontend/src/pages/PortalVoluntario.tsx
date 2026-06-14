@@ -33,7 +33,7 @@ function getAtendimentoDescricaoContexto(atendimento: AtendimentoApi) {
   return atendimento.titulo
     ?? atendimento.descricao
     ?? atendimento.observacao
-    ?? `Atendimento #${atendimento.id}`;
+    ?? 'Atendimento sem descrição';
 }
 
 function statusTone(status?: string) {
