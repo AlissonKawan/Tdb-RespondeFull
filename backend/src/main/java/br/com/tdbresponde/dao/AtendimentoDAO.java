@@ -21,7 +21,7 @@ public class AtendimentoDAO {
 
     private static final String SELECT_BASE = 
             "SELECT A.ID, A.PRIORIDADE, A.STATUS, A.DESCRICAO, A.DATA_ABERTURA, A.DATA_ENCERRAMENTO, " +
-            "A.PESSOA_ATENDIDA_ID, A.VOLUNTARIO_ID, A.CANAL_COMUNICACAO_ID, A.STATUS_CHECKIN, A.HORARIO_ENVIO_CHECKIN, " +
+            "A.PESSOA_ATENDIDA_ID, A.VOLUNTARIO_ID, A.CANAL_COMUNICACAO_ID, A.STATUS_CHECKIN, A.HORARIO_ENVIO_CHECKIN, A.DATA_ATUALIZACAO, " +
             "C.ID AS CANAL_ID, C.NOME AS CANAL_NOME, C.DESCRICAO AS CANAL_DESC, " +
             "V.ID AS VOLUNTARIO_ID_REAL, V.NOME AS VOLUNTARIO_NOME, V.DISPONIVEL AS VOLUNTARIO_DISP, V.ACESSO_SIGILO AS VOLUNTARIO_SIGILO, " +
             "P.ID AS PESSOA_ID, P.NOME_CODIFICADO AS PESSOA_NOME, P.DATA_CADASTRO AS PESSOA_DATA, P.TELEFONE AS PESSOA_TEL, P.EMAIL AS PESSOA_EMAIL, P.TIPO AS PESSOA_TIPO, P.ID_CONTA AS PESSOA_CONTA " +
@@ -41,6 +41,29 @@ public class AtendimentoDAO {
 
     @Inject
     PessoaAtendidaDAO pessoaAtendidaDAO;
+
+    @jakarta.annotation.PostConstruct
+    void init() {
+        try (Connection conn = dataSource.getConnection();
+             Statement stmt = conn.createStatement()) {
+            try {
+                stmt.execute("ALTER TABLE ATENDIMENTO ADD (DATA_ATUALIZACAO TIMESTAMP)");
+                System.out.println("Coluna DATA_ATUALIZACAO adicionada com sucesso");
+            } catch (Exception ignore) { }
+        } catch (Exception ignore) { }
+    }
+
+    public void atualizarDataAtualizacao(int id) {
+        String sql = "UPDATE ATENDIMENTO SET DATA_ATUALIZACAO = ? WHERE ID = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setObject(1, LocalDateTime.now());
+            stmt.setInt(2, id);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Erro ao atualizar data_atualizacao: " + e.getMessage());
+        }
+    }
 
     // CREATE
     public void inserir(Atendimento atendimento) {
@@ -307,6 +330,11 @@ public class AtendimentoDAO {
         a.setDataEncerramento(rs.getObject("DATA_ENCERRAMENTO", LocalDate.class));
         a.setStatusCheckin(rs.getString("STATUS_CHECKIN"));
         a.setHorarioEnvioCheckin(rs.getObject("HORARIO_ENVIO_CHECKIN", LocalDateTime.class));
+        try {
+            a.setDataAtualizacao(rs.getObject("DATA_ATUALIZACAO", LocalDateTime.class));
+        } catch (SQLException ignore) {
+            // Coluna pode ainda nao existir se for a primeira execucao
+        }
 
         // Carrega canal pelo JOIN
         int canalId = rs.getInt("CANAL_COMUNICACAO_ID");

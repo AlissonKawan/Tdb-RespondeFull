@@ -25,6 +25,7 @@ public class AtendimentoResponse {
     public CanalComunicacaoResponse canalOrigem;
     public LocalDate dataAbertura;
     public LocalDate dataEncerramento;
+    public LocalDateTime dataAtualizacao;
     public String statusCheckin;
     public LocalDateTime horarioEnvioCheckin;
     public String previsaoCheckin;
@@ -70,6 +71,7 @@ public class AtendimentoResponse {
         }
         response.dataAbertura = atendimento.getDataAbertura();
         response.dataEncerramento = atendimento.getDataEncerramento();
+        response.dataAtualizacao = atendimento.getDataAtualizacao();
         response.statusCheckin = atendimento.getStatusCheckin();
         response.horarioEnvioCheckin = atendimento.getHorarioEnvioCheckin();
         return response;

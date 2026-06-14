@@ -290,6 +290,11 @@ function DetalheAtendimento() {
       setMensagens(dadosMensagens);
       setStatusEdit(dadosAtendimento.status ?? 'ABERTO');
       setPrioridadeEdit(String(dadosAtendimento.prioridade ?? 3));
+
+      // Busca a previsao de checkin em background para nao travar a tela
+      atendimentoService.preverCheckinIA(atendimentoId).then(previsao => {
+        setAtendimento(prev => prev ? { ...prev, ...previsao } : prev);
+      }).catch(() => {});
     } catch (error) {
       let msgErro = 'Nao foi possivel carregar os detalhes deste atendimento. Tente novamente mais tarde.';
       if (error instanceof Error) {

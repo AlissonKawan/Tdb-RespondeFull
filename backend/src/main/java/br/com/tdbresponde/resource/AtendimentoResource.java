@@ -88,13 +88,18 @@ public class AtendimentoResource {
     @GET
     @Path("/{id}")
     public Response buscarPorId(@PathParam("id") int id) {
-        CheckinPrevisaoResponse[] holder = new CheckinPrevisaoResponse[1];
-        Atendimento atendimento = bo.buscarPorIdComPrevisao(id, holder);
-        CheckinPrevisaoResponse previsao = holder[0];
-        String prevStr = previsao != null ? previsao.previsaoCheckin : null;
-        Double conf = previsao != null ? previsao.confiancaCheckin : null;
-        String just = previsao != null ? previsao.justificativaCheckin : null;
-        return Response.ok(AtendimentoResponse.from(atendimento, prevStr, conf, just)).build();
+        Atendimento atendimento = bo.buscarPorId(id);
+        return Response.ok(AtendimentoResponse.from(atendimento)).build();
+    }
+
+    @GET
+    @Path("/{id}/previsao-ia")
+    public Response buscarPrevisaoIA(@PathParam("id") int id) {
+        CheckinPrevisaoResponse previsao = bo.preverCheckinIA(id);
+        if (previsao == null) {
+            return Response.status(Response.Status.NO_CONTENT).build();
+        }
+        return Response.ok(previsao).build();
     }
 
     @GET

@@ -110,16 +110,11 @@ public class AtendimentoBO {
     }
 
     /**
-     * Busca o atendimento por ID e enriquece com a previsao da IA.
-     * Retorna null para previsao caso a IA esteja offline.
+     * Retorna a previsao da IA isoladamente, para carregamento assincrono no front.
      */
-    public Atendimento buscarPorIdComPrevisao(int id, CheckinPrevisaoResponse[] previsaoHolder) {
+    public CheckinPrevisaoResponse preverCheckinIA(int id) {
         Atendimento atendimento = buscarPorId(id);
-        CheckinPrevisaoResponse previsao = iaClient.preverCheckin(atendimento);
-        if (previsaoHolder != null && previsaoHolder.length > 0) {
-            previsaoHolder[0] = previsao;
-        }
-        return atendimento;
+        return iaClient.preverCheckin(atendimento);
     }
 
     public Atendimento inserir(AtendimentoRequest request) {
@@ -127,6 +122,10 @@ public class AtendimentoBO {
         validar(atendimento);
         atendimentoDAO.inserir(atendimento);
         return atendimento;
+    }
+
+    public void atualizarDataAtualizacao(int id) {
+        atendimentoDAO.atualizarDataAtualizacao(id);
     }
 
     public Atendimento solicitar(SolicitarAtendimentoRequest request) {

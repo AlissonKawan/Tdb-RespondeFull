@@ -15,6 +15,7 @@ public class Atendimento {
     private LocalDate dataEncerramento; // pode ser null se não encerrou
     private String statusCheckin;
     private LocalDateTime horarioEnvioCheckin;
+    private LocalDateTime dataAtualizacao;
 
     public Atendimento() {}
 
@@ -115,6 +116,14 @@ public class Atendimento {
 
     public void setHorarioEnvioCheckin(LocalDateTime horarioEnvioCheckin) {
         this.horarioEnvioCheckin = horarioEnvioCheckin;
+    }
+
+    public LocalDateTime getDataAtualizacao() {
+        return dataAtualizacao;
+    }
+
+    public void setDataAtualizacao(LocalDateTime dataAtualizacao) {
+        this.dataAtualizacao = dataAtualizacao;
     }
 
     @Override
