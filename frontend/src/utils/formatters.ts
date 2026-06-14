@@ -13,7 +13,7 @@ export function formatStatusLabel(status?: string): string {
   };
   return labels[status.toUpperCase()] || status;
 }
-}
+
 
 export function formatDate(value?: string | null | number[] | any): string {
   if (!value) return '';
