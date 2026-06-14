@@ -52,6 +52,7 @@ export interface AtendimentoApi {
   horarioEnvioCheckin?: string;
   previsaoCheckin?: StatusCheckin | string;
   confiancaCheckin?: number;
+  justificativaCheckin?: string;
   tipoPessoa?: TipoPessoaRelato;
   gravidade?: number;
 }

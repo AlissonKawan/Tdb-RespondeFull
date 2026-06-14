@@ -12,10 +12,14 @@ public class CheckinPrevisaoResponse {
     /** Nível de confiança da previsão — valor entre 0 e 1 (ex: 0.66 = 66%). */
     public double confiancaCheckin;
 
+    /** Justificativa textual dada pelo LLM. */
+    public String justificativaCheckin;
+
     public CheckinPrevisaoResponse() {}
 
-    public CheckinPrevisaoResponse(String previsaoCheckin, double confiancaCheckin) {
+    public CheckinPrevisaoResponse(String previsaoCheckin, double confiancaCheckin, String justificativaCheckin) {
         this.previsaoCheckin = previsaoCheckin;
         this.confiancaCheckin = confiancaCheckin;
+        this.justificativaCheckin = justificativaCheckin;
     }
 }

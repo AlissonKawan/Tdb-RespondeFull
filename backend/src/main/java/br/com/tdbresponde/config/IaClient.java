@@ -56,7 +56,7 @@ public class IaClient {
             // 3. Montar o Prompt inteligente
             String prompt = "Você é um assistente da ONG Turma do Bem. Sua função é ler a conversa abaixo e descobrir se o paciente confirmou presença na consulta (check-in).\n\n" +
                             "Responda EXCLUSIVAMENTE com um JSON válido neste exato formato:\n" +
-                            "{\"previsao_checkin\": \"CONFIRMADO\" | \"NAO_COMPARECERA\" | \"REAGENDAMENTO_SOLICITADO\" | \"SEM_RESPOSTA\", \"confianca\": 0.95}\n\n" +
+                            "{\"previsao_checkin\": \"CONFIRMADO\" | \"NAO_COMPARECERA\" | \"REAGENDAMENTO_SOLICITADO\" | \"SEM_RESPOSTA\", \"confianca\": 0.95, \"justificativa\": \"Explique brevemente em uma frase o motivo da sua decisão com base no que o beneficiário falou\"}\n\n" +
                             "Regras:\n" +
                             "- Se o beneficiário confirmou ou disse 'sim', retorne CONFIRMADO.\n" +
                             "- Se ele disse que não pode ir ou vai faltar, retorne NAO_COMPARECERA.\n" +
@@ -76,7 +76,7 @@ public class IaClient {
 
             String body = objectMapper.writeValueAsString(rootNode);
 
-            String urlComChave = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + geminiApiKey;
+            String urlComChave = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + geminiApiKey.trim();
 
             // 5. Enviar request
             HttpRequest request = HttpRequest.newBuilder()
@@ -116,9 +116,10 @@ public class IaClient {
                 com.fasterxml.jackson.databind.JsonNode innerRoot = objectMapper.readTree(text);
                 String previsao = innerRoot.has("previsao_checkin") ? innerRoot.get("previsao_checkin").asText() : "SEM_RESPOSTA";
                 double confianca = innerRoot.has("confianca") ? innerRoot.get("confianca").asDouble() : 0.0;
+                String justificativa = innerRoot.has("justificativa") ? innerRoot.get("justificativa").asText() : "Sem justificativa fornecida.";
                 
                 System.out.println("[IaClient] Gemini concluiu! Status: " + previsao + " | Confiança: " + confianca);
-                return new CheckinPrevisaoResponse(previsao, confianca);
+                return new CheckinPrevisaoResponse(previsao, confianca, justificativa);
             }
         } catch (Exception e) {
             System.out.println("[IaClient] Erro ao parsear resposta do Gemini: " + e.getMessage());

@@ -93,7 +93,8 @@ public class AtendimentoResource {
         CheckinPrevisaoResponse previsao = holder[0];
         String prevStr = previsao != null ? previsao.previsaoCheckin : null;
         Double conf = previsao != null ? previsao.confiancaCheckin : null;
-        return Response.ok(AtendimentoResponse.from(atendimento, prevStr, conf)).build();
+        String just = previsao != null ? previsao.justificativaCheckin : null;
+        return Response.ok(AtendimentoResponse.from(atendimento, prevStr, conf, just)).build();
     }
 
     @GET
@@ -184,7 +185,8 @@ public class AtendimentoResource {
         CheckinPrevisaoResponse previsao = holder[0];
         String prevStr = previsao != null ? previsao.previsaoCheckin : null;
         Double conf = previsao != null ? previsao.confiancaCheckin : null;
-        return Response.ok(AtendimentoResponse.from(atendimento, prevStr, conf)).build();
+        String just = previsao != null ? previsao.justificativaCheckin : null;
+        return Response.ok(AtendimentoResponse.from(atendimento, prevStr, conf, just)).build();
     }
 
     @DELETE

@@ -29,6 +29,7 @@ public class AtendimentoResponse {
     public LocalDateTime horarioEnvioCheckin;
     public String previsaoCheckin;
     public Double confiancaCheckin;
+    public String justificativaCheckin;
     public String tipoPessoa;
     public Integer gravidade;
 
@@ -78,10 +79,11 @@ public class AtendimentoResponse {
      * Versao enriquecida com previsao da IA.
      * Usa o factory padrao e depois injeta os campos extras calculados pelo BO.
      */
-    public static AtendimentoResponse from(Atendimento atendimento, String previsaoCheckin, Double confiancaCheckin) {
+    public static AtendimentoResponse from(Atendimento atendimento, String previsaoCheckin, Double confiancaCheckin, String justificativaCheckin) {
         AtendimentoResponse response = from(atendimento);
         response.previsaoCheckin = previsaoCheckin;
         response.confiancaCheckin = confiancaCheckin;
+        response.justificativaCheckin = justificativaCheckin;
         return response;
     }
 }
