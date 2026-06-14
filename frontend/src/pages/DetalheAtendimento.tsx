@@ -161,6 +161,14 @@ function DetalheAtendimento() {
   // a segunda chega, fazendo o check "prev.some()" falhar.
   // O ref é atualizado instantaneamente, evitando duplicatas.
   const seenIdsRef = useRef<Set<number>>(new Set());
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [mensagens]);
+
   const [erro, setErro] = useState('');
   const [feedback, setFeedback] = useState('');
   const [conteudo, setConteudo] = useState('');
@@ -556,6 +564,7 @@ function DetalheAtendimento() {
                       </div>
                     );
                   })}
+                  <div ref={messagesEndRef} />
                 </div>
 
                 <form onSubmit={enviarMensagem} className="border-t border-[#E2E8F0] p-6">
