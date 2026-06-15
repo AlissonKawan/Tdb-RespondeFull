@@ -24,18 +24,7 @@ function statusTone(status?: string) {
   return 'neutral';
 }
 
-function prioridadeLabel(prioridade?: string | number) {
-  const labels: Record<string, string> = {
-    '1': 'Crítico',
-    '2': 'Alto',
-    '3': 'Médio',
-    '4': 'Baixo',
-    ALTA: 'Alto',
-    MEDIA: 'Médio',
-    BAIXA: 'Baixo',
-  };
-  return prioridade === undefined ? 'Não informada' : labels[String(prioridade)] ?? String(prioridade);
-}
+
 
 function formatDate(value?: string | null) {
   if (!value) return 'Não informada';
