@@ -11,6 +11,10 @@ function Footer() {
       name: 'LinkedIn Marcos',
       url: 'https://www.linkedin.com/in/marcos-vinicius-de-jesus-almeida/',
     },
+    {
+      name: 'LinkedIn Eduardo',
+      url: 'https://www.linkedin.com/in/eduardo-boni-b6b851310',
+    },
   ];
 
   const team = ['Alisson Kawan', 'Marcos Vinicius', 'Eduardo Boni'];
