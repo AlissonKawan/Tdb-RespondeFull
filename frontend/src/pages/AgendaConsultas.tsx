@@ -257,7 +257,7 @@ export default function AgendaConsultas() {
                 </div>
 
                 <div className="flex justify-between items-start mb-4 pr-16">
-                  <Badge tone={consulta.status === 'CONFIRMADO' ? 'success' : consulta.status === 'AGUARDANDO' ? 'warning' : 'danger'}>
+                  <Badge tone={consulta.status === 'CONCLUIDO' ? 'success' : consulta.status === 'CONFIRMADO' ? 'neutral' : consulta.status === 'AGUARDANDO' ? 'warning' : 'danger'}>
                     {consulta.status}
                   </Badge>
                   <span className="text-xs font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded-md">
@@ -316,7 +316,8 @@ export default function AgendaConsultas() {
                 <Select disabled={isSaving} value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})}>
                   <option value="AGUARDANDO">Aguardando</option>
                   <option value="CONFIRMADO">Confirmado</option>
-                  <option value="REAGENDAR">Reagendar</option>
+                  <option value="CONCLUIDO">Concluído (Atendido)</option>
+                  <option value="REAGENDAR">Reagendar / Faltou</option>
                 </Select>
               </Field>
             </div>
