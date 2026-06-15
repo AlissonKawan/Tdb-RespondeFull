@@ -14,17 +14,36 @@ type ConsultaMock = {
   id: number;
   paciente: string;
   tipo: string;
-  data: string;
+  data: string; // YYYY-MM-DD
   horario: string;
   status: string;
   tipoPessoa: string;
 };
 
+// Utils para Datas
+const getTodayStr = () => {
+  const d = new Date();
+  return d.toISOString().split('T')[0];
+};
+
+const getTomorrowStr = () => {
+  const d = new Date();
+  d.setDate(d.getDate() + 1);
+  return d.toISOString().split('T')[0];
+};
+
+const formatDateLabel = (dateStr: string) => {
+  if (dateStr === getTodayStr()) return 'Hoje';
+  if (dateStr === getTomorrowStr()) return 'Amanhã';
+  const [y, m, d] = dateStr.split('-');
+  return `${d}/${m}/${y}`;
+};
+
 const DEFAULT_MOCK: ConsultaMock[] = [
-  { id: 1, paciente: 'Ana S.', tipo: 'Avaliação Inicial', data: 'Hoje', horario: '14:00', status: 'CONFIRMADO', tipoPessoa: 'MULHER_APOLONIA' },
-  { id: 2, paciente: 'Lucas (Resp: Maria)', tipo: 'Tratamento de Cárie', data: 'Hoje', horario: '16:30', status: 'AGUARDANDO', tipoPessoa: 'CRIANCA_ADOLESCENTE' },
-  { id: 3, paciente: 'Beatriz N.', tipo: 'Retorno', data: 'Amanhã', horario: '09:00', status: 'CONFIRMADO', tipoPessoa: 'MULHER_APOLONIA' },
-  { id: 4, paciente: 'João Pedro', tipo: 'Limpeza', data: 'Amanhã', horario: '11:00', status: 'REAGENDAR', tipoPessoa: 'CRIANCA_ADOLESCENTE' }
+  { id: 1, paciente: 'Ana S.', tipo: 'Avaliação Inicial', data: getTodayStr(), horario: '14:00', status: 'CONFIRMADO', tipoPessoa: 'MULHER_APOLONIA' },
+  { id: 2, paciente: 'Lucas (Resp: Maria)', tipo: 'Tratamento de Cárie', data: getTodayStr(), horario: '16:30', status: 'AGUARDANDO', tipoPessoa: 'CRIANCA_ADOLESCENTE' },
+  { id: 3, paciente: 'Beatriz N.', tipo: 'Retorno', data: getTomorrowStr(), horario: '09:00', status: 'CONFIRMADO', tipoPessoa: 'MULHER_APOLONIA' },
+  { id: 4, paciente: 'João Pedro', tipo: 'Limpeza', data: getTomorrowStr(), horario: '11:00', status: 'REAGENDAR', tipoPessoa: 'CRIANCA_ADOLESCENTE' }
 ];
 
 export default function AgendaConsultas() {
@@ -42,7 +61,7 @@ export default function AgendaConsultas() {
   const [formData, setFormData] = useState({
     paciente: '',
     tipo: 'Avaliação Inicial',
-    data: 'Hoje',
+    data: getTodayStr(),
     horario: '08:00',
     status: 'AGUARDANDO',
     tipoPessoa: 'OUTRO'
@@ -51,7 +70,7 @@ export default function AgendaConsultas() {
   // Carrega do localStorage especifico do usuario logado
   useEffect(() => {
     if (!user?.id) return;
-    const storageKey = `agenda_mock_${user.id}`;
+    const storageKey = `agenda_mock_v2_${user.id}`;
     const saved = localStorage.getItem(storageKey);
     if (saved) {
       setConsultas(JSON.parse(saved));
@@ -64,18 +83,20 @@ export default function AgendaConsultas() {
   // Salva no localStorage sempre que consultas muda
   useEffect(() => {
     if (!user?.id || consultas.length === 0) return;
-    const storageKey = `agenda_mock_${user.id}`;
+    const storageKey = `agenda_mock_v2_${user.id}`;
     localStorage.setItem(storageKey, JSON.stringify(consultas));
   }, [consultas, user?.id]);
 
   const consultasFiltradas = consultas.filter(c => {
     if (filtro === 'Todos') return true;
-    return c.data === filtro;
+    if (filtro === 'Hoje') return c.data === getTodayStr();
+    if (filtro === 'Amanhã') return c.data === getTomorrowStr();
+    return true;
   });
 
   const handleOpenNew = () => {
     setEditingId(null);
-    setFormData({ paciente: '', tipo: 'Avaliação Inicial', data: 'Hoje', horario: '08:00', status: 'AGUARDANDO', tipoPessoa: 'OUTRO' });
+    setFormData({ paciente: '', tipo: 'Avaliação Inicial', data: getTodayStr(), horario: '08:00', status: 'AGUARDANDO', tipoPessoa: 'OUTRO' });
     setIsModalOpen(true);
   };
 
@@ -107,6 +128,10 @@ export default function AgendaConsultas() {
   const handleSave = () => {
     if (!formData.paciente.trim()) {
       alert("O nome do paciente é obrigatório!");
+      return;
+    }
+    if (!formData.data) {
+      alert("A data é obrigatória!");
       return;
     }
 
@@ -155,7 +180,7 @@ export default function AgendaConsultas() {
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {consultasFiltradas.map((consulta) => (
+            {consultasFiltradas.sort((a,b) => a.data.localeCompare(b.data) || a.horario.localeCompare(b.horario)).map((consulta) => (
               <Card key={consulta.id} className="p-6 border-l-4 border-l-[#2563EB] hover:shadow-lg transition-shadow relative group">
                 <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button onClick={() => handleOpenEdit(consulta)} className="p-2 text-blue-600 bg-blue-50 rounded-full hover:bg-blue-100" title="Editar">
@@ -171,7 +196,7 @@ export default function AgendaConsultas() {
                     {consulta.status}
                   </Badge>
                   <span className="text-xs font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded-md">
-                    {consulta.data}
+                    {formatDateLabel(consulta.data)}
                   </span>
                 </div>
                 
@@ -216,11 +241,7 @@ export default function AgendaConsultas() {
               </Field>
               <div className="grid grid-cols-2 gap-4">
                 <Field label="Data">
-                  <Select value={formData.data} onChange={e => setFormData({...formData, data: e.target.value})}>
-                    <option value="Hoje">Hoje</option>
-                    <option value="Amanhã">Amanhã</option>
-                    <option value="Outro">Outro</option>
-                  </Select>
+                  <Input type="date" min={getTodayStr()} value={formData.data} onChange={e => setFormData({...formData, data: e.target.value})} />
                 </Field>
                 <Field label="Horário">
                   <Input type="time" value={formData.horario} onChange={e => setFormData({...formData, horario: e.target.value})} />
