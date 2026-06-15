@@ -21,8 +21,8 @@ Bem-vindo ao repositório completo do **TDB Responde**. Esta plataforma foi cria
 
 O sistema funciona com uma arquitetura separada (Client-Server), onde o front-end consome os endpoints REST expostos pelo back-end.
 
-1. **Front-end (SPA)**: Aplicação web construída em **React** e **Vite**, que fornece portais exclusivos para Beneficiários, Voluntários e Administradores. O gerenciamento de estado e chamadas à API são realizados com as ferramentas nativas (`fetch`) e TypeScript.
-2. **Back-end (API REST)**: Construído com **Java 21** e **Quarkus**, garante alta performance. A conexão com o banco de dados **Oracle** é feita de forma manual via JDBC, mantendo controle direto sobre as consultas.
+1. **Front-end (SPA)**: Aplicação web construída em **React** e **Vite**, que fornece portais exclusivos para Beneficiários, Voluntários e Administradores. O gerenciamento de estado e chamadas à API são realizados com as ferramentas nativas (`fetch`) e TypeScript. Entre os grandes destaques da interface, temos: **Prontuário Médico Digital**, **Módulo de Expirados Inteligente** e **Painel Admin com Edição Avançada**.
+2. **Back-end (API REST)**: Construído com **Java 21** e **Quarkus**, garante alta performance. A conexão com o banco de dados **Oracle** é feita de forma manual via JDBC, mantendo controle direto sobre as consultas, com suporte completo ao histórico de evolução clínica dos atendimentos.
 3. **Inteligência Artificial (Opcional)**: Há integração com um modelo de IA para categorização e predição (acessível caso a rota `VITE_IA_API_URL` esteja configurada).
 
 ---
@@ -142,6 +142,7 @@ A API gerencia os dados de forma relacional. Caso haja necessidade de recriar o 
 - `T_CONTA_USUARIO`: Gerencia logins centralizados (Senha convertida em HASH com salt, não em texto puro).
 - `VOLUNTARIO`, `PESSOA_ATENDIDA`: Estendem o conceito de conta para perfis específicos.
 - `ATENDIMENTO`: Representa o vínculo e histórico de solicitações.
+- `PRONTUARIO`: Tabela especializada para registro contínuo da evolução clínica e observações dos dentistas vinculada a cada agendamento e voluntário.
 - Scripts manuais recomendados de execução: 
   1. `01_drop_tables.sql`
   2. `02_create_tables.sql`
