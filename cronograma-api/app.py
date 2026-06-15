@@ -59,7 +59,9 @@ def init_pool():
             dsn=f"{os.environ.get('DB_HOST', 'oracle.fiap.com.br')}:{os.environ.get('DB_PORT', '1521')}/{os.environ.get('DB_SID', 'orcl')}",
             min=2,
             max=10,
-            increment=1
+            increment=1,
+            ping_interval=30,
+            timeout=60
         )
         print("Pool de conexões Oracle inicializado com sucesso.")
     except Exception as e:
