@@ -534,7 +534,7 @@ function DetalheAtendimento() {
                   {!isBeneficiario && <InfoItem label="Prioridade" value={labelPrioridade(atendimento.prioridade)} />}
                   <InfoItem label="Data de abertura" value={formatDate(atendimento.dataAbertura ?? atendimento.dataCriacao)} />
                   <InfoItem label="Data de encerramento" value={atendimento.dataEncerramento ? formatDate(atendimento.dataEncerramento) : 'Em aberto'} />
-                  <InfoItem label="Canal" value={atendimento.canalOrigem?.nome ?? atendimento.canal} />
+                  <InfoItem label="Canal" value={(atendimento.canalOrigem?.nome ?? atendimento.canal)?.toLowerCase().includes('sistema web') ? 'TDB - Responde' : (atendimento.canalOrigem?.nome ?? atendimento.canal)} />
                   <InfoItem label="Voluntário responsável" value={atendimento.nomeVoluntario ?? atendimento.voluntario?.nome ?? 'Aguardando voluntário'} />
                   <InfoItem label="Pessoa atendida" value={pessoaAtendida} />
                   <InfoItem label="Email da pessoa" value={atendimento.pessoaAtendidaEmail} />

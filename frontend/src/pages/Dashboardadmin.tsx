@@ -221,7 +221,7 @@ export default function DashboardAdmin() {
                           <h3 className="font-bold text-slate-900">#{item.id} {item.pessoaAtendidaNome || item.beneficiarioNome || 'Sem Nome'}</h3>
                           <Badge tone={item.status === 'ENCERRADO' ? 'success' : item.status === 'ABERTO' ? 'info' : 'warning'}>{formatStatusLabel(item.status)}</Badge>
                         </div>
-                        <p className="mt-1 text-sm text-slate-500">Canal: {item.canal || 'Padrão'} | Criado em {formatDate(item.dataCriacao)}</p>
+                        <p className="mt-1 text-sm text-slate-500">Canal: {(item.canal === 'Sistema Web' || item.canal === 'sistemas web' || item.canal === 'sistema web' || item.canal === 'Sistemas Web') ? 'TDB - Responde' : (item.canal || 'Padrão')} | Criado em {formatDate(item.dataCriacao)}</p>
                         <p className="mt-1 text-sm text-slate-600">Responsável: {item.nomeVoluntario || 'Não atribuído'}</p>
                       </div>
                       <Select value={item.status || 'ABERTO'} onChange={(e) => {
