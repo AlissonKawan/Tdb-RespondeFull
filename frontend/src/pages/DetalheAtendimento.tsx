@@ -418,36 +418,24 @@ function DetalheAtendimento() {
     setConteudo('');
     setFeedback('');
 
-    const tempId = -Date.now() - Math.floor(Math.random() * 1000);
-    const mensagemOtimista: Mensagem = {
-      id: tempId,
-      atendimentoId,
-      conteudo: texto,
-      enviadoPor: remetenteAtual,
-      dataHora: new Date().toISOString()
-    };
-
-    setMensagens((atuais) => [...atuais, mensagemOtimista]);
-
     try {
       const novaMensagem = await mensagensService.enviarMensagem(atendimentoId, {
         conteudo: texto,
         enviadoPor: remetenteAtual,
       });
-      seenIdsRef.current.add(novaMensagem.id);
-      setMensagens((atuais) => {
-        // Remove a mensagem otimista incondicionalmente
-        const semOtimista = atuais.filter(m => m.id !== tempId);
-        // Se a mensagem real ainda não foi inserida pelo WebSocket, insere agora
-        if (!semOtimista.some(m => m.id === novaMensagem.id)) {
-          return [...semOtimista, novaMensagem];
-        }
-        return semOtimista;
-      });
+      
+      if (!seenIdsRef.current.has(novaMensagem.id)) {
+        seenIdsRef.current.add(novaMensagem.id);
+        setMensagens((atuais) => {
+          if (!atuais.some(m => m.id === novaMensagem.id)) {
+            return [...atuais, novaMensagem];
+          }
+          return atuais;
+        });
+      }
     } catch (error) {
       setFeedback(error instanceof Error ? error.message : 'Não foi possível enviar a mensagem.');
       setConteudo(texto); // Restaura o texto
-      setMensagens((atuais) => atuais.filter(m => m.id !== tempId)); // Remove a otimista
     }
   };
 
