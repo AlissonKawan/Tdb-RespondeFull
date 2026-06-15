@@ -48,33 +48,13 @@ def handle_banco_dados_error(e):
 # CONEXÃO COM ORACLE (Connection Pooling)
 # ============================================================
 
-pool = None
-
-def init_pool():
-    global pool
-    try:
-        pool = oracledb.create_pool(
-            user=os.environ.get("DB_USERNAME"),
-            password=os.environ.get("DB_PASSWORD"),
-            dsn=f"{os.environ.get('DB_HOST', 'oracle.fiap.com.br')}:{os.environ.get('DB_PORT', '1521')}/{os.environ.get('DB_SID', 'orcl')}",
-            min=2,
-            max=10,
-            increment=1,
-            ping_interval=30,
-            timeout=60,
-            expire_time=1,
-            tcp_connect_timeout=10
-        )
-        print("Pool de conexões Oracle inicializado com sucesso.")
-    except Exception as e:
-        print(f"Erro ao inicializar pool Oracle: {e}")
-
-init_pool()
-
 def get_connection():
-    if pool is None:
-        init_pool()
-    return pool.acquire()
+    return oracledb.connect(
+        user=os.environ.get("DB_USERNAME"),
+        password=os.environ.get("DB_PASSWORD"),
+        dsn=f"{os.environ.get('DB_HOST', 'oracle.fiap.com.br')}:{os.environ.get('DB_PORT', '1521')}/{os.environ.get('DB_SID', 'orcl')}",
+        tcp_connect_timeout=10
+    )
 
 
 def tarefa_to_dict(row, cursor):
