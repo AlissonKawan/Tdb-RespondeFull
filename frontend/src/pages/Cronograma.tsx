@@ -264,7 +264,7 @@ export default function Cronograma() {
             </Button>
           </div>
 
-          {loading && <LoadingState title="Carregando seu cronograma..." />}
+          {loading && <LoadingState title="Carregando seu cronograma..." description="O servidor do cronograma na nuvem entra em repouso por inatividade e pode levar até 50 segundos para acordar no primeiro acesso." />}
           {error && <ErrorState title="Oops!" description={error} />}
           {!loading && !error && tarefas.length === 0 && (
             <EmptyState title="Seu cronograma está vazio." description="Clique no botão acima para adicionar tarefas à sua semana." />
