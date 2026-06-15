@@ -61,7 +61,9 @@ def init_pool():
             max=10,
             increment=1,
             ping_interval=30,
-            timeout=60
+            timeout=60,
+            expire_time=1,
+            tcp_connect_timeout=10
         )
         print("Pool de conexões Oracle inicializado com sucesso.")
     except Exception as e:
