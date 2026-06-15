@@ -11,6 +11,8 @@ import { useAuth } from '../context/useAuth';
 import { useConfirm } from '../hooks/useConfirm';
 import { agendaService } from '../services/agendaService';
 import type { AgendaConsulta } from '../services/agendaService';
+import { prontuarioService } from '../services/prontuarioService';
+import type { Prontuario } from '../services/prontuarioService';
 
 // Utils para Datas
 const getTodayStr = () => {
@@ -48,7 +50,16 @@ export default function AgendaConsultas() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  // Modal Prontuario State
+  const [selectedProntuarioAgenda, setSelectedProntuarioAgenda] = useState<AgendaConsulta | null>(null);
+  const [prontuariosList, setProntuariosList] = useState<Prontuario[]>([]);
+  const [isProntuarioLoading, setIsProntuarioLoading] = useState(false);
   
+  const [prontuarioForm, setProntuarioForm] = useState({
+    historicoMedico: '',
+    tratamentoAtual: ''
+  });
+
   const [formData, setFormData] = useState<Omit<AgendaConsulta, 'id' | 'voluntarioId'>>({
     paciente: '',
     tipo: 'Avaliação Inicial',
@@ -155,6 +166,50 @@ export default function AgendaConsultas() {
     }
   };
 
+  // --- Lógica de Prontuário ---
+  const handleOpenProntuario = async (agenda: AgendaConsulta) => {
+    setSelectedProntuarioAgenda(agenda);
+    setProntuarioForm({ historicoMedico: '', tratamentoAtual: '' });
+    if (!agenda.id) return;
+    try {
+      setIsProntuarioLoading(true);
+      const data = await prontuarioService.buscarPorAgenda(agenda.id);
+      setProntuariosList(data);
+    } catch (e) {
+      console.error(e);
+      alert("Erro ao carregar prontuário.");
+    } finally {
+      setIsProntuarioLoading(false);
+    }
+  };
+
+  const handleSaveProntuario = async () => {
+    if (!selectedProntuarioAgenda?.id || !user?.id) return;
+    if (!prontuarioForm.tratamentoAtual.trim()) {
+      alert("Descreva o tratamento atual para salvar no prontuário.");
+      return;
+    }
+
+    try {
+      setIsProntuarioLoading(true);
+      const novo: Prontuario = {
+        voluntarioId: user.id,
+        agendaId: selectedProntuarioAgenda.id,
+        paciente: selectedProntuarioAgenda.paciente,
+        historicoMedico: prontuarioForm.historicoMedico,
+        tratamentoAtual: prontuarioForm.tratamentoAtual
+      };
+      const criado = await prontuarioService.registrarEvolucao(novo);
+      setProntuariosList(prev => [criado, ...prev]); // Adiciona no topo
+      setProntuarioForm({ historicoMedico: '', tratamentoAtual: '' }); // limpa
+    } catch (e) {
+      console.error(e);
+      alert("Erro ao salvar evolução.");
+    } finally {
+      setIsProntuarioLoading(false);
+    }
+  };
+
   return (
     <PageShell>
       <header className="border-b border-[#E2E8F0] bg-white/90 backdrop-blur-xl">
@@ -221,7 +276,7 @@ export default function AgendaConsultas() {
                 </div>
 
                 <div className="mt-6 pt-4 border-t border-slate-100 flex justify-end">
-                  <Button variant="ghost" onClick={() => alert('Na versão final, isso abrirá o prontuário do paciente!')}>
+                  <Button variant="ghost" onClick={() => handleOpenProntuario(consulta)}>
                     Ver Prontuário
                   </Button>
                 </div>
@@ -269,6 +324,111 @@ export default function AgendaConsultas() {
             <div className="mt-8 flex justify-end gap-3">
               <Button disabled={isSaving} variant="secondary" onClick={() => setIsModalOpen(false)}>Cancelar</Button>
               <Button disabled={isSaving} onClick={handleSave}>{isSaving ? 'Salvando...' : 'Salvar'}</Button>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {/* Modal Prontuário Premium */}
+      {selectedProntuarioAgenda && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-4">
+          <Card className="w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl animate-in fade-in zoom-in duration-200">
+            {/* Header do Prontuário */}
+            <div className="bg-gradient-to-r from-slate-900 to-slate-800 p-6 text-white shrink-0">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h2 className="text-2xl font-bold flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M12 18v-6"/><path d="M9 15h6"/></svg>
+                    Prontuário Clínico
+                  </h2>
+                  <p className="mt-1 text-slate-300">Paciente: <strong className="text-white">{selectedProntuarioAgenda.paciente}</strong></p>
+                </div>
+                <button onClick={() => setSelectedProntuarioAgenda(null)} className="text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 p-2 rounded-full transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+              </div>
+            </div>
+            
+            <div className="p-6 overflow-y-auto space-y-8 flex-1 bg-slate-50">
+              
+              {/* Form de Nova Evolução */}
+              <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                  <span className="bg-blue-100 text-blue-600 p-1.5 rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  </span>
+                  Nova Evolução ({formatDateLabel(selectedProntuarioAgenda.dataConsulta)})
+                </h3>
+                
+                <div className="grid gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Alertas Médicos / Anamnese (Tags separadas por vírgula)</label>
+                    <Input 
+                      disabled={isProntuarioLoading}
+                      placeholder="Ex: Alérgico a Penicilina, Hipertenso" 
+                      value={prontuarioForm.historicoMedico}
+                      onChange={e => setProntuarioForm({...prontuarioForm, historicoMedico: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Procedimento Realizado Hoje <span className="text-red-500">*</span></label>
+                    <textarea 
+                      disabled={isProntuarioLoading}
+                      className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[100px]"
+                      placeholder="Descreva detalhadamente a evolução clínica, dentes tratados, etc..."
+                      value={prontuarioForm.tratamentoAtual}
+                      onChange={e => setProntuarioForm({...prontuarioForm, tratamentoAtual: e.target.value})}
+                    />
+                  </div>
+                </div>
+                
+                <div className="flex justify-end">
+                  <Button disabled={isProntuarioLoading} onClick={handleSaveProntuario}>
+                    {isProntuarioLoading ? 'Salvando...' : 'Salvar Evolução'}
+                  </Button>
+                </div>
+              </div>
+
+              {/* Histórico da Timeline */}
+              <div>
+                <h3 className="font-bold text-slate-800 mb-4 px-1">Histórico Clínico</h3>
+                {isProntuarioLoading && prontuariosList.length === 0 ? (
+                  <div className="text-center py-6 text-slate-500 text-sm">Carregando histórico...</div>
+                ) : prontuariosList.length === 0 ? (
+                  <div className="text-center py-8 bg-white border border-dashed border-slate-300 rounded-xl text-slate-500">
+                    Nenhuma evolução registrada para esta consulta ainda.
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {prontuariosList.map((p, index) => (
+                      <div key={p.id || index} className="flex gap-4">
+                        <div className="flex flex-col items-center">
+                          <div className="w-3 h-3 rounded-full bg-blue-500 mt-1.5 shadow-[0_0_0_4px_#eff6ff]"></div>
+                          {index !== prontuariosList.length - 1 && <div className="w-0.5 h-full bg-blue-100 my-1"></div>}
+                        </div>
+                        <div className="bg-white p-4 rounded-xl border border-slate-200 flex-1 shadow-sm">
+                          <div className="flex justify-between items-start mb-2">
+                            <span className="text-xs font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded">
+                              {p.dataRegistro ? new Date(p.dataRegistro).toLocaleString('pt-BR') : 'Agora'}
+                            </span>
+                          </div>
+                          
+                          {p.historicoMedico && (
+                            <div className="mb-3 flex flex-wrap gap-1.5">
+                              {p.historicoMedico.split(',').map((tag, i) => tag.trim() ? (
+                                <Badge key={i} tone="danger">{tag.trim()}</Badge>
+                              ) : null)}
+                            </div>
+                          )}
+                          
+                          <p className="text-slate-700 text-sm whitespace-pre-wrap">{p.tratamentoAtual}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
             </div>
           </Card>
         </div>

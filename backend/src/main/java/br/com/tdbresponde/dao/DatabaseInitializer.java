@@ -41,5 +41,28 @@ public class DatabaseInitializer {
             stmt.execute("CREATE INDEX IDX_AGENDA_DATA ON AGENDA_CONSULTA(DATA_CONSULTA)");
             System.out.println("Indice IDX_AGENDA_DATA criado.");
         } catch (Exception e) {}
+
+        // --- PRONTUARIO ---
+        try (Connection conn = dataSource.getConnection(); Statement stmt = conn.createStatement()) {
+            String createTable = "CREATE TABLE PRONTUARIO (" +
+                "ID NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
+                "VOLUNTARIO_ID NUMBER NOT NULL, " +
+                "AGENDA_ID NUMBER NOT NULL, " +
+                "PACIENTE VARCHAR2(255) NOT NULL, " +
+                "HISTORICO_MEDICO VARCHAR2(1000), " +
+                "TRATAMENTO_ATUAL VARCHAR2(2000), " +
+                "DATA_REGISTRO TIMESTAMP DEFAULT CURRENT_TIMESTAMP" +
+                ")";
+            stmt.execute(createTable);
+            System.out.println("Tabela PRONTUARIO criada.");
+        } catch (Exception e) {}
+
+        try (Connection conn = dataSource.getConnection(); Statement stmt = conn.createStatement()) {
+            stmt.execute("CREATE INDEX IDX_PRONTUARIO_VOL ON PRONTUARIO(VOLUNTARIO_ID)");
+        } catch (Exception e) {}
+
+        try (Connection conn = dataSource.getConnection(); Statement stmt = conn.createStatement()) {
+            stmt.execute("CREATE INDEX IDX_PRONTUARIO_AGE ON PRONTUARIO(AGENDA_ID)");
+        } catch (Exception e) {}
     }
 }

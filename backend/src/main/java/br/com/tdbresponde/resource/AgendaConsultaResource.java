@@ -56,6 +56,31 @@ public class AgendaConsultaResource {
         } catch (Exception e) {
             result.append("Erro ao criar índice DATA_CONSULTA: ").append(e.getMessage()).append("\n");
         }
+
+        // --- PRONTUARIO ---
+        try (Connection conn = dataSource.getConnection(); Statement stmt = conn.createStatement()) {
+            String createTable = "CREATE TABLE PRONTUARIO (" +
+                "ID NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
+                "VOLUNTARIO_ID NUMBER NOT NULL, " +
+                "AGENDA_ID NUMBER NOT NULL, " +
+                "PACIENTE VARCHAR2(255) NOT NULL, " +
+                "HISTORICO_MEDICO VARCHAR2(1000), " +
+                "TRATAMENTO_ATUAL VARCHAR2(2000), " +
+                "DATA_REGISTRO TIMESTAMP DEFAULT CURRENT_TIMESTAMP" +
+                ")";
+            stmt.execute(createTable);
+            result.append("Tabela PRONTUARIO criada.\n");
+        } catch (Exception e) {
+            result.append("Erro ao criar tabela PRONTUARIO: ").append(e.getMessage()).append("\n");
+        }
+
+        try (Connection conn = dataSource.getConnection(); Statement stmt = conn.createStatement()) {
+            stmt.execute("CREATE INDEX IDX_PRONTUARIO_VOL ON PRONTUARIO(VOLUNTARIO_ID)");
+        } catch (Exception e) {}
+
+        try (Connection conn = dataSource.getConnection(); Statement stmt = conn.createStatement()) {
+            stmt.execute("CREATE INDEX IDX_PRONTUARIO_AGE ON PRONTUARIO(AGENDA_ID)");
+        } catch (Exception e) {}
         
         return Response.ok(result.toString()).build();
     }
