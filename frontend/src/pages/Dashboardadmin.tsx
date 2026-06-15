@@ -14,11 +14,11 @@ import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import Container from '../components/ui/Container';
 import { EmptyState, ErrorState, LoadingState } from '../components/ui/FeedbackState';
-import { Input, Select } from '../components/ui/Input';
+import { Field, Input, Select } from '../components/ui/Input';
 import SectionTitle from '../components/ui/SectionTitle';
 import StatCard from '../components/ui/StatCard';
 
-type Aba = 'dashboard' | 'atendimentos' | 'voluntarios' | 'inscricoes';
+type Aba = 'dashboard' | 'atendimentos' | 'voluntarios' | 'beneficiarios' | 'inscricoes';
 
 export default function DashboardAdmin() {
   const { user, logout } = useAuth();
@@ -39,6 +39,10 @@ export default function DashboardAdmin() {
   const [feedback, setFeedback] = useState('');
   const [busca, setBusca] = useState('');
   const [filtroStatus, setFiltroStatus] = useState('todos');
+  
+  // States de Edicao Admin
+  const [editingVoluntario, setEditingVoluntario] = useState<VoluntarioApi | null>(null);
+  const [editingBeneficiario, setEditingBeneficiario] = useState<AuthUser | null>(null);
 
   const carregarDados = async () => {
     setLoading(true);
@@ -86,6 +90,40 @@ export default function DashboardAdmin() {
     }
   };
 
+  const handleSaveVoluntario = async () => {
+    if(!editingVoluntario) return;
+    try {
+      await voluntariosService.atualizar(editingVoluntario.id, {
+        nome: editingVoluntario.nome,
+        especialidadeId: editingVoluntario.especialidade?.id,
+        cro: editingVoluntario.cro,
+        ufCro: editingVoluntario.ufCro,
+        disponivel: editingVoluntario.disponivel
+      } as any);
+      setFeedback('Voluntário atualizado com sucesso!');
+      setEditingVoluntario(null);
+      await carregarDados();
+    } catch {
+      alert('Erro ao atualizar voluntário.');
+    }
+  };
+
+  const handleSaveBeneficiario = async () => {
+    if(!editingBeneficiario) return;
+    try {
+      await usuarioService.atualizar(editingBeneficiario.id, {
+        nome: editingBeneficiario.nome,
+        email: editingBeneficiario.email,
+        ativo: editingBeneficiario.ativo
+      });
+      setFeedback('Beneficiário atualizado com sucesso!');
+      setEditingBeneficiario(null);
+      await carregarDados();
+    } catch {
+      alert('Erro ao atualizar beneficiário.');
+    }
+  };
+
   const aprovarInscricao = async (id: number) => {
     setFeedback('');
     try {
@@ -113,6 +151,7 @@ export default function DashboardAdmin() {
     ['dashboard', 'Dashboard'],
     ['atendimentos', 'Atendimentos'],
     ['voluntarios', 'Voluntários'],
+    ['beneficiarios', 'Beneficiários'],
     ['inscricoes', inscricoes.length ? `Inscrições (${inscricoes.length})` : 'Inscrições'],
   ];
 
@@ -220,6 +259,7 @@ export default function DashboardAdmin() {
                         <th className="px-4 py-3 text-left">Especialidade</th>
                         <th className="px-4 py-3 text-left">CRO</th>
                         <th className="px-4 py-3 text-left">Disponível</th>
+                        <th className="px-4 py-3 text-right">Ações</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -231,6 +271,49 @@ export default function DashboardAdmin() {
                           <td className="px-4 py-3 text-slate-500">{vol.cro ? `${vol.cro} (${vol.ufCro || 'N/A'})` : 'N/A'}</td>
                           <td className="px-4 py-3">
                             <Badge tone={vol.disponivel ? 'success' : 'danger'}>{vol.disponivel ? 'Sim' : 'Não'}</Badge>
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <Button size="sm" variant="secondary" onClick={() => setEditingVoluntario(vol)}>Editar</Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </Card>
+            )}
+          </div>
+        )}
+
+        {aba === 'beneficiarios' && (
+          <div className="space-y-4">
+            <SectionTitle title="Beneficiários Cadastrados" description="Pessoas assistidas que criaram conta na plataforma." />
+            {beneficiarios.length === 0 ? <EmptyState /> : (
+              <Card className="overflow-hidden border-0 shadow-sm md:border md:shadow-none">
+                <div className="overflow-x-auto w-full -mx-4 md:mx-0 px-4 md:px-0">
+                  <table className="w-full text-sm min-w-[600px]">
+                    <thead className="bg-slate-50 text-xs uppercase text-slate-500">
+                      <tr>
+                        <th className="px-4 py-3 text-left">ID</th>
+                        <th className="px-4 py-3 text-left">Nome</th>
+                        <th className="px-4 py-3 text-left">E-mail</th>
+                        <th className="px-4 py-3 text-left">Data de Criação</th>
+                        <th className="px-4 py-3 text-left">Status Conta</th>
+                        <th className="px-4 py-3 text-right">Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {beneficiarios.map((ben) => (
+                        <tr key={ben.id} className="border-t border-slate-100">
+                          <td className="px-4 py-3 font-semibold text-slate-800">#{ben.id}</td>
+                          <td className="px-4 py-3 text-slate-800">{ben.nome}</td>
+                          <td className="px-4 py-3 text-slate-500">{ben.email}</td>
+                          <td className="px-4 py-3 text-slate-500">{formatDate(ben.dataCriacao)}</td>
+                          <td className="px-4 py-3">
+                            <Badge tone={ben.ativo ? 'success' : 'danger'}>{ben.ativo ? 'Ativo' : 'Inativo'}</Badge>
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <Button size="sm" variant="secondary" onClick={() => setEditingBeneficiario(ben)}>Editar</Button>
                           </td>
                         </tr>
                       ))}
@@ -288,6 +371,73 @@ export default function DashboardAdmin() {
         )}
 
       </Container>
+
+      {/* Modais de Edicao */}
+      {editingVoluntario && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
+          <Card className="w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
+            <h2 className="text-xl font-bold mb-4 text-slate-800">Editar Voluntário</h2>
+            <div className="grid gap-4">
+              <Field label="Nome">
+                <Input value={editingVoluntario.nome} onChange={e => setEditingVoluntario({...editingVoluntario, nome: e.target.value})} />
+              </Field>
+              <Field label="CRO">
+                <Input value={editingVoluntario.cro || ''} onChange={e => setEditingVoluntario({...editingVoluntario, cro: e.target.value})} />
+              </Field>
+              <Field label="UF CRO">
+                <Input value={editingVoluntario.ufCro || ''} onChange={e => setEditingVoluntario({...editingVoluntario, ufCro: e.target.value})} />
+              </Field>
+              <Field label="Disponível">
+                <Select value={editingVoluntario.disponivel ? 'true' : 'false'} onChange={e => setEditingVoluntario({...editingVoluntario, disponivel: e.target.value === 'true'})}>
+                  <option value="true">Sim</option>
+                  <option value="false">Não</option>
+                </Select>
+              </Field>
+            </div>
+            <div className="mt-6 flex justify-end gap-2">
+              <Button variant="ghost" onClick={() => setEditingVoluntario(null)}>Cancelar</Button>
+              <Button onClick={() => confirm({
+                title: 'Confirmar Alterações',
+                message: 'Você tem certeza de que deseja forçar estas alterações neste voluntário?',
+                onConfirm: handleSaveVoluntario,
+                confirmText: 'Salvar'
+              })}>Salvar Alterações</Button>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {editingBeneficiario && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
+          <Card className="w-full max-w-md p-6">
+            <h2 className="text-xl font-bold mb-4 text-slate-800">Editar Beneficiário</h2>
+            <div className="grid gap-4">
+              <Field label="Nome">
+                <Input value={editingBeneficiario.nome} onChange={e => setEditingBeneficiario({...editingBeneficiario, nome: e.target.value})} />
+              </Field>
+              <Field label="E-mail">
+                <Input value={editingBeneficiario.email} onChange={e => setEditingBeneficiario({...editingBeneficiario, email: e.target.value})} />
+              </Field>
+              <Field label="Status (Ativo)">
+                <Select value={editingBeneficiario.ativo ? 'true' : 'false'} onChange={e => setEditingBeneficiario({...editingBeneficiario, ativo: e.target.value === 'true'})}>
+                  <option value="true">Sim (Ativo)</option>
+                  <option value="false">Não (Inativo)</option>
+                </Select>
+              </Field>
+            </div>
+            <div className="mt-6 flex justify-end gap-2">
+              <Button variant="ghost" onClick={() => setEditingBeneficiario(null)}>Cancelar</Button>
+              <Button onClick={() => confirm({
+                title: 'Confirmar Alterações',
+                message: 'Você tem certeza de que deseja forçar estas alterações neste beneficiário?',
+                onConfirm: handleSaveBeneficiario,
+                confirmText: 'Salvar'
+              })}>Salvar Alterações</Button>
+            </div>
+          </Card>
+        </div>
+      )}
+
       <ConfirmModal />
     </div>
   );
