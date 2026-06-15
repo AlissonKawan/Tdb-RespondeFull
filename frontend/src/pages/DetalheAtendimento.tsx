@@ -700,7 +700,7 @@ function DetalheAtendimento() {
                     <Button fullWidth disabled={salvando} onClick={() => {
                       confirm({
                         title: 'Salvar Alterações',
-                        message: 'Deseja confirmar as alterações feitas neste atendimento?',
+                        message: 'Você realmente quer alterar o atendimento?',
                         confirmText: 'Salvar',
                         tone: 'primary',
                         onConfirm: () => salvarAtendimento(false)

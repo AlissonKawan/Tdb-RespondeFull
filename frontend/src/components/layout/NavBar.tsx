@@ -22,7 +22,7 @@ function NavBar() {
   const handleLogout = () => {
     confirm({
       title: 'Sair da conta',
-      message: 'Tem certeza que deseja sair da sua conta?',
+      message: 'Você realmente quer sair da conta?',
       confirmText: 'Sair',
       tone: 'danger',
       onConfirm: () => {
