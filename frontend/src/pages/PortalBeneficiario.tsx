@@ -178,7 +178,7 @@ function PortalBeneficiario() {
                     {novasMensagens[atendimento.id] && <Badge tone="danger">Nova Mensagem</Badge>}
                   </div>
                   <div className="mt-3 grid gap-2 text-sm text-[#475569] md:grid-cols-2">
-                    <p><strong className="text-[#0F172A]">Prioridade:</strong> {prioridadeLabel(atendimento.prioridade)}</p>
+
                     <p><strong className="text-[#0F172A]">Última Atividade:</strong> {formatDate(atendimento.dataAtualizacao ?? atendimento.dataAbertura ?? atendimento.dataCriacao)}</p>
                     <p><strong className="text-[#0F172A]">Encerramento:</strong> {formatDate(atendimento.dataEncerramento)}</p>
                     <p><strong className="text-[#0F172A]">Voluntário:</strong> {atendimento.nomeVoluntario ?? atendimento.voluntario?.nome ?? 'Aguardando definicao'}</p>

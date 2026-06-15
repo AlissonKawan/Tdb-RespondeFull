@@ -141,7 +141,7 @@ function obterEstiloCategoriaIA(categoria?: string) {
 function DetalheAtendimento() {
   const { id } = useParams();
   const atendimentoId = Number(id);
-  const { user, logout } = useAuth();
+  const { user, logout, isBeneficiario } = useAuth();
   const navigate = useNavigate();
   const { confirm, ConfirmModal } = useConfirm();
 
@@ -531,7 +531,7 @@ function DetalheAtendimento() {
                 </div>
 
                 <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                  <InfoItem label="Prioridade" value={labelPrioridade(atendimento.prioridade)} />
+                  {!isBeneficiario && <InfoItem label="Prioridade" value={labelPrioridade(atendimento.prioridade)} />}
                   <InfoItem label="Data de abertura" value={formatDate(atendimento.dataAbertura ?? atendimento.dataCriacao)} />
                   <InfoItem label="Data de encerramento" value={atendimento.dataEncerramento ? formatDate(atendimento.dataEncerramento) : 'Em aberto'} />
                   <InfoItem label="Canal" value={atendimento.canalOrigem?.nome ?? atendimento.canal} />
