@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useConfirm } from '../hooks/useConfirm';
 import Section from '../components/layout/Section';
 import PageShell from '../components/layout/PageShell';
 import Badge from '../components/ui/Badge';
@@ -15,6 +16,7 @@ import { voluntariosService, type Voluntario } from '../services/voluntariosServ
 function AprovacaoVoluntarios() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { confirm, ConfirmModal } = useConfirm();
   const [solicitacoes, setSolicitacoes] = useState<Voluntario[]>([]);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState('');
@@ -62,7 +64,18 @@ function AprovacaoVoluntarios() {
             </button>
             <p className="mt-1 text-sm text-[#475569]">Sessao de {user?.nome}</p>
           </div>
-          <Button variant="secondary" onClick={() => { logout(); navigate('/login'); }}>Sair</Button>
+          <Button variant="secondary" onClick={() => {
+            confirm({
+              title: 'Sair da conta',
+              message: 'Você realmente quer sair da conta?',
+              confirmText: 'Sair',
+              tone: 'danger',
+              onConfirm: () => {
+                logout();
+                navigate('/login');
+              }
+            });
+          }}>Sair</Button>
         </Container>
       </header>
 
@@ -142,6 +155,7 @@ function AprovacaoVoluntarios() {
           ))}
         </div>
       </Section>
+      <ConfirmModal />
     </PageShell>
   );
 }

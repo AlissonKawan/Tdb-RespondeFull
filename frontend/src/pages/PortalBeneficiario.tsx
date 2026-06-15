@@ -12,6 +12,7 @@ import SectionHeader from '../components/ui/SectionHeader';
 import { useAuth } from '../context/useAuth';
 import { atendimentoService } from '../services/atendimentoService';
 import { mensagensService } from '../services/mensagensService';
+import { useConfirm } from '../hooks/useConfirm';
 import { formatStatusLabel } from '../utils/formatters';
 import type { AtendimentoApi } from '../types/AtendimentoApi';
 
@@ -62,6 +63,7 @@ function getPessoa(atendimento: AtendimentoApi) {
 function PortalBeneficiario() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { confirm, ConfirmModal } = useConfirm();
   const [atendimentos, setAtendimentos] = useState<AtendimentoApi[]>([]);
   const [novasMensagens, setNovasMensagens] = useState<Record<number, boolean>>({});
   const [loading, setLoading] = useState(true);
@@ -116,7 +118,18 @@ function PortalBeneficiario() {
           <div>
             <p className="text-sm text-[#475569]">Portal do beneficiario | {user?.nome}</p>
           </div>
-          <Button variant="secondary" onClick={() => { logout(); navigate('/login'); }}>Sair</Button>
+          <Button variant="secondary" onClick={() => {
+            confirm({
+              title: 'Sair da conta',
+              message: 'Você realmente quer sair da conta?',
+              confirmText: 'Sair',
+              tone: 'danger',
+              onConfirm: () => {
+                logout();
+                navigate('/login');
+              }
+            });
+          }}>Sair</Button>
         </Container>
       </header>
 
@@ -182,6 +195,7 @@ function PortalBeneficiario() {
           ))}
         </div>
       </Section>
+      <ConfirmModal />
     </PageShell>
   );
 }
