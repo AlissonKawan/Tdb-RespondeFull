@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageShell from '../components/layout/PageShell';
 import PageHeader from '../components/ui/PageHeader';
@@ -107,7 +107,7 @@ export default function AgendaConsultas() {
               </div>
 
               <div className="mt-6 pt-4 border-t border-slate-100 flex justify-end">
-                <Button variant="ghost" size="small" onClick={() => alert('Na versão final, isso abrirá o prontuário do paciente!')}>
+                <Button variant="ghost" onClick={() => alert('Na versão final, isso abrirá o prontuário do paciente!')}>
                   Ver Prontuário
                 </Button>
               </div>
