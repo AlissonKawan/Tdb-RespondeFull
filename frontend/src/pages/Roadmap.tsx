@@ -61,9 +61,9 @@ function Roadmap() {
   return (
     <PageShell>
       <PageHeader
-        eyebrow="Solucao"
+        eyebrow="Solução"
         title="Como o TDB Responde ajuda na pratica"
-        description="Uma solucao digital para reduzir dispersao, acelerar triagem e preservar contexto em atendimentos sociais sensiveis."
+        description="Uma solução digital para reduzir dispersão, acelerar triagem e preservar contexto em atendimentos sociais sensíveis."
       />
 
       <Section tone="white" className="reveal">
@@ -105,7 +105,7 @@ function Roadmap() {
         <SectionHeader
           eyebrow="Quem e afetado"
           title="Dois grupos precisam de resposta rapida e cuidadosa"
-          description="A solucao foi pensada para apoiar publicos com necessidades diferentes, mas com o mesmo desafio: atendimento que precisa de contexto, prioridade e acolhimento."
+          description="A solução foi pensada para apoiar públicos com necessidades diferentes, mas com o mesmo desafio: atendimento que precisa de contexto, prioridade e acolhimento."
         />
         <div className="grid gap-6 lg:grid-cols-2">
           {audiences.map((audience) => (

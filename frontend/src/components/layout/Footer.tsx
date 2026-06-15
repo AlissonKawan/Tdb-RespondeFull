@@ -36,7 +36,7 @@ function Footer() {
             Plataforma criada para centralizar canais, organizar históricos e apoiar voluntários com uma operação mais clara.
           </p>
           <p className="mt-3 text-sm font-semibold text-blue-200">
-            Em colaboracao com a Turma do Bem.
+            Em colaboração com a Turma do Bem.
           </p>
         </div>
 

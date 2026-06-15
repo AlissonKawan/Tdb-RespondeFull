@@ -220,7 +220,7 @@ export default function SolicitarAtendimento() {
       <PageHeader
         eyebrow="Atendimento"
         title="Relatar uma situacao"
-        description="Preencha as informacoes com cuidado. A equipe usa esses dados para priorizar e encaminhar o atendimento."
+        description="Preencha as informações com cuidado. A equipe usa esses dados para priorizar e encaminhar o atendimento."
       />
 
       <Section tone="white">

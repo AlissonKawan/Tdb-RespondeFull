@@ -10,7 +10,7 @@ const pillars = [
   'Atendimento organizado',
   'Historico preservado',
   'Priorizacao clara',
-  'Sigilo em casos sensiveis',
+  'Sigilo em casos sensíveis',
   'Voluntarios por especialidade',
   'Acompanhamento pelo beneficiario',
 ];
@@ -24,7 +24,7 @@ const challenges = [
 
 const solutions = [
   ['Atendimento centralizado', 'Todos os canais aparecem em uma única operação visual.'],
-  ['Protocolo de sigilo', 'Casos sensiveis podem ser tratados com mais cuidado e controle.'],
+  ['Protocolo de sigilo', 'Casos sensíveis podem ser tratados com mais cuidado e controle.'],
   ['Painel operacional', 'Status, prioridades e responsaveis ficam visiveis para a equipe.'],
   ['Triagem por prioridade', 'Demandas sao classificadas para orientar a proxima resposta.'],
   ['Historico unificado', 'Mensagens e mudancas de status ficam registradas no fluxo.'],
@@ -33,7 +33,7 @@ const solutions = [
 
 const flow = [
   ['1', 'Entrada do beneficiario', 'A demanda chega por canais como WhatsApp, e-mail, redes sociais ou atendimento presencial.'],
-  ['2', 'Triagem inicial', 'A equipe registra dados, classifica prioridade e protege informacoes sensiveis.'],
+  ['2', 'Triagem inicial', 'A equipe registra dados, classifica prioridade e protege informações sensíveis.'],
   ['3', 'Atribuicao', 'O caso e direcionado ao voluntario adequado conforme disponibilidade e especialidade.'],
   ['4', 'Acompanhamento', 'Mensagens, status e histórico permanecem em um fluxo único.'],
   ['5', 'Encerramento', 'O atendimento e finalizado com contexto preservado para consultas futuras.'],
@@ -66,7 +66,7 @@ function Sobre() {
         <SectionHeader
           eyebrow="Desafios"
           title="O problema que orientou o produto"
-          description="A proposta nasce da necessidade de reduzir dispersao operacional e dar mais clareza ao atendimento."
+          description="A proposta nasce da necessidade de reduzir dispersão operacional e dar mais clareza ao atendimento."
         />
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {challenges.map(([title, desc], index) => (

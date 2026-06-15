@@ -78,22 +78,22 @@ function NavBar() {
                 <Link to="/faq" className={linkClass('/faq')}>FAQ</Link>
                 <Link to="/contato" className={linkClass('/contato')}>Contato</Link>
                 <Link to="/integrantes" className={linkClass('/integrantes')}>Integrantes</Link>
-                <Link to="/roadmap" className={linkClass('/roadmap')}>Solucao</Link>
-                <Link to="/quero-ser-voluntario" className={linkClass('/quero-ser-voluntario')}>Seja voluntario</Link>
+                <Link to="/roadmap" className={linkClass('/roadmap')}>Solução</Link>
+                <Link to="/quero-ser-voluntario" className={linkClass('/quero-ser-voluntario')}>Seja voluntário</Link>
               </>
             )}
 
             {!user && <span className="mx-2 h-6 w-px bg-slate-200" />}
 
             {!user && <Button href="/login" size="sm">Entrar</Button>}
-            {!user && <Button href="/cadastro-beneficiario" variant="secondary" size="sm">Criar conta beneficiario</Button>}
+            {!user && <Button href="/cadastro-beneficiario" variant="secondary" size="sm">Criar conta beneficiário</Button>}
             {user && <span className="rounded-xl bg-white px-3 py-2 text-sm font-semibold text-[#475569] ring-1 ring-[#E2E8F0]">{user.nome}</span>}
             {user && isBeneficiario && <Button href={portalPath} size="sm">Meu portal</Button>}
             {user && isBeneficiario && <Button href="/beneficiario/solicitar-atendimento" variant="secondary" size="sm">Solicitar atendimento</Button>}
-            {user && isVoluntario && <Button href={portalPath} size="sm">Portal do voluntario</Button>}
+            {user && isVoluntario && <Button href={portalPath} size="sm">Portal do voluntário</Button>}
             {user && isAdmin && (
               <Button type="button" onClick={() => navigate('/inscricoes-pendentes')} variant={isAdmin ? 'primary' : 'secondary'} size="sm">
-                Inscricoes pendentes
+                Inscrições pendentes
               </Button>
             )}
             {user && (
@@ -114,8 +114,8 @@ function NavBar() {
                 <Link to="/faq" onClick={() => setIsOpen(false)} className={linkClass('/faq')}>FAQ</Link>
                 <Link to="/contato" onClick={() => setIsOpen(false)} className={linkClass('/contato')}>Contato</Link>
                 <Link to="/integrantes" onClick={() => setIsOpen(false)} className={linkClass('/integrantes')}>Integrantes</Link>
-                <Link to="/roadmap" onClick={() => setIsOpen(false)} className={linkClass('/roadmap')}>Solucao</Link>
-                <Link to="/quero-ser-voluntario" onClick={() => setIsOpen(false)} className={linkClass('/quero-ser-voluntario')}>Seja voluntario</Link>
+                <Link to="/roadmap" onClick={() => setIsOpen(false)} className={linkClass('/roadmap')}>Solução</Link>
+                <Link to="/quero-ser-voluntario" onClick={() => setIsOpen(false)} className={linkClass('/quero-ser-voluntario')}>Seja voluntário</Link>
               </>
             )}
 
@@ -124,7 +124,7 @@ function NavBar() {
             {!user && (
               <div className="flex flex-col gap-2">
                 <Button href="/login" size="sm" onClick={() => setIsOpen(false)}>Entrar</Button>
-                <Button href="/cadastro-beneficiario" variant="secondary" size="sm" onClick={() => setIsOpen(false)}>Criar conta beneficiario</Button>
+                <Button href="/cadastro-beneficiario" variant="secondary" size="sm" onClick={() => setIsOpen(false)}>Criar conta beneficiário</Button>
               </div>
             )}
             {user && <span className="rounded-xl bg-white px-3 py-2 text-sm font-semibold text-[#475569] ring-1 ring-[#E2E8F0] block text-center mb-1">{user.nome}</span>}
@@ -134,10 +134,10 @@ function NavBar() {
                 <Button href="/beneficiario/solicitar-atendimento" variant="secondary" size="sm" onClick={() => setIsOpen(false)}>Solicitar atendimento</Button>
               </div>
             )}
-            {user && isVoluntario && <Button href={portalPath} size="sm" onClick={() => setIsOpen(false)}>Portal do voluntario</Button>}
+            {user && isVoluntario && <Button href={portalPath} size="sm" onClick={() => setIsOpen(false)}>Portal do voluntário</Button>}
             {user && isAdmin && (
               <Button type="button" onClick={() => { setIsOpen(false); navigate('/inscricoes-pendentes'); }} variant={isAdmin ? 'primary' : 'secondary'} size="sm">
-                Inscricoes pendentes
+                Inscrições pendentes
               </Button>
             )}
             {user && (

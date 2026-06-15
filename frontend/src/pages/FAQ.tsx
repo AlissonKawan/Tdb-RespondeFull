@@ -77,7 +77,7 @@ function FAQ() {
 
       <Section tone="blue" className="border-t border-[#E2E8F0] reveal">
         <div className="text-center">
-          <p className="mb-4 text-[#475569]">Ainda tem duvidas?</p>
+          <p className="mb-4 text-[#475569]">Ainda tem dúvidas?</p>
           <Button href="/contato" size="large">Entre em contato</Button>
         </div>
       </Section>

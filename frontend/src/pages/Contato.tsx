@@ -56,7 +56,7 @@ function Contato() {
       <PageHeader
         eyebrow="Contato"
         title="Fale com a equipe"
-        description="Envie uma mensagem para saber mais sobre o projeto, compartilhar duvidas ou conversar sobre colaboracao."
+        description="Envie uma mensagem para saber mais sobre o projeto, compartilhar dúvidas ou conversar sobre colaboração."
       />
 
       <Section tone="white" className="reveal">
@@ -68,7 +68,7 @@ function Contato() {
               <div className="mt-5 space-y-3 text-[#475569]">
                 <p>Rua Mauricio Francisco Klabin 449, Vila Mariana, Sao Paulo/SP</p>
                 <p>(11) 5084-7276</p>
-                <p>Atendimento e colaboracao via equipe do projeto.</p>
+                <p>Atendimento e colaboração via equipe do projeto.</p>
               </div>
             </Card>
             <Card className="bg-gradient-to-br from-[#1E3A8A] to-[#2563EB] p-6 text-white">
