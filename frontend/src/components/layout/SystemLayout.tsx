@@ -83,6 +83,13 @@ export default function SystemLayout() {
                 Cronograma
               </Link>
               <Link 
+                to="/agenda" 
+                onClick={() => setIsSidebarOpen(false)}
+                className={`block px-4 py-2 rounded transition-colors ${location.pathname === '/agenda' ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-700 hover:bg-slate-50'}`}
+              >
+                Minha Agenda
+              </Link>
+              <Link 
                 to="/ranking" 
                 onClick={() => setIsSidebarOpen(false)}
                 className={`block px-4 py-2 rounded transition-colors ${location.pathname === '/ranking' ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-700 hover:bg-slate-50'}`}
