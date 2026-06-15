@@ -114,7 +114,8 @@ export default function DashboardAdmin() {
       await usuarioService.atualizar(editingBeneficiario.id, {
         nome: editingBeneficiario.nome,
         email: editingBeneficiario.email,
-        ativo: editingBeneficiario.ativo
+        ativo: editingBeneficiario.ativo,
+        tipoUsuario: editingBeneficiario.tipoUsuario
       });
       setFeedback('Beneficiário atualizado com sucesso!');
       setEditingBeneficiario(null);

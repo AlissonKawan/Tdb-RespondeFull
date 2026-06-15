@@ -19,10 +19,13 @@ export function formatDate(value?: string | null | number[] | any): string {
   if (!value) return '';
   try {
     if (Array.isArray(value)) {
-      if (value.length >= 3) {
+      if (value.length === 3) {
+        // LocalDate (apenas data)
+        const [y, m, d] = value;
+        return new Date(y, m - 1, d).toLocaleDateString('pt-BR');
+      } else if (value.length > 3) {
+        // LocalDateTime (data e hora, vindo em UTC do Azure)
         const [y, m, d, h = 0, min = 0, s = 0] = value;
-        // O backend (Azure) costuma enviar como array de inteiros em UTC.
-        // Criando a data em UTC garante que o toLocaleString converta para o fuso local (-3 BR).
         return new Date(Date.UTC(y, m - 1, d, h, min, s)).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
       }
       return '';
