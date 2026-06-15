@@ -14,11 +14,11 @@ import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import Container from '../components/ui/Container';
 import { EmptyState, ErrorState, LoadingState } from '../components/ui/FeedbackState';
-import { Field, Input, Select, Textarea } from '../components/ui/Input';
+import { Input, Select } from '../components/ui/Input';
 import SectionTitle from '../components/ui/SectionTitle';
 import StatCard from '../components/ui/StatCard';
 
-type Aba = 'dashboard' | 'atendimentos' | 'novo' | 'voluntarios' | 'beneficiarios' | 'inscricoes';
+type Aba = 'dashboard' | 'atendimentos' | 'voluntarios' | 'inscricoes';
 
 export default function DashboardAdmin() {
   const { user, logout } = useAuth();
@@ -39,15 +39,6 @@ export default function DashboardAdmin() {
   const [feedback, setFeedback] = useState('');
   const [busca, setBusca] = useState('');
   const [filtroStatus, setFiltroStatus] = useState('todos');
-  const [submitting, setSubmitting] = useState(false);
-
-  // States para Novo Atendimento
-  const [novoAtendimento, setNovoAtendimento] = useState({
-    beneficiarioId: '',
-    prioridade: '2',
-    canalComunicacaoId: '1',
-    descricao: '',
-  });
 
   const carregarDados = async () => {
     setLoading(true);
@@ -95,33 +86,6 @@ export default function DashboardAdmin() {
     }
   };
 
-  const criarAtendimento = async () => {
-    setErro('');
-    setFeedback('');
-    if (!novoAtendimento.beneficiarioId || !novoAtendimento.descricao) {
-      setErro('Preencha o beneficiário e a descrição.');
-      return;
-    }
-    
-    try {
-      setSubmitting(true);
-      await atendimentoService.solicitar({
-        beneficiarioId: Number(novoAtendimento.beneficiarioId),
-        prioridade: Number(novoAtendimento.prioridade),
-        canalComunicacaoId: Number(novoAtendimento.canalComunicacaoId),
-        descricao: novoAtendimento.descricao
-      });
-      setFeedback('Atendimento criado com sucesso.');
-      setNovoAtendimento({ beneficiarioId: '', prioridade: '2', canalComunicacaoId: '1', descricao: '' });
-      await carregarDados();
-      setAba('atendimentos');
-    } catch {
-      setErro('Não foi possível criar o atendimento.');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
   const aprovarInscricao = async (id: number) => {
     setFeedback('');
     try {
@@ -148,9 +112,7 @@ export default function DashboardAdmin() {
   const abas: [Aba, string][] = [
     ['dashboard', 'Dashboard'],
     ['atendimentos', 'Atendimentos'],
-    ['novo', 'Novo Atendimento'],
     ['voluntarios', 'Voluntários'],
-    ['beneficiarios', 'Beneficiários'],
     ['inscricoes', inscricoes.length ? `Inscrições (${inscricoes.length})` : 'Inscrições'],
   ];
 
@@ -244,36 +206,6 @@ export default function DashboardAdmin() {
           </div>
         )}
 
-        {aba === 'novo' && (
-          <Card className="max-w-2xl p-6">
-            <SectionTitle title="Novo atendimento (Via API)" description="Abre protocolo direto pela API conectando ao beneficiário." />
-            <div className="grid gap-4 md:grid-cols-2">
-              <Field label="Selecione o Beneficiário">
-                <Select value={novoAtendimento.beneficiarioId} onChange={(e) => setNovoAtendimento({ ...novoAtendimento, beneficiarioId: e.target.value })}>
-                  <option value="">Selecione...</option>
-                  {beneficiarios.map((b) => <option key={b.id} value={b.id}>{b.nome}</option>)}
-                </Select>
-              </Field>
-              <Field label="Prioridade">
-                <Select value={novoAtendimento.prioridade} onChange={(e) => setNovoAtendimento({ ...novoAtendimento, prioridade: e.target.value })}>
-                  <option value="1">Baixa</option>
-                  <option value="2">Média</option>
-                  <option value="3">Alta</option>
-                </Select>
-              </Field>
-              <Field label="Canal de Comunicação (ID)">
-                <Input type="number" value={novoAtendimento.canalComunicacaoId} onChange={(e) => setNovoAtendimento({ ...novoAtendimento, canalComunicacaoId: e.target.value })} />
-              </Field>
-              <div className="md:col-span-2">
-                <Field label="Descrição">
-                  <Textarea value={novoAtendimento.descricao} onChange={(e) => setNovoAtendimento({ ...novoAtendimento, descricao: e.target.value })} rows={3} />
-                </Field>
-              </div>
-            </div>
-            <Button className="mt-5" onClick={criarAtendimento} disabled={submitting}>Abrir atendimento</Button>
-          </Card>
-        )}
-
         {aba === 'voluntarios' && (
           <div className="space-y-4">
             <SectionTitle title="Voluntários Aprovados" description="Equipe cadastrada no sistema." />
@@ -299,42 +231,6 @@ export default function DashboardAdmin() {
                           <td className="px-4 py-3 text-slate-500">{vol.cro ? `${vol.cro} (${vol.ufCro || 'N/A'})` : 'N/A'}</td>
                           <td className="px-4 py-3">
                             <Badge tone={vol.disponivel ? 'success' : 'danger'}>{vol.disponivel ? 'Sim' : 'Não'}</Badge>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </Card>
-            )}
-          </div>
-        )}
-
-        {aba === 'beneficiarios' && (
-          <div className="space-y-4">
-            <SectionTitle title="Beneficiários Cadastrados" description="Pessoas assistidas que criaram conta na plataforma." />
-            {beneficiarios.length === 0 ? <EmptyState /> : (
-              <Card className="overflow-hidden border-0 shadow-sm md:border md:shadow-none">
-                <div className="overflow-x-auto w-full -mx-4 md:mx-0 px-4 md:px-0">
-                  <table className="w-full text-sm min-w-[600px]">
-                    <thead className="bg-slate-50 text-xs uppercase text-slate-500">
-                      <tr>
-                        <th className="px-4 py-3 text-left">ID</th>
-                        <th className="px-4 py-3 text-left">Nome</th>
-                        <th className="px-4 py-3 text-left">E-mail</th>
-                        <th className="px-4 py-3 text-left">Data de Criação</th>
-                        <th className="px-4 py-3 text-left">Status Conta</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {beneficiarios.map((ben) => (
-                        <tr key={ben.id} className="border-t border-slate-100">
-                          <td className="px-4 py-3 font-semibold text-slate-800">#{ben.id}</td>
-                          <td className="px-4 py-3 text-slate-800">{ben.nome}</td>
-                          <td className="px-4 py-3 text-slate-500">{ben.email}</td>
-                          <td className="px-4 py-3 text-slate-500">{formatDate(ben.dataCriacao)}</td>
-                          <td className="px-4 py-3">
-                            <Badge tone={ben.ativo ? 'success' : 'danger'}>{ben.ativo ? 'Ativo' : 'Inativo'}</Badge>
                           </td>
                         </tr>
                       ))}
