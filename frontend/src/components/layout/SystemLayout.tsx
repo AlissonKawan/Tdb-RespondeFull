@@ -6,7 +6,6 @@ import { useConfirm } from '../../hooks/useConfirm';
 export default function SystemLayout() {
   const { user, logout, isVoluntario, isBeneficiario, isAdmin } = useAuth();
   const navigate = useNavigate();
-  const navigate = useNavigate();
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { confirm, ConfirmModal } = useConfirm();
