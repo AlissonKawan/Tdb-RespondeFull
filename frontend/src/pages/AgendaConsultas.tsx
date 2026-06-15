@@ -9,16 +9,8 @@ import Badge from '../components/ui/Badge';
 import { Field, Input, Select } from '../components/ui/Input';
 import { useAuth } from '../context/useAuth';
 import { useConfirm } from '../hooks/useConfirm';
-
-type ConsultaMock = {
-  id: number;
-  paciente: string;
-  tipo: string;
-  data: string; // YYYY-MM-DD
-  horario: string;
-  status: string;
-  tipoPessoa: string;
-};
+import { agendaService } from '../services/agendaService';
+import type { AgendaConsulta } from '../services/agendaService';
 
 // Utils para Datas
 const getTodayStr = () => {
@@ -35,16 +27,13 @@ const getTomorrowStr = () => {
 const formatDateLabel = (dateStr: string) => {
   if (dateStr === getTodayStr()) return 'Hoje';
   if (dateStr === getTomorrowStr()) return 'Amanhã';
-  const [y, m, d] = dateStr.split('-');
-  return `${d}/${m}/${y}`;
+  const parts = dateStr.split('-');
+  if (parts.length === 3) {
+    const [y, m, d] = parts;
+    return `${d}/${m}/${y}`;
+  }
+  return dateStr;
 };
-
-const DEFAULT_MOCK: ConsultaMock[] = [
-  { id: 1, paciente: 'Ana S.', tipo: 'Avaliação Inicial', data: getTodayStr(), horario: '14:00', status: 'CONFIRMADO', tipoPessoa: 'MULHER_APOLONIA' },
-  { id: 2, paciente: 'Lucas (Resp: Maria)', tipo: 'Tratamento de Cárie', data: getTodayStr(), horario: '16:30', status: 'AGUARDANDO', tipoPessoa: 'CRIANCA_ADOLESCENTE' },
-  { id: 3, paciente: 'Beatriz N.', tipo: 'Retorno', data: getTomorrowStr(), horario: '09:00', status: 'CONFIRMADO', tipoPessoa: 'MULHER_APOLONIA' },
-  { id: 4, paciente: 'João Pedro', tipo: 'Limpeza', data: getTomorrowStr(), horario: '11:00', status: 'REAGENDAR', tipoPessoa: 'CRIANCA_ADOLESCENTE' }
-];
 
 export default function AgendaConsultas() {
   const navigate = useNavigate();
@@ -52,63 +41,64 @@ export default function AgendaConsultas() {
   const { confirm, ConfirmModal } = useConfirm();
   
   const [filtro, setFiltro] = useState<'Todos' | 'Hoje' | 'Amanhã'>('Todos');
-  const [consultas, setConsultas] = useState<ConsultaMock[]>([]);
+  const [consultas, setConsultas] = useState<AgendaConsulta[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
   
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Omit<AgendaConsulta, 'id' | 'voluntarioId'>>({
     paciente: '',
     tipo: 'Avaliação Inicial',
-    data: getTodayStr(),
+    dataConsulta: getTodayStr(),
     horario: '08:00',
     status: 'AGUARDANDO',
     tipoPessoa: 'OUTRO'
   });
 
-  // Carrega do localStorage especifico do usuario logado
-  useEffect(() => {
+  const carregarAgendas = async () => {
     if (!user?.id) return;
-    const storageKey = `agenda_mock_v2_${user.id}`;
-    const saved = localStorage.getItem(storageKey);
-    if (saved) {
-      setConsultas(JSON.parse(saved));
-    } else {
-      setConsultas(DEFAULT_MOCK);
-      localStorage.setItem(storageKey, JSON.stringify(DEFAULT_MOCK));
+    try {
+      setIsLoading(true);
+      const data = await agendaService.buscarPorVoluntario(user.id);
+      setConsultas(data);
+    } catch (error) {
+      console.error("Erro ao carregar agenda", error);
+      alert("Falha ao conectar com o servidor para buscar sua agenda.");
+    } finally {
+      setIsLoading(false);
     }
-  }, [user?.id]);
+  };
 
-  // Salva no localStorage sempre que consultas muda
   useEffect(() => {
-    if (!user?.id || consultas.length === 0) return;
-    const storageKey = `agenda_mock_v2_${user.id}`;
-    localStorage.setItem(storageKey, JSON.stringify(consultas));
-  }, [consultas, user?.id]);
+    carregarAgendas();
+  }, [user?.id]);
 
   const consultasFiltradas = consultas.filter(c => {
     if (filtro === 'Todos') return true;
-    if (filtro === 'Hoje') return c.data === getTodayStr();
-    if (filtro === 'Amanhã') return c.data === getTomorrowStr();
+    if (filtro === 'Hoje') return c.dataConsulta === getTodayStr();
+    if (filtro === 'Amanhã') return c.dataConsulta === getTomorrowStr();
     return true;
   });
 
   const handleOpenNew = () => {
     setEditingId(null);
-    setFormData({ paciente: '', tipo: 'Avaliação Inicial', data: getTodayStr(), horario: '08:00', status: 'AGUARDANDO', tipoPessoa: 'OUTRO' });
+    setFormData({ paciente: '', tipo: 'Avaliação Inicial', dataConsulta: getTodayStr(), horario: '08:00', status: 'AGUARDANDO', tipoPessoa: 'OUTRO' });
     setIsModalOpen(true);
   };
 
-  const handleOpenEdit = (c: ConsultaMock) => {
+  const handleOpenEdit = (c: AgendaConsulta) => {
+    if (!c.id) return;
     setEditingId(c.id);
     setFormData({
       paciente: c.paciente,
       tipo: c.tipo,
-      data: c.data,
+      dataConsulta: c.dataConsulta,
       horario: c.horario,
       status: c.status,
-      tipoPessoa: c.tipoPessoa
+      tipoPessoa: c.tipoPessoa || 'OUTRO'
     });
     setIsModalOpen(true);
   };
@@ -119,32 +109,50 @@ export default function AgendaConsultas() {
       message: 'Você tem certeza que deseja excluir este agendamento? Esta ação não pode ser desfeita.',
       confirmText: 'Excluir',
       tone: 'danger',
-      onConfirm: () => {
-        setConsultas(prev => prev.filter(c => c.id !== id));
+      onConfirm: async () => {
+        try {
+          await agendaService.excluir(id);
+          setConsultas(prev => prev.filter(c => c.id !== id));
+        } catch (error) {
+          console.error(error);
+          alert("Erro ao excluir agendamento.");
+        }
       }
     });
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.paciente.trim()) {
       alert("O nome do paciente é obrigatório!");
       return;
     }
-    if (!formData.data) {
+    if (!formData.dataConsulta) {
       alert("A data é obrigatória!");
       return;
     }
+    if (!user?.id) return;
 
-    if (editingId) {
-      setConsultas(prev => prev.map(c => c.id === editingId ? { ...c, ...formData } : c));
-    } else {
-      const novaConsulta: ConsultaMock = {
-        id: Date.now(),
-        ...formData
+    try {
+      setIsSaving(true);
+      const agendaPayload: AgendaConsulta = {
+        ...formData,
+        voluntarioId: user.id
       };
-      setConsultas(prev => [...prev, novaConsulta]);
+
+      if (editingId) {
+        const atualizada = await agendaService.atualizar(editingId, agendaPayload);
+        setConsultas(prev => prev.map(c => c.id === editingId ? atualizada : c));
+      } else {
+        const nova = await agendaService.criar(agendaPayload);
+        setConsultas(prev => [...prev, nova]);
+      }
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error(error);
+      alert("Erro ao salvar agendamento.");
+    } finally {
+      setIsSaving(false);
     }
-    setIsModalOpen(false);
   };
 
   return (
@@ -174,19 +182,21 @@ export default function AgendaConsultas() {
           <Button variant={filtro === 'Amanhã' ? 'primary' : 'secondary'} onClick={() => setFiltro('Amanhã')}>Amanhã</Button>
         </div>
 
-        {consultasFiltradas.length === 0 ? (
+        {isLoading ? (
+          <div className="text-center py-12 text-slate-500">Carregando sua agenda...</div>
+        ) : consultasFiltradas.length === 0 ? (
           <div className="text-center py-12 text-slate-500 bg-white rounded-xl border border-slate-200">
             <p>Nenhuma consulta encontrada para este filtro.</p>
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {consultasFiltradas.sort((a,b) => a.data.localeCompare(b.data) || a.horario.localeCompare(b.horario)).map((consulta) => (
+            {consultasFiltradas.sort((a,b) => a.dataConsulta.localeCompare(b.dataConsulta) || a.horario.localeCompare(b.horario)).map((consulta) => (
               <Card key={consulta.id} className="p-6 border-l-4 border-l-[#2563EB] hover:shadow-lg transition-shadow relative group">
                 <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button onClick={() => handleOpenEdit(consulta)} className="p-2 text-blue-600 bg-blue-50 rounded-full hover:bg-blue-100" title="Editar">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                   </button>
-                  <button onClick={() => handleDelete(consulta.id)} className="p-2 text-red-600 bg-red-50 rounded-full hover:bg-red-100" title="Excluir">
+                  <button onClick={() => consulta.id && handleDelete(consulta.id)} className="p-2 text-red-600 bg-red-50 rounded-full hover:bg-red-100" title="Excluir">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
                   </button>
                 </div>
@@ -196,7 +206,7 @@ export default function AgendaConsultas() {
                     {consulta.status}
                   </Badge>
                   <span className="text-xs font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded-md">
-                    {formatDateLabel(consulta.data)}
+                    {formatDateLabel(consulta.dataConsulta)}
                   </span>
                 </div>
                 
@@ -227,28 +237,28 @@ export default function AgendaConsultas() {
           <Card className="w-full max-w-md p-6 animate-in fade-in zoom-in duration-200">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold text-[#0F172A]">{editingId ? 'Editar Consulta' : 'Nova Consulta'}</h2>
-              <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600">
+              <button onClick={() => !isSaving && setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
             </div>
             
             <div className="space-y-4">
               <Field label="Nome do Paciente">
-                <Input value={formData.paciente} onChange={e => setFormData({...formData, paciente: e.target.value})} placeholder="Ex: Maria Silva" />
+                <Input disabled={isSaving} value={formData.paciente} onChange={e => setFormData({...formData, paciente: e.target.value})} placeholder="Ex: Maria Silva" />
               </Field>
               <Field label="Tipo de Atendimento">
-                <Input value={formData.tipo} onChange={e => setFormData({...formData, tipo: e.target.value})} placeholder="Ex: Avaliação Inicial" />
+                <Input disabled={isSaving} value={formData.tipo} onChange={e => setFormData({...formData, tipo: e.target.value})} placeholder="Ex: Avaliação Inicial" />
               </Field>
               <div className="grid grid-cols-2 gap-4">
                 <Field label="Data">
-                  <Input type="date" min={getTodayStr()} value={formData.data} onChange={e => setFormData({...formData, data: e.target.value})} />
+                  <Input disabled={isSaving} type="date" min={getTodayStr()} value={formData.dataConsulta} onChange={e => setFormData({...formData, dataConsulta: e.target.value})} />
                 </Field>
                 <Field label="Horário">
-                  <Input type="time" value={formData.horario} onChange={e => setFormData({...formData, horario: e.target.value})} />
+                  <Input disabled={isSaving} type="time" value={formData.horario} onChange={e => setFormData({...formData, horario: e.target.value})} />
                 </Field>
               </div>
               <Field label="Status">
-                <Select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})}>
+                <Select disabled={isSaving} value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})}>
                   <option value="AGUARDANDO">Aguardando</option>
                   <option value="CONFIRMADO">Confirmado</option>
                   <option value="REAGENDAR">Reagendar</option>
@@ -257,8 +267,8 @@ export default function AgendaConsultas() {
             </div>
 
             <div className="mt-8 flex justify-end gap-3">
-              <Button variant="secondary" onClick={() => setIsModalOpen(false)}>Cancelar</Button>
-              <Button onClick={handleSave}>Salvar</Button>
+              <Button disabled={isSaving} variant="secondary" onClick={() => setIsModalOpen(false)}>Cancelar</Button>
+              <Button disabled={isSaving} onClick={handleSave}>{isSaving ? 'Salvando...' : 'Salvar'}</Button>
             </div>
           </Card>
         </div>
