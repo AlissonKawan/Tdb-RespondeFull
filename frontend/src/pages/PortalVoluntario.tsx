@@ -164,9 +164,9 @@ function PortalVoluntario() {
 
       await carregarSolicitados();
 
-      if (user.tipoUsuario !== 'VOLUNTARIO') {
+      if (user.tipoUsuario !== 'VOLUNTARIO' && user.tipoUsuario !== 'ADMIN') {
         setLoadingMeus(false);
-        setErroMeus('Esta área é exclusiva para voluntários.');
+        setErroMeus('Esta área é exclusiva para voluntários e administradores.');
         return;
       }
 
@@ -174,7 +174,7 @@ function PortalVoluntario() {
         setLoadingMeus(false);
         setErroMeus('');
         setMeusAtendimentos([]);
-        setFeedback('Sua conta de voluntário está sem vínculo de voluntário. Você pode visualizar os atendimentos, mas ainda não pode assumir casos.');
+        setFeedback(user.tipoUsuario === 'ADMIN' ? 'Atenção: Administrador sem perfil de voluntário. Você pode visualizar os atendimentos, mas recursos de voluntário estão desativados.' : 'Sua conta de voluntário está sem vínculo de voluntário. Você pode visualizar os atendimentos, mas ainda não pode assumir casos.');
         return;
       }
 

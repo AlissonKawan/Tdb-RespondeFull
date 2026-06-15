@@ -90,15 +90,17 @@ export default function Cronograma() {
   const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm<TarefaCronograma>();
 
   const carregarTarefas = async () => {
-    if (!user?.voluntarioId) {
+    const targetId = user?.voluntarioId ?? (user?.tipoUsuario === 'ADMIN' ? user?.id : undefined);
+
+    if (!targetId) {
       setLoading(false);
-      setError('Sua conta não está vinculada a um voluntário.');
+      setError(user?.tipoUsuario === 'ADMIN' ? 'Não foi possível carregar cronograma do admin.' : 'Sua conta não está vinculada a um voluntário.');
       return;
     }
     setLoading(true);
     setError('');
     try {
-      const response = await cronogramaService.listarTarefas(user.voluntarioId);
+      const response = await cronogramaService.listarTarefas(targetId);
       const tarefasNormalizadas = (response.tarefas || []).map(t => ({
         ...t,
         dia_semana: normalizeParaFrontend(t.dia_semana),
@@ -118,7 +120,8 @@ export default function Cronograma() {
   }, [user]);
 
   const onSubmit = async (data: TarefaCronograma) => {
-    if (!user?.voluntarioId) return;
+    const targetId = user?.voluntarioId ?? (user?.tipoUsuario === 'ADMIN' ? user?.id : undefined);
+    if (!targetId) return;
 
     const acao = tarefaEmEdicao ? 'editar' : 'criar';
     confirm({
@@ -140,7 +143,7 @@ export default function Cronograma() {
 
           const payload = { 
             id_tarefa: tarefaEmEdicao?.id_tarefa,
-            id_voluntario: user.voluntarioId,
+            id_voluntario: targetId,
             tipo: data.tipo,
             titulo: data.titulo,
             descricao: data.descricao,

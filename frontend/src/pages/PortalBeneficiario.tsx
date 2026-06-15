@@ -69,9 +69,9 @@ function PortalBeneficiario() {
 
   useEffect(() => {
     async function carregarAtendimentos() {
-      if (!user || user.tipoUsuario !== 'BENEFICIARIO') {
+      if (!user || (user.tipoUsuario !== 'BENEFICIARIO' && user.tipoUsuario !== 'ADMIN')) {
         setLoading(false);
-        setErro('Esta area e exclusiva para beneficiarios.');
+        setErro('Esta área é exclusiva para beneficiários e administradores.');
         return;
       }
 
