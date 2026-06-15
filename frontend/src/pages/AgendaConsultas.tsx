@@ -60,6 +60,9 @@ export default function AgendaConsultas() {
     tratamentoAtual: ''
   });
 
+  // Modal Expirado
+  const [resolveExpiredAgenda, setResolveExpiredAgenda] = useState<AgendaConsulta | null>(null);
+
   const [formData, setFormData] = useState<Omit<AgendaConsulta, 'id' | 'voluntarioId'>>({
     paciente: '',
     tipo: 'Avaliação Inicial',
@@ -210,6 +213,32 @@ export default function AgendaConsultas() {
     }
   };
 
+  // --- Lógica de Expirados ---
+  const handleEncerrarExpirada = async () => {
+    if (!resolveExpiredAgenda?.id) return;
+    try {
+      setIsSaving(true);
+      const atualizada = await agendaService.atualizar(resolveExpiredAgenda.id, {
+        ...resolveExpiredAgenda,
+        status: 'ENCERRADO'
+      });
+      setConsultas(prev => prev.map(c => c.id === resolveExpiredAgenda.id ? atualizada : c));
+      setResolveExpiredAgenda(null);
+    } catch (e) {
+      console.error(e);
+      alert("Erro ao encerrar a consulta.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleReagendarExpirada = () => {
+    if (!resolveExpiredAgenda) return;
+    const agenda = resolveExpiredAgenda;
+    setResolveExpiredAgenda(null);
+    handleOpenEdit(agenda);
+  };
+
   return (
     <PageShell>
       <header className="border-b border-[#E2E8F0] bg-white/90 backdrop-blur-xl">
@@ -257,7 +286,7 @@ export default function AgendaConsultas() {
                 </div>
 
                 <div className="flex justify-between items-start mb-4 pr-16">
-                  <Badge tone={consulta.status === 'CONCLUIDO' ? 'success' : consulta.status === 'CONFIRMADO' ? 'neutral' : consulta.status === 'AGUARDANDO' ? 'warning' : 'danger'}>
+                  <Badge tone={consulta.status === 'CONCLUIDO' ? 'success' : consulta.status === 'CONFIRMADO' ? 'neutral' : consulta.status === 'ENCERRADO' ? 'neutral' : consulta.status === 'AGUARDANDO' ? 'warning' : 'danger'}>
                     {consulta.status}
                   </Badge>
                   <span className="text-xs font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded-md">
@@ -275,11 +304,26 @@ export default function AgendaConsultas() {
                   {consulta.horario}
                 </div>
 
-                <div className="mt-6 pt-4 border-t border-slate-100 flex justify-end">
-                  <Button variant="ghost" onClick={() => handleOpenProntuario(consulta)}>
-                    Ver Prontuário
-                  </Button>
-                </div>
+                {consulta.dataConsulta < getTodayStr() && consulta.status !== 'CONCLUIDO' && consulta.status !== 'ENCERRADO' ? (
+                  <div className="mt-6 pt-4 border-t border-slate-100">
+                    <div className="bg-red-50 text-red-700 p-3 rounded-lg border border-red-100 mb-3 text-sm flex items-start gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" className="mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                      <div>
+                        <strong>Data Expirada!</strong>
+                        <p>O paciente não compareceu ou a data passou.</p>
+                      </div>
+                    </div>
+                    <Button variant="danger" className="w-full justify-center" onClick={() => setResolveExpiredAgenda(consulta)}>
+                      Resolver Pendência
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="mt-6 pt-4 border-t border-slate-100 flex justify-end">
+                    <Button variant="ghost" onClick={() => handleOpenProntuario(consulta)}>
+                      Ver Prontuário
+                    </Button>
+                  </div>
+                )}
               </Card>
             ))}
           </div>
@@ -317,7 +361,7 @@ export default function AgendaConsultas() {
                   <option value="AGUARDANDO">Aguardando</option>
                   <option value="CONFIRMADO">Confirmado</option>
                   <option value="CONCLUIDO">Concluído (Atendido)</option>
-                  <option value="REAGENDAR">Reagendar / Faltou</option>
+                  <option value="ENCERRADO">Encerrado / Desistência</option>
                 </Select>
               </Field>
             </div>
@@ -430,6 +474,31 @@ export default function AgendaConsultas() {
                 )}
               </div>
 
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {/* Modal Resolver Expirada */}
+      {resolveExpiredAgenda && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
+          <Card className="w-full max-w-sm p-6 animate-in fade-in zoom-in duration-200 text-center border-t-4 border-t-red-500">
+            <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <h2 className="text-lg font-bold text-slate-800 mb-2">Consulta Expirada</h2>
+            <p className="text-slate-500 text-sm mb-6">A data de consulta de <strong>{resolveExpiredAgenda.paciente}</strong> passou. O que deseja fazer?</p>
+            
+            <div className="flex flex-col gap-3">
+              <Button disabled={isSaving} onClick={handleReagendarExpirada} className="w-full justify-center text-md">
+                Reagendar Consulta
+              </Button>
+              <Button disabled={isSaving} variant="danger" onClick={handleEncerrarExpirada} className="w-full justify-center text-md">
+                {isSaving ? 'Aguarde...' : 'Encerrar (Não compareceu)'}
+              </Button>
+              <Button disabled={isSaving} variant="ghost" onClick={() => setResolveExpiredAgenda(null)} className="w-full justify-center mt-2">
+                Cancelar
+              </Button>
             </div>
           </Card>
         </div>
