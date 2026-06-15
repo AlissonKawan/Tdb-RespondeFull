@@ -17,7 +17,7 @@ const RankingVoluntarios: React.FC = () => {
     carregarRanking();
   }, []);
 
-  const carregarRanking = async () => {
+  async function carregarRanking() {
     try {
       setLoading(true);
       setError(null);
