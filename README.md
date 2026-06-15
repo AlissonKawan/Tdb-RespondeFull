@@ -130,7 +130,7 @@ Ao realizar a manutenção ou publicar o sistema, você deve garantir as seguint
 - `PORT`: Porta da API (Padrão 8080).
 
 **Front-end (`frontend/.env`):**
-- `VITE_API_URL`: URL principal do Back-end. (Ex: `https://tdb-respondefull.onrender.com`)
+- `VITE_API_URL`: URL principal do Back-end. (Ex: `https://tdbresponde.azurewebsites.net`)
 - `VITE_IA_API_URL`: Rota para o modelo de IA (quando aplicável).
 
 ---
@@ -155,7 +155,7 @@ A API gerencia os dados de forma relacional. Caso haja necessidade de recriar o 
 O projeto está preparado para hospedagem em nuvem utilizando variáveis de ambiente para isolar as credenciais. Atualmente as URLs publicadas são:
 
 - **Front-end (Vercel)**: [https://tdb-responde-full.vercel.app](https://tdb-responde-full.vercel.app)
-- **Back-end (Render)**: [https://tdb-respondefull.onrender.com](https://tdb-respondefull.onrender.com)
+- **Back-end (Azure)**: [https://tdbresponde.azurewebsites.net](https://tdbresponde.azurewebsites.net)
 
 **Como compilar para Produção:**
 - Para o Java, gere o _Fat Jar_: `mvn clean package -DskipTests`.
