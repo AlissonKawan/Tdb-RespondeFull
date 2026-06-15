@@ -21,11 +21,14 @@ export function formatDate(value?: string | null | number[] | any): string {
     if (Array.isArray(value)) {
       if (value.length >= 3) {
         const [y, m, d, h = 0, min = 0, s = 0] = value;
-        return new Date(y, m - 1, d, h, min, s).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+        // O backend (Azure) costuma enviar como array de inteiros em UTC.
+        // Criando a data em UTC garante que o toLocaleString converta para o fuso local (-3 BR).
+        return new Date(Date.UTC(y, m - 1, d, h, min, s)).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
       }
       return '';
     }
-    const date = new Date(value);
+    const dateStr = typeof value === 'string' && !value.endsWith('Z') && value.includes('T') ? `${value}Z` : value;
+    const date = new Date(dateStr);
     if (Number.isNaN(date.getTime())) return String(value);
     return date.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
   } catch {
