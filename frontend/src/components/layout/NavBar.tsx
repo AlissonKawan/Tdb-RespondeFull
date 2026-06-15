@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/useAuth';
+import { useConfirm } from '../../hooks/useConfirm';
 import Button from '../ui/Button';
 import Container from '../ui/Container';
 
@@ -8,6 +9,7 @@ function NavBar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout, isVoluntario, isBeneficiario, isAdmin } = useAuth();
+  const { confirm, ConfirmModal } = useConfirm();
   const [isOpen, setIsOpen] = useState(false);
 
   const linkClass = (path: string) =>
@@ -18,9 +20,17 @@ function NavBar() {
     }`;
 
   const handleLogout = () => {
-    logout();
-    setIsOpen(false);
-    navigate('/login');
+    confirm({
+      title: 'Sair da conta',
+      message: 'Tem certeza que deseja sair da sua conta?',
+      confirmText: 'Sair',
+      tone: 'danger',
+      onConfirm: () => {
+        logout();
+        setIsOpen(false);
+        navigate('/login');
+      }
+    });
   };
 
   const portalPath = isVoluntario
@@ -148,6 +158,7 @@ function NavBar() {
           </div>
         )}
       </Container>
+      <ConfirmModal />
     </nav>
   );
 }
