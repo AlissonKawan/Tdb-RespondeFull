@@ -1,16 +1,27 @@
 import { useState } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/useAuth';
+import { useConfirm } from '../../hooks/useConfirm';
 
 export default function SystemLayout() {
   const { user, logout, isVoluntario, isBeneficiario, isAdmin } = useAuth();
   const navigate = useNavigate();
+  const navigate = useNavigate();
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { confirm, ConfirmModal } = useConfirm();
 
   const handleLogout = () => {
-    logout();
-    navigate('/login');
+    confirm({
+      title: 'Sair da conta',
+      message: 'Você realmente quer sair da conta?',
+      confirmText: 'Sair',
+      tone: 'danger',
+      onConfirm: () => {
+        logout();
+        navigate('/login');
+      }
+    });
   };
 
   return (
@@ -138,6 +149,7 @@ export default function SystemLayout() {
           <Outlet />
         </div>
       </main>
+      <ConfirmModal />
     </div>
   );
 }
