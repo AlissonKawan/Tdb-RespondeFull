@@ -436,10 +436,13 @@ function DetalheAtendimento() {
       });
       seenIdsRef.current.add(novaMensagem.id);
       setMensagens((atuais) => {
-        if (atuais.some(m => m.id === novaMensagem.id)) {
-          return atuais.filter(m => m.id !== tempId);
+        // Remove a mensagem otimista incondicionalmente
+        const semOtimista = atuais.filter(m => m.id !== tempId);
+        // Se a mensagem real ainda não foi inserida pelo WebSocket, insere agora
+        if (!semOtimista.some(m => m.id === novaMensagem.id)) {
+          return [...semOtimista, novaMensagem];
         }
-        return atuais.map(m => m.id === tempId ? novaMensagem : m);
+        return semOtimista;
       });
     } catch (error) {
       setFeedback(error instanceof Error ? error.message : 'Não foi possível enviar a mensagem.');
