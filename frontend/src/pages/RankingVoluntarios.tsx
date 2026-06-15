@@ -13,9 +13,6 @@ const RankingVoluntarios: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    carregarRanking();
-  }, []);
 
   async function carregarRanking() {
     try {
@@ -30,7 +27,11 @@ const RankingVoluntarios: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }
+
+  useEffect(() => {
+    carregarRanking();
+  }, []);;
 
   const renderPodium = () => {
     if (ranking.length === 0) return null;
