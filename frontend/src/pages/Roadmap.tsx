@@ -39,8 +39,8 @@ const audiences = [
   {
     title: 'Criancas e adolescentes',
     description:
-      'Ajuda a organizar demandas odontologicas, responsaveis, escola, prioridade e historico do atendimento em um unico fluxo.',
-    details: ['Dor ou urgencia bucal', 'Acompanhamento com responsavel', 'Registro por codigo protegido'],
+      'Ajuda a organizar demandas odontológicas, responsáveis, escola, prioridade e histórico do atendimento em um único fluxo.',
+    details: ['Dor ou urgência bucal', 'Acompanhamento com responsável', 'Registro por código protegido'],
   },
   {
     title: 'Mulheres do Programa Apolonia',
@@ -54,7 +54,7 @@ const helpFlow = [
   ['Entrada', 'A demanda chega por um canal da ONG e deixa de ficar perdida em conversas separadas.'],
   ['Triagem', 'A equipe classifica tipo, prioridade, canal, contexto e necessidade de sigilo.'],
   ['Encaminhamento', 'O atendimento e direcionado a um voluntario disponivel e com especialidade adequada.'],
-  ['Acompanhamento', 'Mensagens, status e historico ficam registrados para continuidade do cuidado.'],
+  ['Acompanhamento', 'Mensagens, status e histórico ficam registrados para continuidade do cuidado.'],
 ];
 
 function Roadmap() {
@@ -89,7 +89,7 @@ function Roadmap() {
         <SectionHeader
           eyebrow="Por que ajuda"
           title="O problema deixa de ser invisivel"
-          description="Quando tudo fica em mensagens soltas, a equipe perde prioridade, contexto e continuidade. O TDB Responde organiza isso em uma operacao unica."
+          description="Quando tudo fica em mensagens soltas, a equipe perde prioridade, contexto e continuidade. O TDB Responde organiza isso em uma operação única."
         />
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {visualImpactMetrics.map((metric) => (
@@ -131,7 +131,7 @@ function Roadmap() {
         <SectionHeader
           eyebrow="Como funciona"
           title="Da primeira mensagem ate a resposta acompanhada"
-          description="O fluxo simplifica o trabalho da equipe sem esconder o que importa: prioridade, responsavel, historico e status."
+          description="O fluxo simplifica o trabalho da equipe sem esconder o que importa: prioridade, responsável, histórico e status."
         />
         <div className="grid gap-4 lg:grid-cols-4">
           {helpFlow.map(([title, description], index) => (
@@ -151,7 +151,7 @@ function Roadmap() {
         <Card className="flex flex-col gap-6 bg-gradient-to-br from-[#1E3A8A] to-[#2563EB] p-8 text-white md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-xs font-bold uppercase tracking-widest text-blue-100">Resultado esperado</p>
-            <h2 className="mt-2 text-3xl font-black">Uma operacao mais clara para quem cuida</h2>
+            <h2 className="mt-2 text-3xl font-black">Uma operação mais clara para quem cuida</h2>
             <p className="mt-3 max-w-2xl text-blue-100">
               A plataforma não substitui o acolhimento humano. Ela remove ruído operacional para que a equipe consiga responder melhor.
             </p>

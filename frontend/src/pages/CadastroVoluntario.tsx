@@ -72,8 +72,8 @@ function CadastroVoluntario() {
 
   const errorMessage = (error: unknown) => {
     if (error instanceof ApiError) {
-      if (error.status === 409) return 'Este e-mail ja esta cadastrado.';
-      if (error.status === 400) return error.message || 'Confira os dados da solicitacao.';
+      if (error.status === 409) return 'Este e-mail já está cadastrado.';
+      if (error.status === 400) return error.message || 'Confira os dados da solicitação.';
       if (error.status === 0) return 'Não foi possível conectar ao servidor.';
       return error.message;
     }
@@ -123,7 +123,7 @@ function CadastroVoluntario() {
       <PageHeader
         eyebrow="Voluntariado"
         title="Solicitar cadastro como voluntário"
-        description="Envie sua solicitacao para analise. O acesso ao portal so sera liberado apos aprovacao."
+        description="Envie sua solicitação para análise. O acesso ao portal só será liberado após aprovação."
       />
 
       <Section tone="white">
@@ -135,7 +135,7 @@ function CadastroVoluntario() {
         <div className="grid gap-6 md:grid-cols-3">
           {[
             ['1', 'Solicite cadastro', 'Preencha seus dados, especialidade e motivo para participar.'],
-            ['2', 'Aguarde aprovacao', 'Um responsavel avalia a solicitacao antes de liberar acesso.'],
+            ['2', 'Aguarde aprovação', 'Um responsável avalia a solicitação antes de liberar acesso.'],
             ['3', 'Acesse o portal', 'Depois de aprovado, entre com e-mail e senha para acompanhar atendimentos.'],
           ].map(([step, title, desc]) => (
             <Card key={step} className="p-6">
@@ -173,7 +173,7 @@ function CadastroVoluntario() {
                 type="email"
                 {...register('email', {
                   required: 'E-mail obrigatorio',
-                  pattern: { value: /^\S+@\S+$/i, message: 'E-mail invalido' },
+                  pattern: { value: /^\S+@\S+$/i, message: 'E-mail inválido' },
                 })}
                 placeholder="maria@email.com"
               />
@@ -252,11 +252,11 @@ function CadastroVoluntario() {
                   required: 'Conte seu motivo para ser voluntário',
                   minLength: { value: 20, message: 'Minimo 20 caracteres' },
                 })}
-                placeholder="Quero contribuir com atendimento odontologico para pessoas que precisam."
+                placeholder="Quero contribuir com atendimento odontológico para pessoas que precisam."
               />
             </Field>
             <Button type="submit" disabled={loading || loadingEspecialidades || Boolean(erroEspecialidades)} size="large" fullWidth>
-              {loading ? 'Enviando solicitacao...' : 'Enviar solicitacao de voluntariado'}
+              {loading ? 'Enviando solicitação...' : 'Enviar solicitação de voluntariado'}
             </Button>
           </form>
         </Card>

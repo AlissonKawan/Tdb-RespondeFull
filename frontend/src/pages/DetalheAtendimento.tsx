@@ -282,7 +282,7 @@ function DetalheAtendimento() {
 
   const carregarDados = async () => {
     if (!Number.isFinite(atendimentoId) || atendimentoId <= 0) {
-      setErro('Atendimento invalido.');
+      setErro('Atendimento inválido.');
       setLoading(false);
       return;
     }
@@ -308,7 +308,7 @@ function DetalheAtendimento() {
       let msgErro = 'Não foi possível carregar os detalhes deste atendimento. Tente novamente mais tarde.';
       if (error instanceof Error) {
         if (error.message.includes('Error injecting') || error.message.includes('Internal Server Error') || error.message.includes('500')) {
-          msgErro = 'Houve uma falha interna no servidor ao carregar este atendimento. A equipe tecnica ja foi notificada.';
+          msgErro = 'Houve uma falha interna no servidor ao carregar este atendimento. A equipe técnica já foi notificada.';
         } else {
           msgErro = error.message;
         }
@@ -580,7 +580,7 @@ function DetalheAtendimento() {
                 <form onSubmit={enviarMensagem} className="border-t border-[#E2E8F0] p-6">
                   {chatBloqueado && (
                     <div className="mb-4 rounded-xl border border-orange-100 bg-orange-50 px-4 py-3 text-sm font-semibold text-orange-800">
-                      Este atendimento esta {labelStatus(atendimento.status).toLowerCase()}. O envio de mensagens esta bloqueado.
+                      Este atendimento está {labelStatus(atendimento.status).toLowerCase()}. O envio de mensagens está bloqueado.
                     </div>
                   )}
                   <Field label="Nova mensagem">
@@ -810,7 +810,7 @@ function DetalheAtendimento() {
                 <Card className="p-6">
                   <h2 className="text-xl font-bold text-[#0F172A]">Acompanhamento</h2>
                   <p className="mt-2 text-sm leading-6 text-[#475569]">
-                    Voce pode acompanhar os detalhes e conversar pelo chat. Alteracoes de status e prioridade ficam com a equipe responsavel.
+                    Você pode acompanhar os detalhes e conversar pelo chat. Alterações de status e prioridade ficam com a equipe responsável.
                   </p>
                 </Card>
               )}

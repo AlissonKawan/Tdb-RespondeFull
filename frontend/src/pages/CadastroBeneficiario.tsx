@@ -28,7 +28,7 @@ function CadastroBeneficiario() {
 
   const errorMessage = (error: unknown) => {
     if (error instanceof ApiError) {
-      if (error.status === 409) return 'Este e-mail ja esta cadastrado.';
+      if (error.status === 409) return 'Este e-mail já está cadastrado.';
       if (error.status === 400) return error.message || 'Confira os dados do cadastro.';
       if (error.status === 0) return 'Não foi possível conectar ao servidor.';
       return error.message;
@@ -61,7 +61,7 @@ function CadastroBeneficiario() {
       <PageHeader
         eyebrow="Beneficiario"
         title="Criar conta de beneficiario"
-        description="Use esta conta para acompanhar seus atendimentos e conversar com o dentista responsavel."
+        description="Use esta conta para acompanhar seus atendimentos e conversar com o dentista responsável."
       />
 
       <Section tone="white">
@@ -85,7 +85,7 @@ function CadastroBeneficiario() {
                 type="email"
                 {...register('email', {
                   required: 'E-mail obrigatorio',
-                  pattern: { value: /^\S+@\S+$/i, message: 'E-mail invalido' },
+                  pattern: { value: /^\S+@\S+$/i, message: 'E-mail inválido' },
                 })}
                 placeholder="maria@email.com"
               />

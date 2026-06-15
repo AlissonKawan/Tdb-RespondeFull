@@ -142,7 +142,7 @@ function PortalBeneficiario() {
 
         <SectionHeader
           title="Acompanhamento"
-          description="Acompanhe o andamento dos seus atendimentos e fale com o responsavel quando necessario."
+          description="Acompanhe o andamento dos seus atendimentos e fale com o responsável quando necessário."
         />
 
         {loading && <LoadingState title="Carregando seus atendimentos..." />}

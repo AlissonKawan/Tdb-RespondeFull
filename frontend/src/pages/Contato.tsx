@@ -98,8 +98,8 @@ function Contato() {
                 <Input
                   type="email"
                   {...register('email', {
-                    required: 'Digite um e-mail valido',
-                    pattern: { value: /^\S+@\S+$/i, message: 'E-mail invalido' },
+                    required: 'Digite um e-mail válido',
+                    pattern: { value: /^\S+@\S+$/i, message: 'E-mail inválido' },
                   })}
                   placeholder="seu@email.com"
                 />

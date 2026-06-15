@@ -70,7 +70,7 @@ function ChatAtendimento({ atendimentoId, enviadoPor }: ChatAtendimentoProps) {
           seenIdsRef.current = novosIds;
           setMensagens(msgs);
         } catch (error) {
-          setErro(error instanceof Error ? error.message : 'Nao foi possivel carregar as mensagens.');
+          setErro(error instanceof Error ? error.message : 'Não foi possível carregar as mensagens.');
         } finally {
           if (mostrarLoading) {
             setLoading(false);
@@ -171,7 +171,7 @@ function ChatAtendimento({ atendimentoId, enviadoPor }: ChatAtendimentoProps) {
       setNovaMensagem('');
       // Nao precisa recarregar via HTTP — o WebSocket ja vai entregar a mensagem nova
     } catch (error) {
-      setErro(error instanceof Error ? error.message : 'Nao foi possivel enviar a mensagem.');
+      setErro(error instanceof Error ? error.message : 'Não foi possível enviar a mensagem.');
       // Em caso de erro, recarrega para garantir consistencia
       await carregarMensagens(false);
     } finally {

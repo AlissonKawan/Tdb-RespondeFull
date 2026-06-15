@@ -14,13 +14,13 @@ export class ApiError extends Error {
 }
 
 function friendlyMessage(status: number, path: string) {
-  if (status === 400) return 'Dados invalidos. Confira os campos e tente novamente.';
-  if (status === 401) return 'Credenciais invalidas ou sessao expirada.';
-  if (status === 403) return 'Acesso negado ou conta ainda nao liberada.';
-  if (status === 404) return 'Registro nao encontrado.';
+  if (status === 400) return 'Dados inválidos. Confira os campos e tente novamente.';
+  if (status === 401) return 'Credenciais inválidas ou sessão expirada.';
+  if (status === 403) return 'Acesso negado ou conta ainda não liberada.';
+  if (status === 404) return 'Registro não encontrado.';
   if (status === 409) return 'Registro em conflito. Verifique os dados enviados.';
   if (status >= 500) return 'Erro interno da API. Tente novamente em instantes.';
-  return `Nao foi possivel concluir a chamada ${path}.`;
+  return `Não foi possível concluir a chamada ${path}.`;
 }
 
 export async function extractErrorMessage(response: Response, fallback?: string) {
@@ -50,7 +50,7 @@ export async function request<T>(path: string, options: ApiRequestOptions = {}):
       body: body !== undefined ? JSON.stringify(body) : undefined,
     });
   } catch {
-    throw new ApiError('Nao foi possivel conectar com a API. Verifique se o back-end esta rodando.');
+    throw new ApiError('Não foi possível conectar com a API. Verifique se o back-end está rodando.');
   }
 
   const text = await response.text();
@@ -79,7 +79,7 @@ export async function request<T>(path: string, options: ApiRequestOptions = {}):
   try {
     return JSON.parse(text) as T;
   } catch {
-    throw new ApiError('A API retornou um JSON invalido.', response.status, text);
+    throw new ApiError('A API retornou um JSON inválido.', response.status, text);
   }
 }
 

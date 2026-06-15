@@ -3,8 +3,8 @@ import type { CanalComunicacaoApi } from '../types/AtendimentoApi';
 
 const CANAIS_FALLBACK: CanalComunicacaoApi[] = [
   { id: 1, nome: 'WhatsApp', descricao: 'Contato rapido por mensagem.' },
-  { id: 2, nome: 'Telefone', descricao: 'Ligacao da equipe responsavel.' },
-  { id: 3, nome: 'Email', descricao: 'Comunicacao por correio eletronico.' },
+  { id: 2, nome: 'Telefone', descricao: 'Ligação da equipe responsável.' },
+  { id: 3, nome: 'Email', descricao: 'Comunicação por correio eletrônico.' },
 ];
 
 function normalizarCanais(data: unknown): CanalComunicacaoApi[] {

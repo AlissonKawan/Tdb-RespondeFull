@@ -73,15 +73,15 @@ function AprovacaoVoluntarios() {
       />
 
       <Section tone="white">
-        <SectionHeader title="Aguardando analise" description="Confira especialidade, contato e justificativa antes de aprovar." />
+        <SectionHeader title="Aguardando análise" description="Confira especialidade, contato e justificativa antes de aprovar." />
 
         {feedback && (
           <div className="mb-5 rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm font-semibold text-[#2563EB]">
             {feedback}
           </div>
         )}
-        {loading && <LoadingState title="Carregando solicitacoes..." />}
-        {erro && <ErrorState title="Erro ao carregar solicitacoes" description={erro} />}
+        {loading && <LoadingState title="Carregando solicitações..." />}
+        {erro && <ErrorState title="Erro ao carregar solicitações" description={erro} />}
         {!loading && !erro && solicitacoes.length === 0 && (
           <EmptyState title="Nenhuma inscrição pendente no momento." description="Quando alguém solicitar cadastro como voluntário, o pedido aparecerá aqui." />
         )}
@@ -93,7 +93,7 @@ function AprovacaoVoluntarios() {
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
                     <h3 className="text-lg font-bold text-[#0F172A]">{solicitacao.nome}</h3>
-                    <Badge tone="warning">Aguardando analise</Badge>
+                    <Badge tone="warning">Aguardando análise</Badge>
                   </div>
                   <div className="mt-3 grid gap-2 text-sm text-[#475569] md:grid-cols-2">
                     {solicitacao.usuario && <p><strong className="text-[#0F172A]">Contato:</strong> {solicitacao.usuario}</p>}

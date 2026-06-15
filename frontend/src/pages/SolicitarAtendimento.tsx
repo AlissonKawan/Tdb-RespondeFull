@@ -89,14 +89,14 @@ function validar(form: FormState) {
   }
   if (!form.telefone.trim()) return 'Informe um telefone para contato.';
   if (!form.email.trim()) return 'Informe um email para contato.';
-  if (!form.canalComunicacaoId) return 'Erro ao carregar canal de comunicacao.';
+  if (!form.canalComunicacaoId) return 'Erro ao carregar canal de comunicação.';
   if (!form.descricao.trim() || form.descricao.trim().length < 15) {
     return 'Descreva a situacao com pelo menos 15 caracteres.';
   }
 
   if (form.tipoPessoaAtendida === 'CRIANCA_ADOLESCENTE') {
     if (!form.idade || Number(form.idade) < 0) return 'Informe a idade da crianca ou adolescente.';
-    if (!form.nomeResponsavel.trim()) return 'Informe o nome do responsavel.';
+    if (!form.nomeResponsavel.trim()) return 'Informe o nome do responsável.';
     if (!form.escola.trim()) return 'Informe a escola.';
   }
 
@@ -280,7 +280,7 @@ export default function SolicitarAtendimento() {
               <div className="rounded-xl border border-blue-100 bg-blue-50/60 p-5">
                 <div className="mb-4 flex flex-wrap items-center gap-2">
                   <Badge tone="info">Crianca ou adolescente</Badge>
-                  <p className="text-sm text-[#475569]">Campos especificos para cuidado odontologico e responsavel.</p>
+                  <p className="text-sm text-[#475569]">Campos específicos para cuidado odontológico e responsável.</p>
                 </div>
                 <div className="grid gap-5 md:grid-cols-2">
                   <Field label="Idade">
@@ -292,7 +292,7 @@ export default function SolicitarAtendimento() {
                       placeholder="Ex.: 12"
                     />
                   </Field>
-                  <Field label="Nome do responsavel">
+                  <Field label="Nome do responsável">
                     <Input
                       value={form.nomeResponsavel}
                       onChange={(event) => updateField('nomeResponsavel', event.target.value)}
@@ -354,7 +354,7 @@ export default function SolicitarAtendimento() {
                 rows={6}
                 value={form.descricao}
                 onChange={(event) => updateField('descricao', event.target.value)}
-                placeholder="Conte o que esta acontecendo, quando comecou e qual apoio precisa agora."
+                placeholder="Conte o que está acontecendo, quando começou e qual apoio precisa agora."
               />
             </Field>
 

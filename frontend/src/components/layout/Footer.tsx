@@ -33,7 +33,7 @@ function Footer() {
             </div>
           </div>
           <p className="mt-4 max-w-md text-sm leading-6 text-slate-300">
-            Plataforma criada para centralizar canais, organizar historicos e apoiar voluntarios com uma operacao mais clara.
+            Plataforma criada para centralizar canais, organizar históricos e apoiar voluntários com uma operação mais clara.
           </p>
           <p className="mt-3 text-sm font-semibold text-blue-200">
             Em colaboracao com a Turma do Bem.

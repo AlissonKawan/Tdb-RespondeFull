@@ -23,19 +23,19 @@ const challenges = [
 ];
 
 const solutions = [
-  ['Atendimento centralizado', 'Todos os canais aparecem em uma unica operacao visual.'],
+  ['Atendimento centralizado', 'Todos os canais aparecem em uma única operação visual.'],
   ['Protocolo de sigilo', 'Casos sensiveis podem ser tratados com mais cuidado e controle.'],
   ['Painel operacional', 'Status, prioridades e responsaveis ficam visiveis para a equipe.'],
   ['Triagem por prioridade', 'Demandas sao classificadas para orientar a proxima resposta.'],
   ['Historico unificado', 'Mensagens e mudancas de status ficam registradas no fluxo.'],
-  ['Captacao de voluntarios', 'Formulario publico registra candidatos para analise interna.'],
+  ['Captação de voluntários', 'Formulário público registra candidatos para análise interna.'],
 ];
 
 const flow = [
   ['1', 'Entrada do beneficiario', 'A demanda chega por canais como WhatsApp, e-mail, redes sociais ou atendimento presencial.'],
   ['2', 'Triagem inicial', 'A equipe registra dados, classifica prioridade e protege informacoes sensiveis.'],
   ['3', 'Atribuicao', 'O caso e direcionado ao voluntario adequado conforme disponibilidade e especialidade.'],
-  ['4', 'Acompanhamento', 'Mensagens, status e historico permanecem em um fluxo unico.'],
+  ['4', 'Acompanhamento', 'Mensagens, status e histórico permanecem em um fluxo único.'],
   ['5', 'Encerramento', 'O atendimento e finalizado com contexto preservado para consultas futuras.'],
 ];
 
@@ -45,7 +45,7 @@ function Sobre() {
       <PageHeader
         eyebrow="Sobre o projeto"
         title="Uma plataforma para organizar atendimento social"
-        description="O TDB Responde e um MVP desenvolvido para centralizar comunicacao, priorizar demandas e apoiar voluntarios da Turma do Bem com uma experiencia digital mais clara."
+        description="O TDB Responde é um MVP desenvolvido para centralizar comunicação, priorizar demandas e apoiar voluntários da Turma do Bem com uma experiência digital mais clara."
       />
 
       <Section tone="white" className="reveal">
@@ -53,10 +53,10 @@ function Sobre() {
           <SectionHeader title="O que e o TDB Responde?" />
           <div className="grid gap-6 text-lg leading-8 text-[#475569] lg:grid-cols-2">
             <p>
-              O sistema unifica atendimentos da ONG em uma plataforma digital, facilitando a comunicacao entre voluntarios e beneficiarios.
+              O sistema unifica atendimentos da ONG em uma plataforma digital, facilitando a comunicação entre voluntários e beneficiários.
             </p>
             <p>
-              A solucao atende criancas, adolescentes e mulheres em situacao de vulnerabilidade, preservando contexto, prioridade e sigilo quando necessario.
+              A solução atende crianças, adolescentes e mulheres em situação de vulnerabilidade, preservando contexto, prioridade e sigilo quando necessário.
             </p>
           </div>
         </Card>
@@ -85,7 +85,7 @@ function Sobre() {
         <SectionHeader
           eyebrow="Solucao"
           title="Como o TDB Responde resolve"
-          description="Funcionalidades pensadas para transformar mensagens dispersas em uma operacao acompanhavel."
+          description="Funcionalidades pensadas para transformar mensagens dispersas em uma operação acompanhável."
         />
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {solutions.map(([title, desc], index) => (

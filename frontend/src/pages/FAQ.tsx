@@ -16,7 +16,7 @@ function FAQ() {
   const faqs: FAQItem[] = [
     {
       question: 'O que e o TDB Responde?',
-      answer: 'E uma plataforma de atendimento centralizado para a Turma do Bem, reunindo canais, historico e prioridades em um unico fluxo.',
+      answer: 'É uma plataforma de atendimento centralizado para a Turma do Bem, reunindo canais, histórico e prioridades em um único fluxo.',
     },
     {
       question: 'Quem pode usar a plataforma?',
@@ -36,7 +36,7 @@ function FAQ() {
     },
     {
       question: 'Como me tornar voluntario?',
-      answer: 'Use a pagina Seja voluntario para registrar interesse. A equipe pode analisar a solicitacao no painel.',
+      answer: 'Use a página Seja voluntário para registrar interesse. A equipe pode analisar a solicitação no painel.',
     },
     {
       question: 'Quem desenvolveu o projeto?',
