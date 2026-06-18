@@ -1,7 +1,5 @@
 # Mapa do Projeto — TDB Responde
 
-Este documento existe para ajudar a controlar o projeto quando você for usar IA/Codex. A ideia não é decorar tudo, mas saber **onde cada tipo de mudança deve acontecer**.
-
 ---
 
 ## 1. Visão geral
