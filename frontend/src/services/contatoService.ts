@@ -12,7 +12,6 @@ export interface MensagemContatoResponse {
   email: string;
   mensagem: string;
   dataEnvio: string;
-  classificacaoIA: string;
   lida: boolean;
 }
 

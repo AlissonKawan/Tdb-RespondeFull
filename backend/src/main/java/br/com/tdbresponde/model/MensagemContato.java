@@ -8,7 +8,6 @@ public class MensagemContato {
     private String email;
     private String mensagem;
     private LocalDateTime dataEnvio;
-    private String classificacaoIA;
     private boolean lida;
 
     public MensagemContato() {
@@ -54,14 +53,6 @@ public class MensagemContato {
         this.dataEnvio = dataEnvio;
     }
 
-    public String getClassificacaoIA() {
-        return classificacaoIA;
-    }
-
-    public void setClassificacaoIA(String classificacaoIA) {
-        this.classificacaoIA = classificacaoIA;
-    }
-
     public boolean isLida() {
         return lida;
     }
@@ -78,7 +69,6 @@ public class MensagemContato {
                 ", email='" + email + '\'' +
                 ", mensagem='" + mensagem + '\'' +
                 ", dataEnvio=" + dataEnvio +
-                ", classificacaoIA='" + classificacaoIA + '\'' +
                 ", lida=" + lida +
                 '}';
     }

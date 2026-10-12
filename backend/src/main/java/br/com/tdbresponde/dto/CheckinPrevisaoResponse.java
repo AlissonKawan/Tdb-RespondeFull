@@ -1,7 +1,7 @@
 package br.com.tdbresponde.dto;
 
 /**
- * DTO que representa a resposta da API Python (/predict_checkin).
+ * DTO que representa a previsão de check-in obtida pelo cliente Java do Gemini.
  * Cada campo é mapeado diretamente do JSON retornado pela IA.
  */
 public class CheckinPrevisaoResponse {

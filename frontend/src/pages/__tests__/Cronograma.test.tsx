@@ -33,6 +33,48 @@ describe('Cronograma', () => {
     window.alert = originalAlert;
   });
 
+  it('deve criar tarefa mantendo o contrato do cronograma Java', async () => {
+    const user = userEvent.setup();
+    vi.mocked(useAuth).mockReturnValue({
+      user: { id: 1, nome: 'Voluntario', tipoUsuario: 'VOLUNTARIO', voluntarioId: 10 },
+      logout: vi.fn(),
+    } as any);
+    vi.mocked(cronogramaService.listarTarefas).mockResolvedValue({ tarefas: [] } as any);
+    const { container } = render(<Cronograma />);
+    await user.click(screen.getByRole('button', { name: '+ Nova Tarefa' }));
+    await user.type(screen.getByPlaceholderText('Ex: Reunião com equipe'), 'Reunião da equipe');
+    await user.type(container.querySelector('input[type="date"]')!, '2026-10-13');
+    await user.click(screen.getByRole('button', { name: 'Salvar Tarefa' }));
+    expect(cronogramaService.criarTarefa).not.toHaveBeenCalled();
+    await user.click(await screen.findByRole('button', { name: 'Criar' }));
+    await waitFor(() => {
+      expect(cronogramaService.criarTarefa).toHaveBeenCalledWith(expect.objectContaining({
+        id_voluntario: 10,
+        titulo: 'Reunião da equipe',
+        dia_semana: 'Terca-feira',
+        data_atividade: '2026-10-13',
+        prioridade: 'Media',
+        status: 'Pendente',
+      }));
+    });
+  });
+
+  it('deve excluir tarefa somente após a confirmação', async () => {
+    const user = userEvent.setup();
+    vi.mocked(useAuth).mockReturnValue({
+      user: { id: 1, nome: 'Voluntario', tipoUsuario: 'VOLUNTARIO', voluntarioId: 10 },
+      logout: vi.fn(),
+    } as any);
+    vi.mocked(cronogramaService.listarTarefas).mockResolvedValue({
+      tarefas: [{ id_tarefa: 42, titulo: 'Tarefa', dia_semana: 'Segunda-feira', prioridade: 'Alta', status: 'Pendente', tipo: 'Outros' }],
+    } as any);
+    render(<Cronograma />);
+    await user.click(await screen.findByTitle('Excluir tarefa'));
+    expect(cronogramaService.excluirTarefa).not.toHaveBeenCalled();
+    await user.click(await screen.findByRole('button', { name: 'Excluir' }));
+    await waitFor(() => expect(cronogramaService.excluirTarefa).toHaveBeenCalledWith(42));
+  });
+
   it('deve normalizar o status Concluído para Concluido ao confirmar uma tarefa (enviando sem acento para a API)', async () => {
     const user = userEvent.setup();
     vi.mocked(useAuth).mockReturnValue({
@@ -66,6 +108,7 @@ describe('Cronograma', () => {
     // Encontrar o botão de confirmar tarefa
     const btnConfirmar = await screen.findByTitle('Marcar como concluída');
     await user.click(btnConfirmar);
+    await user.click(await screen.findByRole('button', { name: 'Confirmar' }));
 
     await waitFor(() => {
       // Verificar se a API foi chamada com o status e propriedades normalizadas (sem acento)
@@ -110,7 +153,7 @@ describe('Cronograma', () => {
     expect(screen.queryByTitle('Marcar como concluída')).not.toBeInTheDocument();
   });
 
-  it('deve exibir um alerta com detalhes do erro se a API retornar erro de validação (ex: 400 Bad Request)', async () => {
+  it('deve avisar quando a confirmação da tarefa falhar', async () => {
     const user = userEvent.setup();
     vi.mocked(useAuth).mockReturnValue({
       user: { id: 1, nome: 'Voluntario', tipoUsuario: 'VOLUNTARIO', voluntarioId: 10 },
@@ -131,7 +174,6 @@ describe('Cronograma', () => {
     } as any);
 
     const apiError = new Error('Erro de validação');
-    (apiError as any).details = { mensagem: "O campo 'id_voluntario' é obrigatório." };
     vi.mocked(cronogramaService.atualizarTarefa).mockRejectedValue(apiError);
 
     render(<Cronograma />);
@@ -142,11 +184,12 @@ describe('Cronograma', () => {
 
     const btnConfirmar = await screen.findByTitle('Marcar como concluída');
     await user.click(btnConfirmar);
+    await user.click(await screen.findByRole('button', { name: 'Confirmar' }));
 
     await waitFor(() => {
-      // Verifica se a mensagem de erro da API foi mostrada no alerta para o usuário
+      // Verifica que a falha não é apresentada como confirmação bem-sucedida.
       expect(window.alert).toHaveBeenCalledWith(
-        expect.stringContaining("O campo 'id_voluntario' é obrigatório.")
+        'Erro ao confirmar tarefa'
       );
     });
   });

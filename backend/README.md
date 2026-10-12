@@ -97,6 +97,41 @@ https://tdb-respondefull.onrender.com
 | GET | `/mensagens/atendimento/{atendimentoId}` | Lista mensagens por atendimento. |
 | POST | `/mensagens` | Cadastra mensagem. |
 
+## Cronograma em Java
+
+As rotas existentes em `/api/cronograma/tarefas` oferecem criação, consulta por ID,
+listagem por voluntário (filtros `dia_semana`, `status`, `prioridade`),
+atualização, exclusão e resumo semanal. O acesso ao Oracle usa o DataSource
+do Java e a tabela `T_TAREFA_CRONOGRAMA`, preservando os dados existentes.
+
+Em ambiente novo, criar a tabela com `src/main/resources/sql/cronograma.sql`.
+Não executar esse script em uma tabela já existente. Datas de atividade e horários
+mantêm o contrato textual anterior. Nenhum script é executado automaticamente.
+
+A classificação de mensagens foi removida. A previsão de check-in pelo Gemini
+continua no cliente Java `IaClient`.
+
+### Validacao opcional no Oracle
+
+Na pasta `backend`, configure credenciais reais em `.env` (nao versionado) ou nas
+variaveis `DB_URL`, `DB_USERNAME` e `DB_PASSWORD`. Nunca coloque senhas no codigo.
+Para executar o teste de integracao no PowerShell:
+
+```powershell
+$env:TDB_ORACLE_VALIDATION = 'true'
+try {
+    .\mvnw.cmd test '-Dtest=CronogramaOracleIntegrationTest'
+} finally {
+    Remove-Item Env:TDB_ORACLE_VALIDATION -ErrorAction SilentlyContinue
+}
+```
+
+O teste exige a tabela existente e um voluntario cadastrado. Verifica o schema,
+CRUD, filtros e resumo semanal em uma transacao com rollback, sem iniciar o
+Quarkus nem executar scripts de criacao. O Oracle pode consumir um numero da
+sequencia/identity mesmo com rollback. Sem a variavel de ativacao, o teste e
+ignorado. ORA-01017 indica que as credenciais precisam ser corrigidas localmente.
+
 ## Variaveis de ambiente
 
 Para rodar o projeto, configure as variaveis de ambiente abaixo:

@@ -27,21 +27,10 @@ export default function MensagensContato() {
     carregarContatos();
   }, []);
 
-  const obterEstiloCategoriaIA = (categoria: string) => {
-    switch (categoria.toLowerCase()) {
-      case 'urgencia': return { badge: 'bg-red-100 text-red-700', dot: 'bg-red-500' };
-      case 'reclamacao': return { badge: 'bg-orange-100 text-orange-700', dot: 'bg-orange-500' };
-      case 'elogio': return { badge: 'bg-emerald-100 text-emerald-700', dot: 'bg-emerald-500' };
-      case 'sugestao': return { badge: 'bg-purple-100 text-purple-700', dot: 'bg-purple-500' };
-      case 'informativo': return { badge: 'bg-slate-100 text-slate-700', dot: 'bg-slate-500' };
-      default: return { badge: 'bg-blue-100 text-blue-700', dot: 'bg-blue-500' };
-    }
-  };
-
   return (
     <PageShell>
       <Section className="py-8 md:py-12">
-        <SectionHeader title="Mensagens de Contato" description="Mensagens recebidas pelo site classificadas com Inteligência Artificial." />
+        <SectionHeader title="Mensagens de Contato" description="Mensagens recebidas pelo site." />
         
         {loading && <LoadingState title="Carregando mensagens..." />}
         {erro && <ErrorState title="Erro ao carregar mensagens" description={erro} />}
@@ -56,10 +45,6 @@ export default function MensagensContato() {
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
                     <h3 className="text-lg font-bold text-[#0F172A]">{contato.nome}</h3>
-                    <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ${obterEstiloCategoriaIA(contato.classificacaoIA).badge}`}>
-                      <span className={`h-1.5 w-1.5 rounded-full ${obterEstiloCategoriaIA(contato.classificacaoIA).dot}`} />
-                      IA: {contato.classificacaoIA.toUpperCase()}
-                    </span>
                   </div>
                   <div className="mt-3 text-sm text-[#475569]">
                     <p><strong className="text-[#0F172A]">E-mail:</strong> {contato.email}</p>

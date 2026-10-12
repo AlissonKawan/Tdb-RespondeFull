@@ -2,7 +2,6 @@ package br.com.tdbresponde.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.time.LocalDateTime;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TarefaCronogramaDTO {
@@ -54,12 +53,6 @@ public class TarefaCronogramaDTO {
 
     @JsonProperty("id_voluntario")
     public Long getIdVoluntario() {
-        return idVoluntario;
-    }
-
-    // Fallback para a versão da API Python que possa estar esperando voluntario_id
-    @JsonProperty("voluntario_id")
-    public Long getVoluntarioIdAlternativo() {
         return idVoluntario;
     }
 

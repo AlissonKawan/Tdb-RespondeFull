@@ -2,53 +2,69 @@ package br.com.tdbresponde.resource;
 
 import br.com.tdbresponde.bo.CronogramaBO;
 import br.com.tdbresponde.dto.TarefaCronogramaDTO;
-import io.quarkus.test.InjectMock;
-import io.quarkus.test.junit.QuarkusTest;
-import io.restassured.http.ContentType;
+import br.com.tdbresponde.dto.TarefaCronogramaResponseDTO;
+import br.com.tdbresponde.dto.ResumoSemanalDTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import java.util.List;
+import java.util.Map;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.CoreMatchers.is;
+class CronogramaResourceTest {
+    private CronogramaResource resource;
+    private CronogramaBO bo;
+    private final ObjectMapper mapper = new ObjectMapper();
 
-@QuarkusTest
-public class CronogramaResourceTest {
-
-    @InjectMock
-    CronogramaBO cronogramaBO;
-
-    @Test
-    public void testBuscarTarefaEndpoint() {
-        TarefaCronogramaDTO mockTarefa = new TarefaCronogramaDTO();
-        mockTarefa.setIdTarefa(1L);
-        mockTarefa.setTitulo("Atividade Social");
-
-        Mockito.when(cronogramaBO.buscarTarefa(1L)).thenReturn(mockTarefa);
-
-        given()
-          .when().get("/api/cronograma/tarefas/1")
-          .then()
-             .statusCode(200)
-             .body("titulo", is("Atividade Social"));
+    @BeforeEach
+    void preparar() {
+        resource = new CronogramaResource();
+        bo = mock(CronogramaBO.class);
+        resource.cronogramaBO = bo;
     }
 
     @Test
-    public void testCriarTarefaEndpoint() {
-        TarefaCronogramaDTO mockTarefa = new TarefaCronogramaDTO();
-        mockTarefa.setTitulo("Nova Tarefa");
-        
-        java.util.Map<String, Object> responseMap = new java.util.HashMap<>();
-        responseMap.put("mensagem", "Tarefa criada com sucesso!");
-        responseMap.put("id_tarefa", 1);
+    void criarPreservaContratoJsonE201() throws Exception {
+        var tarefa = mapper.readValue("{\"id_voluntario\":10,\"tipo\":\"Consulta\",\"dia_semana\":\"Segunda-feira\",\"titulo\":\"Consulta\",\"prioridade\":\"Alta\"}", TarefaCronogramaDTO.class);
+        when(bo.criarTarefa(tarefa)).thenReturn(Map.of("mensagem", "Tarefa cadastrada com sucesso!", "id_tarefa", 42L));
+        var resposta = resource.criarTarefa(tarefa);
+        assertEquals(201, resposta.getStatus());
+        assertEquals(42L, ((Map<?, ?>) resposta.getEntity()).get("id_tarefa"));
+        assertEquals(10L, tarefa.getIdVoluntario());
+    }
 
-        Mockito.when(cronogramaBO.criarTarefa(Mockito.any(TarefaCronogramaDTO.class))).thenReturn(responseMap);
+    @Test
+    void listarPreservaSnakeCaseEFiltros() throws Exception {
+        var tarefa = new TarefaCronogramaDTO();
+        tarefa.setIdTarefa(42L);
+        tarefa.setIdVoluntario(10L);
+        var lista = new TarefaCronogramaResponseDTO();
+        lista.setVoluntario_id(10L);
+        lista.setTotal(1);
+        lista.setTarefas(List.of(tarefa));
+        when(bo.listarTarefasPorVoluntario(10L, "Segunda-feira", "Pendente", "Alta")).thenReturn(lista);
+        var resposta = resource.listarTarefasPorVoluntario(10L, "Segunda-feira", "Pendente", "Alta");
+        var json = mapper.valueToTree(resposta.getEntity());
+        assertEquals(200, resposta.getStatus());
+        assertEquals(10, json.get("voluntario_id").asInt());
+        assertEquals(42, json.get("tarefas").get(0).get("id_tarefa").asInt());
+        verify(bo).listarTarefasPorVoluntario(10L, "Segunda-feira", "Pendente", "Alta");
+    }
 
-        given()
-          .contentType(ContentType.JSON)
-          .body("{\"titulo\": \"Nova Tarefa\", \"dia_semana\": \"Segunda-feira\"}")
-          .when().post("/api/cronograma/tarefas")
-          .then()
-             .statusCode(201)
-             .body("mensagem", is("Tarefa criada com sucesso!"));
+    @Test
+    void buscarAtualizarExcluirEResumoDelegamAoJava() {
+        var tarefa = new TarefaCronogramaDTO();
+        when(bo.buscarTarefa(42L)).thenReturn(tarefa);
+        when(bo.atualizarTarefa(42L, tarefa)).thenReturn(Map.of("id_tarefa", 42L));
+        when(bo.excluirTarefa(42L)).thenReturn(Map.of("id_tarefa", 42L));
+        var resumo = new ResumoSemanalDTO();
+        resumo.setVoluntario_id(10L);
+        resumo.setResumo(Map.of("Segunda-feira", Map.of("Pendente", 1)));
+        when(bo.resumoSemanal(10L)).thenReturn(resumo);
+        assertSame(tarefa, resource.buscarTarefa(42L).getEntity());
+        assertEquals(200, resource.atualizarTarefa(42L, tarefa).getStatus());
+        assertEquals(200, resource.excluirTarefa(42L).getStatus());
+        assertSame(resumo, resource.resumoSemanal(10L).getEntity());
     }
 }

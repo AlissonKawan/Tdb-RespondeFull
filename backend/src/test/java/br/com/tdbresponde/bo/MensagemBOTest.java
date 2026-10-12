@@ -30,6 +30,7 @@ class MensagemBOTest {
         atendimentoBO = new FakeAtendimentoBO();
         bo.mensagemDAO = mensagemDAO;
         bo.atendimentoBO = atendimentoBO;
+        bo.objectMapper = new com.fasterxml.jackson.databind.ObjectMapper().findAndRegisterModules();
     }
 
     @Test

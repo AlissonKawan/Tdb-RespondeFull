@@ -27,6 +27,7 @@ vi.mock('../../services/atendimentoService', () => ({
     buscarPorId: vi.fn(),
     atualizarStatusPrioridade: vi.fn(),
     atualizarCheckin: vi.fn(),
+    preverCheckinIA: vi.fn().mockResolvedValue({}),
   },
 }));
 
@@ -60,11 +61,13 @@ class MockWebSocket {
 }
 
 const originalWebSocket = (window as any).WebSocket;
+const originalScrollIntoView = HTMLElement.prototype.scrollIntoView;
 
 describe('DetalheAtendimento - Deduplicação de Mensagens', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     activeWebSocketInstances = [];
+    HTMLElement.prototype.scrollIntoView = vi.fn();
     (window as any).WebSocket = MockWebSocket as any;
 
     // Default mock implementation for auth
@@ -76,6 +79,7 @@ describe('DetalheAtendimento - Deduplicação de Mensagens', () => {
 
   afterEach(() => {
     (window as any).WebSocket = originalWebSocket;
+    HTMLElement.prototype.scrollIntoView = originalScrollIntoView;
   });
 
   const mockAtendimento: AtendimentoApi = {
@@ -129,6 +133,7 @@ describe('DetalheAtendimento - Deduplicação de Mensagens', () => {
     // Cada uma das mensagens deve aparecer apenas uma vez
     expect(screen.getAllByText('Olá Maria, em que posso ajudar?')).toHaveLength(1);
     expect(screen.getAllByText('Tenho uma dor de dente muito forte')).toHaveLength(1);
+    expect(screen.queryByText('IA: Classificação')).not.toBeInTheDocument();
   });
 
   it('deve deduplicar mensagens novas idênticas recebidas via WebSocket', async () => {

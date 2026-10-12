@@ -23,7 +23,7 @@ O sistema funciona com uma arquitetura separada (Client-Server), onde o front-en
 
 1. **Front-end (SPA)**: Aplicação web construída em **React** e **Vite**, que fornece portais exclusivos para Beneficiários, Voluntários e Administradores. O gerenciamento de estado e chamadas à API são realizados com as ferramentas nativas (`fetch`) e TypeScript. Entre os grandes destaques da interface, temos: **Prontuário Médico Digital**, **Módulo de Expirados Inteligente** e **Painel Admin com Edição Avançada**.
 2. **Back-end (API REST)**: Construído com **Java 21** e **Quarkus**, garante alta performance. A conexão com o banco de dados **Oracle** é feita de forma manual via JDBC, mantendo controle direto sobre as consultas, com suporte completo ao histórico de evolução clínica dos atendimentos.
-3. **Inteligência Artificial (Opcional)**: Há integração com um modelo de IA para categorização e predição (acessível caso a rota `VITE_IA_API_URL` esteja configurada).
+3. **Cronograma**: CRUD de tarefas, filtros e resumo semanal implementados no backend Java, com JDBC e Oracle. A previsão de check-in utiliza um cliente Java para o Gemini.
 
 ---
 
@@ -53,7 +53,6 @@ Tdb-RespondeFull/
 │   └── pom.xml         # Dependências Maven
 │
 ├── database/        # Scripts SQL para criação de tabelas e inserção (Oracle)
-├── IA-API/          # Projeto da API Python/IA para predições
 └── docs/            # Documentações complementares e artefatos de entrega
 ```
 
@@ -131,7 +130,6 @@ Ao realizar a manutenção ou publicar o sistema, você deve garantir as seguint
 
 **Front-end (`frontend/.env`):**
 - `VITE_API_URL`: URL principal do Back-end. (Ex: `https://tdbresponde.azurewebsites.net`)
-- `VITE_IA_API_URL`: Rota para o modelo de IA (quando aplicável).
 
 ---
 

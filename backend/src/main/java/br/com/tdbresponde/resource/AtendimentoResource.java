@@ -11,7 +11,6 @@ import br.com.tdbresponde.dto.CheckinRequest;
 import br.com.tdbresponde.dto.EncerrarAtendimentoRequest;
 import br.com.tdbresponde.dto.MensagemRequest;
 import br.com.tdbresponde.dto.MensagemResponse;
-import br.com.tdbresponde.dto.PredictResponse; // Adicionado para a IA
 import br.com.tdbresponde.dto.RelatarSituacaoRequest;
 import br.com.tdbresponde.dto.SolicitarAtendimentoRequest;
 import jakarta.inject.Inject;
@@ -112,7 +111,6 @@ public class AtendimentoResource {
 
     /**
      * Endpoint de inserção de mensagem via atendimento.
-     * Modificado para chamar a IA do Python e classificar o conteúdo.
      */
     @POST
     @Path("/{id}/mensagens")
@@ -127,15 +125,6 @@ public class AtendimentoResource {
 
         // 2. Converte para o DTO de resposta
         MensagemResponse response = MensagemResponse.from(mensagem);
-
-        // 3. INTEGRAÇÃO: Chama a IA para classificar a mensagem recém-criada
-        PredictResponse predicao = mensagemBO.classificarMensagem(mensagem);
-
-        // 4. Se a IA respondeu, preenchemos os campos de classificação na resposta
-        if (predicao != null) {
-            response.categoriaIA = predicao.categoriaPrevista;
-            response.confiancaIA = predicao.confianca;
-        }
 
         return Response.status(Response.Status.CREATED)
                 .entity(response)

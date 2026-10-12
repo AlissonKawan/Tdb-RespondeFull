@@ -29,13 +29,6 @@ public class ContatoResource {
         return Response.ok(mensagens).build();
     }
 
-    @PUT
-    @Path("/reclassificar")
-    public Response reclassificarTodas() {
-        bo.reclassificarTodas();
-        return Response.ok("{\"mensagem\": \"Mensagens reclassificadas com sucesso!\"}").build();
-    }
-
     @DELETE
     @Path("/todas")
     public Response apagarTodas() {

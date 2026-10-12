@@ -54,13 +54,6 @@
             <artifactId>quarkus-arc</artifactId>
         </dependency>
 
-        <!-- Adicionado dentro da tag <dependencies> -->
-        <dependency>
-            <!-- Grupo da biblioteca: io.quarkus (Framework que você está usando) -->
-            <groupId>io.quarkus</groupId>
-            <!-- Artefato: rest-client-jackson (Ferramenta para chamadas REST com suporte a JSON) -->
-            <artifactId>quarkus-rest-client-jackson</artifactId>
-        </dependency>
         <!-- Testes -->
         <dependency>
             <groupId>io.quarkus</groupId>

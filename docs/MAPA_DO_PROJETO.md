@@ -11,8 +11,6 @@ Tdb-RespondeFull/
 ├── frontend/        # Interface web React + TypeScript + Vite + Tailwind
 ├── backend/         # API Java 21 + Quarkus + JDBC + Oracle
 ├── database/        # Scripts SQL principais do Oracle
-├── IA-API/          # API Python de classificação/predição
-├── cronograma-api/  # API auxiliar para cronograma
 └── docs/            # Documentações do projeto
 ```
 
@@ -133,7 +131,6 @@ frontend/src/config/api.ts
 Responsabilidade:
 
 - definir a URL base do backend;
-- definir a URL base da IA;
 - usar `VITE_API_URL` quando existir;
 - usar localhost em desenvolvimento.
 
@@ -141,7 +138,6 @@ Ponto de atenção:
 
 ```txt
 API_BASE_URL
-IA_API_BASE_URL
 ```
 
 Quando o front não consegue conversar com o backend, comece por aqui e depois confira `.env`, Vercel/Render/Azure e CORS no backend.
@@ -194,7 +190,6 @@ prontuarioService.ts      # prontuário
 agendaService.ts          # agenda/consultas
 cronogramaService.ts      # cronograma
 relatoAtendimentoService.ts # relato/solicitação de situação
-iaService.ts              # chamadas para IA
 contatoService.ts         # formulário/mensagens de contato
 ```
 
@@ -332,7 +327,7 @@ backend/Dockerfile
 Responsabilidade:
 
 - `pom.xml`: dependências Java/Quarkus, Oracle JDBC, REST, WebSocket, testes e build;
-- `application.properties`: porta, Oracle, CORS, IA, cronograma, validação CRO e Gemini;
+- `application.properties`: porta, Oracle, CORS, validação CRO e Gemini;
 - `Dockerfile`: empacotamento/deploy.
 
 Tecnologias centrais:
@@ -458,7 +453,6 @@ MensagemBO
 - impedir mensagem em atendimento encerrado/cancelado
 - salvar mensagem
 - disparar WebSocket
-- chamar IA para classificar mensagem
 ```
 
 ---
@@ -560,8 +554,6 @@ CheckinPrevisaoResponse
 EncerrarAtendimentoRequest
 MensagemRequest
 MensagemResponse
-PredictRequest
-PredictResponse
 RelatarSituacaoRequest
 RelatarSituacaoResponse
 AuthUserResponse
@@ -688,71 +680,25 @@ Perguntas para guiar debug:
 
 ## 6. IA e integrações externas
 
-### 6.1 IA de mensagem/check-in
+### 6.1 Previsão de check-in em Java
 
-Locais principais:
+O cliente Java `backend/src/main/java/br/com/tdbresponde/config/IaClient.java`
+consulta o Gemini. Configuração: `gemini.api.key` / `GEMINI_API_KEY`.
+A classificação automática de mensagens foi removida.
 
-```txt
-IA-API/
-backend/src/main/java/br/com/tdbresponde/service/ClassificadorService.java
-backend/src/main/java/br/com/tdbresponde/config/IaClient.java
-backend/src/main/java/br/com/tdbresponde/dto/PredictRequest.java
-backend/src/main/java/br/com/tdbresponde/dto/PredictResponse.java
-frontend/src/services/iaService.ts
-```
+### 6.2 Cronograma em Java
 
-Configuração:
+- Tela: `frontend/src/pages/Cronograma.tsx`.
+- Chamadas: `frontend/src/services/cronogramaService.ts`.
+- Rotas: `backend/src/main/java/br/com/tdbresponde/resource/CronogramaResource.java`.
+- Regras: `backend/src/main/java/br/com/tdbresponde/bo/CronogramaBO.java`.
+- Oracle/JDBC: `backend/src/main/java/br/com/tdbresponde/dao/CronogramaDAO.java`.
 
-```txt
-IA_API_URL
-VITE_IA_API_URL
-ia.api.url
-classificador-api/mp-rest/url
-```
-
-Fluxos:
-
-```txt
-Mensagem enviada
-   ↓
-MensagemBO.classificarMensagem
-   ↓
-ClassificadorService / IA Python
-   ↓
-PredictResponse com categoria/confianca
-```
-
-```txt
-Check-in atualizado
-   ↓
-AtendimentoBO.atualizarCheckinComPrevisao
-   ↓
-IaClient.preverCheckin
-   ↓
-CheckinPrevisaoResponse
-```
-
----
-
-### 6.2 Cronograma
-
-Locais principais:
-
-```txt
-cronograma-api/
-backend/src/main/java/br/com/tdbresponde/resource/CronogramaResource.java
-backend/src/main/java/br/com/tdbresponde/bo/CronogramaBO.java
-backend/src/main/java/br/com/tdbresponde/client/CronogramaRestClient.java
-frontend/src/pages/Cronograma.tsx
-frontend/src/services/cronogramaService.ts
-```
-
-Configuração:
-
-```txt
-CRONOGRAMA_API_URL
-cronograma-api/mp-rest/url
-```
+Fluxo: React → Resource → BO → DAO → Oracle, usando o DataSource do backend.
+As rotas em `/api/cronograma/tarefas` e os campos JSON em snake_case foram mantidos.
+Usa a tabela existente `T_TAREFA_CRONOGRAMA`. Para um ambiente sem essa tabela,
+há um script opcional em `backend/src/main/resources/sql/cronograma.sql`.
+O script não deve recriar a tabela que já contém tarefas.
 
 ---
 
@@ -1059,13 +1005,10 @@ Pontos sensíveis:
 
 ```txt
 VITE_API_URL
-VITE_IA_API_URL
 DB_URL
 DB_USERNAME
 DB_PASSWORD
 CORS_ORIGINS
-IA_API_URL
-CRONOGRAMA_API_URL
 ```
 
 ---

@@ -17,8 +17,8 @@ public class MensagemContatoDAO {
     DataSource dataSource;
 
     public void inserir(MensagemContato mensagem) {
-        String sql = "INSERT INTO T_MENSAGEM_CONTATO (NOME, EMAIL, MENSAGEM, CLASSIFICACAO_IA, LIDA) " +
-                "VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO T_MENSAGEM_CONTATO (NOME, EMAIL, MENSAGEM, LIDA) " +
+                "VALUES (?, ?, ?, ?)";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, new String[]{"ID_MENSAGEM_CONTATO"})) {
@@ -26,8 +26,7 @@ public class MensagemContatoDAO {
             stmt.setString(1, mensagem.getNome());
             stmt.setString(2, mensagem.getEmail());
             stmt.setString(3, mensagem.getMensagem());
-            stmt.setString(4, mensagem.getClassificacaoIA());
-            stmt.setInt(5, mensagem.isLida() ? 1 : 0);
+            stmt.setInt(4, mensagem.isLida() ? 1 : 0);
 
             stmt.executeUpdate();
 
@@ -44,7 +43,7 @@ public class MensagemContatoDAO {
     }
 
     public List<MensagemContato> listar() {
-        String sql = "SELECT ID_MENSAGEM_CONTATO, NOME, EMAIL, MENSAGEM, DATA_ENVIO, CLASSIFICACAO_IA, LIDA " +
+        String sql = "SELECT ID_MENSAGEM_CONTATO, NOME, EMAIL, MENSAGEM, DATA_ENVIO, LIDA " +
                 "FROM T_MENSAGEM_CONTATO ORDER BY DATA_ENVIO DESC";
 
         List<MensagemContato> mensagens = new ArrayList<>();
@@ -65,7 +64,6 @@ public class MensagemContatoDAO {
                     m.setDataEnvio(dataEnvio.toLocalDateTime());
                 }
                 
-                m.setClassificacaoIA(rs.getString("CLASSIFICACAO_IA"));
                 m.setLida(rs.getInt("LIDA") == 1);
                 
                 mensagens.add(m);
@@ -76,21 +74,6 @@ public class MensagemContatoDAO {
         }
 
         return mensagens;
-    }
-
-    public void atualizarClassificacao(int id, String classificacao) {
-        String sql = "UPDATE T_MENSAGEM_CONTATO SET CLASSIFICACAO_IA = ? WHERE ID_MENSAGEM_CONTATO = ?";
-
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, classificacao);
-            stmt.setInt(2, id);
-            stmt.executeUpdate();
-
-        } catch (SQLException e) {
-            throw new DatabaseException("Erro ao atualizar classificacao: " + e.getMessage(), e);
-        }
     }
 
     public void apagarTodos() {

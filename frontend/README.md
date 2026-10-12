@@ -112,7 +112,6 @@ O front-end consome a API Java/Quarkus publicada no Render usando `fetch` nativo
 | DELETE | `/voluntarios/{id}` | Exclui voluntario. |
 | GET | `/voluntarios/pendentes` | Lista voluntarios pendentes. |
 | PUT | `/voluntarios/{id}/aprovar` | Aprova voluntario. |
-| POST | `/predict` | Classifica mensagem na API de IA, quando configurada. |
 
 ## Variaveis de ambiente
 
@@ -120,10 +119,8 @@ Para rodar usando a API publicada, crie um arquivo `.env` na pasta `frontend/` c
 
 ```env
 VITE_API_URL=https://tdb-respondefull.onrender.com
-VITE_IA_API_URL=https://URL-DA-IA
 ```
 
-`VITE_IA_API_URL` so precisa ser configurada se a API de IA estiver publicada.
 
 ## Como executar localmente
 

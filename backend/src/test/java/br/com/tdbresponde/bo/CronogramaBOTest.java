@@ -1,117 +1,131 @@
 package br.com.tdbresponde.bo;
 
-import br.com.tdbresponde.client.CronogramaRestClient;
-import br.com.tdbresponde.dto.ResumoSemanalDTO;
+import br.com.tdbresponde.dao.CronogramaDAO;
 import br.com.tdbresponde.dto.TarefaCronogramaDTO;
-import br.com.tdbresponde.exception.NotFoundException;
-import io.quarkus.test.InjectMock;
-import io.quarkus.test.junit.QuarkusTest;
-import jakarta.inject.Inject;
-import jakarta.ws.rs.WebApplicationException;
-import jakarta.ws.rs.ProcessingException;
-import jakarta.ws.rs.core.Response;
 import br.com.tdbresponde.exception.BusinessException;
-import org.eclipse.microprofile.rest.client.inject.RestClient;
-import org.junit.jupiter.api.Assertions;
+import br.com.tdbresponde.exception.DatabaseException;
+import br.com.tdbresponde.exception.NotFoundException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-@QuarkusTest
-public class CronogramaBOTest {
+class CronogramaBOTest {
+    private CronogramaBO bo;
+    private CronogramaDAO dao;
 
-    @Inject
-    CronogramaBO cronogramaBO;
-
-    @InjectMock
-    @RestClient
-    CronogramaRestClient restClient;
-
-    @Test
-    public void testBuscarTarefaSucesso() {
-        TarefaCronogramaDTO mockTarefa = new TarefaCronogramaDTO();
-        mockTarefa.setIdTarefa(1L);
-        mockTarefa.setTitulo("Teste");
-
-        Mockito.when(restClient.buscarTarefa(1L)).thenReturn(mockTarefa);
-
-        TarefaCronogramaDTO result = cronogramaBO.buscarTarefa(1L);
-
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(1L, result.getIdTarefa());
-        Assertions.assertEquals("Teste", result.getTitulo());
+    @BeforeEach
+    void preparar() {
+        bo = new CronogramaBO();
+        dao = mock(CronogramaDAO.class);
+        bo.dao = dao;
     }
 
     @Test
-    public void testBuscarTarefaNaoEncontrada() {
-        Response notFoundResponse = Response.status(404).build();
-        Mockito.when(restClient.buscarTarefa(99L)).thenThrow(new WebApplicationException(notFoundResponse));
-
-        Assertions.assertThrows(NotFoundException.class, () -> {
-            cronogramaBO.buscarTarefa(99L);
-        });
+    void criarSempreIniciaPendente() {
+        TarefaCronogramaDTO tarefa = tarefa();
+        tarefa.setStatus("Concluido");
+        when(dao.inserir(tarefa)).thenReturn(42L);
+        assertEquals(42L, bo.criarTarefa(tarefa).get("id_tarefa"));
+        assertEquals("Pendente", tarefa.getStatus());
+        verify(dao).inserir(tarefa);
     }
 
     @Test
-    public void testResumoSemanalSucesso() {
-        ResumoSemanalDTO mockResumo = new ResumoSemanalDTO();
-        mockResumo.setVoluntario_id(1L);
-        Map<String, Map<String, Integer>> resumoMap = new HashMap<>();
-        Map<String, Integer> statusCount = new HashMap<>();
-        statusCount.put("Pendente", 2);
-        resumoMap.put("Segunda-feira", statusCount);
-        mockResumo.setResumo(resumoMap);
-
-        Mockito.when(restClient.resumoSemanal(1L)).thenReturn(mockResumo);
-
-        ResumoSemanalDTO result = cronogramaBO.resumoSemanal(1L);
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(1L, result.getVoluntario_id());
-        Assertions.assertTrue(result.getResumo().containsKey("Segunda-feira"));
+    void validarCamposAntesDePersistir() {
+        assertThrows(BusinessException.class, () -> bo.criarTarefa(null));
+        TarefaCronogramaDTO tarefa = tarefa();
+        tarefa.setTitulo(" ");
+        assertThrows(BusinessException.class, () -> bo.criarTarefa(tarefa));
+        tarefa.setTitulo("Consulta");
+        tarefa.setDiaSemana("Invalido");
+        assertThrows(BusinessException.class, () -> bo.criarTarefa(tarefa));
+        tarefa.setDiaSemana("Segunda-feira");
+        tarefa.setPrioridade("Invalida");
+        assertThrows(BusinessException.class, () -> bo.criarTarefa(tarefa));
+        verifyNoInteractions(dao);
     }
 
     @Test
-    public void testCriarTarefaErroValidacao() {
-        TarefaCronogramaDTO tarefaInvalida = new TarefaCronogramaDTO();
-        
-        Map<String, Object> errorBody = new HashMap<>();
-        errorBody.put("mensagem", "Campo 'titulo' é obrigatório.");
-        
-        Response badRequestResponse = Response.status(400).entity(errorBody).build();
-        Mockito.when(restClient.criarTarefa(Mockito.any(TarefaCronogramaDTO.class)))
-               .thenThrow(new WebApplicationException(badRequestResponse));
-
-        BusinessException exception = Assertions.assertThrows(BusinessException.class, () -> {
-            cronogramaBO.criarTarefa(tarefaInvalida);
-        });
-        
-        Assertions.assertTrue(exception.getMessage().contains("Campo 'titulo' é obrigatório."));
+    void listarPreservaFiltrosETotal() {
+        when(dao.listarPorVoluntario(10L, "Segunda-feira", "Pendente", "Alta")).thenReturn(List.of(tarefa()));
+        var resposta = bo.listarTarefasPorVoluntario(10L, "Segunda-feira", "Pendente", "Alta");
+        assertEquals(10L, resposta.getVoluntario_id());
+        assertEquals(1, resposta.getTotal());
+        assertEquals("Consulta", resposta.getTarefas().get(0).getTitulo());
     }
 
     @Test
-    public void testAtualizarTarefaErroServidor() {
-        TarefaCronogramaDTO mockTarefa = new TarefaCronogramaDTO();
-        Response serverErrorResponse = Response.status(500).build();
-        Mockito.when(restClient.atualizarTarefa(Mockito.eq(1L), Mockito.any(TarefaCronogramaDTO.class)))
-               .thenThrow(new WebApplicationException(serverErrorResponse));
-
-        BusinessException exception = Assertions.assertThrows(BusinessException.class, () -> {
-            cronogramaBO.atualizarTarefa(1L, mockTarefa);
-        });
-        
-        Assertions.assertTrue(exception.getMessage().contains("Erro 500 na API de Cronograma"));
+    void buscarInexistenteRetornaNaoEncontrado() {
+        assertThrows(NotFoundException.class, () -> bo.buscarTarefa(99L));
     }
 
     @Test
-    public void testExcluirTarefaErroConexao() {
-        Mockito.when(restClient.excluirTarefa(1L)).thenThrow(new ProcessingException("Connection refused"));
+    void atualizarNormalizaVariantesDeConclusao() {
+        for (String status : List.of("Concluido", "Concluida", "Concluído", "Concluída", "CONCLUIDO", "CONCLUIDA")) {
+            TarefaCronogramaDTO tarefa = tarefa();
+            tarefa.setStatus(status);
+            when(dao.atualizar(1L, tarefa)).thenReturn(true);
+            assertEquals(1L, bo.atualizarTarefa(1L, tarefa).get("id_tarefa"));
+            assertEquals("Concluida", tarefa.getStatus());
+        }
+    }
 
-        BusinessException exception = Assertions.assertThrows(BusinessException.class, () -> {
-            cronogramaBO.excluirTarefa(1L);
-        });
-        
-        Assertions.assertTrue(exception.getMessage().contains("Não foi possível conectar à API de Cronograma"));
+    @Test
+    void atualizarInexistenteRetornaNaoEncontrado() {
+        TarefaCronogramaDTO tarefa = tarefa();
+        assertThrows(NotFoundException.class, () -> bo.atualizarTarefa(99L, tarefa));
+    }
+
+    @Test
+    void statusInvalidoNaoExecutaUpdate() {
+        TarefaCronogramaDTO tarefa = tarefa();
+        tarefa.setStatus("Invalido");
+        assertThrows(BusinessException.class, () -> bo.atualizarTarefa(1L, tarefa));
+        verifyNoInteractions(dao);
+    }
+
+    @Test
+    void excluirRetornaIdOuNaoEncontrado() {
+        when(dao.excluir(1L)).thenReturn(true);
+        assertEquals(1L, bo.excluirTarefa(1L).get("id_tarefa"));
+        assertThrows(NotFoundException.class, () -> bo.excluirTarefa(99L));
+    }
+
+    @Test
+    void resumoPreservaAgrupamentoPorDiaEStatus() {
+        var resumo = Map.of("Segunda-feira", Map.of("Pendente", 2, "Concluida", 1));
+        when(dao.resumoSemanal(10L)).thenReturn(resumo);
+        var resposta = bo.resumoSemanal(10L);
+        assertEquals(10L, resposta.getVoluntario_id());
+        assertEquals(resumo, resposta.getResumo());
+    }
+
+    @Test
+    void erroDoBancoPermaneceErroDoBanco() {
+        when(dao.buscarPorId(1L)).thenThrow(new DatabaseException("Falha", new java.sql.SQLException()));
+        assertThrows(DatabaseException.class, () -> bo.buscarTarefa(1L));
+    }
+
+    @Test
+    void idsInvalidosNaoAcessamBanco() {
+        assertThrows(BusinessException.class, () -> bo.buscarTarefa(0L));
+        assertThrows(BusinessException.class, () -> bo.excluirTarefa(-1L));
+        assertThrows(BusinessException.class, () -> bo.resumoSemanal(null));
+        assertThrows(BusinessException.class, () -> bo.listarTarefasPorVoluntario(0L, null, null, null));
+        verifyNoInteractions(dao);
+    }
+
+    private TarefaCronogramaDTO tarefa() {
+        var tarefa = new TarefaCronogramaDTO();
+        tarefa.setIdVoluntario(10L);
+        tarefa.setTipo("Consulta");
+        tarefa.setDiaSemana("Segunda-feira");
+        tarefa.setTitulo("Consulta");
+        tarefa.setPrioridade("Alta");
+        tarefa.setStatus("Pendente");
+        return tarefa;
     }
 }

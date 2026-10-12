@@ -12,7 +12,7 @@ vi.mock('./apiClient', () => ({
 describe('contatoService', () => {
   it('deve enviar uma mensagem com sucesso', async () => {
     const mockRequest = { nome: 'João', email: 'joao@teste.com', mensagem: 'Olá' };
-    const mockResponse = { ...mockRequest, id: 1, dataEnvio: '2023-01-01', classificacaoIA: 'informativo', lida: false };
+    const mockResponse = { ...mockRequest, id: 1, dataEnvio: '2023-01-01', lida: false };
     
     vi.mocked(apiClient.post).mockResolvedValueOnce(mockResponse);
 
@@ -24,7 +24,7 @@ describe('contatoService', () => {
 
   it('deve listar mensagens com sucesso', async () => {
     const mockResponse = [
-      { id: 1, nome: 'João', email: 'joao@teste.com', mensagem: 'Olá', dataEnvio: '2023-01-01', classificacaoIA: 'informativo', lida: false }
+      { id: 1, nome: 'João', email: 'joao@teste.com', mensagem: 'Olá', dataEnvio: '2023-01-01', lida: false }
     ];
     
     vi.mocked(apiClient.get).mockResolvedValueOnce(mockResponse);
