@@ -27,10 +27,18 @@ describe('SolicitarAtendimento', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(useAuth).mockReturnValue({
-      user: { id: 10, nome: 'Maria Silva', email: 'maria@example.com', tipoUsuario: 'BENEFICIARIO' },
+      user: { id: 10, nome: 'Maria Silva', email: 'maria@example.com', tipoUsuario: 'BENEFICIARIO', ativo: true },
+      isVoluntario: false,
+      isBeneficiario: true,
+      isAdmin: false,
+      isAuthenticated: true,
+      isLoading: false,
+      authError: '',
       logout: vi.fn(),
-    } as any);
-    vi.mocked(listarCanais).mockResolvedValue(mockCanais as any);
+      login: vi.fn(),
+      register: vi.fn(),
+    });
+    vi.mocked(listarCanais).mockResolvedValue(mockCanais);
   });
 
   it('deve ocultar campos tecnicos (prioridade, gravidade bucal, canal de comunicacao) na renderizacao inicial', async () => {
@@ -65,19 +73,22 @@ describe('SolicitarAtendimento', () => {
       expect(listarCanais).toHaveBeenCalled();
     });
 
-    // Altera o tipo para Mulher Apolonia
-    const selectTipo = screen.getByLabelText(/Tipo da pessoa atendida/i);
-    fireEvent.change(selectTipo, { target: { value: 'MULHER_APOLONIA' } });
+    fireEvent.click(screen.getByRole('radio', { name: /Mulher em Vulnerabilidade/i }));
 
     // O campo geral de nome deve desaparecer
     expect(screen.queryByLabelText(/Nome da pessoa atendida/i)).not.toBeInTheDocument();
 
     // O campo codinome deve aparecer no bloco de sigilo sensível
-    expect(screen.getByLabelText(/Codinome/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^Codinome$/i)).toBeInTheDocument();
   });
 
   it('deve submeter o payload correto com o codinome mapeado para nomeCodificado para Mulher Apolonia', async () => {
-    vi.mocked(relatarAtendimento).mockResolvedValue({ id: 123 } as any);
+    vi.mocked(relatarAtendimento).mockResolvedValue({
+      atendimentoId: 123,
+      pessoaAtendidaId: 456,
+      status: 'ABERTO',
+      mensagem: 'Relato recebido',
+    });
 
     render(
       <BrowserRouter>
@@ -89,14 +100,12 @@ describe('SolicitarAtendimento', () => {
       expect(listarCanais).toHaveBeenCalled();
     });
 
-    // Altera o tipo para Mulher Apolonia
-    const selectTipo = screen.getByLabelText(/Tipo da pessoa atendida/i);
-    fireEvent.change(selectTipo, { target: { value: 'MULHER_APOLONIA' } });
+    fireEvent.click(screen.getByRole('radio', { name: /Mulher em Vulnerabilidade/i }));
 
     // Preenche telefone, email, codinome e descricao
     fireEvent.change(screen.getByLabelText(/Telefone/i), { target: { value: '(11) 98888-8888' } });
     fireEvent.change(screen.getByLabelText(/Email/i), { target: { value: 'test@example.com' } });
-    fireEvent.change(screen.getByLabelText(/Codinome/i), { target: { value: 'Aurora Segura' } });
+    fireEvent.change(screen.getByLabelText(/^Codinome$/i), { target: { value: 'Aurora Segura' } });
     fireEvent.change(screen.getByLabelText(/Descricao da situacao/i), { target: { value: 'Esta e uma descricao de teste valida com mais de 15 caracteres.' } });
 
     // Clica no botão de enviar
@@ -114,6 +123,7 @@ describe('SolicitarAtendimento', () => {
     // e o canalComunicacaoId deve ser 5 (Formulario Web detectado automaticamente)
     const payload = vi.mocked(relatarAtendimento).mock.calls[0][0];
     expect(payload.nomeCodificado).toBe('Aurora Segura');
+    expect(JSON.stringify(payload)).not.toContain('Maria Silva');
     expect(payload.canalComunicacaoId).toBe(5); // Detectado Formulario Web na busca automatica do mock
     expect(payload.prioridade).toBe(3); // Default inicial
   });
@@ -129,9 +139,7 @@ describe('SolicitarAtendimento', () => {
       expect(listarCanais).toHaveBeenCalled();
     });
 
-    // Altera o tipo para Mulher Apolonia
-    const selectTipo = screen.getByLabelText(/Tipo da pessoa atendida/i);
-    fireEvent.change(selectTipo, { target: { value: 'MULHER_APOLONIA' } });
+    fireEvent.click(screen.getByRole('radio', { name: /Mulher em Vulnerabilidade/i }));
 
     // Encontra o select de nível de risco
     const selectRisco = screen.getByLabelText(/Nivel de risco/i) as HTMLSelectElement;
@@ -145,5 +153,20 @@ describe('SolicitarAtendimento', () => {
       '4 - Alto',
       '5 - Critico'
     ]);
+  });
+
+  it('deve aplicar máscara de telefone enquanto a pessoa digita', async () => {
+    render(
+      <BrowserRouter>
+        <SolicitarAtendimento />
+      </BrowserRouter>
+    );
+
+    await waitFor(() => expect(listarCanais).toHaveBeenCalled());
+    const telefone = screen.getByLabelText(/Telefone/i) as HTMLInputElement;
+
+    fireEvent.change(telefone, { target: { value: '11988887777' } });
+
+    expect(telefone.value).toBe('(11) 98888-7777');
   });
 });

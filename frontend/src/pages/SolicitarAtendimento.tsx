@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Section from '../components/layout/Section';
 import PageShell from '../components/layout/PageShell';
@@ -51,6 +51,19 @@ const initialForm: FormState = {
 
 function toBoolean(value: string) {
   return value === 'true';
+}
+
+function formatPhone(value: string) {
+  const digits = value.replace(/\D/g, '').slice(0, 11);
+  if (!digits) return '';
+  if (digits.length <= 2) return `(${digits}`;
+
+  const areaCode = digits.slice(0, 2);
+  const subscriber = digits.slice(2);
+  if (subscriber.length <= 4) return `(${areaCode}) ${subscriber}`;
+
+  const prefixLength = subscriber.length <= 8 ? 4 : 5;
+  return `(${areaCode}) ${subscriber.slice(0, prefixLength)}-${subscriber.slice(prefixLength)}`;
 }
 
 function montarPayload(form: FormState, idContaBeneficiario?: number): RelatarAtendimentoRequest {
@@ -141,17 +154,24 @@ export default function SolicitarAtendimento() {
     void carregarCanais();
   }, []);
 
-  const tipoSelecionado = useMemo(() => {
-    const labels: Record<TipoPessoaRelato, string> = {
-      CRIANCA_ADOLESCENTE: 'Crianca ou adolescente',
-      MULHER_APOLONIA: 'Mulher Apolonia',
-      OUTRO: 'Outro atendimento',
-    };
-    return labels[form.tipoPessoaAtendida];
-  }, [form.tipoPessoaAtendida]);
+  const tipoSelecionado = form.tipoPessoaAtendida === 'MULHER_APOLONIA'
+    ? 'Programa Apolônia'
+    : 'Criança ou adolescente';
 
   const updateField = (field: keyof FormState, value: string) => {
     setForm((current) => ({ ...current, [field]: value }));
+    setErro('');
+    setSucesso('');
+  };
+
+  const selectCarePath = (tipo: Extract<TipoPessoaRelato, 'CRIANCA_ADOLESCENTE' | 'MULHER_APOLONIA'>) => {
+    setForm((current) => ({
+      ...current,
+      tipoPessoaAtendida: tipo,
+      nomeCodificado: tipo === 'MULHER_APOLONIA'
+        ? ''
+        : current.nomeCodificado || user?.nome || '',
+    }));
     setErro('');
     setSucesso('');
   };
@@ -180,7 +200,7 @@ export default function SolicitarAtendimento() {
           setSucesso('Relato enviado com sucesso. Aguarde um voluntário assumir o atendimento.');
           setForm((current) => ({
             ...initialForm,
-            nomeCodificado: current.nomeCodificado,
+            nomeCodificado: user?.nome ?? current.nomeCodificado,
             telefone: current.telefone,
             email: current.email,
             canalComunicacaoId: current.canalComunicacaoId,
@@ -221,6 +241,77 @@ export default function SolicitarAtendimento() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-8 p-6 sm:p-8">
+            <fieldset aria-describedby="care-path-description">
+              <legend className="text-base font-bold text-foreground">Quem precisa de atendimento?</legend>
+              <p id="care-path-description" className="mt-1 text-sm leading-6 text-muted-foreground">
+                Escolha o caminho mais adequado. As próximas perguntas serão adaptadas à sua situação.
+              </p>
+
+              <div className="mt-4 grid gap-4 md:grid-cols-2">
+                <label
+                  className={`group relative flex min-h-44 cursor-pointer flex-col rounded-ui-lg border-2 p-5 transition-[border-color,background-color,box-shadow] duration-fast focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 ${
+                    form.tipoPessoaAtendida === 'CRIANCA_ADOLESCENTE'
+                      ? 'border-primary bg-blue-50/70 shadow-sm'
+                      : 'border-border bg-surface hover:border-blue-200 hover:bg-blue-50/30'
+                  }`}
+                >
+                  <input
+                    className="sr-only"
+                    type="radio"
+                    name="tipoPessoaAtendida"
+                    value="CRIANCA_ADOLESCENTE"
+                    checked={form.tipoPessoaAtendida === 'CRIANCA_ADOLESCENTE'}
+                    onChange={() => selectCarePath('CRIANCA_ADOLESCENTE')}
+                  />
+                  <span className="flex h-11 w-11 items-center justify-center rounded-ui bg-blue-100 text-primary ring-1 ring-blue-200" aria-hidden="true">
+                    <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                      <circle cx="9" cy="8" r="3" />
+                      <circle cx="17" cy="10" r="2.5" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3.5 20c.4-4 2.2-6 5.5-6s5.1 2 5.5 6M14 15.5c3.7-.8 5.8.7 6.5 4.5" />
+                    </svg>
+                  </span>
+                  <span className="mt-4 text-base font-bold text-foreground">Criança ou Adolescente</span>
+                  <span className="mt-1 text-sm leading-6 text-muted-foreground">
+                    Atendimento odontológico com informações do responsável e contexto escolar.
+                  </span>
+                  <span className="mt-auto pt-3 text-xs font-bold uppercase tracking-wide text-primary">
+                    {form.tipoPessoaAtendida === 'CRIANCA_ADOLESCENTE' ? 'Selecionado' : 'Selecionar este atendimento'}
+                  </span>
+                </label>
+
+                <label
+                  className={`group relative flex min-h-44 cursor-pointer flex-col rounded-ui-lg border-2 p-5 transition-[border-color,background-color,box-shadow] duration-fast focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 ${
+                    form.tipoPessoaAtendida === 'MULHER_APOLONIA'
+                      ? 'border-rose-500 bg-rose-50/75 shadow-sm'
+                      : 'border-border bg-surface hover:border-rose-200 hover:bg-rose-50/30'
+                  }`}
+                >
+                  <input
+                    className="sr-only"
+                    type="radio"
+                    name="tipoPessoaAtendida"
+                    value="MULHER_APOLONIA"
+                    checked={form.tipoPessoaAtendida === 'MULHER_APOLONIA'}
+                    onChange={() => selectCarePath('MULHER_APOLONIA')}
+                  />
+                  <span className="flex h-11 w-11 items-center justify-center rounded-ui bg-rose-100 text-rose-700 ring-1 ring-rose-200" aria-hidden="true">
+                    <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m9 12 2 2 4-4" />
+                    </svg>
+                  </span>
+                  <span className="mt-4 text-base font-bold text-foreground">Mulher em Vulnerabilidade</span>
+                  <span className="text-sm font-semibold text-rose-700">Programa Apolônia</span>
+                  <span className="mt-1 text-sm leading-6 text-muted-foreground">
+                    Seu nome real não será solicitado. O atendimento usa codinome e informações protegidas por sigilo.
+                  </span>
+                  <span className="mt-auto pt-3 text-xs font-bold uppercase tracking-wide text-rose-700">
+                    {form.tipoPessoaAtendida === 'MULHER_APOLONIA' ? 'Selecionado com sigilo' : 'Selecionar atendimento sigiloso'}
+                  </span>
+                </label>
+              </div>
+            </fieldset>
+
             <div className="grid gap-5 md:grid-cols-2">
               {form.tipoPessoaAtendida !== 'MULHER_APOLONIA' && (
                 <Field label="Nome da pessoa atendida">
@@ -234,8 +325,12 @@ export default function SolicitarAtendimento() {
 
               <Field label="Telefone">
                 <Input
+                  type="tel"
+                  inputMode="tel"
+                  autoComplete="tel"
+                  maxLength={15}
                   value={form.telefone}
-                  onChange={(event) => updateField('telefone', event.target.value)}
+                  onChange={(event) => updateField('telefone', formatPhone(event.target.value))}
                   placeholder="(11) 99999-9999"
                 />
               </Field>
@@ -249,16 +344,6 @@ export default function SolicitarAtendimento() {
                 />
               </Field>
 
-              <Field label="Tipo da pessoa atendida">
-                <Select
-                  value={form.tipoPessoaAtendida}
-                  onChange={(event) => updateField('tipoPessoaAtendida', event.target.value as TipoPessoaRelato)}
-                >
-                  <option value="CRIANCA_ADOLESCENTE">Crianca ou adolescente</option>
-                  <option value="MULHER_APOLONIA">Mulher Apolonia</option>
-                  <option value="OUTRO">Outro</option>
-                </Select>
-              </Field>
             </div>
 
             {form.tipoPessoaAtendida === 'CRIANCA_ADOLESCENTE' && (
@@ -296,14 +381,16 @@ export default function SolicitarAtendimento() {
             )}
 
             {form.tipoPessoaAtendida === 'MULHER_APOLONIA' && (
-              <div className="rounded-xl border border-rose-100 bg-rose-50/60 p-5">
+              <div className="rounded-ui-lg border border-rose-200 bg-rose-50/70 p-5">
                 <div className="mb-4 flex flex-wrap items-center gap-2">
                   <Badge tone="danger">Sigilo sensivel</Badge>
-                  <p className="text-sm text-muted-foreground">Essas respostas ajudam a proteger a seguranca da solicitante.</p>
+                  <p className="text-sm text-rose-900">Não informe o nome real. Use apenas um codinome que seja seguro para você.</p>
                 </div>
                 <div className="grid gap-5 md:grid-cols-2">
-                  <Field label="Codinome">
+                  <Field label="Codinome" hint="Este será o único nome usado para identificar a solicitante neste relato.">
                     <Input
+                      required
+                      autoComplete="off"
                       value={form.codinome}
                       onChange={(event) => updateField('codinome', event.target.value)}
                       placeholder="Ex.: Aurora"
