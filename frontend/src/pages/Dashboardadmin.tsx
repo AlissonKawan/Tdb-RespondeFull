@@ -1,16 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useDeferredValue, useEffect, useRef, useState } from 'react';
 import { useAuth } from '../context/useAuth';
 import { useConfirm } from '../hooks/useConfirm';
 import { voluntariosService, type Voluntario } from '../services/voluntariosService';
 import { atendimentoService } from '../services/atendimentoService';
 import { usuarioService } from '../services/usuarioService';
 import { formatStatusLabel, formatDate } from '../utils/formatters';
-import type { VoluntarioApi } from '../types/api';
-import type { AtendimentoApi } from '../types/AtendimentoApi';
+import type { VoluntarioApi, VoluntarioRequestApi } from '../types/api';
+import type { AtendimentoApi, AtendimentoStatus } from '../types/AtendimentoApi';
 import type { AuthUser } from '../types/auth';
 import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
+import { Dialog } from '../components/ui/ConfirmDialog';
 import Container from '../components/ui/Container';
 import { EmptyState, ErrorState, LoadingState } from '../components/ui/FeedbackState';
 import { Field, Input, Select } from '../components/ui/Input';
@@ -19,6 +20,14 @@ import SectionTitle from '../components/ui/SectionTitle';
 import StatCard from '../components/ui/StatCard';
 
 type Aba = 'dashboard' | 'atendimentos' | 'voluntarios' | 'beneficiarios' | 'inscricoes';
+type Feedback = { message: string; tone: 'success' | 'danger' };
+
+const normalizeSearch = (value: string | null | undefined) =>
+  (value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
 
 export default function DashboardAdmin() {
   const { user } = useAuth();
@@ -35,13 +44,17 @@ export default function DashboardAdmin() {
   // States de UI
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState('');
-  const [feedback, setFeedback] = useState('');
+  const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [busca, setBusca] = useState('');
   const [filtroStatus, setFiltroStatus] = useState('todos');
+  const [buscaVoluntarios, setBuscaVoluntarios] = useState('');
+  const [buscaBeneficiarios, setBuscaBeneficiarios] = useState('');
   
   // States de Edicao Admin
   const [editingVoluntario, setEditingVoluntario] = useState<VoluntarioApi | null>(null);
   const [editingBeneficiario, setEditingBeneficiario] = useState<AuthUser | null>(null);
+  const primeiroInputVoluntarioRef = useRef<HTMLInputElement>(null);
+  const primeiroInputBeneficiarioRef = useRef<HTMLInputElement>(null);
 
   const carregarDados = async () => {
     setLoading(true);
@@ -63,7 +76,7 @@ export default function DashboardAdmin() {
       setVoluntarios(vols);
       setBeneficiarios(users.filter(u => u.tipoUsuario === 'BENEFICIARIO'));
       setInscricoes(pends);
-    } catch (e) {
+    } catch {
       setErro('Ocorreu um erro ao carregar os dados. Verifique a conexão com o servidor.');
     } finally {
       setLoading(false);
@@ -80,30 +93,45 @@ export default function DashboardAdmin() {
     return passaStatus && texto.includes(busca.toLowerCase());
   });
 
-  const mudarStatusAtendimento = async (id: number, novoStatus: string) => {
+  const buscaVoluntariosDiferida = useDeferredValue(buscaVoluntarios);
+  const buscaBeneficiariosDiferida = useDeferredValue(buscaBeneficiarios);
+  const termoVoluntarios = normalizeSearch(buscaVoluntariosDiferida);
+  const termoBeneficiarios = normalizeSearch(buscaBeneficiariosDiferida);
+  const voluntariosFiltrados = voluntarios.filter((voluntario) =>
+    normalizeSearch(`${voluntario.nome} ${voluntario.cro || ''}`).includes(termoVoluntarios),
+  );
+  const beneficiariosFiltrados = beneficiarios.filter((beneficiario) =>
+    normalizeSearch(`${beneficiario.nome} ${beneficiario.email || ''}`).includes(termoBeneficiarios),
+  );
+
+  const mudarStatusAtendimento = async (id: number, novoStatus: AtendimentoStatus) => {
     try {
       await atendimentoService.atualizarStatusPrioridade(id, { status: novoStatus });
-      setAtendimentos(atendimentos.map(a => a.id === id ? { ...a, status: novoStatus as any } : a));
+      setAtendimentos(atendimentos.map(a => a.id === id ? { ...a, status: novoStatus } : a));
     } catch {
-      alert('Não foi possível atualizar o status.');
+      setFeedback({ message: 'Não foi possível atualizar o status.', tone: 'danger' });
     }
   };
 
   const handleSaveVoluntario = async () => {
     if(!editingVoluntario) return;
     try {
-      await voluntariosService.atualizar(editingVoluntario.id, {
+      const atualizacao = {
         nome: editingVoluntario.nome,
         especialidadeId: editingVoluntario.especialidade?.id,
         cro: editingVoluntario.cro,
         ufCro: editingVoluntario.ufCro,
         disponivel: editingVoluntario.disponivel
-      } as any);
-      setFeedback('Voluntário atualizado com sucesso!');
+      };
+      await voluntariosService.atualizar(
+        editingVoluntario.id,
+        atualizacao as unknown as VoluntarioRequestApi,
+      );
+      setFeedback({ message: 'Voluntário atualizado com sucesso!', tone: 'success' });
       setEditingVoluntario(null);
       await carregarDados();
     } catch {
-      alert('Erro ao atualizar voluntário.');
+      setFeedback({ message: 'Erro ao atualizar voluntário. Tente novamente.', tone: 'danger' });
     }
   };
 
@@ -116,34 +144,34 @@ export default function DashboardAdmin() {
         ativo: editingBeneficiario.ativo,
         tipoUsuario: editingBeneficiario.tipoUsuario
       });
-      setFeedback('Beneficiário atualizado com sucesso!');
+      setFeedback({ message: 'Beneficiário atualizado com sucesso!', tone: 'success' });
       setEditingBeneficiario(null);
       await carregarDados();
     } catch {
-      alert('Erro ao atualizar beneficiário.');
+      setFeedback({ message: 'Erro ao atualizar beneficiário. Tente novamente.', tone: 'danger' });
     }
   };
 
   const aprovarInscricao = async (id: number) => {
-    setFeedback('');
+    setFeedback(null);
     try {
       if (!user) return;
       await voluntariosService.aprovar(id, { aprovadorId: user.id });
-      setFeedback('Voluntário aprovado com sucesso.');
+      setFeedback({ message: 'Voluntário aprovado com sucesso.', tone: 'success' });
       await carregarDados();
     } catch {
-      setFeedback('Erro ao aprovar.');
+      setFeedback({ message: 'Erro ao aprovar. Tente novamente.', tone: 'danger' });
     }
   };
 
   const rejeitarInscricao = async (id: number) => {
-    setFeedback('');
+    setFeedback(null);
     try {
       await voluntariosService.excluir(id);
-      setFeedback('Inscrição rejeitada (excluída).');
+      setFeedback({ message: 'Inscrição rejeitada (excluída).', tone: 'success' });
       await carregarDados();
     } catch {
-      setFeedback('Erro ao rejeitar.');
+      setFeedback({ message: 'Erro ao rejeitar. Tente novamente.', tone: 'danger' });
     }
   };
 
@@ -175,7 +203,19 @@ export default function DashboardAdmin() {
           ))}
         </div>
 
-        {feedback && <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800">{feedback}</div>}
+        {feedback ? (
+          <div
+            role={feedback.tone === 'danger' ? 'alert' : 'status'}
+            aria-live="polite"
+            className={`mb-4 rounded-ui border px-4 py-3 text-sm font-medium ${
+              feedback.tone === 'success'
+                ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
+                : 'border-red-200 bg-red-50 text-red-800'
+            }`}
+          >
+            {feedback.message}
+          </div>
+        ) : null}
         {erro && <ErrorState title={erro} />}
 
         {aba === 'dashboard' && (
@@ -213,7 +253,7 @@ export default function DashboardAdmin() {
                         <p className="mt-1 text-sm text-slate-600">Responsável: {item.nomeVoluntario || 'Não atribuído'}</p>
                       </div>
                       <Select value={item.status || 'ABERTO'} onChange={(e) => {
-                        const novoStatus = e.target.value;
+                        const novoStatus = e.target.value as AtendimentoStatus;
                         confirm({
                           title: 'Alterar Status',
                           message: `Deseja realmente alterar o status deste atendimento para ${novoStatus}?`,
@@ -235,11 +275,28 @@ export default function DashboardAdmin() {
         {aba === 'voluntarios' && (
           <div className="space-y-4">
             <SectionTitle title="Voluntários Aprovados" description="Equipe cadastrada no sistema." />
-            {voluntarios.length === 0 ? <EmptyState /> : (
+            <Field label="Buscar voluntário">
+              <Input
+                type="search"
+                value={buscaVoluntarios}
+                onChange={(event) => setBuscaVoluntarios(event.target.value)}
+                placeholder="Digite o nome ou CRO"
+                autoComplete="off"
+              />
+            </Field>
+            <p className="text-sm text-muted-foreground" aria-live="polite">
+              {voluntariosFiltrados.length} {voluntariosFiltrados.length === 1 ? 'voluntário encontrado' : 'voluntários encontrados'}
+            </p>
+            {voluntariosFiltrados.length === 0 ? (
+              <EmptyState
+                title={voluntarios.length === 0 ? 'Nenhum voluntário cadastrado' : 'Nenhum voluntário encontrado'}
+                description={voluntarios.length === 0 ? undefined : 'Tente buscar por outro nome ou CRO.'}
+              />
+            ) : (
               <Card className="overflow-hidden border-0 shadow-sm md:border md:shadow-none">
                 <div className="overflow-x-auto w-full -mx-4 md:mx-0 px-4 md:px-0">
                   <table className="w-full text-sm min-w-[600px]">
-                    <thead className="bg-slate-50 text-xs uppercase text-slate-500">
+                    <thead className="bg-muted/70 text-xs uppercase tracking-wide text-muted-foreground">
                       <tr>
                         <th className="px-4 py-3 text-left">Nome</th>
                         <th className="px-4 py-3 text-left">Usuário</th>
@@ -250,8 +307,8 @@ export default function DashboardAdmin() {
                       </tr>
                     </thead>
                     <tbody>
-                      {voluntarios.map((vol) => (
-                        <tr key={vol.id} className="border-t border-slate-100">
+                      {voluntariosFiltrados.map((vol) => (
+                        <tr key={vol.id} className="border-t border-border transition-colors duration-fast hover:bg-muted/40">
                           <td className="px-4 py-3 font-semibold text-slate-800">{vol.nome}</td>
                           <td className="px-4 py-3 text-slate-500">{vol.usuario || 'N/A'}</td>
                           <td className="px-4 py-3"><Badge>{vol.especialidade?.nome || 'N/A'}</Badge></td>
@@ -275,11 +332,28 @@ export default function DashboardAdmin() {
         {aba === 'beneficiarios' && (
           <div className="space-y-4">
             <SectionTitle title="Beneficiários Cadastrados" description="Pessoas assistidas que criaram conta na plataforma." />
-            {beneficiarios.length === 0 ? <EmptyState /> : (
+            <Field label="Buscar beneficiário">
+              <Input
+                type="search"
+                value={buscaBeneficiarios}
+                onChange={(event) => setBuscaBeneficiarios(event.target.value)}
+                placeholder="Digite o nome ou e-mail"
+                autoComplete="off"
+              />
+            </Field>
+            <p className="text-sm text-muted-foreground" aria-live="polite">
+              {beneficiariosFiltrados.length} {beneficiariosFiltrados.length === 1 ? 'beneficiário encontrado' : 'beneficiários encontrados'}
+            </p>
+            {beneficiariosFiltrados.length === 0 ? (
+              <EmptyState
+                title={beneficiarios.length === 0 ? 'Nenhum beneficiário cadastrado' : 'Nenhum beneficiário encontrado'}
+                description={beneficiarios.length === 0 ? undefined : 'Tente buscar por outro nome ou e-mail.'}
+              />
+            ) : (
               <Card className="overflow-hidden border-0 shadow-sm md:border md:shadow-none">
                 <div className="overflow-x-auto w-full -mx-4 md:mx-0 px-4 md:px-0">
                   <table className="w-full text-sm min-w-[600px]">
-                    <thead className="bg-slate-50 text-xs uppercase text-slate-500">
+                    <thead className="bg-muted/70 text-xs uppercase tracking-wide text-muted-foreground">
                       <tr>
                         <th className="px-4 py-3 text-left">ID</th>
                         <th className="px-4 py-3 text-left">Nome</th>
@@ -290,8 +364,8 @@ export default function DashboardAdmin() {
                       </tr>
                     </thead>
                     <tbody>
-                      {beneficiarios.map((ben) => (
-                        <tr key={ben.id} className="border-t border-slate-100">
+                      {beneficiariosFiltrados.map((ben) => (
+                        <tr key={ben.id} className="border-t border-border transition-colors duration-fast hover:bg-muted/40">
                           <td className="px-4 py-3 font-semibold text-slate-800">#{ben.id}</td>
                           <td className="px-4 py-3 text-slate-800">{ben.nome}</td>
                           <td className="px-4 py-3 text-slate-500">{ben.email}</td>
@@ -361,68 +435,76 @@ export default function DashboardAdmin() {
 
       {/* Modais de Edicao */}
       {editingVoluntario && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
-          <Card className="w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
-            <h2 className="text-xl font-bold mb-4 text-slate-800">Editar Voluntário</h2>
-            <div className="grid gap-4">
-              <Field label="Nome">
-                <Input value={editingVoluntario.nome} onChange={e => setEditingVoluntario({...editingVoluntario, nome: e.target.value})} />
-              </Field>
-              <Field label="CRO">
-                <Input value={editingVoluntario.cro || ''} onChange={e => setEditingVoluntario({...editingVoluntario, cro: e.target.value})} />
-              </Field>
-              <Field label="UF CRO">
-                <Input value={editingVoluntario.ufCro || ''} onChange={e => setEditingVoluntario({...editingVoluntario, ufCro: e.target.value})} />
-              </Field>
-              <Field label="Disponível">
-                <Select value={editingVoluntario.disponivel ? 'true' : 'false'} onChange={e => setEditingVoluntario({...editingVoluntario, disponivel: e.target.value === 'true'})}>
-                  <option value="true">Sim</option>
-                  <option value="false">Não</option>
-                </Select>
-              </Field>
-            </div>
-            <div className="mt-6 flex justify-end gap-2">
-              <Button variant="ghost" onClick={() => setEditingVoluntario(null)}>Cancelar</Button>
+        <Dialog
+          title="Editar Voluntário"
+          description="Atualize os dados profissionais e a disponibilidade."
+          onClose={() => setEditingVoluntario(null)}
+          initialFocusRef={primeiroInputVoluntarioRef}
+          footer={(
+            <>
+              <Button variant="secondary" onClick={() => setEditingVoluntario(null)}>Cancelar</Button>
               <Button onClick={() => confirm({
                 title: 'Confirmar Alterações',
                 message: 'Você tem certeza de que deseja forçar estas alterações neste voluntário?',
                 onConfirm: handleSaveVoluntario,
                 confirmText: 'Salvar'
               })}>Salvar Alterações</Button>
-            </div>
-          </Card>
-        </div>
+            </>
+          )}
+        >
+          <div className="grid gap-4">
+            <Field label="Nome">
+              <Input ref={primeiroInputVoluntarioRef} value={editingVoluntario.nome} onChange={e => setEditingVoluntario({...editingVoluntario, nome: e.target.value})} />
+            </Field>
+            <Field label="CRO">
+              <Input value={editingVoluntario.cro || ''} onChange={e => setEditingVoluntario({...editingVoluntario, cro: e.target.value})} />
+            </Field>
+            <Field label="UF CRO">
+              <Input value={editingVoluntario.ufCro || ''} onChange={e => setEditingVoluntario({...editingVoluntario, ufCro: e.target.value})} />
+            </Field>
+            <Field label="Disponível">
+              <Select value={editingVoluntario.disponivel ? 'true' : 'false'} onChange={e => setEditingVoluntario({...editingVoluntario, disponivel: e.target.value === 'true'})}>
+                <option value="true">Sim</option>
+                <option value="false">Não</option>
+              </Select>
+            </Field>
+          </div>
+        </Dialog>
       )}
 
       {editingBeneficiario && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
-          <Card className="w-full max-w-md p-6">
-            <h2 className="text-xl font-bold mb-4 text-slate-800">Editar Beneficiário</h2>
-            <div className="grid gap-4">
-              <Field label="Nome">
-                <Input value={editingBeneficiario.nome} onChange={e => setEditingBeneficiario({...editingBeneficiario, nome: e.target.value})} />
-              </Field>
-              <Field label="E-mail">
-                <Input value={editingBeneficiario.email} onChange={e => setEditingBeneficiario({...editingBeneficiario, email: e.target.value})} />
-              </Field>
-              <Field label="Status (Ativo)">
-                <Select value={editingBeneficiario.ativo ? 'true' : 'false'} onChange={e => setEditingBeneficiario({...editingBeneficiario, ativo: e.target.value === 'true'})}>
-                  <option value="true">Sim (Ativo)</option>
-                  <option value="false">Não (Inativo)</option>
-                </Select>
-              </Field>
-            </div>
-            <div className="mt-6 flex justify-end gap-2">
-              <Button variant="ghost" onClick={() => setEditingBeneficiario(null)}>Cancelar</Button>
+        <Dialog
+          title="Editar Beneficiário"
+          description="Atualize os dados da conta e o status de acesso."
+          onClose={() => setEditingBeneficiario(null)}
+          initialFocusRef={primeiroInputBeneficiarioRef}
+          footer={(
+            <>
+              <Button variant="secondary" onClick={() => setEditingBeneficiario(null)}>Cancelar</Button>
               <Button onClick={() => confirm({
                 title: 'Confirmar Alterações',
                 message: 'Você tem certeza de que deseja forçar estas alterações neste beneficiário?',
                 onConfirm: handleSaveBeneficiario,
                 confirmText: 'Salvar'
               })}>Salvar Alterações</Button>
-            </div>
-          </Card>
-        </div>
+            </>
+          )}
+        >
+          <div className="grid gap-4">
+            <Field label="Nome">
+              <Input ref={primeiroInputBeneficiarioRef} value={editingBeneficiario.nome} onChange={e => setEditingBeneficiario({...editingBeneficiario, nome: e.target.value})} />
+            </Field>
+            <Field label="E-mail">
+              <Input type="email" value={editingBeneficiario.email} onChange={e => setEditingBeneficiario({...editingBeneficiario, email: e.target.value})} />
+            </Field>
+            <Field label="Status (Ativo)">
+              <Select value={editingBeneficiario.ativo ? 'true' : 'false'} onChange={e => setEditingBeneficiario({...editingBeneficiario, ativo: e.target.value === 'true'})}>
+                <option value="true">Sim (Ativo)</option>
+                <option value="false">Não (Inativo)</option>
+              </Select>
+            </Field>
+          </div>
+        </Dialog>
       )}
 
       {confirmDialog}
