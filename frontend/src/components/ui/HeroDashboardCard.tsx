@@ -1,112 +1,90 @@
+const networkMetrics = [
+  { value: '+18 mil', label: 'Dentistas Voluntários' },
+  { value: '+90 mil', label: 'Jovens Atendidos' },
+  { value: '12 Países', label: 'América Latina e Portugal' },
+];
+
 function HeroDashboardCard() {
   return (
-    <div className="relative min-w-0" aria-label="Exemplo de triagem com dados protegidos">
+    <section className="relative min-w-0" aria-labelledby="programas-acolhimento-title">
       <div className="absolute -inset-3 -z-10 rounded-[2.25rem] bg-gradient-to-br from-blue-300/35 via-white/10 to-sky-300/30 blur-2xl" />
 
       <div className="overflow-hidden rounded-[1.75rem] border border-white/90 bg-white/95 shadow-[0_28px_80px_-32px_rgba(15,23,42,0.45)] ring-1 ring-blue-950/5 backdrop-blur sm:rounded-[2rem]">
-        <div className="flex items-center justify-between gap-3 border-b border-slate-200 bg-slate-50/90 px-4 py-3 sm:px-5">
-          <div className="flex items-center gap-2" aria-hidden="true">
-            <span className="h-2.5 w-2.5 rounded-full bg-rose-400" />
-            <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
-            <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
-          </div>
-          <div className="flex min-w-0 items-center gap-1.5 text-xs font-semibold text-slate-600">
-            <svg className="h-3.5 w-3.5 shrink-0 text-emerald-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-              <rect x="5" y="10" width="14" height="10" rx="2" />
-              <path d="M8 10V7a4 4 0 0 1 8 0v3" strokeLinecap="round" />
-            </svg>
-            <span className="truncate">Ambiente protegido</span>
-          </div>
-        </div>
-
-        <div className="p-4 sm:p-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div className="flex min-w-0 items-center gap-3">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-100 text-blue-700 ring-1 ring-blue-200">
-                <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-                  <path d="M12 13a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM5 21a7 7 0 0 1 14 0" strokeLinecap="round" />
-                </svg>
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs font-semibold text-slate-500">Paciente identificado por codinome</p>
-                <h2 className="mt-0.5 truncate text-lg font-bold text-slate-950">Sorriso Aurora</h2>
-              </div>
-            </div>
-
-            <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-bold text-rose-700">
-              <span className="h-1.5 w-1.5 rounded-full bg-rose-500" aria-hidden="true" />
-              Caso Urgente
-            </span>
-          </div>
-
-          <div className="mt-5 grid gap-3 sm:grid-cols-2">
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-              <p className="text-xs font-semibold text-slate-500">Necessidade sinalizada</p>
-              <p className="mt-1 text-sm font-semibold leading-6 text-slate-900">Dor intensa e dificuldade para se alimentar</p>
-            </div>
-            <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
-              <p className="text-xs font-semibold text-amber-800">Status da triagem</p>
-              <p className="mt-1 flex items-center gap-2 text-sm font-bold leading-6 text-amber-950">
-                <span className="h-2 w-2 shrink-0 rounded-full bg-amber-500" aria-hidden="true" />
-                Aguardando Dentista
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-4 flex items-start gap-2.5 rounded-xl border border-blue-100 bg-blue-50/80 px-3.5 py-3 text-xs leading-5 text-blue-900">
-            <svg className="mt-0.5 h-4 w-4 shrink-0 text-blue-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+        <header className="border-b border-blue-100 bg-gradient-to-br from-blue-50 via-white to-sky-50 px-5 py-5 sm:px-6 sm:py-6">
+          <span className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-white px-3 py-1.5 text-xs font-bold text-blue-800 shadow-sm">
+            <svg className="h-3.5 w-3.5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
               <path d="M12 3 5 6v5c0 4.6 2.8 8.2 7 10 4.2-1.8 7-5.4 7-10V6l-7-3Z" strokeLinecap="round" strokeLinejoin="round" />
               <path d="m9.5 12 1.7 1.7 3.6-3.7" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-            <span><strong>Sigilo em primeiro lugar:</strong> dados pessoais ficam restritos à equipe responsável pelo acolhimento.</span>
-          </div>
-        </div>
+            OSCIP <span className="text-blue-300" aria-hidden="true">•</span> Fundação em 2002
+          </span>
 
-        <div className="border-t border-blue-100 bg-gradient-to-br from-blue-50 via-white to-sky-50 px-4 py-5 sm:px-6 sm:py-6">
-          <div className="flex flex-col gap-5">
-            <div className="flex flex-col gap-4">
-              <div className="flex min-w-0 items-center gap-3">
-                <div className="flex shrink-0 -space-x-3" aria-label="Profissionais voluntários da rede">
-                  {[
-                    ['https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=120&q=80', 'Dentista voluntária'],
-                    ['https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&w=120&q=80', 'Dentista voluntário'],
-                    ['https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&w=120&q=80', 'Profissional voluntária'],
-                  ].map(([src, alt]) => (
-                    <img
-                      key={src}
-                      src={src}
-                      alt={alt}
-                      className="h-10 w-10 rounded-full border-[3px] border-white object-cover shadow-sm sm:h-11 sm:w-11"
-                      loading="lazy"
-                    />
-                  ))}
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full border-[3px] border-white bg-primary text-xs font-black text-white shadow-sm sm:h-11 sm:w-11">
-                    500+
-                  </span>
-                </div>
-                <p className="min-w-0 flex-1 text-sm font-bold leading-5 text-slate-900">
-                  Mais de 500 profissionais voluntários ativos
+          <h2 id="programas-acolhimento-title" className="mt-4 text-2xl font-black tracking-tight text-slate-950 sm:text-3xl">
+            Programas de Acolhimento Social
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+            A Turma do Bem transforma mensagens dispersas em atendimento odontológico digno e gratuito.
+          </p>
+        </header>
+
+        <div className="grid gap-3 p-4 sm:p-5">
+          <article className="rounded-2xl border border-blue-200 bg-blue-50/70 p-4 sm:p-5">
+            <div className="flex items-start gap-3.5">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-sm shadow-blue-600/20">
+                <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+                  <path d="M7.2 11.4a3.8 3.8 0 1 1 5.4-5.4A3.8 3.8 0 1 1 18 11.4L12.6 17a.85.85 0 0 1-1.2 0l-5.5-5.6" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M8.8 11.1c.9 1.2 2 1.8 3.2 1.8s2.3-.6 3.2-1.8" strokeLinecap="round" />
+                </svg>
+              </div>
+
+              <div className="min-w-0 flex-1">
+                <span className="inline-flex rounded-full border border-blue-200 bg-white px-2.5 py-1 text-[0.6875rem] font-bold leading-4 text-blue-800">
+                  Crianças e Jovens (11 a 17 anos)
+                </span>
+                <h3 className="mt-2 text-lg font-black text-slate-950">Dentista do Bem</h3>
+                <p className="mt-1.5 text-sm leading-6 text-slate-700">
+                  Atendimento odontológico integral e gratuito realizado em consultórios particulares voluntários até completarem 18 anos. Mais de 90 mil jovens já foram transformados.
                 </p>
               </div>
+            </div>
+          </article>
 
-              <div className="flex w-full min-w-0 items-center gap-2.5 rounded-2xl border border-blue-200 bg-white/90 px-3.5 py-2.5 text-xs font-semibold leading-5 text-blue-950 shadow-sm">
-                <svg className="h-5 w-5 shrink-0 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+          <article className="rounded-2xl border border-violet-200 bg-violet-50/65 p-4 sm:p-5">
+            <div className="flex items-start gap-3.5">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-violet-700 text-white shadow-sm shadow-violet-700/20">
+                <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
                   <path d="M12 3 5 6v5c0 4.6 2.8 8.2 7 10 4.2-1.8 7-5.4 7-10V6l-7-3Z" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="m9 12 2 2 4-4" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M9.2 12.1 11 14l4-4.2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
-                <span className="min-w-0">Rede Turma do Bem <span className="text-blue-300" aria-hidden="true">•</span> Maior rede de voluntariado odontológico do mundo</span>
+              </div>
+
+              <div className="min-w-0 flex-1">
+                <span className="inline-flex rounded-full border border-violet-200 bg-white px-2.5 py-1 text-[0.6875rem] font-bold leading-4 text-violet-800">
+                  Mulheres Sobreviventes de Violência
+                </span>
+                <h3 className="mt-2 text-lg font-black text-slate-950">Apolônias do Bem</h3>
+                <p className="mt-1.5 text-sm leading-6 text-slate-700">
+                  Reabilitação bucal integral para mulheres que sofreram violência doméstica, restabelecendo a saúde, o sorriso e a dignidade com protocolo de sigilo absoluto. Mais de 1.200 mulheres acolhidas.
+                </p>
               </div>
             </div>
-
-            <p className="border-l-2 border-primary pl-3 text-sm leading-6 text-slate-700">
-              Cada história é acolhida com escuta, respeito e sigilo — porque cuidar de um sorriso começa por proteger quem confia em nós.
-            </p>
-          </div>
+          </article>
         </div>
+
+        <footer className="border-t border-slate-200 bg-slate-950 px-4 py-4 text-white sm:px-5 sm:py-5">
+          <p className="mb-3 text-xs font-semibold text-sky-300">Impacto da rede Turma do Bem</p>
+          <dl className="grid grid-cols-1 gap-2 min-[390px]:grid-cols-3">
+            {networkMetrics.map((metric) => (
+              <div key={metric.label} className="flex flex-col rounded-xl border border-white/10 bg-white/[0.07] px-3 py-3">
+                <dt className="order-2 text-[0.6875rem] font-medium leading-4 text-slate-300">{metric.label}</dt>
+                <dd className="order-first mb-1 text-lg font-black leading-none tracking-tight text-white sm:text-xl">{metric.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </footer>
       </div>
-    </div>
+    </section>
   );
 }
 
 export default HeroDashboardCard;
-
