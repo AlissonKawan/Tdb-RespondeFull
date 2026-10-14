@@ -23,7 +23,7 @@ type Aba = 'dashboard' | 'atendimentos' | 'voluntarios' | 'beneficiarios' | 'ins
 export default function DashboardAdmin() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const { confirm, ConfirmModal } = useConfirm();
+  const { confirm, confirmDialog } = useConfirm();
 
   const [aba, setAba] = useState<Aba>('dashboard');
   
@@ -439,7 +439,7 @@ export default function DashboardAdmin() {
         </div>
       )}
 
-      <ConfirmModal />
+      {confirmDialog}
     </div>
   );
 }

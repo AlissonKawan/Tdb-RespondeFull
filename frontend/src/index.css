@@ -2,15 +2,75 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Scroll Reveal Animations */
-.reveal {
-  opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: transform, opacity;
+@layer base {
+  :root {
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
+    --surface: 0 0% 100%;
+    --primary: 221 83% 53%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 214 32% 91%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 214 32% 95%;
+    --muted-foreground: 215 16% 37%;
+    --border: 214 32% 91%;
+    --ring: 221 83% 53%;
+    --success: 160 84% 31%;
+    --warning: 32 95% 44%;
+    --danger: 0 72% 51%;
+    --radius-sm: 0.5rem;
+    --radius-md: 0.75rem;
+    --radius-lg: 1rem;
+    --duration-fast: 150ms;
+    --duration-normal: 220ms;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    min-width: 320px;
+    text-rendering: optimizeLegibility;
+  }
+
+  :focus-visible {
+    outline: 3px solid hsl(var(--ring) / 0.7);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background: hsl(var(--primary) / 0.18);
+  }
 }
 
+/* Compatibilidade com as páginas existentes, sem ocultar conteúdo via JavaScript. */
+.reveal,
 .reveal.active {
   opacity: 1;
   transform: translateY(0);
+}
+
+.skip-link {
+  @apply fixed left-4 top-4 z-[100] -translate-y-20 rounded-ui bg-foreground px-4 py-3 font-semibold text-white transition-transform duration-fast;
+}
+
+.skip-link:focus {
+  @apply translate-y-0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }

@@ -10,13 +10,13 @@ interface SectionProps {
 
 function Section({ children, className = '', containerClassName = '', tone = 'base' }: SectionProps) {
   const tones = {
-    base: 'bg-[#F8FAFC]',
-    white: 'bg-white',
-    blue: 'bg-gradient-to-b from-white to-[#EFF6FF]',
+    base: 'bg-background',
+    white: 'bg-surface',
+    blue: 'border-y border-blue-100 bg-blue-50/65',
   };
 
   return (
-    <section className={`py-16 ${tones[tone]} ${className}`}>
+    <section className={`py-14 sm:py-16 ${tones[tone]} ${className}`}>
       <Container className={containerClassName}>{children}</Container>
     </section>
   );

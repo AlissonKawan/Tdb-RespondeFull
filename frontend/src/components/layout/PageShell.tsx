@@ -6,7 +6,7 @@ interface PageShellProps {
 }
 
 function PageShell({ children, className = '' }: PageShellProps) {
-  return <div className={`bg-[#F8FAFC] text-[#0F172A] ${className}`}>{children}</div>;
+  return <div className={`bg-background text-foreground ${className}`}>{children}</div>;
 }
 
 export default PageShell;

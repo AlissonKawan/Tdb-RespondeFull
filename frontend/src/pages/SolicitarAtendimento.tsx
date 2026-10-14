@@ -110,7 +110,7 @@ function validar(form: FormState) {
 export default function SolicitarAtendimento() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const { confirm, ConfirmModal } = useConfirm();
+  const { confirm, confirmDialog } = useConfirm();
   const [form, setForm] = useState<FormState>(() => ({
     ...initialForm,
     nomeCodificado: user?.nome ?? '',
@@ -379,7 +379,7 @@ export default function SolicitarAtendimento() {
           </form>
         </Card>
       </Section>
-      <ConfirmModal />
+      {confirmDialog}
     </PageShell>
   );
 }

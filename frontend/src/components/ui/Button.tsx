@@ -40,19 +40,19 @@ function Button({
   ...props
 }: Props) {
   const baseClasses =
-    'inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition-all duration-150 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100';
+    'inline-flex min-h-11 touch-manipulation items-center justify-center gap-2 rounded-ui font-semibold transition-[color,background-color,border-color,box-shadow,opacity] duration-fast focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-55';
 
   const variantClasses = {
-    primary: 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-sm shadow-blue-500/25 hover:from-blue-700 hover:to-indigo-700 hover:shadow-md hover:shadow-blue-500/25 focus:ring-blue-500',
-    secondary: 'border border-[#E2E8F0] bg-white text-[#0F172A] shadow-sm hover:border-slate-300 hover:bg-slate-50 focus:ring-slate-300',
-    danger: 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-sm shadow-red-500/20 hover:from-red-700 hover:to-rose-700 focus:ring-red-500',
-    ghost: 'text-[#475569] hover:bg-slate-100 hover:text-[#0F172A] focus:ring-slate-300',
+    primary: 'bg-primary text-primary-foreground shadow-sm hover:bg-blue-700 active:bg-blue-800',
+    secondary: 'border border-border bg-surface text-foreground shadow-sm hover:border-slate-300 hover:bg-muted',
+    danger: 'bg-danger text-white shadow-sm hover:bg-red-700 active:bg-red-800',
+    ghost: 'text-muted-foreground hover:bg-muted hover:text-foreground',
   };
 
   const sizeClasses = {
-    sm: 'px-3.5 py-2 text-xs',
+    sm: 'px-3.5 py-2 text-sm',
     normal: 'px-5 py-2.5 text-sm',
-    large: 'px-6 py-3 text-base',
+    large: 'min-h-12 px-6 py-3 text-base',
   };
 
   const classes = `${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${

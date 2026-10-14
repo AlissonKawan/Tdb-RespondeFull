@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import Section from '../components/layout/Section';
 import PageShell from '../components/layout/PageShell';
 import Button from '../components/ui/Button';
@@ -12,6 +12,7 @@ interface FAQItem {
 
 function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const accordionId = useId();
 
   const faqs: FAQItem[] = [
     {
@@ -60,13 +61,21 @@ function FAQ() {
               <button
                 type="button"
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left transition hover:bg-blue-50/50"
+                aria-expanded={openIndex === index}
+                aria-controls={`${accordionId}-panel-${index}`}
+                id={`${accordionId}-trigger-${index}`}
+                className="flex min-h-12 w-full items-center justify-between gap-4 px-6 py-5 text-left transition-colors duration-fast hover:bg-blue-50/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
               >
                 <span className="text-base font-bold text-[#0F172A]">{faq.question}</span>
                 <span className={`text-2xl font-light text-[#2563EB] transition-transform ${openIndex === index ? 'rotate-45' : ''}`}>+</span>
               </button>
               {openIndex === index && (
-                <div className="border-t border-[#E2E8F0] px-6 py-5 text-[#475569]">
+                <div
+                  id={`${accordionId}-panel-${index}`}
+                  role="region"
+                  aria-labelledby={`${accordionId}-trigger-${index}`}
+                  className="border-t border-border px-6 py-5 text-muted-foreground"
+                >
                   {faq.answer}
                 </div>
               )}

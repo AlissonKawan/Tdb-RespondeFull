@@ -16,7 +16,7 @@ import { voluntariosService, type Voluntario } from '../services/voluntariosServ
 function AprovacaoVoluntarios() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const { confirm, ConfirmModal } = useConfirm();
+  const { confirm, confirmDialog } = useConfirm();
   const [solicitacoes, setSolicitacoes] = useState<Voluntario[]>([]);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState('');
@@ -155,7 +155,7 @@ function AprovacaoVoluntarios() {
           ))}
         </div>
       </Section>
-      <ConfirmModal />
+      {confirmDialog}
     </PageShell>
   );
 }

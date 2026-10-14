@@ -40,7 +40,7 @@ const formatDateLabel = (dateStr: string) => {
 export default function AgendaConsultas() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { confirm, ConfirmModal } = useConfirm();
+  const { confirm, confirmDialog } = useConfirm();
   
   const [filtro, setFiltro] = useState<'Todos' | 'Hoje' | 'Amanhã'>('Todos');
   const [consultas, setConsultas] = useState<AgendaConsulta[]>([]);
@@ -504,7 +504,7 @@ export default function AgendaConsultas() {
         </div>
       )}
       
-      <ConfirmModal />
+      {confirmDialog}
     </PageShell>
   );
 }

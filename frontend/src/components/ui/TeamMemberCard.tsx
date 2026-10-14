@@ -21,7 +21,7 @@ function TeamMemberCard({ name, rm, course, image, github, linkedin }: TeamMembe
   return (
     <Card className="group p-6 text-center transition-all hover:-translate-y-1 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-950/10">
       <div className="mx-auto mb-5 flex h-32 w-32 items-center justify-center overflow-hidden rounded-3xl border border-[#E2E8F0] bg-gradient-to-br from-blue-50 to-white text-3xl font-black text-[#2563EB] shadow-sm">
-        {image ? <img src={image} alt={name} className="h-full w-full object-cover" /> : initials(name)}
+        {image ? <img src={image} alt={name} width="320" height="320" loading="lazy" className="h-full w-full object-cover" /> : initials(name)}
       </div>
       <h2 className="text-xl font-bold text-[#0F172A]">{name}</h2>
       <div className="mt-2 min-h-11 text-sm text-[#475569]">

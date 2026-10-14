@@ -80,7 +80,7 @@ function formatarData(dataStr?: string) {
 
 export default function Cronograma() {
   const { user } = useAuth();
-  const { confirm, ConfirmModal } = useConfirm();
+  const { confirm, confirmDialog } = useConfirm();
   const [tarefas, setTarefas] = useState<TarefaCronograma[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -421,7 +421,7 @@ export default function Cronograma() {
           </div>
         </div>
       )}
-      <ConfirmModal />
+      {confirmDialog}
     </PageShell>
   );
 }

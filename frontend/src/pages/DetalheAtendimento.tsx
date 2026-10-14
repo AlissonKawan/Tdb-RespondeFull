@@ -106,7 +106,7 @@ function DetalheAtendimento() {
   const atendimentoId = Number(id);
   const { user, logout, isBeneficiario } = useAuth();
   const navigate = useNavigate();
-  const { confirm, ConfirmModal } = useConfirm();
+  const { confirm, confirmDialog } = useConfirm();
 
   const [atendimento, setAtendimento] = useState<AtendimentoApi | null>(null);
   const [mensagens, setMensagens] = useState<Mensagem[]>([]);
@@ -704,7 +704,7 @@ function DetalheAtendimento() {
           </div>
         )}
       </Section>
-      <ConfirmModal />
+      {confirmDialog}
     </PageShell>
   );
 }

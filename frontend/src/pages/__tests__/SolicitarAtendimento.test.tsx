@@ -103,6 +103,9 @@ describe('SolicitarAtendimento', () => {
     const submitBtn = screen.getByRole('button', { name: /Enviar relato/i });
     fireEvent.click(submitBtn);
 
+    const confirmBtn = await screen.findByRole('button', { name: /^Enviar$/i });
+    fireEvent.click(confirmBtn);
+
     await waitFor(() => {
       expect(relatarAtendimento).toHaveBeenCalled();
     });

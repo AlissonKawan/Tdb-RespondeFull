@@ -14,6 +14,9 @@ function Header() {
           <img
             src="/img/logo-header.png"
             alt="TDB Responde"
+            width="1024"
+            height="1024"
+            fetchPriority="high"
             className="h-[64px] w-auto object-contain md:h-[80px] lg:h-[110px]"
           />
 
@@ -36,6 +39,8 @@ function Header() {
           <img
             src="/img/turmadobem.png"
             alt="Turma do Bem"
+            width="159"
+            height="90"
             className="h-12 w-auto object-contain"
           />
         </a>

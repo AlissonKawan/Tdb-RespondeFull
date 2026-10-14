@@ -70,7 +70,7 @@ function BeneficiaryEmptyState({ onCreate }: { onCreate: () => void }) {
 function PortalBeneficiario() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const { confirm, ConfirmModal } = useConfirm();
+  const { confirm, confirmDialog } = useConfirm();
   const [atendimentos, setAtendimentos] = useState<AtendimentoApi[]>([]);
   const [novasMensagens, setNovasMensagens] = useState<Record<number, boolean>>({});
   const [loading, setLoading] = useState(true);
@@ -199,7 +199,7 @@ function PortalBeneficiario() {
           ))}
         </div>
       </Section>
-      <ConfirmModal />
+      {confirmDialog}
     </PageShell>
   );
 }

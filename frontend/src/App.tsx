@@ -40,11 +40,13 @@ function App() {
     <AuthProvider>
       <Router>
         <SessionGate>
-        <Suspense fallback={<div className="flex items-center justify-center h-screen text-blue-600">Carregando...</div>}>
+        <Suspense fallback={<div className="flex min-h-dvh items-center justify-center bg-background text-primary" role="status">Carregando…</div>}>
           <Routes>
-            {/* Rotas com Layout (Header + NavBar + Footer) */}
             <Route element={<GuestOnly />}>
-            <Route path="login" element={<Login />} />
+              <Route path="login" element={<Login />} />
+            </Route>
+
+            {/* Rotas públicas com Layout (Header + NavBar + Footer) */}
             <Route element={<Layout />}>
               <Route path="/" element={<Home />} />
               <Route path="institucional" element={<Home />} />
@@ -58,8 +60,6 @@ function App() {
               <Route path="cadastro-voluntario" element={<CadastroVoluntario />} />
               <Route path="cadastro-beneficiario" element={<CadastroBeneficiario />} />
               <Route path="quero-ser-voluntario" element={<CadastroVoluntario />} />
-            </Route>
-
             </Route>
             {/* Rotas protegidas (Sistema) usando SystemLayout */}
             <Route element={<ProtectedRoute><SystemLayout /></ProtectedRoute>}>

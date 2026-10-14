@@ -17,7 +17,7 @@ interface FormData {
 }
 
 function Contato() {
-  const { confirm, ConfirmModal } = useConfirm();
+  const { confirm, confirmDialog } = useConfirm();
   const [enviado, setEnviado] = useState(false);
   const [erro, setErro] = useState('');
   const [loading, setLoading] = useState(false);
@@ -118,7 +118,7 @@ function Contato() {
           </Card>
         </div>
       </Section>
-      <ConfirmModal />
+      {confirmDialog}
     </PageShell>
   );
 }

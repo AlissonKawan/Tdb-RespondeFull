@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/useAuth';
 import { useConfirm } from '../../hooks/useConfirm';
@@ -9,17 +9,41 @@ function NavBar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout, isVoluntario, isBeneficiario, isAdmin } = useAuth();
-  const { confirm, ConfirmModal } = useConfirm();
+  const { confirm, confirmDialog } = useConfirm();
   const [isOpen, setIsOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+
+  const isActive = (path: string) => path === '/'
+    ? location.pathname === '/' || location.pathname === '/institucional'
+    : location.pathname === path;
 
   const linkClass = (path: string) =>
-    `block rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors ${
-      (path === '/'
-        ? location.pathname === '/' || location.pathname === '/institucional'
-        : location.pathname === path)
-        ? 'bg-white text-[#0F172A] shadow-sm ring-1 ring-[#E2E8F0]'
-        : 'text-[#475569] hover:bg-white hover:text-[#0F172A]'
+    `block min-h-11 rounded-ui px-4 py-3 text-sm font-semibold transition-colors duration-fast ${
+      isActive(path)
+        ? 'bg-surface text-foreground shadow-sm ring-1 ring-border'
+        : 'text-muted-foreground hover:bg-surface hover:text-foreground'
     }`;
+
+  const linkProps = (path: string) => ({
+    className: linkClass(path),
+    'aria-current': isActive(path) ? ('page' as const) : undefined,
+  });
+
+  useEffect(() => {
+    setIsOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsOpen(false);
+        menuButtonRef.current?.focus();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen]);
 
   const handleLogout = () => {
     confirm({
@@ -42,7 +66,7 @@ function NavBar() {
       : '/admin';
 
   return (
-    <nav className="sticky top-0 z-40 border-b border-[#E2E8F0]/80 bg-[#F8FAFC]/85 backdrop-blur-xl">
+    <nav aria-label="Navegação principal" className="sticky top-0 z-40 border-b border-border/80 bg-background/95 backdrop-blur-xl">
       <Container className="py-3">
         <div className="flex items-center justify-between md:justify-center">
           {/* Logo or Platform Name on Mobile */}
@@ -52,9 +76,13 @@ function NavBar() {
 
           {/* Hamburger Menu Button */}
           <button
+            ref={menuButtonRef}
+            type="button"
             onClick={() => setIsOpen(!isOpen)}
-            className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:bg-slate-50 md:hidden"
-            aria-label="Alternar menu de navegação"
+            className="flex h-11 w-11 items-center justify-center rounded-ui border border-border bg-surface text-muted-foreground shadow-sm transition-colors hover:bg-muted md:hidden"
+            aria-label={isOpen ? 'Fechar menu de navegação' : 'Abrir menu de navegação'}
+            aria-expanded={isOpen}
+            aria-controls="menu-principal-mobile"
           >
             <svg
               className="h-6 w-6"
@@ -85,13 +113,13 @@ function NavBar() {
           <div className="hidden flex-wrap items-center justify-center gap-2 md:flex">
             {!user && (
               <>
-                <Link to="/" className={linkClass('/')}>Home</Link>
-                <Link to="/sobre" className={linkClass('/sobre')}>Sobre</Link>
-                <Link to="/faq" className={linkClass('/faq')}>FAQ</Link>
-                <Link to="/contato" className={linkClass('/contato')}>Contato</Link>
-                <Link to="/integrantes" className={linkClass('/integrantes')}>Integrantes</Link>
-                <Link to="/roadmap" className={linkClass('/roadmap')}>Solução</Link>
-                <Link to="/quero-ser-voluntario" className={linkClass('/quero-ser-voluntario')}>Seja voluntário</Link>
+                <Link to="/" {...linkProps('/')}>Home</Link>
+                <Link to="/sobre" {...linkProps('/sobre')}>Sobre</Link>
+                <Link to="/faq" {...linkProps('/faq')}>FAQ</Link>
+                <Link to="/contato" {...linkProps('/contato')}>Contato</Link>
+                <Link to="/integrantes" {...linkProps('/integrantes')}>Integrantes</Link>
+                <Link to="/roadmap" {...linkProps('/roadmap')}>Solução</Link>
+                <Link to="/quero-ser-voluntario" {...linkProps('/quero-ser-voluntario')}>Seja voluntário</Link>
               </>
             )}
 
@@ -118,16 +146,16 @@ function NavBar() {
 
         {/* Mobile Navigation Dropdown Menu */}
         {isOpen && (
-          <div className="mt-3 flex flex-col gap-2 border-t border-slate-100 pt-3 md:hidden">
+          <div id="menu-principal-mobile" className="mt-3 flex flex-col gap-2 border-t border-border pt-3 md:hidden">
             {!user && (
               <>
-                <Link to="/" onClick={() => setIsOpen(false)} className={linkClass('/')}>Home</Link>
-                <Link to="/sobre" onClick={() => setIsOpen(false)} className={linkClass('/sobre')}>Sobre</Link>
-                <Link to="/faq" onClick={() => setIsOpen(false)} className={linkClass('/faq')}>FAQ</Link>
-                <Link to="/contato" onClick={() => setIsOpen(false)} className={linkClass('/contato')}>Contato</Link>
-                <Link to="/integrantes" onClick={() => setIsOpen(false)} className={linkClass('/integrantes')}>Integrantes</Link>
-                <Link to="/roadmap" onClick={() => setIsOpen(false)} className={linkClass('/roadmap')}>Solução</Link>
-                <Link to="/quero-ser-voluntario" onClick={() => setIsOpen(false)} className={linkClass('/quero-ser-voluntario')}>Seja voluntário</Link>
+                <Link to="/" onClick={() => setIsOpen(false)} {...linkProps('/')}>Home</Link>
+                <Link to="/sobre" onClick={() => setIsOpen(false)} {...linkProps('/sobre')}>Sobre</Link>
+                <Link to="/faq" onClick={() => setIsOpen(false)} {...linkProps('/faq')}>FAQ</Link>
+                <Link to="/contato" onClick={() => setIsOpen(false)} {...linkProps('/contato')}>Contato</Link>
+                <Link to="/integrantes" onClick={() => setIsOpen(false)} {...linkProps('/integrantes')}>Integrantes</Link>
+                <Link to="/roadmap" onClick={() => setIsOpen(false)} {...linkProps('/roadmap')}>Solução</Link>
+                <Link to="/quero-ser-voluntario" onClick={() => setIsOpen(false)} {...linkProps('/quero-ser-voluntario')}>Seja voluntário</Link>
               </>
             )}
 
@@ -160,7 +188,7 @@ function NavBar() {
           </div>
         )}
       </Container>
-      <ConfirmModal />
+      {confirmDialog}
     </nav>
   );
 }

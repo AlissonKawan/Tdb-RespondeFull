@@ -116,7 +116,7 @@ function AtendimentoCard({ atendimento, onAssumir, assumindo, assumirBloqueado, 
 function PortalVoluntario() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const { confirm, ConfirmModal } = useConfirm();
+  const { confirm, confirmDialog } = useConfirm();
   const [aba, setAba] = useState<Aba>('solicitados');
   const [solicitados, setSolicitados] = useState<AtendimentoApi[]>([]);
   const [meusAtendimentos, setMeusAtendimentos] = useState<AtendimentoApi[]>([]);
@@ -431,7 +431,7 @@ function PortalVoluntario() {
           </div>
         )}
       </Section>
-      <ConfirmModal />
+      {confirmDialog}
     </PageShell>
   );
 }
