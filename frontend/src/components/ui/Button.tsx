@@ -8,6 +8,10 @@ interface BaseButtonProps {
   variant?: ButtonVariant;
   size?: ButtonSize;
   fullWidth?: boolean;
+  isLoading?: boolean;
+  loadingText?: string;
+  leftIcon?: ReactNode;
+  rightIcon?: ReactNode;
 }
 
 type ButtonProps = BaseButtonProps &
@@ -28,16 +32,20 @@ function Button({
   variant = 'primary',
   size = 'normal',
   fullWidth = false,
+  isLoading = false,
+  loadingText,
+  leftIcon,
+  rightIcon,
   className = '',
   ...props
 }: Props) {
   const baseClasses =
-    'inline-flex items-center justify-center rounded-xl font-semibold transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60';
+    'inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition-all duration-150 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100';
 
   const variantClasses = {
-    primary: 'bg-[#2563EB] text-white shadow-md shadow-blue-600/20 hover:bg-[#1E3A8A] focus:ring-[#2563EB]',
+    primary: 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-sm shadow-blue-500/25 hover:from-blue-700 hover:to-indigo-700 hover:shadow-md hover:shadow-blue-500/25 focus:ring-blue-500',
     secondary: 'border border-[#E2E8F0] bg-white text-[#0F172A] shadow-sm hover:border-slate-300 hover:bg-slate-50 focus:ring-slate-300',
-    danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
+    danger: 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-sm shadow-red-500/20 hover:from-red-700 hover:to-rose-700 focus:ring-red-500',
     ghost: 'text-[#475569] hover:bg-slate-100 hover:text-[#0F172A] focus:ring-slate-300',
   };
 
@@ -51,7 +59,9 @@ function Button({
     fullWidth ? 'w-full' : ''
   } ${className}`;
 
-  if (href) {
+  const hasEnhancedContent = isLoading || Boolean(leftIcon) || Boolean(rightIcon);
+
+  if (href && !hasEnhancedContent) {
     return (
       <a href={href} className={classes} {...(props as AnchorHTMLAttributes<HTMLAnchorElement>)}>
         {children}
@@ -59,9 +69,50 @@ function Button({
     );
   }
 
+  if (!href && !hasEnhancedContent) {
+    return (
+      <button className={classes} {...(props as ButtonHTMLAttributes<HTMLButtonElement>)}>
+        {children}
+      </button>
+    );
+  }
+
+  const content = (
+    <>
+      {isLoading ? (
+        <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle className="opacity-25" cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="3" />
+          <path className="opacity-90" fill="currentColor" d="M21 12a9 9 0 0 0-9-9v3a6 6 0 0 1 6 6h3Z" />
+        </svg>
+      ) : leftIcon}
+      {isLoading ? <span>{loadingText || children}</span> : children}
+      {!isLoading && rightIcon}
+    </>
+  );
+
+  if (href) {
+    return (
+      <a
+        href={isLoading ? undefined : href}
+        className={`${classes} ${isLoading ? 'pointer-events-none' : ''}`}
+        aria-busy={isLoading}
+        aria-disabled={isLoading}
+        {...(props as AnchorHTMLAttributes<HTMLAnchorElement>)}
+      >
+        {content}
+      </a>
+    );
+  }
+
+  const buttonProps = props as ButtonHTMLAttributes<HTMLButtonElement>;
   return (
-    <button className={classes} {...(props as ButtonHTMLAttributes<HTMLButtonElement>)}>
-      {children}
+    <button
+      className={classes}
+      {...buttonProps}
+      disabled={isLoading || buttonProps.disabled}
+      aria-busy={isLoading}
+    >
+      {content}
     </button>
   );
 }

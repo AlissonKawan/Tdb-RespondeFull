@@ -6,7 +6,7 @@ import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import Container from '../components/ui/Container';
-import { EmptyState, ErrorState, LoadingState } from '../components/ui/FeedbackState';
+import { ErrorState, LoadingState } from '../components/ui/FeedbackState';
 import PageHeader from '../components/ui/PageHeader';
 import SectionHeader from '../components/ui/SectionHeader';
 import { useAuth } from '../context/useAuth';
@@ -47,6 +47,24 @@ function getPessoa(atendimento: AtendimentoApi) {
     ?? atendimento.beneficiario?.nome
     ?? atendimento.usuario?.nome
     ?? 'Beneficiário não informado';
+}
+
+function BeneficiaryEmptyState({ onCreate }: { onCreate: () => void }) {
+  return (
+    <Card className="border-dashed bg-gradient-to-br from-slate-50 to-blue-50/60 p-8 text-center md:p-10">
+      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-blue-600 shadow-sm ring-1 ring-blue-100">
+        <svg className="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 21s-7-4.4-7-11a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 6.6-7 11-7 11Z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v5m-2.5-2.5h5" />
+        </svg>
+      </div>
+      <h3 className="mt-4 text-lg font-bold text-slate-900">Seu espaço de cuidado começa aqui</h3>
+      <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-600">
+        Você ainda não possui atendimentos. Abra uma solicitação para que nossa equipe possa acolher o seu caso.
+      </p>
+      <Button className="mt-5" onClick={onCreate}>Solicitar primeiro atendimento</Button>
+    </Card>
+  );
 }
 
 function PortalBeneficiario() {
@@ -150,15 +168,12 @@ function PortalBeneficiario() {
         {loading && <LoadingState title="Carregando seus atendimentos..." />}
         {erro && <ErrorState title="Erro ao carregar dados" description={erro} />}
         {!loading && !erro && atendimentos.length === 0 && (
-          <EmptyState
-            title="Você ainda não possui atendimentos."
-            description="Clique em Solicitar atendimento para abrir um novo pedido."
-          />
+          <BeneficiaryEmptyState onCreate={() => navigate('/beneficiario/solicitar-atendimento')} />
         )}
 
         <div className="grid gap-4">
           {!loading && !erro && atendimentos.map((atendimento) => (
-            <Card key={atendimento.id} className="p-4 md:p-6 transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-950/10">
+            <Card key={atendimento.id} className="p-5 hover:-translate-y-0.5 hover:border-blue-200 md:p-6">
               <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">

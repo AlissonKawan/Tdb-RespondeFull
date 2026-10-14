@@ -292,6 +292,26 @@ function DetalheAtendimento() {
       ?? (atendimento?.pessoaAtendidaId ? `Pessoa #${atendimento.pessoaAtendidaId}` : 'Não informada')
   ), [atendimento]);
 
+  const semAlteracoes = Boolean(
+    atendimento
+      && statusEdit === (atendimento.status ?? 'ABERTO')
+      && prioridadeEdit === String(atendimento.prioridade ?? 3),
+  );
+
+  const confirmarAssumirAtendimento = () => {
+    confirm({
+      title: 'Assumir Atendimento',
+      message: 'Você deseja assumir a responsabilidade por este caso? Ele passará para a sua fila de atendimentos ativos e o beneficiário será notificado.',
+      confirmText: 'Sim, assumir caso',
+      tone: 'primary',
+      details: [
+        { label: 'Beneficiário', value: pessoaAtendida },
+        { label: 'Status atual', value: labelStatus(atendimento?.status), tone: 'primary' },
+      ],
+      onConfirm: () => void assumirEsteAtendimento(),
+    });
+  };
+
   const enviarMensagem = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!conteudo.trim() || chatBloqueado || isSubmittingRef.current) return;
@@ -344,6 +364,28 @@ function DetalheAtendimento() {
     } finally {
       setSalvando(false);
     }
+  };
+
+  const confirmarAlteracaoAtendimento = () => {
+    if (!atendimento || semAlteracoes) return;
+
+    const statusAtual = atendimento.status ?? 'ABERTO';
+    const statusFinal = statusEdit;
+    const acaoCritica = statusFinal === 'ENCERRADO' || statusFinal === 'CANCELADO';
+    confirm({
+      title: 'Confirmar mudança de status',
+      message: acaoCritica
+        ? 'Esta alteração finaliza o atendimento e bloqueia novas mensagens no chat. Revise os dados antes de confirmar.'
+        : 'Revise a transição abaixo. O beneficiário poderá acompanhar o novo status do atendimento.',
+      confirmText: acaoCritica ? 'Confirmar e finalizar' : 'Confirmar alteração',
+      tone: acaoCritica ? 'danger' : 'primary',
+      details: [
+        { label: 'Status atual', value: labelStatus(statusAtual) },
+        { label: 'Novo status', value: labelStatus(statusFinal), tone: acaoCritica ? 'danger' : 'primary' },
+        { label: 'Prioridade', value: labelPrioridade(prioridadeEdit) },
+      ],
+      onConfirm: () => void salvarAtendimento(false),
+    });
   };
 
   const handleAlterarCheckin = async (status: string, abrirWhats = false) => {
@@ -500,10 +542,12 @@ function DetalheAtendimento() {
                   <div className="mt-4">
                     <Button 
                       fullWidth 
-                      disabled={assumindo || voluntarioSemVinculo} 
-                      onClick={() => void assumirEsteAtendimento()}
+                      disabled={voluntarioSemVinculo}
+                      isLoading={assumindo}
+                      loadingText="Assumindo..."
+                      onClick={confirmarAssumirAtendimento}
                     >
-                      {assumindo ? 'Assumindo...' : 'Assumir atendimento'}
+                      Assumir atendimento
                     </Button>
                     {voluntarioSemVinculo && (
                       <p className="mt-2 text-xs text-red-500">Sua conta de voluntário precisa estar vinculada para assumir casos.</p>
@@ -536,16 +580,14 @@ function DetalheAtendimento() {
                       </Select>
                     </Field>
 
-                    <Button fullWidth disabled={salvando} onClick={() => {
-                      confirm({
-                        title: 'Salvar Alterações',
-                        message: 'Você realmente quer alterar o atendimento?',
-                        confirmText: 'Salvar',
-                        tone: 'primary',
-                        onConfirm: () => salvarAtendimento(false)
-                      });
-                    }}>
-                      {salvando ? 'Salvando...' : 'Salvar alteracoes'}
+                    <Button
+                      fullWidth
+                      disabled={semAlteracoes}
+                      isLoading={salvando}
+                      loadingText="Salvando..."
+                      onClick={confirmarAlteracaoAtendimento}
+                    >
+                      Salvar alterações
                     </Button>
 
                     <Button
@@ -556,9 +598,14 @@ function DetalheAtendimento() {
                         confirm({
                           title: 'Encerrar Atendimento',
                           message: 'Tem certeza que deseja encerrar este atendimento? Ele ficará como somente leitura e não será possível enviar novas mensagens.',
-                          confirmText: 'Encerrar',
+                          confirmText: 'Confirmar e encerrar',
                           tone: 'danger',
-                          onConfirm: () => salvarAtendimento(true)
+                          details: [
+                            { label: 'Status atual', value: labelStatus(atendimento.status) },
+                            { label: 'Novo status', value: labelStatus('ENCERRADO'), tone: 'danger' },
+                            { label: 'Impacto', value: 'Atendimento e chat finalizados', tone: 'danger' },
+                          ],
+                          onConfirm: () => void salvarAtendimento(true)
                         });
                       }}
                     >

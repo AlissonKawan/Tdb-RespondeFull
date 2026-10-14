@@ -6,7 +6,7 @@ import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import Container from '../components/ui/Container';
-import { EmptyState, ErrorState, LoadingState } from '../components/ui/FeedbackState';
+import { ErrorState, LoadingState } from '../components/ui/FeedbackState';
 import PageHeader from '../components/ui/PageHeader';
 import SectionHeader from '../components/ui/SectionHeader';
 import { atendimentoService } from '../services/atendimentoService';
@@ -50,10 +50,25 @@ function sortAtendimentos(a: AtendimentoApi, b: AtendimentoApi) {
   return dateB - dateA; // Descending
 }
 
+function OperationalEmptyState({ title, description }: { title: string; description: string }) {
+  return (
+    <Card className="border-dashed bg-gradient-to-br from-slate-50 to-blue-50/60 p-8 text-center md:p-10">
+      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-blue-600 shadow-sm ring-1 ring-blue-100">
+        <svg className="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3M5 11h14M6 21h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2Z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="m9 16 2 2 4-5" />
+        </svg>
+      </div>
+      <h3 className="mt-4 text-lg font-bold text-slate-900">{title}</h3>
+      <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-600">{description}</p>
+    </Card>
+  );
+}
+
 
 function AtendimentoCard({ atendimento, onAssumir, assumindo, assumirBloqueado, hasNovaMensagem }: {
   atendimento: AtendimentoApi;
-  onAssumir?: (id: number) => void;
+  onAssumir?: (atendimento: AtendimentoApi) => void;
   assumindo?: boolean;
   assumirBloqueado?: boolean;
   hasNovaMensagem?: boolean;
@@ -61,7 +76,7 @@ function AtendimentoCard({ atendimento, onAssumir, assumindo, assumirBloqueado, 
   const navigate = useNavigate();
 
   return (
-    <Card className="p-4 md:p-6 transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-950/10">
+    <Card className="p-5 hover:-translate-y-0.5 hover:border-blue-200 md:p-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <div className="flex flex-wrap items-center gap-2">
@@ -80,8 +95,13 @@ function AtendimentoCard({ atendimento, onAssumir, assumindo, assumirBloqueado, 
         </div>
         <div className="flex flex-wrap gap-2">
           {onAssumir && (
-            <Button disabled={assumindo || assumirBloqueado} onClick={() => onAssumir(atendimento.id)}>
-              {assumindo ? 'Assumindo...' : 'Assumir atendimento'}
+            <Button
+              disabled={assumirBloqueado}
+              isLoading={assumindo}
+              loadingText="Assumindo..."
+              onClick={() => onAssumir(atendimento)}
+            >
+              Assumir atendimento
             </Button>
           )}
           <Button variant="secondary" onClick={() => navigate(`/atendimentos/${atendimento.id}`)}>
@@ -232,13 +252,18 @@ function PortalVoluntario() {
     }
   };
 
-  const assumirComConfirmacao = (id: number) => {
+  const assumirComConfirmacao = (atendimento: AtendimentoApi) => {
     confirm({
       title: 'Assumir Atendimento',
-      message: 'Você tem certeza que deseja assumir a responsabilidade por este atendimento?',
-      confirmText: 'Assumir',
+      message: 'Você deseja assumir a responsabilidade por este caso? Ele passará para a sua fila de atendimentos ativos e o beneficiário será notificado.',
+      confirmText: 'Sim, assumir caso',
       tone: 'primary',
-      onConfirm: () => assumir(id)
+      details: [
+        { label: 'Beneficiário', value: getPessoa(atendimento) },
+        { label: 'Contexto', value: getAtendimentoDescricaoContexto(atendimento) },
+        { label: 'Status atual', value: formatStatusLabel(atendimento.status ?? 'ABERTO'), tone: 'primary' },
+      ],
+      onConfirm: () => void assumir(atendimento.id)
     });
   };
 
@@ -368,7 +393,10 @@ function PortalVoluntario() {
             {loadingSolicitados && <LoadingState title="Carregando atendimentos solicitados..." />}
             {erroSolicitados && <ErrorState title="Erro ao carregar atendimentos" description={erroSolicitados} />}
             {!loadingSolicitados && !erroSolicitados && solicitados.length === 0 && (
-              <EmptyState title="Nenhum atendimento solicitado no momento." />
+              <OperationalEmptyState
+                title="Tudo acolhido por enquanto"
+                description="Não há novos casos aguardando um profissional. Quando uma solicitação chegar, ela aparecerá nesta fila."
+              />
             )}
             <div className="grid gap-4">
               {!loadingSolicitados && !erroSolicitados && solicitados.map((atendimento) => (
@@ -390,7 +418,10 @@ function PortalVoluntario() {
             {loadingMeus && <LoadingState title="Carregando seus atendimentos..." />}
             {erroMeus && <ErrorState title="Erro ao carregar seus atendimentos" description={erroMeus} />}
             {!loadingMeus && !erroMeus && meusAtendimentos.length === 0 && (
-              <EmptyState title="Nenhum atendimento vinculado ao seu usuário." />
+              <OperationalEmptyState
+                title="Sua fila está livre"
+                description="Os casos assumidos por você aparecerão aqui com status, mensagens e próximos passos."
+              />
             )}
             <div className="grid gap-4">
               {!loadingMeus && !erroMeus && meusAtendimentos.map((atendimento) => (
