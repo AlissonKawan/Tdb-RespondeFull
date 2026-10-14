@@ -1,5 +1,6 @@
 import { API_BASE_URL } from '../config/api';
 import type { ApiRequestOptions } from '../types/api';
+import { AUTH_EXPIRED, readSession } from './session';
 
 export class ApiError extends Error {
   status: number;
@@ -37,6 +38,7 @@ export async function extractErrorMessage(response: Response, fallback?: string)
 
 export async function request<T>(path: string, options: ApiRequestOptions = {}): Promise<T> {
   const { body, headers, ...requestOptions } = options;
+  const token = readSession()?.token;
 
   let response: Response;
   try {
@@ -46,6 +48,7 @@ export async function request<T>(path: string, options: ApiRequestOptions = {}):
         Accept: 'application/json',
         ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}),
         ...headers,
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
       body: body !== undefined ? JSON.stringify(body) : undefined,
     });
@@ -56,6 +59,10 @@ export async function request<T>(path: string, options: ApiRequestOptions = {}):
   const text = await response.text();
 
   if (!response.ok) {
+    if (response.status === 401 && token && readSession()?.token === token
+        && !['/auth/login', '/auth/register'].includes(path.split('?')[0])) {
+      window.dispatchEvent(new Event(AUTH_EXPIRED));
+    }
     let message = friendlyMessage(response.status, path);
     let details: unknown = text;
 

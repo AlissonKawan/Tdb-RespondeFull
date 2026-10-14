@@ -5,7 +5,7 @@ import { EmptyState, ErrorState, LoadingState } from '../ui/FeedbackState';
 import { Textarea } from '../ui/Input';
 import { mensagensService } from '../../services/mensagensService';
 import type { Mensagem } from '../../types/AtendimentoApi';
-import { API_BASE_URL } from '../../config/api';
+import { openChatSocket } from '../../services/chatSocket';
 
 interface ChatAtendimentoProps {
   atendimentoId: number;
@@ -91,16 +91,19 @@ function ChatAtendimento({ atendimentoId, enviadoPor }: ChatAtendimentoProps) {
     let reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
     let reconnectAttempt = 0;
 
-    const wsUrlBase = API_BASE_URL.replace(/\/$/, '').replace(/^http:\/\//i, 'ws://').replace(/^https:\/\//i, 'wss://');
 
-    function connect() {
+    async function connect() {
       if (cancelled) return;
 
       const clientId = `${enviadoPor}-${Math.random().toString(36).substring(7)}`;
-      const wsUrl = `${wsUrlBase}/chat/${atendimentoId}/${clientId}`;
 
-      console.log(`[WebSocket] Conectando a: ${wsUrl} (tentativa ${reconnectAttempt})`);
-      socket = new WebSocket(wsUrl);
+      try {
+        socket = await openChatSocket(atendimentoId, clientId);
+        if (cancelled) { socket.close(); return; }
+      } catch {
+        if (!cancelled) reconnectTimeout = setTimeout(() => { void connect(); }, 10000);
+        return;
+      }
 
       socket.onopen = () => {
         if (cancelled) {

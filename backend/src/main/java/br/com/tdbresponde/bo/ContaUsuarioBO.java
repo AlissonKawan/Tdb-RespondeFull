@@ -91,14 +91,11 @@ public class ContaUsuarioBO {
         validarLogin(request);
 
         ContaUsuario conta = dao.buscarPorEmail(normalizarEmail(request.email));
-        if (conta == null) {
-            throw new NotFoundException("Conta nao encontrada.");
+        if (conta == null || !SenhaHasher.validarSenha(request.senha, conta.getSenhaHash())) {
+            throw new UnauthorizedException("Email ou senha invalidos.");
         }
         if (!conta.isAtivo()) {
             throw new UnauthorizedException("Conta inativa.");
-        }
-        if (!SenhaHasher.validarSenha(request.senha, conta.getSenhaHash())) {
-            throw new UnauthorizedException("Senha incorreta.");
         }
 
         return conta;

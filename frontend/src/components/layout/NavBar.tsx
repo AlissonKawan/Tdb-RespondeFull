@@ -83,7 +83,7 @@ function NavBar() {
           <div className="hidden flex-wrap items-center justify-center gap-2 md:flex">
             {!user && (
               <>
-                <Link to="/" className={linkClass('/')}>Home</Link>
+                <Link to="/institucional" className={linkClass('/institucional')}>Home</Link>
                 <Link to="/sobre" className={linkClass('/sobre')}>Sobre</Link>
                 <Link to="/faq" className={linkClass('/faq')}>FAQ</Link>
                 <Link to="/contato" className={linkClass('/contato')}>Contato</Link>
@@ -119,7 +119,7 @@ function NavBar() {
           <div className="mt-3 flex flex-col gap-2 border-t border-slate-100 pt-3 md:hidden">
             {!user && (
               <>
-                <Link to="/" onClick={() => setIsOpen(false)} className={linkClass('/')}>Home</Link>
+                <Link to="/institucional" onClick={() => setIsOpen(false)} className={linkClass('/institucional')}>Home</Link>
                 <Link to="/sobre" onClick={() => setIsOpen(false)} className={linkClass('/sobre')}>Sobre</Link>
                 <Link to="/faq" onClick={() => setIsOpen(false)} className={linkClass('/faq')}>FAQ</Link>
                 <Link to="/contato" onClick={() => setIsOpen(false)} className={linkClass('/contato')}>Contato</Link>

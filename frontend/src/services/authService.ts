@@ -3,6 +3,8 @@ import type { AuthUser, LoginRequest, RegisterRequest } from '../types/auth';
 
 export const authService = {
   register: (data: RegisterRequest) => apiClient.post<AuthUser>('/auth/register', data),
-  login: (data: LoginRequest) => apiClient.post<AuthUser>('/auth/login', data),
+  login: (data: LoginRequest) => apiClient.post<{ user: AuthUser; token: string; expiresAt: string }>('/auth/login', data),
+  me: () => apiClient.get<AuthUser>('/auth/me'),
+  logout: () => apiClient.post<void>('/auth/logout'),
 };
 

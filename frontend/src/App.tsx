@@ -8,6 +8,8 @@ import { AuthProvider } from './context/AuthContext';
 import Layout from './components/layout/Layout';
 import SystemLayout from './components/layout/SystemLayout';
 import ProtectedRoute from './components/ui/ProtectedRoute';
+import SessionGate from './components/ui/SessionGate';
+import { AccountRedirect, GuestOnly } from './components/ui/AccountRedirect';
 
 // Páginas institucionais (Lazy Loaded)
 const Home = React.lazy(() => import('./pages/Home'));
@@ -37,31 +39,35 @@ function App() {
     // AuthProvider envolve tudo — contexto disponível em qualquer componente
     <AuthProvider>
       <Router>
+        <SessionGate>
         <Suspense fallback={<div className="flex items-center justify-center h-screen text-blue-600">Carregando...</div>}>
           <Routes>
             {/* Rotas com Layout (Header + NavBar + Footer) */}
-            <Route path="/" element={<Layout />}>
-              <Route index element={<Home />} />
+            <Route path="/" element={<AccountRedirect />} />
+            <Route element={<GuestOnly />}>
+            <Route path="login" element={<Login />} />
+            <Route element={<Layout />}>
+              <Route path="institucional" element={<Home />} />
               <Route path="sobre" element={<Sobre />} />
               <Route path="faq" element={<FAQ />} />
               <Route path="contato" element={<Contato />} />
               <Route path="integrantes" element={<Integrantes />} />
               <Route path="roadmap" element={<Roadmap />} />
               <Route path="solucao" element={<Roadmap />} />
-              <Route path="login" element={<Login />} />
               <Route path="cadastro" element={<CadastroVoluntario />} />
               <Route path="cadastro-voluntario" element={<CadastroVoluntario />} />
               <Route path="cadastro-beneficiario" element={<CadastroBeneficiario />} />
               <Route path="quero-ser-voluntario" element={<CadastroVoluntario />} />
             </Route>
 
+            </Route>
             {/* Rotas protegidas (Sistema) usando SystemLayout */}
-            <Route element={<SystemLayout />}>
+            <Route element={<ProtectedRoute><SystemLayout /></ProtectedRoute>}>
               {/* Voluntário: painel de administração */}
               <Route
                 path="/admin"
                 element={
-                  <ProtectedRoute requireVoluntario>
+                  <ProtectedRoute allowedRoles={['ADMIN']}>
                     <DashboardAdmin />
                   </ProtectedRoute>
                 }
@@ -72,7 +78,7 @@ function App() {
                 path="/portal"
                 element={
                   <ProtectedRoute>
-                    <PortalBeneficiario />
+                    <AccountRedirect />
                   </ProtectedRoute>
                 }
               />
@@ -185,8 +191,10 @@ function App() {
               />
             </Route>
 
+            <Route path="*" element={<AccountRedirect />} />
           </Routes>
         </Suspense>
+        </SessionGate>
       </Router>
     </AuthProvider>
   );

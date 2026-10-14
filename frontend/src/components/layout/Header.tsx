@@ -7,7 +7,7 @@ function Header() {
       <Container className="flex min-h-24 items-center justify-between gap-8 py-4">
         {/* Logo principal */}
         <Link
-          to="/"
+          to="/institucional"
           className="flex items-center gap-4 transition hover:opacity-90"
           aria-label="Ir para a página inicial"
         >

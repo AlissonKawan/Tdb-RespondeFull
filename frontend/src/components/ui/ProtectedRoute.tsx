@@ -5,6 +5,7 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../context/useAuth';
 import type { TipoUsuario } from '../../types/auth';
+import { portalFor } from './AccountRedirect';
 
 interface Props {
   children: React.ReactNode;
@@ -17,7 +18,7 @@ function ProtectedRoute({ children, requireVoluntario = false, allowedRoles }: P
 
   if (!user) return <Navigate to="/login" replace />;
   if (requireVoluntario && !isVoluntario && !isAdmin) return <Navigate to="/portal-beneficiario" replace />;
-  if (allowedRoles && !allowedRoles.includes(user.tipoUsuario)) return <Navigate to="/login" replace />;
+  if (allowedRoles && !allowedRoles.includes(user.tipoUsuario)) return <Navigate to={portalFor(user.tipoUsuario)} replace />;
 
   return <>{children}</>;
 }

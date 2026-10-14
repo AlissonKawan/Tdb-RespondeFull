@@ -40,7 +40,7 @@ function Login() {
         return 'Sua solicitação ainda está em análise. Aguarde a aprovação para acessar o portal.';
       }
       if (error.status === 404) return 'Conta não encontrada.';
-      if (error.status === 401) return 'Senha incorreta.';
+      if (error.status === 401) return 'E-mail ou senha inválidos.';
       if (error.status === 403) return 'Sua solicitação ainda está em análise. Aguarde a aprovação para acessar o portal.';
       if (error.status === 0) return 'Não foi possível conectar ao servidor.';
       return error.message;

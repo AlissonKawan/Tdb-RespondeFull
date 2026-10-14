@@ -10,11 +10,14 @@ import java.sql.Statement;
 
 @ApplicationScoped
 public class DatabaseInitializer {
+    @org.eclipse.microprofile.config.inject.ConfigProperty(name = "tdb.schema.init.enabled", defaultValue = "true")
+    boolean schemaInitEnabled;
     
     @Inject
     DataSource dataSource;
 
     void onStart(@Observes StartupEvent ev) {
+        if (!schemaInitEnabled) return;
         try (Connection conn = dataSource.getConnection(); Statement stmt = conn.createStatement()) {
             String createTable = "CREATE TABLE AGENDA_CONSULTA (" +
                 "ID NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +

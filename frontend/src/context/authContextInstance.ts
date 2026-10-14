@@ -7,6 +7,8 @@ export interface AuthContextType {
   register: (data: RegisterRequest) => Promise<AuthUser>;
   logout: () => void;
   isAuthenticated: boolean;
+  isLoading: boolean;
+  authError: string;
   isVoluntario: boolean;
   isBeneficiario: boolean;
   isAdmin: boolean;

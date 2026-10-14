@@ -16,6 +16,13 @@ import java.nio.charset.StandardCharsets;
 public class SpaFallbackResource {
 
     @GET
+    @Path("/institucional")
+    @Produces(MediaType.TEXT_HTML)
+    public Response institucional() {
+        return index();
+    }
+
+    @GET
     @Path("/login")
     @Produces(MediaType.TEXT_HTML)
     public Response login() {

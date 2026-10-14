@@ -22,6 +22,10 @@ vi.mock('../../context/useAuth', () => ({
   useAuth: vi.fn(),
 }));
 
+vi.mock('../../services/chatSocket', () => ({
+  openChatSocket: async (id: number, clientId: string) => new WebSocket(`ws://localhost/chat/${id}/${clientId}?ticket=test`),
+}));
+
 vi.mock('../../services/atendimentoService', () => ({
   atendimentoService: {
     buscarPorId: vi.fn(),

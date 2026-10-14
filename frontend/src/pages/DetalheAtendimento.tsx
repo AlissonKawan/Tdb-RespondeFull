@@ -13,6 +13,7 @@ import { useAuth } from '../context/useAuth';
 import { useConfirm } from '../hooks/useConfirm';
 import { atendimentoService } from '../services/atendimentoService';
 import { mensagensService } from '../services/mensagensService';
+import { openChatSocket } from '../services/chatSocket';
 import type { AtendimentoApi, Mensagem, MensagemRequest } from '../types/AtendimentoApi';
 
 const STATUS_OPTIONS = ['ABERTO', 'EM_ATENDIMENTO', 'ENCERRADO', 'CANCELADO'] as const;
@@ -214,19 +215,18 @@ function DetalheAtendimento() {
     let reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
     let reconnectAttempt = 0;
 
-    // A URL base precisa ser limpa e trocada de http para ws
-    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    const baseUrl = import.meta.env.VITE_API_URL || (isLocalhost ? 'http://localhost:8080' : 'https://tdb-respondefull.onrender.com');
-    const wsUrlBase = baseUrl.replace(/\/$/, '').replace(/^http:\/\//i, 'ws://').replace(/^https:\/\//i, 'wss://');
-
-    function connect() {
+    async function connect() {
       if (cancelled || !atendimentoId) return;
 
       const clientId = `${remetenteAtual}-${Math.random().toString(36).substring(7)}`;
-      const wsUrl = `${wsUrlBase}/chat/${atendimentoId}/${clientId}`;
 
-      console.log(`[WebSocket] Conectando a: ${wsUrl} (tentativa ${reconnectAttempt})`);
-      socket = new WebSocket(wsUrl);
+      try {
+        socket = await openChatSocket(atendimentoId, clientId);
+        if (cancelled) { socket.close(); return; }
+      } catch {
+        if (!cancelled) reconnectTimeout = setTimeout(() => { void connect(); }, 10000);
+        return;
+      }
 
       socket.onopen = () => {
         if (cancelled) {

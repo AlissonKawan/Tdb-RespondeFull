@@ -20,12 +20,15 @@ import java.util.List;
 
 @ApplicationScoped
 public class MensagemDAO {
+    @org.eclipse.microprofile.config.inject.ConfigProperty(name = "tdb.schema.init.enabled", defaultValue = "true")
+    boolean schemaInitEnabled;
 
     @Inject
     AgroalDataSource dataSource;
 
     @PostConstruct
     void init() {
+        if (!schemaInitEnabled) return;
         try (Connection conn = dataSource.getConnection();
              Statement stmt = conn.createStatement()) {
             
