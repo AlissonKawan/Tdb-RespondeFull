@@ -200,7 +200,7 @@ function ChatAtendimento({ atendimentoId, enviadoPor }: ChatAtendimentoProps) {
         </div>
 
         <div className="mt-5 min-h-80 rounded-2xl border border-border bg-muted/50 p-4">
-          {loading && <LoadingState title="Carregando mensagens..." />}
+          {loading && <LoadingState title="Carregando mensagens..." variant="inline" className="min-h-28" />}
           {erro && <ErrorState title="Erro no chat" description={erro} />}
           {!loading && !erro && mensagensOrdenadas.length === 0 && (
               <EmptyState title="Nenhuma mensagem ainda." description="Envie a primeira mensagem para iniciar a conversa." />

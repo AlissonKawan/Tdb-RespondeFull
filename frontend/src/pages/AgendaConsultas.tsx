@@ -7,6 +7,7 @@ import Container from '../components/ui/Container';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import Badge from '../components/ui/Badge';
+import { LoadingState } from '../components/ui/FeedbackState';
 import { Field, Input, Select, Textarea } from '../components/ui/Input';
 import { useAuth } from '../context/useAuth';
 import { useConfirm } from '../hooks/useConfirm';
@@ -284,7 +285,7 @@ export default function AgendaConsultas() {
         )}
 
         {isLoading ? (
-          <div className="text-center py-12 text-slate-500">Carregando sua agenda...</div>
+          <LoadingState title="Carregando sua agenda..." count={3} />
         ) : consultasFiltradas.length === 0 ? (
           <div className="text-center py-12 text-slate-500 bg-white rounded-xl border border-slate-200">
             <p>Nenhuma consulta encontrada para este filtro.</p>
@@ -457,7 +458,7 @@ export default function AgendaConsultas() {
               <div>
                 <h3 className="font-bold text-slate-800 mb-4 px-1">Histórico Clínico</h3>
                 {isProntuarioLoading && prontuariosList.length === 0 ? (
-                  <div className="text-center py-6 text-slate-500 text-sm">Carregando histórico...</div>
+                  <LoadingState title="Carregando histórico..." count={2} className="md:grid-cols-1 xl:grid-cols-1" />
                 ) : prontuariosList.length === 0 ? (
                   <div className="text-center py-8 bg-white border border-dashed border-slate-300 rounded-xl text-slate-500">
                     Nenhuma evolução registrada para esta consulta ainda.

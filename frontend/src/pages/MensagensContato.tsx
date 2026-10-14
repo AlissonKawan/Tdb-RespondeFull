@@ -16,7 +16,7 @@ export default function MensagensContato() {
     try {
       const data = await contatoService.listarMensagens();
       setContatos(data);
-    } catch (error) {
+    } catch {
       setErro('Erro ao carregar contatos.');
     } finally {
       setLoading(false);

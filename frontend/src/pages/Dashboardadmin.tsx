@@ -183,7 +183,7 @@ export default function DashboardAdmin() {
     ['inscricoes', inscricoes.length ? `Inscrições (${inscricoes.length})` : 'Inscrições'],
   ];
 
-  if (loading) return <div className="p-10"><LoadingState title="Carregando sistema..." /></div>;
+  if (loading) return <div className="p-6 md:p-10"><LoadingState title="Carregando sistema..." count={4} className="md:grid-cols-2 xl:grid-cols-4" /></div>;
 
   return (
     <div className="min-h-full bg-muted/50">

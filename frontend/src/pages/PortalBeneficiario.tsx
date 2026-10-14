@@ -234,7 +234,7 @@ function PortalBeneficiario() {
           description="Acompanhe o andamento dos seus atendimentos e fale com o responsável quando necessário."
         />
 
-        {loading && <LoadingState title="Carregando seus atendimentos..." />}
+        {loading && <LoadingState title="Carregando seus atendimentos..." count={3} />}
         {erro && <ErrorState title="Erro ao carregar dados" description={erro} />}
         {!loading && !erro && atendimentos.length === 0 && (
           <BeneficiaryEmptyState onCreate={() => navigate('/beneficiario/solicitar-atendimento')} />

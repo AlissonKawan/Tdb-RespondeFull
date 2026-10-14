@@ -424,7 +424,7 @@ function PortalVoluntario() {
         {aba === 'solicitados' && (
           <div>
             <SectionHeader title="Atendimentos solicitados" description="Casos aguardando acolhimento da equipe voluntária." />
-            {loadingSolicitados && <LoadingState title="Carregando atendimentos solicitados..." />}
+            {loadingSolicitados && <LoadingState title="Carregando atendimentos solicitados..." count={3} />}
             {erroSolicitados && <ErrorState title="Erro ao carregar atendimentos" description={erroSolicitados} />}
             {!loadingSolicitados && !erroSolicitados && solicitados.length === 0 && (
               <OperationalEmptyState
@@ -452,7 +452,7 @@ function PortalVoluntario() {
         {aba === 'meus' && (
           <div>
             <SectionHeader title="Meus atendimentos" description="Casos que já estão vinculados ao seu acompanhamento." />
-            {loadingMeus && <LoadingState title="Carregando seus atendimentos..." />}
+            {loadingMeus && <LoadingState title="Carregando seus atendimentos..." count={3} />}
             {erroMeus && <ErrorState title="Erro ao carregar seus atendimentos" description={erroMeus} />}
             {!loadingMeus && !erroMeus && meusAtendimentos.length === 0 && (
               <OperationalEmptyState

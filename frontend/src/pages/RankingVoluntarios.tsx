@@ -148,8 +148,8 @@ const RankingVoluntarios: React.FC = () => {
 
         {/* Feedback States */}
         {loading && (
-          <div className="max-w-md mx-auto mt-10">
-            <LoadingState title="Buscando as pontuações no servidor..." />
+          <div className="mx-auto mt-10 max-w-4xl">
+            <LoadingState title="Buscando as pontuações no servidor..." count={3} />
           </div>
         )}
 

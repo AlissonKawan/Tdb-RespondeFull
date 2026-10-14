@@ -270,7 +270,7 @@ export default function Cronograma() {
             </Button>
           </div>
 
-          {loading && <LoadingState title="Carregando seu cronograma..." />}
+          {loading && <LoadingState title="Carregando seu cronograma..." count={3} />}
           {error && <ErrorState title="Oops!" description={error} />}
           {actionFeedback && (
             <div

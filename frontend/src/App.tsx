@@ -10,6 +10,7 @@ import SystemLayout from './components/layout/SystemLayout';
 import ProtectedRoute from './components/ui/ProtectedRoute';
 import SessionGate from './components/ui/SessionGate';
 import { AccountRedirect, GuestOnly } from './components/ui/AccountRedirect';
+import { LoadingState } from './components/ui/FeedbackState';
 
 // Páginas institucionais (Lazy Loaded)
 const Home = React.lazy(() => import('./pages/Home'));
@@ -40,7 +41,7 @@ function App() {
     <AuthProvider>
       <Router>
         <SessionGate>
-        <Suspense fallback={<div className="flex min-h-dvh items-center justify-center bg-background text-primary" role="status">Carregando…</div>}>
+        <Suspense fallback={<div className="min-h-dvh bg-background p-6 md:p-10"><LoadingState title="Carregando página..." count={3} /></div>}>
           <Routes>
             <Route element={<GuestOnly />}>
               <Route path="login" element={<Login />} />

@@ -183,7 +183,7 @@ function DetalheAtendimento() {
   const composerRef = useRef<HTMLTextAreaElement>(null);
   
   useEffect(() => {
-    if (messagesEndRef.current) {
+    if (typeof messagesEndRef.current?.scrollIntoView === 'function') {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [mensagens]);
@@ -496,7 +496,7 @@ function DetalheAtendimento() {
       />
 
       <Section tone="white">
-        {loading && <LoadingState title="Carregando atendimento..." />}
+        {loading && <LoadingState title="Carregando atendimento..." count={1} className="md:grid-cols-1 xl:grid-cols-1" />}
         {erro && <ErrorState title="Não foi possível abrir o atendimento" description={erro} />}
 
         {!loading && !erro && atendimento && (

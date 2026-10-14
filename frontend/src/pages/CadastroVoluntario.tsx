@@ -151,7 +151,7 @@ function CadastroVoluntario() {
 
       <Section tone="blue">
         <Card className="mx-auto max-w-3xl p-6 lg:p-8">
-          {loadingEspecialidades && <LoadingState title="Carregando especialidades..." />}
+          {loadingEspecialidades && <LoadingState title="Carregando especialidades..." variant="inline" />}
           {erroEspecialidades && <ErrorState title="Erro ao carregar especialidades" description={erroEspecialidades} />}
           {sucesso && (
             <div className="mb-5 rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm font-semibold text-success">
