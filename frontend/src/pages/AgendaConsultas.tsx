@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
 import PageShell from '../components/layout/PageShell';
 import PageHeader from '../components/ui/PageHeader';
 import Container from '../components/ui/Container';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import Badge from '../components/ui/Badge';
-import { Field, Input, Select } from '../components/ui/Input';
+import { Field, Input, Select, Textarea } from '../components/ui/Input';
 import { useAuth } from '../context/useAuth';
 import { useConfirm } from '../hooks/useConfirm';
 import { agendaService } from '../services/agendaService';
@@ -37,6 +38,18 @@ const formatDateLabel = (dateStr: string) => {
   return dateStr;
 };
 
+type AgendaFormData = Omit<AgendaConsulta, 'id' | 'voluntarioId'>;
+type ProntuarioFormData = Pick<Prontuario, 'historicoMedico' | 'tratamentoAtual'>;
+
+const agendaDefaultValues = (): AgendaFormData => ({
+  paciente: '',
+  tipo: 'Avaliação Inicial',
+  dataConsulta: getTodayStr(),
+  horario: '08:00',
+  status: 'AGUARDANDO',
+  tipoPessoa: 'OUTRO',
+});
+
 export default function AgendaConsultas() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -45,6 +58,7 @@ export default function AgendaConsultas() {
   const [filtro, setFiltro] = useState<'Todos' | 'Hoje' | 'Amanhã'>('Todos');
   const [consultas, setConsultas] = useState<AgendaConsulta[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [feedback, setFeedback] = useState<{ tone: 'success' | 'danger'; message: string } | null>(null);
   
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -55,21 +69,26 @@ export default function AgendaConsultas() {
   const [prontuariosList, setProntuariosList] = useState<Prontuario[]>([]);
   const [isProntuarioLoading, setIsProntuarioLoading] = useState(false);
   
-  const [prontuarioForm, setProntuarioForm] = useState({
-    historicoMedico: '',
-    tratamentoAtual: ''
-  });
-
   // Modal Expirado
   const [resolveExpiredAgenda, setResolveExpiredAgenda] = useState<AgendaConsulta | null>(null);
 
-  const [formData, setFormData] = useState<Omit<AgendaConsulta, 'id' | 'voluntarioId'>>({
-    paciente: '',
-    tipo: 'Avaliação Inicial',
-    dataConsulta: getTodayStr(),
-    horario: '08:00',
-    status: 'AGUARDANDO',
-    tipoPessoa: 'OUTRO'
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm<AgendaFormData>({ mode: 'onBlur', defaultValues: agendaDefaultValues() });
+
+  const {
+    register: registerProntuario,
+    handleSubmit: handleSubmitProntuario,
+    reset: resetProntuario,
+    setError: setProntuarioError,
+    formState: { errors: prontuarioErrors },
+  } = useForm<ProntuarioFormData>({
+    mode: 'onBlur',
+    defaultValues: { historicoMedico: '', tratamentoAtual: '' },
   });
 
   const carregarAgendas = async () => {
@@ -78,9 +97,10 @@ export default function AgendaConsultas() {
       setIsLoading(true);
       const data = await agendaService.buscarPorVoluntario(user.id);
       setConsultas(data);
+      setFeedback(null);
     } catch (error) {
       console.error("Erro ao carregar agenda", error);
-      alert("Falha ao conectar com o servidor para buscar sua agenda.");
+      setFeedback({ tone: 'danger', message: 'Falha ao conectar com o servidor para buscar sua agenda.' });
     } finally {
       setIsLoading(false);
     }
@@ -99,14 +119,14 @@ export default function AgendaConsultas() {
 
   const handleOpenNew = () => {
     setEditingId(null);
-    setFormData({ paciente: '', tipo: 'Avaliação Inicial', dataConsulta: getTodayStr(), horario: '08:00', status: 'AGUARDANDO', tipoPessoa: 'OUTRO' });
+    reset(agendaDefaultValues());
     setIsModalOpen(true);
   };
 
   const handleOpenEdit = (c: AgendaConsulta) => {
     if (!c.id) return;
     setEditingId(c.id);
-    setFormData({
+    reset({
       paciente: c.paciente,
       tipo: c.tipo,
       dataConsulta: c.dataConsulta,
@@ -127,23 +147,16 @@ export default function AgendaConsultas() {
         try {
           await agendaService.excluir(id);
           setConsultas(prev => prev.filter(c => c.id !== id));
+          setFeedback({ tone: 'success', message: 'Agendamento excluído com sucesso.' });
         } catch (error) {
           console.error(error);
-          alert("Erro ao excluir agendamento.");
+          setFeedback({ tone: 'danger', message: 'Erro ao excluir agendamento.' });
         }
       }
     });
   };
 
-  const handleSave = async () => {
-    if (!formData.paciente.trim()) {
-      alert("O nome do paciente é obrigatório!");
-      return;
-    }
-    if (!formData.dataConsulta) {
-      alert("A data é obrigatória!");
-      return;
-    }
+  const handleSave = async (formData: AgendaFormData) => {
     if (!user?.id) return;
 
     try {
@@ -161,9 +174,10 @@ export default function AgendaConsultas() {
         setConsultas(prev => [...prev, nova]);
       }
       setIsModalOpen(false);
+      setFeedback({ tone: 'success', message: editingId ? 'Consulta atualizada com sucesso.' : 'Consulta criada com sucesso.' });
     } catch (error) {
       console.error(error);
-      alert("Erro ao salvar agendamento.");
+      setError('root.server', { message: 'Erro ao salvar agendamento. Tente novamente.' });
     } finally {
       setIsSaving(false);
     }
@@ -172,7 +186,7 @@ export default function AgendaConsultas() {
   // --- Lógica de Prontuário ---
   const handleOpenProntuario = async (agenda: AgendaConsulta) => {
     setSelectedProntuarioAgenda(agenda);
-    setProntuarioForm({ historicoMedico: '', tratamentoAtual: '' });
+    resetProntuario({ historicoMedico: '', tratamentoAtual: '' });
     if (!agenda.id) return;
     try {
       setIsProntuarioLoading(true);
@@ -180,18 +194,14 @@ export default function AgendaConsultas() {
       setProntuariosList(data);
     } catch (e) {
       console.error(e);
-      alert("Erro ao carregar prontuário.");
+      setProntuarioError('root.server', { message: 'Erro ao carregar prontuário.' });
     } finally {
       setIsProntuarioLoading(false);
     }
   };
 
-  const handleSaveProntuario = async () => {
+  const handleSaveProntuario = async (prontuarioForm: ProntuarioFormData) => {
     if (!selectedProntuarioAgenda?.id || !user?.id) return;
-    if (!prontuarioForm.tratamentoAtual.trim()) {
-      alert("Descreva o tratamento atual para salvar no prontuário.");
-      return;
-    }
 
     try {
       setIsProntuarioLoading(true);
@@ -204,10 +214,10 @@ export default function AgendaConsultas() {
       };
       const criado = await prontuarioService.registrarEvolucao(novo);
       setProntuariosList(prev => [criado, ...prev]); // Adiciona no topo
-      setProntuarioForm({ historicoMedico: '', tratamentoAtual: '' }); // limpa
+      resetProntuario({ historicoMedico: '', tratamentoAtual: '' });
     } catch (e) {
       console.error(e);
-      alert("Erro ao salvar evolução.");
+      setProntuarioError('root.server', { message: 'Erro ao salvar evolução. Tente novamente.' });
     } finally {
       setIsProntuarioLoading(false);
     }
@@ -224,9 +234,10 @@ export default function AgendaConsultas() {
       });
       setConsultas(prev => prev.map(c => c.id === resolveExpiredAgenda.id ? atualizada : c));
       setResolveExpiredAgenda(null);
+      setFeedback({ tone: 'success', message: 'Consulta encerrada com sucesso.' });
     } catch (e) {
       console.error(e);
-      alert("Erro ao encerrar a consulta.");
+      setFeedback({ tone: 'danger', message: 'Erro ao encerrar a consulta.' });
     } finally {
       setIsSaving(false);
     }
@@ -262,6 +273,15 @@ export default function AgendaConsultas() {
           <Button variant={filtro === 'Hoje' ? 'primary' : 'secondary'} onClick={() => setFiltro('Hoje')}>Hoje</Button>
           <Button variant={filtro === 'Amanhã' ? 'primary' : 'secondary'} onClick={() => setFiltro('Amanhã')}>Amanhã</Button>
         </div>
+
+        {feedback && (
+          <div
+            role={feedback.tone === 'danger' ? 'alert' : 'status'}
+            className={`mb-6 rounded-xl border px-4 py-3 text-sm font-semibold ${feedback.tone === 'danger' ? 'border-red-200 bg-red-50 text-red-700' : 'border-emerald-200 bg-emerald-50 text-emerald-700'}`}
+          >
+            {feedback.message}
+          </div>
+        )}
 
         {isLoading ? (
           <div className="text-center py-12 text-slate-500">Carregando sua agenda...</div>
@@ -338,35 +358,39 @@ export default function AgendaConsultas() {
               </button>
             </div>
             
-            <div className="space-y-4">
-              <Field label="Nome do Paciente">
-                <Input disabled={isSaving} value={formData.paciente} onChange={e => setFormData({...formData, paciente: e.target.value})} placeholder="Ex: Maria Silva" />
+            <form onSubmit={handleSubmit(handleSave)} noValidate>
+              <div className="space-y-4">
+              <Field label="Nome do Paciente" error={errors.paciente?.message}>
+                <Input autoFocus disabled={isSubmitting} {...register('paciente', { required: 'Informe o nome do paciente.' })} placeholder="Ex: Maria Silva" />
               </Field>
-              <Field label="Tipo de Atendimento">
-                <Input disabled={isSaving} value={formData.tipo} onChange={e => setFormData({...formData, tipo: e.target.value})} placeholder="Ex: Avaliação Inicial" />
+              <Field label="Tipo de Atendimento" error={errors.tipo?.message}>
+                <Input disabled={isSubmitting} {...register('tipo', { required: 'Informe o tipo de atendimento.' })} placeholder="Ex: Avaliação Inicial" />
               </Field>
               <div className="grid grid-cols-2 gap-4">
-                <Field label="Data">
-                  <Input disabled={isSaving} type="date" min={getTodayStr()} value={formData.dataConsulta} onChange={e => setFormData({...formData, dataConsulta: e.target.value})} />
+                <Field label="Data" error={errors.dataConsulta?.message}>
+                  <Input disabled={isSubmitting} type="date" min={getTodayStr()} {...register('dataConsulta', { required: 'Informe a data da consulta.' })} />
                 </Field>
-                <Field label="Horário">
-                  <Input disabled={isSaving} type="time" value={formData.horario} onChange={e => setFormData({...formData, horario: e.target.value})} />
+                <Field label="Horário" error={errors.horario?.message}>
+                  <Input disabled={isSubmitting} type="time" {...register('horario', { required: 'Informe o horário.' })} />
                 </Field>
               </div>
               <Field label="Status">
-                <Select disabled={isSaving} value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})}>
+                <Select disabled={isSubmitting} {...register('status')}>
                   <option value="AGUARDANDO">Aguardando</option>
                   <option value="CONFIRMADO">Confirmado</option>
                   <option value="CONCLUIDO">Concluído (Atendido)</option>
                   <option value="ENCERRADO">Encerrado / Desistência</option>
                 </Select>
               </Field>
-            </div>
+              </div>
 
-            <div className="mt-8 flex justify-end gap-3">
-              <Button disabled={isSaving} variant="secondary" onClick={() => setIsModalOpen(false)}>Cancelar</Button>
-              <Button disabled={isSaving} onClick={handleSave}>{isSaving ? 'Salvando...' : 'Salvar'}</Button>
-            </div>
+              {errors.root?.server?.message && <p role="alert" className="mt-4 text-sm font-medium text-danger">{errors.root.server.message}</p>}
+
+              <div className="mt-8 flex justify-end gap-3">
+                <Button type="button" disabled={isSubmitting} variant="secondary" onClick={() => setIsModalOpen(false)}>Cancelar</Button>
+                <Button type="submit" disabled={isSubmitting}>{isSubmitting ? 'Salvando...' : 'Salvar'}</Button>
+              </div>
+            </form>
           </Card>
         </div>
       )}
@@ -394,7 +418,7 @@ export default function AgendaConsultas() {
             <div className="p-6 overflow-y-auto space-y-8 flex-1 bg-slate-50">
               
               {/* Form de Nova Evolução */}
-              <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+              <form onSubmit={handleSubmitProntuario(handleSaveProntuario)} noValidate className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
                 <h3 className="font-bold text-slate-800 flex items-center gap-2">
                   <span className="bg-blue-100 text-blue-600 p-1.5 rounded-lg">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
@@ -403,33 +427,31 @@ export default function AgendaConsultas() {
                 </h3>
                 
                 <div className="grid gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Alertas Médicos / Anamnese (Tags separadas por vírgula)</label>
-                    <Input 
+                  <Field label="Alertas Médicos / Anamnese" hint="Use vírgulas para separar as informações.">
+                    <Input
                       disabled={isProntuarioLoading}
-                      placeholder="Ex: Alérgico a Penicilina, Hipertenso" 
-                      value={prontuarioForm.historicoMedico}
-                      onChange={e => setProntuarioForm({...prontuarioForm, historicoMedico: e.target.value})}
+                      placeholder="Ex: Alérgico a Penicilina, Hipertenso"
+                      {...registerProntuario('historicoMedico')}
                     />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Procedimento Realizado Hoje <span className="text-red-500">*</span></label>
-                    <textarea 
+                  </Field>
+                  <Field label="Procedimento Realizado Hoje" error={prontuarioErrors.tratamentoAtual?.message}>
+                    <Textarea
                       disabled={isProntuarioLoading}
-                      className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[100px]"
+                      className="min-h-[100px]"
                       placeholder="Descreva detalhadamente a evolução clínica, dentes tratados, etc..."
-                      value={prontuarioForm.tratamentoAtual}
-                      onChange={e => setProntuarioForm({...prontuarioForm, tratamentoAtual: e.target.value})}
+                      {...registerProntuario('tratamentoAtual', { required: 'Descreva o procedimento realizado hoje.' })}
                     />
-                  </div>
+                  </Field>
                 </div>
+
+                {prontuarioErrors.root?.server?.message && <p role="alert" className="text-sm font-medium text-danger">{prontuarioErrors.root.server.message}</p>}
                 
                 <div className="flex justify-end">
-                  <Button disabled={isProntuarioLoading} onClick={handleSaveProntuario}>
+                  <Button type="submit" disabled={isProntuarioLoading}>
                     {isProntuarioLoading ? 'Salvando...' : 'Salvar Evolução'}
                   </Button>
                 </div>
-              </div>
+              </form>
 
               {/* Histórico da Timeline */}
               <div>

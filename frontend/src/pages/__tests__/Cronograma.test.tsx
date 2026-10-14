@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterAll } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Cronograma from '../Cronograma';
@@ -18,19 +18,9 @@ vi.mock('../../services/cronogramaService', () => ({
   },
 }));
 
-const originalConfirm = window.confirm;
-const originalAlert = window.alert;
-
 describe('Cronograma', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    window.confirm = vi.fn().mockReturnValue(true);
-    window.alert = vi.fn();
-  });
-
-  afterAll(() => {
-    window.confirm = originalConfirm;
-    window.alert = originalAlert;
   });
 
   it('deve criar tarefa mantendo o contrato do cronograma Java', async () => {
@@ -186,11 +176,6 @@ describe('Cronograma', () => {
     await user.click(btnConfirmar);
     await user.click(await screen.findByRole('button', { name: 'Confirmar' }));
 
-    await waitFor(() => {
-      // Verifica que a falha não é apresentada como confirmação bem-sucedida.
-      expect(window.alert).toHaveBeenCalledWith(
-        'Erro ao confirmar tarefa'
-      );
-    });
+    expect(await screen.findByRole('alert')).toHaveTextContent('Erro de validação');
   });
 });

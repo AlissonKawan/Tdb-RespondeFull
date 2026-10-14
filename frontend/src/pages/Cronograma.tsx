@@ -8,6 +8,7 @@ import Button from '../components/ui/Button';
 import Badge from '../components/ui/Badge';
 import PageHeader from '../components/ui/PageHeader';
 import { EmptyState, ErrorState, LoadingState } from '../components/ui/FeedbackState';
+import { Field, Input, Select, Textarea } from '../components/ui/Input';
 import { useAuth } from '../context/useAuth';
 import { useConfirm } from '../hooks/useConfirm';
 import { cronogramaService } from '../services/cronogramaService';
@@ -15,17 +16,25 @@ import type { TarefaCronograma } from '../services/cronogramaService';
 
 const DIAS_SEMANA = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
 
-function statusTone(status?: string) {
+type BadgeTone = 'neutral' | 'success' | 'warning' | 'danger' | 'info';
+
+function statusTone(status?: string): BadgeTone {
   if (!status) return 'neutral';
   if (['Concluído', 'Finalizado'].includes(status)) return 'success';
   if (['Pendente', 'Em andamento'].includes(status)) return 'warning';
   return 'neutral';
 }
 
-function prioridadeTone(prioridade?: string) {
+function prioridadeTone(prioridade?: string): BadgeTone {
   if (prioridade === 'Alta' || prioridade === 'Urgente') return 'danger';
   if (prioridade === 'Média' || prioridade === 'Media') return 'warning';
   return 'info';
+}
+
+function getErrorMessage(error: unknown, fallback: string) {
+  if (!(error instanceof Error)) return fallback;
+  const details = 'details' in error ? (error as Error & { details?: unknown }).details : undefined;
+  return details ? `${error.message} Detalhes: ${JSON.stringify(details)}` : error.message;
 }
 
 function normalizeParaBackend(str: string) {
@@ -84,10 +93,11 @@ export default function Cronograma() {
   const [tarefas, setTarefas] = useState<TarefaCronograma[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [actionFeedback, setActionFeedback] = useState<{ tone: 'success' | 'danger'; message: string } | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [tarefaEmEdicao, setTarefaEmEdicao] = useState<TarefaCronograma | null>(null);
 
-  const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm<TarefaCronograma>();
+  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<TarefaCronograma>({ mode: 'onBlur' });
 
   const carregarTarefas = async () => {
     const targetId = user?.voluntarioId ?? (user?.tipoUsuario === 'ADMIN' ? user?.id : undefined);
@@ -160,19 +170,11 @@ export default function Cronograma() {
           setModalOpen(false);
           reset();
           setTarefaEmEdicao(null);
+          setActionFeedback({ tone: 'success', message: tarefaEmEdicao ? 'Tarefa atualizada com sucesso.' : 'Tarefa criada com sucesso.' });
           await carregarTarefas();
         } catch (err) {
           console.error('Erro na API:', err);
-          if (err instanceof Error) {
-            const errorDetails = (err as any).details;
-            if (errorDetails) {
-              alert(`Erro ao salvar: ${err.message}\nDetalhes: ${JSON.stringify(errorDetails)}`);
-            } else {
-              alert(err.message);
-            }
-          } else {
-            alert('Erro ao salvar tarefa');
-          }
+          setActionFeedback({ tone: 'danger', message: getErrorMessage(err, 'Erro ao salvar tarefa.') });
         }
       }
     });
@@ -187,9 +189,10 @@ export default function Cronograma() {
       onConfirm: async () => {
         try {
           await cronogramaService.excluirTarefa(id);
+          setActionFeedback({ tone: 'success', message: 'Tarefa excluída com sucesso.' });
           await carregarTarefas();
         } catch (err) {
-          alert(err instanceof Error ? err.message : 'Erro ao excluir');
+          setActionFeedback({ tone: 'danger', message: getErrorMessage(err, 'Erro ao excluir tarefa.') });
         }
       }
     });
@@ -216,23 +219,26 @@ export default function Cronograma() {
           };
           if (tarefa.id_tarefa) {
             await cronogramaService.atualizarTarefa(tarefa.id_tarefa, payload);
+            setActionFeedback({ tone: 'success', message: 'Tarefa marcada como concluída.' });
             await carregarTarefas();
           }
         } catch (err) {
           console.error(err);
-          alert('Erro ao confirmar tarefa');
+          setActionFeedback({ tone: 'danger', message: getErrorMessage(err, 'Erro ao confirmar tarefa.') });
         }
       }
     });
   };
 
   const abrirModalNova = () => {
+    setActionFeedback(null);
     setTarefaEmEdicao(null);
     reset({ tipo: 'Atividade Social', dia_semana: 'Segunda-feira', status: 'Pendente', prioridade: 'Média', data_atividade: '' });
     setModalOpen(true);
   };
 
   const abrirModalEdicao = (t: TarefaCronograma) => {
+    setActionFeedback(null);
     setTarefaEmEdicao(t);
     // Garantir que o form mostre os valores com acento
     reset({
@@ -266,6 +272,14 @@ export default function Cronograma() {
 
           {loading && <LoadingState title="Carregando seu cronograma..." />}
           {error && <ErrorState title="Oops!" description={error} />}
+          {actionFeedback && (
+            <div
+              role={actionFeedback.tone === 'danger' ? 'alert' : 'status'}
+              className={`mb-5 rounded-xl border px-4 py-3 text-sm font-semibold ${actionFeedback.tone === 'danger' ? 'border-red-200 bg-red-50 text-red-700' : 'border-emerald-200 bg-emerald-50 text-emerald-700'}`}
+            >
+              {actionFeedback.message}
+            </div>
+          )}
           {!loading && !error && tarefas.length === 0 && (
             <EmptyState title="Seu cronograma está vazio." description="Clique no botão acima para adicionar tarefas à sua semana." />
           )}
@@ -326,8 +340,8 @@ export default function Cronograma() {
                            })()}
 
                            <div className="mt-2 flex flex-wrap gap-2 text-xs">
-                             <Badge tone={statusTone(tarefa.status) as any}>{tarefa.status}</Badge>
-                             <Badge tone={prioridadeTone(tarefa.prioridade) as any}>{tarefa.prioridade}</Badge>
+                             <Badge tone={statusTone(tarefa.status)}>{tarefa.status}</Badge>
+                             <Badge tone={prioridadeTone(tarefa.prioridade)}>{tarefa.prioridade}</Badge>
                              <span className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 font-medium text-slate-800">
                                {tarefa.tipo}
                              </span>
@@ -352,61 +366,50 @@ export default function Cronograma() {
             </h3>
             
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-              <div>
-                <label className="mb-1 block text-sm font-medium text-slate-700">Título da Tarefa</label>
-                <input 
-                  {...register('titulo', { required: true })} 
-                  className="w-full rounded-lg border border-slate-300 p-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" 
+              <Field label="Título da Tarefa" error={errors.titulo?.message}>
+                <Input
+                  autoFocus
+                  {...register('titulo', { required: 'Informe o título da tarefa.' })}
                   placeholder="Ex: Reunião com equipe"
                 />
-              </div>
+              </Field>
 
-               <div>
-                <label className="mb-1 block text-sm font-medium text-slate-700">Descrição</label>
-                <textarea 
-                  {...register('descricao')} 
-                  className="w-full rounded-lg border border-slate-300 p-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" 
-                  rows={3}
-                />
-              </div>
+              <Field label="Descrição">
+                <Textarea {...register('descricao')} rows={3} />
+              </Field>
 
-              <div>
-                <label className="mb-1 block text-sm font-medium text-slate-700">Data Prevista</label>
-                <input 
+              <Field label="Data Prevista" error={errors.data_atividade?.message}>
+                <Input
                   type="date"
-                  {...register('data_atividade', { required: true })} 
-                  className="w-full rounded-lg border border-slate-300 p-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" 
+                  {...register('data_atividade', { required: 'Informe a data prevista.' })}
                 />
-              </div>
+              </Field>
 
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700">Prioridade</label>
-                  <select {...register('prioridade')} className="w-full rounded-lg border border-slate-300 p-2 text-sm">
+                <Field label="Prioridade">
+                  <Select {...register('prioridade')}>
                     <option value="Baixa">Baixa</option>
                     <option value="Média">Média</option>
                     <option value="Alta">Alta</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700">Tipo</label>
-                  <select {...register('tipo')} className="w-full rounded-lg border border-slate-300 p-2 text-sm">
+                  </Select>
+                </Field>
+                <Field label="Tipo">
+                  <Select {...register('tipo')}>
                     <option value="Atividade Social">Atividade Social</option>
                     <option value="Treinamento">Treinamento</option>
                     <option value="Reunião">Reunião</option>
                     <option value="Outros">Outros</option>
-                  </select>
-                </div>
+                  </Select>
+                </Field>
               </div>
 
               {tarefaEmEdicao && (
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700">Status</label>
-                  <select {...register('status')} className="w-full rounded-lg border border-slate-300 p-2 text-sm">
+                <Field label="Status">
+                  <Select {...register('status')}>
                     <option value="Pendente">Pendente</option>
                     <option value="Concluído">Concluído</option>
-                  </select>
-                </div>
+                  </Select>
+                </Field>
               )}
 
               <div className="mt-4 flex justify-end gap-2">

@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import PortalVoluntario from '../PortalVoluntario';
 import { useAuth } from '../../context/useAuth';
@@ -7,6 +7,9 @@ import { voluntariosService } from '../../services/voluntariosService';
 import { atendimentoService } from '../../services/atendimentoService';
 import { mensagensService } from '../../services/mensagensService';
 import { BrowserRouter } from 'react-router-dom';
+import type { AuthContextType } from '../../context/authContextInstance';
+import type { AuthUser } from '../../types/auth';
+import type { VoluntarioApi } from '../../types/api';
 
 vi.mock('../../context/useAuth', () => ({
   useAuth: vi.fn(),
@@ -32,6 +35,40 @@ vi.mock('../../services/mensagensService', () => ({
   },
 }));
 
+function authContext(nome = 'Voluntario'): AuthContextType {
+  const user: AuthUser = {
+    id: 1,
+    nome,
+    email: 'voluntario@teste.org',
+    tipoUsuario: 'VOLUNTARIO',
+    ativo: true,
+    voluntarioId: 10,
+  };
+  return {
+    user,
+    login: async () => user,
+    register: async () => user,
+    logout: vi.fn(),
+    isAuthenticated: true,
+    isLoading: false,
+    authError: '',
+    isVoluntario: true,
+    isBeneficiario: false,
+    isAdmin: false,
+  };
+}
+
+function voluntario(codigoIndicacao?: string): VoluntarioApi {
+  return {
+    id: 10,
+    nome: 'Voluntario',
+    usuario: 'voluntario@teste.org',
+    disponivel: true,
+    acessoSigilo: false,
+    codigoIndicacao,
+  };
+}
+
 describe('PortalVoluntario', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -42,16 +79,14 @@ describe('PortalVoluntario', () => {
     });
   });
 
-  it('deve exibir o botao "Gerar meu Link" se o voluntario nao possui codigo', async () => {
-    vi.mocked(useAuth).mockReturnValue({
-      user: { id: 1, nome: 'Test', tipoUsuario: 'VOLUNTARIO', voluntarioId: 10 },
-      logout: vi.fn(),
-    } as any);
+  afterEach(() => {
+    vi.useRealTimers();
+  });
 
-    vi.mocked(voluntariosService.buscarPorId).mockResolvedValue({
-      id: 10,
-      codigoIndicacao: undefined,
-    } as any);
+  it('deve exibir o botao "Gerar meu Link" se o voluntario nao possui codigo', async () => {
+    vi.mocked(useAuth).mockReturnValue(authContext('Test'));
+
+    vi.mocked(voluntariosService.buscarPorId).mockResolvedValue(voluntario());
 
     render(
       <BrowserRouter>
@@ -65,13 +100,10 @@ describe('PortalVoluntario', () => {
 
   it('deve gerar o codigo e exibir o link apos clicar no botao', async () => {
     const user = userEvent.setup();
-    vi.mocked(useAuth).mockReturnValue({
-      user: { id: 1, nome: 'Test', tipoUsuario: 'VOLUNTARIO', voluntarioId: 10 },
-      logout: vi.fn(),
-    } as any);
+    vi.mocked(useAuth).mockReturnValue(authContext('Test'));
 
-    vi.mocked(voluntariosService.buscarPorId).mockResolvedValue({ id: 10 } as any);
-    vi.mocked(voluntariosService.gerarCodigoIndicacao).mockResolvedValue({ id: 10, codigoIndicacao: 'TEST12' } as any);
+    vi.mocked(voluntariosService.buscarPorId).mockResolvedValue(voluntario());
+    vi.mocked(voluntariosService.gerarCodigoIndicacao).mockResolvedValue(voluntario('TEST12'));
 
     render(
       <BrowserRouter>
@@ -92,23 +124,20 @@ describe('PortalVoluntario', () => {
 
   it('deve exibir nome do paciente como titulo, ordenar por dataAtualizacao e exibir badge de Nova Mensagem', async () => {
     const user = userEvent.setup();
-    vi.mocked(useAuth).mockReturnValue({
-      user: { id: 1, nome: 'Voluntario', tipoUsuario: 'VOLUNTARIO', voluntarioId: 10 },
-      logout: vi.fn(),
-    } as any);
+    vi.mocked(useAuth).mockReturnValue(authContext());
 
-    vi.mocked(voluntariosService.buscarPorId).mockResolvedValue({ id: 10 } as any);
+    vi.mocked(voluntariosService.buscarPorId).mockResolvedValue(voluntario());
 
     // Mock Atendimentos (A = Antigo, B = Recente)
     vi.mocked(atendimentoService.listarPorVoluntario).mockResolvedValue([
       { id: 1, beneficiarioNome: 'Paciente Antigo', dataAtualizacao: '2023-01-01T00:00:00Z', status: 'ABERTO' },
       { id: 2, beneficiarioNome: 'Paciente Recente', dataAtualizacao: '2023-12-31T00:00:00Z', status: 'EM_ATENDIMENTO' },
-    ] as any);
+    ]);
 
     // Mock Mensagens para Atendimento 2 (Recente) ter nova mensagem do BENEFICIARIO
     vi.mocked(mensagensService.getMensagensAtendimento).mockImplementation(async (id: number) => {
       if (id === 2) {
-        return [{ id: 100, conteudo: 'Nova msg', enviadoPor: 'BENEFICIARIO', dataHora: new Date().toISOString() }] as any;
+        return [{ id: 100, atendimentoId: 2, conteudo: 'Nova msg', enviadoPor: 'BENEFICIARIO', dataHora: new Date().toISOString() }];
       }
       return [];
     });
@@ -136,5 +165,49 @@ describe('PortalVoluntario', () => {
     const posRecente = titles.indexOf('Paciente Recente');
     const posAntigo = titles.indexOf('Paciente Antigo');
     expect(posRecente).toBeLessThan(posAntigo);
+  });
+
+  it('deve filtrar a fila por urgentes e casos Apolonia', async () => {
+    const user = userEvent.setup();
+    vi.mocked(useAuth).mockReturnValue(authContext());
+    vi.mocked(voluntariosService.buscarPorId).mockResolvedValue(voluntario());
+    vi.mocked(atendimentoService.listarSolicitados).mockResolvedValue([
+      { id: 1, beneficiarioNome: 'Caso Urgente', prioridade: 'ALTA', status: 'ABERTO' },
+      { id: 2, beneficiarioNome: 'Caso Protegido', tipoPessoa: 'MULHER_APOLONIA', prioridade: 'MEDIA', status: 'ABERTO' },
+      { id: 3, beneficiarioNome: 'Caso Regular', prioridade: 'BAIXA', status: 'ABERTO' },
+    ]);
+
+    render(<BrowserRouter><PortalVoluntario /></BrowserRouter>);
+
+    expect(await screen.findByText('Caso Urgente')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /Urgentes \(1\)/i }));
+    expect(screen.getByText('Caso Urgente')).toBeInTheDocument();
+    expect(screen.queryByText('Caso Protegido')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /Casos Apol.nia \(1\)/i }));
+    expect(screen.getByText('Caso Protegido')).toBeInTheDocument();
+    expect(screen.queryByText('Caso Urgente')).not.toBeInTheDocument();
+  });
+
+  it('deve mostrar Copiado por dois segundos ao copiar o link', async () => {
+    vi.mocked(useAuth).mockReturnValue(authContext());
+    vi.mocked(voluntariosService.buscarPorId).mockResolvedValue(voluntario('TEST12'));
+
+    render(<BrowserRouter><PortalVoluntario /></BrowserRouter>);
+    const copyButton = await screen.findByRole('button', { name: /Copiar link/i });
+
+    vi.useFakeTimers();
+    await act(async () => {
+      fireEvent.click(copyButton);
+      await Promise.resolve();
+    });
+
+    expect(navigator.clipboard.writeText).toHaveBeenCalledWith(expect.stringContaining('/cadastro?ref=TEST12'));
+    expect(screen.getByRole('button', { name: /Copiado!/i })).toBeInTheDocument();
+
+    act(() => vi.advanceTimersByTime(1999));
+    expect(screen.getByRole('button', { name: /Copiado!/i })).toBeInTheDocument();
+    act(() => vi.advanceTimersByTime(1));
+    expect(screen.getByRole('button', { name: /Copiar link/i })).toBeInTheDocument();
   });
 });
