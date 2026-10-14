@@ -43,10 +43,10 @@ function App() {
         <Suspense fallback={<div className="flex items-center justify-center h-screen text-blue-600">Carregando...</div>}>
           <Routes>
             {/* Rotas com Layout (Header + NavBar + Footer) */}
-            <Route path="/" element={<AccountRedirect />} />
             <Route element={<GuestOnly />}>
             <Route path="login" element={<Login />} />
             <Route element={<Layout />}>
+              <Route path="/" element={<Home />} />
               <Route path="institucional" element={<Home />} />
               <Route path="sobre" element={<Sobre />} />
               <Route path="faq" element={<FAQ />} />

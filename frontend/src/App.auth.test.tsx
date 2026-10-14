@@ -17,12 +17,18 @@ function authenticated(role: 'VOLUNTARIO' | 'ADMIN' | 'BENEFICIARIO') {
   saveSession({ token: 'x'.repeat(43), expiresAt: new Date(Date.now() + 3600000).toISOString() });
   vi.mocked(authService.me).mockResolvedValue({ id: 7, nome: 'Teste', email: 't@example.test', tipoUsuario: role, ativo: true });
 }
-it.each(['/admin', '/portal', '/portal-voluntario', '/atendimentos/1', '/', '/url-inexistente'])('URL %s sem sessão vai ao login sem layout institucional', async path => {
+it.each(['/admin', '/portal', '/portal-voluntario', '/atendimentos/1', '/url-inexistente'])('URL %s sem sessão vai ao login sem layout institucional', async path => {
   go(path);
   expect(await screen.findByText('Login isolado')).toBeInTheDocument();
   expect(screen.queryByText('Home')).not.toBeInTheDocument();
   expect(screen.queryByText('Dashboard Admin')).not.toBeInTheDocument();
   expect(window.location.pathname).toBe('/login');
+});
+it('raiz sem sessão exibe o conteúdo institucional', async () => {
+  go('/');
+  expect(await screen.findByText('Institucional')).toBeInTheDocument();
+  expect(screen.queryByText('Login isolado')).not.toBeInTheDocument();
+  expect(window.location.pathname).toBe('/');
 });
 it('voluntário não entra no admin digitando URL', async () => {
   authenticated('VOLUNTARIO'); go('/admin');
