@@ -35,16 +35,21 @@ describe('SystemLayout', () => {
       </MemoryRouter>
     );
 
-    expect(screen.getAllByText('Turma do Bem')[0]).toBeInTheDocument();
-    expect(screen.getByText('Olá, João Silva')).toBeInTheDocument();
+    expect(screen.getByAltText('Turma do Bem')).toBeInTheDocument();
+    expect(screen.getAllByText('João Silva')[0]).toBeInTheDocument();
+    expect(screen.getByText('VOLUNTÁRIO')).toBeInTheDocument();
     expect(screen.getByText('Portal Voluntário')).toBeInTheDocument();
     expect(screen.getByText('Ranking')).toBeInTheDocument();
+    expect(screen.getByText('GESTÃO & CONTROLE')).toBeInTheDocument();
+    expect(screen.getByText('CLÍNICA & AGENDA')).toBeInTheDocument();
+    expect(screen.getByText('COMUNICAÇÃO')).toBeInTheDocument();
 
     // Inscrições Pendentes NÃO deve mais aparecer para voluntário comum
     expect(screen.queryByText('Inscrições Pendentes')).not.toBeInTheDocument();
 
-    expect(screen.getByText('Sair')).toBeInTheDocument();
-    expect(screen.getByText('Área restrita / Minha agenda')).toBeInTheDocument();
+    expect(screen.getByText('Sair da conta')).toBeInTheDocument();
+    expect(screen.getByText('Área restrita')).toBeInTheDocument();
+    expect(screen.getByText('Minha agenda')).toBeInTheDocument();
   });
 
   it('renderiza links corretos para beneficiário', () => {
