@@ -64,9 +64,9 @@ function HeroDashboardCard() {
 
         <div className="border-t border-blue-100 bg-gradient-to-br from-blue-50 via-white to-sky-50 px-4 py-5 sm:px-6 sm:py-6">
           <div className="flex flex-col gap-5">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-center gap-3">
-                <div className="flex -space-x-3" aria-label="Profissionais voluntários da rede">
+            <div className="flex flex-col gap-4">
+              <div className="flex min-w-0 items-center gap-3">
+                <div className="flex shrink-0 -space-x-3" aria-label="Profissionais voluntários da rede">
                   {[
                     ['https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=120&q=80', 'Dentista voluntária'],
                     ['https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&w=120&q=80', 'Dentista voluntário'],
@@ -84,17 +84,17 @@ function HeroDashboardCard() {
                     500+
                   </span>
                 </div>
-                <p className="max-w-52 text-sm font-bold leading-5 text-slate-900">
+                <p className="min-w-0 flex-1 text-sm font-bold leading-5 text-slate-900">
                   Mais de 500 profissionais voluntários ativos
                 </p>
               </div>
 
-              <div className="inline-flex max-w-md items-center gap-2.5 self-start rounded-2xl border border-blue-200 bg-white/90 px-3.5 py-2.5 text-xs font-semibold leading-5 text-blue-950 shadow-sm sm:self-auto">
+              <div className="flex w-full min-w-0 items-center gap-2.5 rounded-2xl border border-blue-200 bg-white/90 px-3.5 py-2.5 text-xs font-semibold leading-5 text-blue-950 shadow-sm">
                 <svg className="h-5 w-5 shrink-0 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
                   <path d="M12 3 5 6v5c0 4.6 2.8 8.2 7 10 4.2-1.8 7-5.4 7-10V6l-7-3Z" strokeLinecap="round" strokeLinejoin="round" />
                   <path d="m9 12 2 2 4-4" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
-                <span>Rede Turma do Bem <span className="text-blue-300" aria-hidden="true">•</span> Maior rede de voluntariado odontológico do mundo</span>
+                <span className="min-w-0">Rede Turma do Bem <span className="text-blue-300" aria-hidden="true">•</span> Maior rede de voluntariado odontológico do mundo</span>
               </div>
             </div>
 
