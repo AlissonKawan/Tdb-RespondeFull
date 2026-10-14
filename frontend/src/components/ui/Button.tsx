@@ -1,4 +1,5 @@
-import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from 'react';
+import type { AnchorHTMLAttributes, ButtonHTMLAttributes, MouseEventHandler, ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 
 type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost';
 type ButtonSize = 'sm' | 'normal' | 'large';
@@ -17,18 +18,28 @@ interface BaseButtonProps {
 type ButtonProps = BaseButtonProps &
   ButtonHTMLAttributes<HTMLButtonElement> & {
     href?: undefined;
+    to?: undefined;
   };
 
 type LinkButtonProps = BaseButtonProps &
-  AnchorHTMLAttributes<HTMLAnchorElement> & {
-    href: string;
-  };
+  Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> &
+  (
+    | {
+        href: string;
+        to?: string;
+      }
+    | {
+        href?: string;
+        to: string;
+      }
+  );
 
 type Props = ButtonProps | LinkButtonProps;
 
 function Button({
   children,
   href,
+  to,
   variant = 'primary',
   size = 'normal',
   fullWidth = false,
@@ -60,10 +71,26 @@ function Button({
   } ${className}`;
 
   const hasEnhancedContent = isLoading || Boolean(leftIcon) || Boolean(rightIcon);
+  const internalDestination = to || (href?.startsWith('/') ? href : undefined);
+  const isExternalHref = Boolean(href && /^https?:\/\//i.test(href));
+  const anchorProps = props as Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>;
+
+  if (internalDestination && !hasEnhancedContent) {
+    return (
+      <Link to={internalDestination} className={classes} {...anchorProps}>
+        {children}
+      </Link>
+    );
+  }
 
   if (href && !hasEnhancedContent) {
     return (
-      <a href={href} className={classes} {...(props as AnchorHTMLAttributes<HTMLAnchorElement>)}>
+      <a
+        href={href}
+        className={classes}
+        {...anchorProps}
+        rel={isExternalHref ? 'noopener noreferrer' : anchorProps.rel}
+      >
         {children}
       </a>
     );
@@ -90,6 +117,26 @@ function Button({
     </>
   );
 
+  if (internalDestination) {
+    const handleClick: MouseEventHandler<HTMLAnchorElement> = (event) => {
+      if (isLoading) event.preventDefault();
+      anchorProps.onClick?.(event);
+    };
+
+    return (
+      <Link
+        to={internalDestination}
+        className={`${classes} ${isLoading ? 'pointer-events-none' : ''}`}
+        aria-busy={isLoading}
+        aria-disabled={isLoading}
+        {...anchorProps}
+        onClick={handleClick}
+      >
+        {content}
+      </Link>
+    );
+  }
+
   if (href) {
     return (
       <a
@@ -97,7 +144,8 @@ function Button({
         className={`${classes} ${isLoading ? 'pointer-events-none' : ''}`}
         aria-busy={isLoading}
         aria-disabled={isLoading}
-        {...(props as AnchorHTMLAttributes<HTMLAnchorElement>)}
+        {...anchorProps}
+        rel={isExternalHref ? 'noopener noreferrer' : anchorProps.rel}
       >
         {content}
       </a>
