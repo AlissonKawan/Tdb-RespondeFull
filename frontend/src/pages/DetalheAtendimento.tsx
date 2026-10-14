@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useRef, type FormEvent } from 'react';
+import { useEffect, useMemo, useState, useRef, type FormEvent, type KeyboardEvent, type ReactNode } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Section from '../components/layout/Section';
 import PageShell from '../components/layout/PageShell';
@@ -6,7 +6,7 @@ import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import { ErrorState, LoadingState } from '../components/ui/FeedbackState';
-import { Field, Select, Textarea } from '../components/ui/Input';
+import { Field, Select } from '../components/ui/Input';
 import PageHeader from '../components/ui/PageHeader';
 import { useAuth } from '../context/useAuth';
 import { useConfirm } from '../hooks/useConfirm';
@@ -29,6 +29,13 @@ function formatDate(value?: string | null) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
   return date.toLocaleString('pt-BR');
+}
+
+function formatTime(value?: string | null) {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 }
 
 function labelStatus(status?: string) {
@@ -58,6 +65,15 @@ function getSender(tipoUsuario?: string): MensagemRequest['enviadoPor'] {
   return 'BENEFICIARIO';
 }
 
+function labelRemetente(remetente?: string) {
+  const labels: Record<string, string> = {
+    VOLUNTARIO: 'Dentista Voluntário',
+    BENEFICIARIO: 'Beneficiário',
+    ADMIN: 'Administração',
+  };
+  return remetente ? labels[remetente] ?? 'Equipe de atendimento' : 'Equipe de atendimento';
+}
+
 function InfoItem({ label, value }: { label: string; value?: string | number | null }) {
   return (
     <div>
@@ -84,20 +100,63 @@ function labelStatusCheckin(status?: string) {
     NAO_COMPARECERA: 'Não comparecerá',
     REAGENDAMENTO_SOLICITADO: 'Reagendamento solicitado',
     SEM_RESPOSTA: 'Sem resposta',
+    AGUARDANDO_RESPOSTA: 'Aguardando resposta',
   };
   return status ? labels[status] ?? status : 'Não enviado';
 }
 
 function iaPrevisaoConfig(previsao?: string) {
   if (!previsao) return null;
-  const map: Record<string, { cor: string; bg: string; border: string; icone: string }> = {
-    CONFIRMADO:               { cor: 'text-emerald-800', bg: 'bg-emerald-50',  border: 'border-emerald-200', icone: 'V' },
-    NAO_COMPARECERA:          { cor: 'text-red-800',     bg: 'bg-red-50',      border: 'border-red-200',     icone: 'X' },
-    REAGENDAMENTO_SOLICITADO: { cor: 'text-amber-800',   bg: 'bg-amber-50',    border: 'border-amber-200',   icone: '~' },
-    SEM_RESPOSTA:             { cor: 'text-slate-700',   bg: 'bg-slate-50',    border: 'border-slate-200',   icone: '?' },
-    AGUARDANDO_RESPOSTA:      { cor: 'text-blue-800',    bg: 'bg-blue-50',     border: 'border-blue-200',    icone: '...' },
+  const iconClass = 'h-5 w-5';
+  const map: Record<string, { cor: string; bg: string; border: string; iconBg: string; icone: ReactNode }> = {
+    CONFIRMADO: {
+      cor: 'text-emerald-800', bg: 'bg-emerald-50', border: 'border-emerald-200', iconBg: 'bg-emerald-100',
+      icone: (
+        <svg viewBox="0 0 24 24" fill="none" className={iconClass} stroke="currentColor" strokeWidth="2" aria-hidden="true">
+          <circle cx="12" cy="12" r="9" />
+          <path d="m8 12 2.5 2.5L16 9" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      ),
+    },
+    NAO_COMPARECERA: {
+      cor: 'text-red-800', bg: 'bg-red-50', border: 'border-red-200', iconBg: 'bg-red-100',
+      icone: (
+        <svg viewBox="0 0 24 24" fill="none" className={iconClass} stroke="currentColor" strokeWidth="2" aria-hidden="true">
+          <circle cx="12" cy="12" r="9" />
+          <path d="m9 9 6 6m0-6-6 6" strokeLinecap="round" />
+        </svg>
+      ),
+    },
+    REAGENDAMENTO_SOLICITADO: {
+      cor: 'text-amber-800', bg: 'bg-amber-50', border: 'border-amber-200', iconBg: 'bg-amber-100',
+      icone: (
+        <svg viewBox="0 0 24 24" fill="none" className={iconClass} stroke="currentColor" strokeWidth="2" aria-hidden="true">
+          <rect x="4" y="5.5" width="16" height="14" rx="2" />
+          <path d="M8 3.5v4m8-4v4M4 10h16m-5 3-3 3-2-2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      ),
+    },
+    SEM_RESPOSTA: {
+      cor: 'text-slate-700', bg: 'bg-slate-50', border: 'border-slate-200', iconBg: 'bg-slate-200',
+      icone: (
+        <svg viewBox="0 0 24 24" fill="none" className={iconClass} stroke="currentColor" strokeWidth="2" aria-hidden="true">
+          <circle cx="12" cy="12" r="9" />
+          <circle cx="8" cy="12" r="1" fill="currentColor" stroke="none" />
+          <circle cx="12" cy="12" r="1" fill="currentColor" stroke="none" />
+          <circle cx="16" cy="12" r="1" fill="currentColor" stroke="none" />
+        </svg>
+      ),
+    },
+    AGUARDANDO_RESPOSTA: {
+      cor: 'text-blue-800', bg: 'bg-blue-50', border: 'border-blue-200', iconBg: 'bg-blue-100',
+      icone: (
+        <svg viewBox="0 0 24 24" fill="none" className={iconClass} stroke="currentColor" strokeWidth="2" aria-hidden="true">
+          <path d="M8 3h8M8 21h8M9 3v3.2c0 1.3.6 2.5 1.6 3.2L12 10.5l1.4-1.1c1-.8 1.6-2 1.6-3.2V3m0 18v-3.2c0-1.3-.6-2.5-1.6-3.2L12 13.5l-1.4 1.1c-1 .8-1.6 2-1.6 3.2V21" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      ),
+    },
   };
-  return map[previsao] ?? { cor: 'text-slate-700', bg: 'bg-slate-50', border: 'border-slate-200', icone: '?' };
+  return map[previsao] ?? map.SEM_RESPOSTA;
 }
 
 function DetalheAtendimento() {
@@ -121,6 +180,7 @@ function DetalheAtendimento() {
   // O ref é atualizado instantaneamente, evitando duplicatas.
   const seenIdsRef = useRef<Set<number>>(new Set());
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const composerRef = useRef<HTMLTextAreaElement>(null);
   
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -320,6 +380,7 @@ function DetalheAtendimento() {
 
     const texto = conteudo.trim();
     setConteudo('');
+    if (composerRef.current) composerRef.current.style.height = '44px';
     setFeedback('');
 
     try {
@@ -341,6 +402,18 @@ function DetalheAtendimento() {
       setFeedback(error instanceof Error ? error.message : 'Não foi possível enviar a mensagem.');
       setConteudo(texto); // Restaura o texto
     }
+  };
+
+  const ajustarAlturaComposer = (element: HTMLTextAreaElement) => {
+    element.style.height = '44px';
+    element.style.height = `${Math.min(element.scrollHeight, 128)}px`;
+  };
+
+  const handleComposerKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key !== 'Enter' || event.shiftKey || event.nativeEvent.isComposing) return;
+    event.preventDefault();
+    if (!conteudo.trim() || chatBloqueado) return;
+    event.currentTarget.form?.requestSubmit();
   };
 
   const salvarAtendimento = async (encerrar = false) => {
@@ -454,15 +527,27 @@ function DetalheAtendimento() {
                 </div>
               </Card>
 
-              <Card className="overflow-hidden">
-                <div className="border-b border-border bg-slate-50 px-6 py-5">
-                  <h2 className="text-xl font-bold text-foreground">Mensagens</h2>
-                  <p className="mt-1 text-sm text-muted-foreground">Conversa vinculada ao atendimento.</p>
+              <Card className="overflow-hidden shadow-sm">
+                <div className="flex items-center justify-between gap-4 border-b border-border bg-surface px-5 py-4 sm:px-6">
+                  <div>
+                    <h2 className="text-xl font-bold text-foreground">Mensagens</h2>
+                    <p className="mt-1 text-sm text-muted-foreground">Conversa vinculada ao atendimento.</p>
+                  </div>
+                  <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-800">
+                    <span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden="true" />
+                    Canal ativo
+                  </span>
                 </div>
 
-                <div className="max-h-[520px] space-y-4 overflow-y-auto p-6">
+                <div
+                  className="max-h-[540px] min-h-72 space-y-3 overflow-y-auto bg-muted/35 p-4 sm:p-6"
+                  role="log"
+                  aria-live="polite"
+                  aria-relevant="additions"
+                  aria-label="Histórico de mensagens"
+                >
                   {mensagens.length === 0 && (
-                    <div className="rounded-2xl border border-dashed border-border px-4 py-8 text-center text-sm text-muted-foreground">
+                    <div className="rounded-2xl border border-dashed border-border bg-surface/80 px-4 py-10 text-center text-sm text-muted-foreground">
                       Nenhuma mensagem enviada ainda.
                     </div>
                   )}
@@ -471,44 +556,63 @@ function DetalheAtendimento() {
                     const minha = mensagem.enviadoPor === remetenteAtual;
                     return (
                       <div key={mensagem.id} className={`flex ${minha ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[82%] rounded-2xl px-4 py-3 text-sm shadow-sm ${
+                        <article className={`max-w-[88%] rounded-2xl px-4 py-3 text-sm shadow-sm sm:max-w-[78%] ${
                           minha
-                            ? 'bg-primary text-white'
-                            : 'border border-border bg-white text-foreground'
+                            ? 'rounded-br-md bg-primary text-primary-foreground'
+                            : 'rounded-bl-md border border-border bg-surface text-foreground'
                         }`}
                         >
-                          <p className="text-xs font-bold uppercase tracking-widest opacity-75">{mensagem.enviadoPor}</p>
-                          <p className="mt-1 whitespace-pre-wrap leading-6">{mensagem.conteudo}</p>
-                          <p className={`mt-2 text-xs ${minha ? 'text-blue-100' : 'text-muted-foreground'}`}>
-                            {formatDate(mensagem.dataHora)}
-                          </p>
-                        </div>
+                          <header className={`flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-xs ${minha ? 'text-blue-100' : 'text-muted-foreground'}`}>
+                            <span className="font-semibold">
+                              {minha ? 'Você · ' : ''}{labelRemetente(mensagem.enviadoPor)}
+                            </span>
+                            <time dateTime={mensagem.dataHora}>{formatTime(mensagem.dataHora)}</time>
+                          </header>
+                          <p className="mt-1.5 whitespace-pre-wrap break-words leading-6">{mensagem.conteudo}</p>
+                        </article>
                       </div>
                     );
                   })}
-                  <div ref={messagesEndRef} />
+                  <div ref={messagesEndRef} aria-hidden="true" />
                 </div>
 
-                <form onSubmit={enviarMensagem} className="border-t border-border p-6">
+                <form onSubmit={enviarMensagem} className="border-t border-border bg-surface p-4 sm:p-5">
                   {chatBloqueado && (
                     <div className="mb-4 rounded-xl border border-orange-100 bg-orange-50 px-4 py-3 text-sm font-semibold text-orange-800">
                       Este atendimento está {labelStatus(atendimento.status).toLowerCase()}. O envio de mensagens está bloqueado.
                     </div>
                   )}
-                  <Field label="Nova mensagem">
-                    <Textarea
-                      rows={4}
+                  <label htmlFor="chat-composer" className="sr-only">Nova mensagem</label>
+                  <div className="flex items-end gap-2 rounded-2xl border border-border bg-background p-2 shadow-sm transition-[border-color,box-shadow] duration-fast focus-within:border-primary focus-within:ring-2 focus-within:ring-ring/20">
+                    <textarea
+                      ref={composerRef}
+                      id="chat-composer"
+                      rows={1}
                       value={conteudo}
-                      onChange={(event) => setConteudo(event.target.value)}
+                      onChange={(event) => {
+                        setConteudo(event.target.value);
+                        ajustarAlturaComposer(event.target);
+                      }}
+                      onKeyDown={handleComposerKeyDown}
                       disabled={chatBloqueado}
                       placeholder="Escreva sua mensagem..."
+                      className="min-h-11 max-h-32 flex-1 resize-none overflow-y-auto bg-transparent px-3 py-2.5 text-base leading-6 text-foreground outline-none placeholder:text-slate-400 disabled:cursor-not-allowed disabled:text-muted-foreground"
                     />
-                  </Field>
-                  <div className="mt-4 flex justify-end">
-                    <Button type="submit" disabled={chatBloqueado || !conteudo.trim()}>
-                      Enviar mensagem
+                    <Button
+                      type="submit"
+                      disabled={chatBloqueado || !conteudo.trim()}
+                      className="h-11 w-11 shrink-0 rounded-full !px-0"
+                      aria-label="Enviar mensagem"
+                      title="Enviar mensagem"
+                    >
+                      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                        <path d="m4 4 16 8-16 8 3-8-3-8Z" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M7 12h13" strokeLinecap="round" />
+                      </svg>
+                      <span className="sr-only">Enviar mensagem</span>
                     </Button>
                   </div>
+                  <p className="mt-2 px-1 text-xs text-muted-foreground">Enter envia · Shift + Enter adiciona uma nova linha</p>
                 </form>
               </Card>
             </div>
@@ -618,14 +722,19 @@ function DetalheAtendimento() {
                       ? Math.round(atendimento.confiancaCheckin * 100)
                       : null;
                     return (
-                      <div className={`mt-4 rounded-xl border px-4 py-3 ${cfg.bg} ${cfg.border}`}>
-                        <p className={`text-xs font-bold uppercase tracking-widest ${cfg.cor}`}>
-                          Previsao da Inteligencia Artificial
-                        </p>
-                        <p className={`mt-1 text-sm font-semibold ${cfg.cor}`}>
-                          [{cfg.icone}] {labelStatusCheckin(atendimento.previsaoCheckin)}
-                          {pct !== null && <span className="ml-2 opacity-75">({pct}% de confianca)</span>}
-                        </p>
+                      <div className={`mt-4 flex gap-3 rounded-xl border px-4 py-3 ${cfg.bg} ${cfg.border}`}>
+                        <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${cfg.iconBg} ${cfg.cor}`}>
+                          {cfg.icone}
+                        </span>
+                        <div className="min-w-0">
+                          <p className={`text-xs font-bold uppercase tracking-widest ${cfg.cor}`}>
+                            Previsão da Inteligência Artificial
+                          </p>
+                          <p className={`mt-1 text-sm font-semibold ${cfg.cor}`}>
+                            {labelStatusCheckin(atendimento.previsaoCheckin)}
+                            {pct !== null && <span className="ml-2 font-medium opacity-75">({pct}% de confiança)</span>}
+                          </p>
+                        </div>
                       </div>
                     );
                   })()}
@@ -643,11 +752,12 @@ function DetalheAtendimento() {
                       <p className="text-xs text-red-500">Telefone não preenchido para abrir WhatsApp.</p>
                     )}
 
-                    <div className="grid grid-cols-2 gap-2 mt-4">
+                    <div className="mt-4 grid grid-cols-2 gap-2">
                       <Button
                         variant="secondary"
                         disabled={salvandoCheckin}
                         onClick={() => void handleAlterarCheckin('CONFIRMADO')}
+                        className="!border-emerald-200 !bg-emerald-50 !text-emerald-800 hover:!bg-emerald-100"
                       >
                         Confirmou
                       </Button>
@@ -655,6 +765,7 @@ function DetalheAtendimento() {
                         variant="secondary"
                         disabled={salvandoCheckin}
                         onClick={() => void handleAlterarCheckin('NAO_COMPARECERA')}
+                        className="!border-red-200 !bg-red-50 !text-red-800 hover:!bg-red-100"
                       >
                         Não vai
                       </Button>
@@ -662,6 +773,7 @@ function DetalheAtendimento() {
                         variant="secondary"
                         disabled={salvandoCheckin}
                         onClick={() => void handleAlterarCheckin('REAGENDAMENTO_SOLICITADO')}
+                        className="!border-amber-200 !bg-amber-50 !text-amber-800 hover:!bg-amber-100"
                       >
                         Reagendar
                       </Button>
@@ -669,6 +781,7 @@ function DetalheAtendimento() {
                         variant="secondary"
                         disabled={salvandoCheckin}
                         onClick={() => void handleAlterarCheckin('SEM_RESPOSTA')}
+                        className="!border-slate-200 !bg-slate-50 !text-slate-700 hover:!bg-slate-100"
                       >
                         Sem resposta
                       </Button>

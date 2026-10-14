@@ -138,6 +138,9 @@ describe('DetalheAtendimento - Deduplicação de Mensagens', () => {
     expect(screen.getAllByText('Olá Maria, em que posso ajudar?')).toHaveLength(1);
     expect(screen.getAllByText('Tenho uma dor de dente muito forte')).toHaveLength(1);
     expect(screen.queryByText('IA: Classificação')).not.toBeInTheDocument();
+    expect(screen.getByText('Você · Dentista Voluntário')).toBeInTheDocument();
+    expect(screen.getByText('Beneficiário')).toBeInTheDocument();
+    expect(screen.getAllByText(/^\d{2}:\d{2}$/)).toHaveLength(2);
   });
 
   it('deve deduplicar mensagens novas idênticas recebidas via WebSocket', async () => {
@@ -174,6 +177,7 @@ describe('DetalheAtendimento - Deduplicação de Mensagens', () => {
     await waitFor(() => {
       expect(screen.getByText('Vou agendar um horário para você')).toBeInTheDocument();
     });
+    expect(HTMLElement.prototype.scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth' });
 
     // Dispara a mesma mensagem novamente no WebSocket (simulando outra conexão aberta ou duplicidade do broadcast)
     act(() => {
@@ -232,5 +236,59 @@ describe('DetalheAtendimento - Deduplicação de Mensagens', () => {
     // A mensagem NÃO deve estar duplicada visualmente
     const elements = screen.getAllByText('Estou enviando um teste agora mesmo');
     expect(elements).toHaveLength(1);
+  });
+
+  it('envia com Enter e preserva quebra de linha com Shift + Enter', async () => {
+    const userEventSetup = userEvent.setup();
+    vi.mocked(atendimentoService.buscarPorId).mockResolvedValue(mockAtendimento);
+    vi.mocked(mensagensService.getMensagensAtendimento).mockResolvedValue(mockMensagensIniciais);
+    vi.mocked(mensagensService.enviarMensagem).mockResolvedValue({
+      id: 105,
+      atendimentoId: 1,
+      conteudo: 'Primeira linha\nSegunda linha',
+      dataHora: '2026-06-03T19:20:00.000Z',
+      enviadoPor: 'VOLUNTARIO',
+    });
+
+    render(
+      <MemoryRouter>
+        <DetalheAtendimento />
+      </MemoryRouter>
+    );
+
+    const composer = await screen.findByPlaceholderText('Escreva sua mensagem...');
+    await userEventSetup.type(composer, 'Primeira linha');
+    await userEventSetup.keyboard('{Shift>}{Enter}{/Shift}');
+    expect(mensagensService.enviarMensagem).not.toHaveBeenCalled();
+    expect(composer).toHaveValue('Primeira linha\n');
+
+    await userEventSetup.type(composer, 'Segunda linha');
+    await userEventSetup.keyboard('{Enter}');
+
+    await waitFor(() => expect(mensagensService.enviarMensagem).toHaveBeenCalledWith(1, {
+      conteudo: 'Primeira linha\nSegunda linha',
+      enviadoPor: 'VOLUNTARIO',
+    }));
+  });
+
+  it('exibe a previsão da IA sem marcadores ASCII', async () => {
+    vi.mocked(atendimentoService.buscarPorId).mockResolvedValue(mockAtendimento);
+    vi.mocked(mensagensService.getMensagensAtendimento).mockResolvedValue(mockMensagensIniciais);
+    vi.mocked(atendimentoService.preverCheckinIA).mockResolvedValue({
+      previsaoCheckin: 'CONFIRMADO',
+      confiancaCheckin: 0.92,
+    });
+
+    render(
+      <MemoryRouter>
+        <DetalheAtendimento />
+      </MemoryRouter>
+    );
+
+    expect(await screen.findByText('Previsão da Inteligência Artificial')).toBeInTheDocument();
+    expect(screen.getByText('Confirmado')).toBeInTheDocument();
+    expect(screen.queryByText('[V]')).not.toBeInTheDocument();
+    expect(screen.queryByText('[X]')).not.toBeInTheDocument();
+    expect(screen.queryByText('[~]')).not.toBeInTheDocument();
   });
 });
