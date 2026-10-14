@@ -272,7 +272,7 @@ export default function AgendaConsultas() {
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {consultasFiltradas.sort((a,b) => a.dataConsulta.localeCompare(b.dataConsulta) || a.horario.localeCompare(b.horario)).map((consulta) => (
-              <Card key={consulta.id} className="p-6 border-l-4 border-l-[#2563EB] hover:shadow-lg transition-shadow relative group">
+              <Card key={consulta.id} className="p-6 border-l-4 border-l-primary hover:shadow-lg transition-shadow relative group">
                 <div className="absolute top-4 right-4 flex gap-2">
                   <button onClick={() => handleOpenEdit(consulta)} className="p-2 text-blue-600 bg-blue-50 rounded-full hover:bg-blue-100 transition-colors" title="Editar">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
@@ -291,10 +291,10 @@ export default function AgendaConsultas() {
                   </span>
                 </div>
                 
-                <h3 className="text-xl font-bold text-[#0F172A]">{consulta.paciente}</h3>
-                <p className="text-sm text-[#475569] mt-1">{consulta.tipo}</p>
+                <h3 className="text-xl font-bold text-foreground">{consulta.paciente}</h3>
+                <p className="text-sm text-muted-foreground mt-1">{consulta.tipo}</p>
                 
-                <div className="mt-6 flex items-center gap-2 text-[#1E3A8A] font-semibold bg-blue-50 px-3 py-2 rounded-lg w-max">
+                <div className="mt-6 flex items-center gap-2 text-primary font-semibold bg-blue-50 px-3 py-2 rounded-lg w-max">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
@@ -332,7 +332,7 @@ export default function AgendaConsultas() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
           <Card className="w-full max-w-md p-6 animate-in fade-in zoom-in duration-200">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-[#0F172A]">{editingId ? 'Editar Consulta' : 'Nova Consulta'}</h2>
+              <h2 className="text-xl font-bold text-foreground">{editingId ? 'Editar Consulta' : 'Nova Consulta'}</h2>
               <button onClick={() => !isSaving && setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
@@ -445,7 +445,7 @@ export default function AgendaConsultas() {
                     {prontuariosList.map((p, index) => (
                       <div key={p.id || index} className="flex gap-4">
                         <div className="flex flex-col items-center">
-                          <div className="w-3 h-3 rounded-full bg-blue-500 mt-1.5 shadow-[0_0_0_4px_#eff6ff]"></div>
+                          <div className="w-3 h-3 rounded-full bg-blue-500 mt-1.5 ring-4 ring-primary/10"></div>
                           {index !== prontuariosList.length - 1 && <div className="w-0.5 h-full bg-blue-100 my-1"></div>}
                         </div>
                         <div className="bg-white p-4 rounded-xl border border-slate-200 flex-1 shadow-sm">

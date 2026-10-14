@@ -66,8 +66,8 @@ function FAQ() {
                 id={`${accordionId}-trigger-${index}`}
                 className="flex min-h-12 w-full items-center justify-between gap-4 px-6 py-5 text-left transition-colors duration-fast hover:bg-blue-50/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
               >
-                <span className="text-base font-bold text-[#0F172A]">{faq.question}</span>
-                <span className={`text-2xl font-light text-[#2563EB] transition-transform ${openIndex === index ? 'rotate-45' : ''}`}>+</span>
+                <span className="text-base font-bold text-foreground">{faq.question}</span>
+                <span className={`text-2xl font-light text-primary transition-transform ${openIndex === index ? 'rotate-45' : ''}`}>+</span>
               </button>
               {openIndex === index && (
                 <div
@@ -84,9 +84,9 @@ function FAQ() {
         </div>
       </Section>
 
-      <Section tone="blue" className="border-t border-[#E2E8F0] reveal">
+      <Section tone="blue" className="border-t border-border reveal">
         <div className="text-center">
-          <p className="mb-4 text-[#475569]">Ainda tem dúvidas?</p>
+          <p className="mb-4 text-muted-foreground">Ainda tem dúvidas?</p>
           <Button href="/contato" size="large">Entre em contato</Button>
         </div>
       </Section>

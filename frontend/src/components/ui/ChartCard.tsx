@@ -50,7 +50,7 @@ function ChartCard() {
             setStats(prev => ({ ...prev, mensagens: '0' }));
           }
         })();
-      } catch (error) {
+      } catch {
         setStats({
           atendimentos: '0',
           mensagens: '0',
@@ -64,13 +64,13 @@ function ChartCard() {
   }, []);
 
   return (
-    <div className="rounded-3xl border border-white/70 bg-white/85 p-5 shadow-2xl shadow-blue-950/15 backdrop-blur-xl">
+    <div className="rounded-3xl border border-border/70 bg-surface/85 p-5 shadow-2xl shadow-primary/15 backdrop-blur-xl">
       <div className="mb-5 flex items-center justify-between">
         <div>
-          <p className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">Operação Global</p>
-          <h3 className="mt-1 text-lg font-bold text-[#0F172A]">Estatísticas em Tempo Real</h3>
+          <p className="text-xs font-bold uppercase tracking-widest text-primary">Operação Global</p>
+          <h3 className="mt-1 text-lg font-bold text-foreground">Estatísticas em Tempo Real</h3>
         </div>
-        <span className="rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-xs font-semibold text-[#059669]">
+        <span className="rounded-full border border-success/20 bg-success/10 px-3 py-1 text-xs font-semibold text-success">
           Online
         </span>
       </div>
@@ -82,9 +82,9 @@ function ChartCard() {
           [stats.voluntarios, 'voluntários'],
           [stats.beneficiarios, 'beneficiários'],
         ].map(([value, label]) => (
-          <div key={label} className="rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] p-3 text-center sm:text-left">
-            <p className="text-xl font-black text-[#0F172A]">{value}</p>
-            <p className="text-xs font-semibold uppercase tracking-wide text-[#475569]">{label}</p>
+          <div key={label} className="rounded-2xl border border-border bg-muted/50 p-3 text-center sm:text-left">
+            <p className="text-xl font-black text-foreground">{value}</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</p>
           </div>
         ))}
       </div>

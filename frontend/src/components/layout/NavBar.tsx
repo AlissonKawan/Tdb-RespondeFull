@@ -127,7 +127,7 @@ function NavBar() {
 
             {!user && <Button href="/login" size="sm">Entrar</Button>}
             {!user && <Button href="/cadastro-beneficiario" variant="secondary" size="sm">Criar conta beneficiário</Button>}
-            {user && <span className="rounded-xl bg-white px-3 py-2 text-sm font-semibold text-[#475569] ring-1 ring-[#E2E8F0]">{user.nome}</span>}
+            {user && <span className="rounded-xl bg-white px-3 py-2 text-sm font-semibold text-muted-foreground ring-1 ring-border">{user.nome}</span>}
             {user && isBeneficiario && <Button href={portalPath} size="sm">Meu portal</Button>}
             {user && isBeneficiario && <Button href="/beneficiario/solicitar-atendimento" variant="secondary" size="sm">Solicitar atendimento</Button>}
             {user && isVoluntario && <Button href={portalPath} size="sm">Portal do voluntário</Button>}
@@ -167,7 +167,7 @@ function NavBar() {
                 <Button href="/cadastro-beneficiario" variant="secondary" size="sm" onClick={() => setIsOpen(false)}>Criar conta beneficiário</Button>
               </div>
             )}
-            {user && <span className="rounded-xl bg-white px-3 py-2 text-sm font-semibold text-[#475569] ring-1 ring-[#E2E8F0] block text-center mb-1">{user.nome}</span>}
+            {user && <span className="rounded-xl bg-white px-3 py-2 text-sm font-semibold text-muted-foreground ring-1 ring-border block text-center mb-1">{user.nome}</span>}
             {user && isBeneficiario && (
               <div className="flex flex-col gap-2">
                 <Button href={portalPath} size="sm" onClick={() => setIsOpen(false)}>Meu portal</Button>

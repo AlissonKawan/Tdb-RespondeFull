@@ -61,9 +61,9 @@ function Integrantes() {
       <Section tone="blue" className="reveal">
         <Card className="flex flex-col gap-6 p-8 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">Contato</p>
-            <h2 className="mt-2 text-3xl font-bold text-[#0F172A]">Vamos conversar?</h2>
-            <p className="mt-2 text-[#475569]">Entre em contato com a equipe do projeto.</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-primary">Contato</p>
+            <h2 className="mt-2 text-3xl font-bold text-foreground">Vamos conversar?</h2>
+            <p className="mt-2 text-muted-foreground">Entre em contato com a equipe do projeto.</p>
           </div>
           <Button href="/contato" size="large">Fale conosco</Button>
         </Card>

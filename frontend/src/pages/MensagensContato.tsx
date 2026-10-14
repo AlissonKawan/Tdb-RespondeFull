@@ -44,11 +44,11 @@ export default function MensagensContato() {
               <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="text-lg font-bold text-[#0F172A]">{contato.nome}</h3>
+                    <h3 className="text-lg font-bold text-foreground">{contato.nome}</h3>
                   </div>
-                  <div className="mt-3 text-sm text-[#475569]">
-                    <p><strong className="text-[#0F172A]">E-mail:</strong> {contato.email}</p>
-                    <p><strong className="text-[#0F172A]">Data:</strong> {new Date(contato.dataEnvio).toLocaleString()}</p>
+                  <div className="mt-3 text-sm text-muted-foreground">
+                    <p><strong className="text-foreground">E-mail:</strong> {contato.email}</p>
+                    <p><strong className="text-foreground">Data:</strong> {new Date(contato.dataEnvio).toLocaleString()}</p>
                     <p className="mt-4 text-slate-800 whitespace-pre-wrap">{contato.mensagem}</p>
                   </div>
                 </div>

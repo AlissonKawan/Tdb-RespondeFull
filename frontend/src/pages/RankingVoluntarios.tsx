@@ -101,7 +101,7 @@ const RankingVoluntarios: React.FC = () => {
 
     return (
       <Card className="p-6">
-        <h3 className="text-lg font-bold text-[#0F172A] mb-4 border-b pb-2">Outros Indicadores (Top 10)</h3>
+        <h3 className="text-lg font-bold text-foreground mb-4 border-b pb-2">Outros Indicadores (Top 10)</h3>
         <div className="space-y-3">
           {rest.map((voluntario, index) => (
             <div

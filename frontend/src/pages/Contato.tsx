@@ -63,15 +63,15 @@ function Contato() {
         <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr]">
           <div className="space-y-4">
             <Card className="p-6">
-              <p className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">Turma do Bem</p>
-              <h2 className="mt-3 text-2xl font-bold text-[#0F172A]">Canais de apoio</h2>
-              <div className="mt-5 space-y-3 text-[#475569]">
+              <p className="text-xs font-bold uppercase tracking-widest text-primary">Turma do Bem</p>
+              <h2 className="mt-3 text-2xl font-bold text-foreground">Canais de apoio</h2>
+              <div className="mt-5 space-y-3 text-muted-foreground">
                 <p>Rua Mauricio Francisco Klabin 449, Vila Mariana, Sao Paulo/SP</p>
                 <p>(11) 5084-7276</p>
                 <p>Atendimento e colaboração via equipe do projeto.</p>
               </div>
             </Card>
-            <Card className="bg-gradient-to-br from-[#1E3A8A] to-[#2563EB] p-6 text-white">
+            <Card className="bg-gradient-to-br from-foreground to-primary p-6 text-primary-foreground">
               <h3 className="text-xl font-bold">Resposta organizada</h3>
               <p className="mt-2 text-sm leading-6 text-blue-100">
                 A proposta do TDB Responde e transformar mensagens dispersas em um fluxo claro de acompanhamento.
@@ -81,12 +81,12 @@ function Contato() {
 
           <Card className="p-6 lg:p-8">
             {enviado && (
-              <div className="mb-5 rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm font-semibold text-[#059669]">
+              <div className="mb-5 rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm font-semibold text-success">
                 Mensagem enviada com sucesso.
               </div>
             )}
             {erro && (
-              <div className="mb-5 rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-semibold text-[#DC2626]">
+              <div className="mb-5 rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-semibold text-danger">
                 {erro}
               </div>
             )}

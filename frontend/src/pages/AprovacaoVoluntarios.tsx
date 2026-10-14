@@ -69,7 +69,7 @@ function AprovacaoVoluntarios() {
         <SectionHeader title="Aguardando análise" description="Confira especialidade, contato e justificativa antes de aprovar." />
 
         {feedback && (
-          <div className="mb-5 rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm font-semibold text-[#2563EB]">
+          <div className="mb-5 rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm font-semibold text-primary">
             {feedback}
           </div>
         )}
@@ -85,16 +85,16 @@ function AprovacaoVoluntarios() {
               <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="text-lg font-bold text-[#0F172A]">{solicitacao.nome}</h3>
+                    <h3 className="text-lg font-bold text-foreground">{solicitacao.nome}</h3>
                     <Badge tone="warning">Aguardando análise</Badge>
                   </div>
-                  <div className="mt-3 grid gap-2 text-sm text-[#475569] md:grid-cols-2">
-                    {solicitacao.usuario && <p><strong className="text-[#0F172A]">Contato:</strong> {solicitacao.usuario}</p>}
-                    <p><strong className="text-[#0F172A]">Especialidade:</strong> {solicitacao.especialidade?.nome ?? 'Não informada'}</p>
+                  <div className="mt-3 grid gap-2 text-sm text-muted-foreground md:grid-cols-2">
+                    {solicitacao.usuario && <p><strong className="text-foreground">Contato:</strong> {solicitacao.usuario}</p>}
+                    <p><strong className="text-foreground">Especialidade:</strong> {solicitacao.especialidade?.nome ?? 'Não informada'}</p>
                     {solicitacao.cro && (
                       <div className="flex flex-col gap-1">
                         <p>
-                          <strong className="text-[#0F172A]">Registro Profissional (CRO):</strong> {solicitacao.cro} - {solicitacao.ufCro || 'N/A'}
+                          <strong className="text-foreground">Registro Profissional (CRO):</strong> {solicitacao.cro} - {solicitacao.ufCro || 'N/A'}
                         </p>
                         {solicitacao.statusCro === 'VALIDADO' && (
                           <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full w-fit mt-1 border border-emerald-100">
@@ -122,7 +122,7 @@ function AprovacaoVoluntarios() {
                     )}
                   </div>
                   {solicitacao.motivoVoluntariado && (
-                    <p className="mt-4 rounded-xl bg-[#F8FAFC] p-4 text-sm leading-6 text-[#475569]">
+                    <p className="mt-4 rounded-xl bg-muted/50 p-4 text-sm leading-6 text-muted-foreground">
                       {solicitacao.motivoVoluntariado}
                     </p>
                   )}

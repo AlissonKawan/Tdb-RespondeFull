@@ -184,10 +184,10 @@ function ChatAtendimento({ atendimentoId, enviadoPor }: ChatAtendimentoProps) {
 
   return (
       <Card className="p-5 lg:p-6">
-        <div className="flex flex-col gap-3 border-b border-[#E2E8F0] pb-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 border-b border-border pb-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">Chat</p>
-            <h2 className="mt-1 text-2xl font-bold text-[#0F172A]">Mensagens do atendimento</h2>
+            <p className="text-xs font-bold uppercase tracking-widest text-primary">Chat</p>
+            <h2 className="mt-1 text-2xl font-bold text-foreground">Mensagens do atendimento</h2>
           </div>
           <Button
               type="button"
@@ -199,7 +199,7 @@ function ChatAtendimento({ atendimentoId, enviadoPor }: ChatAtendimentoProps) {
           </Button>
         </div>
 
-        <div className="mt-5 min-h-80 rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] p-4">
+        <div className="mt-5 min-h-80 rounded-2xl border border-border bg-muted/50 p-4">
           {loading && <LoadingState title="Carregando mensagens..." />}
           {erro && <ErrorState title="Erro no chat" description={erro} />}
           {!loading && !erro && mensagensOrdenadas.length === 0 && (
@@ -215,8 +215,8 @@ function ChatAtendimento({ atendimentoId, enviadoPor }: ChatAtendimentoProps) {
                         <div
                             className={`max-w-[82%] rounded-2xl px-4 py-3 text-sm shadow-sm ${
                                 minhaMensagem
-                                    ? 'bg-[#2563EB] text-white shadow-blue-600/20'
-                                    : 'border border-[#E2E8F0] bg-white text-[#0F172A]'
+                                    ? 'bg-primary text-white shadow-blue-600/20'
+                                    : 'border border-border bg-white text-foreground'
                             }`}
                         >
                           <p className="whitespace-pre-wrap leading-6">{mensagem.conteudo}</p>

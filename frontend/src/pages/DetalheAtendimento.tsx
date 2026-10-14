@@ -61,8 +61,8 @@ function getSender(tipoUsuario?: string): MensagemRequest['enviadoPor'] {
 function InfoItem({ label, value }: { label: string; value?: string | number | null }) {
   return (
     <div>
-      <p className="text-xs font-bold uppercase tracking-widest text-[#64748B]">{label}</p>
-      <p className="mt-1 break-words text-sm font-semibold text-[#0F172A]">{value || 'Não informado'}</p>
+      <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{label}</p>
+      <p className="mt-1 break-words text-sm font-semibold text-foreground">{value || 'Não informado'}</p>
     </div>
   );
 }
@@ -430,13 +430,13 @@ function DetalheAtendimento() {
           <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
             <div className="space-y-6">
               <Card className="p-6">
-                <div className="flex flex-col gap-4 border-b border-[#E2E8F0] pb-5 sm:flex-row sm:items-start sm:justify-between">
+                <div className="flex flex-col gap-4 border-b border-border pb-5 sm:flex-row sm:items-start sm:justify-between">
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
-                      <h2 className="text-2xl font-bold text-[#0F172A]">Detalhes do Atendimento</h2>
+                      <h2 className="text-2xl font-bold text-foreground">Detalhes do Atendimento</h2>
                       <Badge tone={statusTone(atendimento.status)}>{labelStatus(atendimento.status)}</Badge>
                     </div>
-                    <p className="mt-3 max-w-3xl text-sm leading-6 text-[#475569]">
+                    <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">
                       {atendimento.descricao || 'Sem descricao cadastrada.'}
                     </p>
                   </div>
@@ -455,14 +455,14 @@ function DetalheAtendimento() {
               </Card>
 
               <Card className="overflow-hidden">
-                <div className="border-b border-[#E2E8F0] bg-slate-50 px-6 py-5">
-                  <h2 className="text-xl font-bold text-[#0F172A]">Mensagens</h2>
-                  <p className="mt-1 text-sm text-[#475569]">Conversa vinculada ao atendimento.</p>
+                <div className="border-b border-border bg-slate-50 px-6 py-5">
+                  <h2 className="text-xl font-bold text-foreground">Mensagens</h2>
+                  <p className="mt-1 text-sm text-muted-foreground">Conversa vinculada ao atendimento.</p>
                 </div>
 
                 <div className="max-h-[520px] space-y-4 overflow-y-auto p-6">
                   {mensagens.length === 0 && (
-                    <div className="rounded-2xl border border-dashed border-[#E2E8F0] px-4 py-8 text-center text-sm text-[#64748B]">
+                    <div className="rounded-2xl border border-dashed border-border px-4 py-8 text-center text-sm text-muted-foreground">
                       Nenhuma mensagem enviada ainda.
                     </div>
                   )}
@@ -473,13 +473,13 @@ function DetalheAtendimento() {
                       <div key={mensagem.id} className={`flex ${minha ? 'justify-end' : 'justify-start'}`}>
                         <div className={`max-w-[82%] rounded-2xl px-4 py-3 text-sm shadow-sm ${
                           minha
-                            ? 'bg-[#2563EB] text-white'
-                            : 'border border-[#E2E8F0] bg-white text-[#0F172A]'
+                            ? 'bg-primary text-white'
+                            : 'border border-border bg-white text-foreground'
                         }`}
                         >
                           <p className="text-xs font-bold uppercase tracking-widest opacity-75">{mensagem.enviadoPor}</p>
                           <p className="mt-1 whitespace-pre-wrap leading-6">{mensagem.conteudo}</p>
-                          <p className={`mt-2 text-xs ${minha ? 'text-blue-100' : 'text-[#64748B]'}`}>
+                          <p className={`mt-2 text-xs ${minha ? 'text-blue-100' : 'text-muted-foreground'}`}>
                             {formatDate(mensagem.dataHora)}
                           </p>
                         </div>
@@ -489,7 +489,7 @@ function DetalheAtendimento() {
                   <div ref={messagesEndRef} />
                 </div>
 
-                <form onSubmit={enviarMensagem} className="border-t border-[#E2E8F0] p-6">
+                <form onSubmit={enviarMensagem} className="border-t border-border p-6">
                   {chatBloqueado && (
                     <div className="mb-4 rounded-xl border border-orange-100 bg-orange-50 px-4 py-3 text-sm font-semibold text-orange-800">
                       Este atendimento está {labelStatus(atendimento.status).toLowerCase()}. O envio de mensagens está bloqueado.
@@ -515,15 +515,15 @@ function DetalheAtendimento() {
 
             <aside className="space-y-6">
               {feedback && (
-                <div className="rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm font-semibold text-[#2563EB]">
+                <div className="rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm font-semibold text-primary">
                   {feedback}
                 </div>
               )}
 
               {podeAlterar && atendimento.status === 'ABERTO' && !atendimento.voluntarioId && (
                 <Card className="p-6 border border-blue-200 bg-blue-50/50">
-                  <h2 className="text-xl font-bold text-[#0F172A]">Acolher caso</h2>
-                  <p className="mt-1 text-sm text-[#475569]">Este atendimento está aberto e aguardando um profissional voluntário.</p>
+                  <h2 className="text-xl font-bold text-foreground">Acolher caso</h2>
+                  <p className="mt-1 text-sm text-muted-foreground">Este atendimento está aberto e aguardando um profissional voluntário.</p>
                   <div className="mt-4">
                     <Button 
                       fullWidth 
@@ -543,8 +543,8 @@ function DetalheAtendimento() {
 
               {podeAlterar && (
                 <Card className="p-6">
-                  <h2 className="text-xl font-bold text-[#0F172A]">Acoes do atendimento</h2>
-                  <p className="mt-1 text-sm text-[#475569]">Somente voluntários e administradores podem alterar estes campos.</p>
+                  <h2 className="text-xl font-bold text-foreground">Acoes do atendimento</h2>
+                  <p className="mt-1 text-sm text-muted-foreground">Somente voluntários e administradores podem alterar estes campos.</p>
 
                   <div className="mt-5 space-y-4">
                     <Field label="Status">
@@ -602,9 +602,9 @@ function DetalheAtendimento() {
 
               {podeAlterar && (
                 <Card className="p-6">
-                  <h2 className="text-xl font-bold text-[#0F172A]">Check-in via WhatsApp</h2>
+                  <h2 className="text-xl font-bold text-foreground">Check-in via WhatsApp</h2>
                   
-                  <div className="mt-4 text-sm text-[#475569]">
+                  <div className="mt-4 text-sm text-muted-foreground">
                     <p>Status atual: <strong>{labelStatusCheckin(atendimento.statusCheckin)}</strong></p>
                     {atendimento.horarioEnvioCheckin && (
                       <p>Enviado em: {formatDate(atendimento.horarioEnvioCheckin)}</p>
@@ -679,8 +679,8 @@ function DetalheAtendimento() {
 
               {!podeAlterar && (
                 <Card className="p-6">
-                  <h2 className="text-xl font-bold text-[#0F172A]">Acompanhamento</h2>
-                  <p className="mt-2 text-sm leading-6 text-[#475569]">
+                  <h2 className="text-xl font-bold text-foreground">Acompanhamento</h2>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
                     Você pode acompanhar os detalhes e conversar pelo chat. Alterações de status e prioridade ficam com a equipe responsável.
                   </p>
                 </Card>

@@ -127,9 +127,9 @@ function PortalBeneficiario() {
       <Section tone="white">
         <Card className="mb-6 flex flex-col gap-5 p-4 md:p-6 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">Pessoa atendida</p>
-            <h2 className="mt-2 text-2xl font-bold text-[#0F172A]">Meus atendimentos</h2>
-            <p className="mt-1 text-[#475569]">
+            <p className="text-xs font-bold uppercase tracking-widest text-primary">Pessoa atendida</p>
+            <h2 className="mt-2 text-2xl font-bold text-foreground">Meus atendimentos</h2>
+            <p className="mt-1 text-muted-foreground">
               Veja aqui os pedidos vinculados ao seu cadastro.
             </p>
           </div>
@@ -155,18 +155,18 @@ function PortalBeneficiario() {
               <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="text-lg font-bold text-[#0F172A] truncate">{getPessoa(atendimento)}</h3>
+                    <h3 className="text-lg font-bold text-foreground truncate">{getPessoa(atendimento)}</h3>
                     {atendimento.status && <Badge tone={statusTone(atendimento.status) as any}>{formatStatusLabel(atendimento.status)}</Badge>}
                     {novasMensagens[atendimento.id] && <Badge tone="danger">Nova Mensagem</Badge>}
                   </div>
-                  <div className="mt-3 grid gap-2 text-sm text-[#475569] md:grid-cols-2">
+                  <div className="mt-3 grid gap-2 text-sm text-muted-foreground md:grid-cols-2">
 
-                    <p><strong className="text-[#0F172A]">Última Atividade:</strong> {formatDate(atendimento.dataAtualizacao ?? atendimento.dataAbertura ?? atendimento.dataCriacao)}</p>
-                    <p><strong className="text-[#0F172A]">Encerramento:</strong> {formatDate(atendimento.dataEncerramento)}</p>
-                    <p><strong className="text-[#0F172A]">Voluntário:</strong> {atendimento.nomeVoluntario ?? atendimento.voluntario?.nome ?? 'Aguardando definicao'}</p>
+                    <p><strong className="text-foreground">Última Atividade:</strong> {formatDate(atendimento.dataAtualizacao ?? atendimento.dataAbertura ?? atendimento.dataCriacao)}</p>
+                    <p><strong className="text-foreground">Encerramento:</strong> {formatDate(atendimento.dataEncerramento)}</p>
+                    <p><strong className="text-foreground">Voluntário:</strong> {atendimento.nomeVoluntario ?? atendimento.voluntario?.nome ?? 'Aguardando definicao'}</p>
                   </div>
                   {atendimento.descricao && (
-                    <p className="mt-4 max-w-3xl text-sm leading-6 text-[#475569]">{atendimento.descricao}</p>
+                    <p className="mt-4 max-w-3xl text-sm leading-6 text-muted-foreground">{atendimento.descricao}</p>
                   )}
                 </div>
                 <Button variant="secondary" onClick={() => navigate(`/atendimentos/${atendimento.id}`)}>

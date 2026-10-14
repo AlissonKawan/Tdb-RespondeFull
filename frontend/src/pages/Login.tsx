@@ -92,12 +92,12 @@ function Login() {
                 {erro}
               </div>
             )}
-            <div className="mb-6 grid grid-cols-2 gap-2 rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] p-1">
+            <div className="mb-6 grid grid-cols-2 gap-2 rounded-2xl border border-border bg-muted/50 p-1">
               <button
                 type="button"
                 onClick={() => setAba('BENEFICIARIO')}
                 className={`rounded-xl px-3 py-3 text-sm font-bold transition ${
-                  aba === 'BENEFICIARIO' ? 'bg-white text-[#2563EB] shadow-sm' : 'text-[#475569] hover:text-[#0F172A]'
+                  aba === 'BENEFICIARIO' ? 'bg-white text-primary shadow-sm' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 Beneficiário
@@ -106,7 +106,7 @@ function Login() {
                 type="button"
                 onClick={() => setAba('VOLUNTARIO')}
                 className={`rounded-xl px-3 py-3 text-sm font-bold transition ${
-                  aba === 'VOLUNTARIO' ? 'bg-white text-[#2563EB] shadow-sm' : 'text-[#475569] hover:text-[#0F172A]'
+                  aba === 'VOLUNTARIO' ? 'bg-white text-primary shadow-sm' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 Voluntário
@@ -114,10 +114,10 @@ function Login() {
             </div>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               <div>
-                <h2 className="text-2xl font-bold text-[#0F172A]">
+                <h2 className="text-2xl font-bold text-foreground">
                   {aba === 'BENEFICIARIO' ? 'Acesso do beneficiário' : 'Acesso do voluntário'}
                 </h2>
-                <p className="mt-2 text-sm leading-6 text-[#475569]">
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
                   {aba === 'BENEFICIARIO'
                     ? 'Acompanhe seus atendimentos e converse com o dentista responsável.'
                     : 'Veja seus atendimentos, chamados abertos e solicitações de novos voluntários.'}
@@ -151,7 +151,7 @@ function Login() {
             </form>
           </Card>
 
-          <Card className="bg-gradient-to-br from-[#1E3A8A] to-[#2563EB] p-8 text-white">
+          <Card className="bg-gradient-to-br from-foreground to-primary p-8 text-primary-foreground">
             <p className="text-xs font-bold uppercase tracking-widest text-blue-100">Conta nova</p>
             <h2 className="mt-3 text-3xl font-black">Precisa de acesso?</h2>
             <p className="mt-4 leading-7 text-blue-100">

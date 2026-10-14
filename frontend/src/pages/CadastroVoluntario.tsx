@@ -139,11 +139,11 @@ function CadastroVoluntario() {
             ['3', 'Acesse o portal', 'Depois de aprovado, entre com e-mail e senha para acompanhar atendimentos.'],
           ].map(([step, title, desc]) => (
             <Card key={step} className="p-6">
-              <span className="mb-4 flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 font-bold text-[#2563EB] ring-1 ring-blue-100">
+              <span className="mb-4 flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 font-bold text-primary ring-1 ring-blue-100">
                 {step}
               </span>
-              <h3 className="font-bold text-[#0F172A]">{title}</h3>
-              <p className="mt-2 text-sm leading-6 text-[#475569]">{desc}</p>
+              <h3 className="font-bold text-foreground">{title}</h3>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">{desc}</p>
             </Card>
           ))}
         </div>
@@ -154,7 +154,7 @@ function CadastroVoluntario() {
           {loadingEspecialidades && <LoadingState title="Carregando especialidades..." />}
           {erroEspecialidades && <ErrorState title="Erro ao carregar especialidades" description={erroEspecialidades} />}
           {sucesso && (
-            <div className="mb-5 rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm font-semibold text-[#059669]">
+            <div className="mb-5 rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm font-semibold text-success">
               {sucesso}
             </div>
           )}

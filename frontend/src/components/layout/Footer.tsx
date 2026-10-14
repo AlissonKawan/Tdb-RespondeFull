@@ -20,7 +20,7 @@ function Footer() {
   const team = ['Alisson Kawan', 'Marcos Vinicius', 'Eduardo Boni'];
 
   return (
-    <footer className="border-t border-blue-950/20 bg-[#0B1220] text-white">
+    <footer className="border-t border-blue-950/20 bg-foreground text-white">
       <Container className="grid gap-8 py-10 md:grid-cols-[1.2fr_0.8fr_0.8fr]">
         <div>
           <div className="flex items-center gap-4">
@@ -62,7 +62,7 @@ function Footer() {
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm font-medium text-slate-300 transition hover:text-[#60A5FA]"
+                className="text-sm font-medium text-slate-300 transition hover:text-accent"
               >
                 {link.name}
               </a>

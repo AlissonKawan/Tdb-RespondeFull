@@ -19,24 +19,24 @@ function initials(name: string) {
 
 function TeamMemberCard({ name, rm, course, image, github, linkedin }: TeamMemberCardProps) {
   return (
-    <Card className="group p-6 text-center transition-all hover:-translate-y-1 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-950/10">
-      <div className="mx-auto mb-5 flex h-32 w-32 items-center justify-center overflow-hidden rounded-3xl border border-[#E2E8F0] bg-gradient-to-br from-blue-50 to-white text-3xl font-black text-[#2563EB] shadow-sm">
+    <Card className="group p-6 text-center transition-all hover:-translate-y-1 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10">
+      <div className="mx-auto mb-5 flex h-32 w-32 items-center justify-center overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-primary/10 to-surface text-3xl font-black text-primary shadow-sm">
         {image ? <img src={image} alt={name} width="320" height="320" loading="lazy" className="h-full w-full object-cover" /> : initials(name)}
       </div>
-      <h2 className="text-xl font-bold text-[#0F172A]">{name}</h2>
-      <div className="mt-2 min-h-11 text-sm text-[#475569]">
-        {rm && <p className="font-semibold text-[#2563EB]">RM: {rm}</p>}
+      <h2 className="text-xl font-bold text-foreground">{name}</h2>
+      <div className="mt-2 min-h-11 text-sm text-muted-foreground">
+        {rm && <p className="font-semibold text-primary">RM: {rm}</p>}
         {course && <p>{course}</p>}
       </div>
       {(github || linkedin) && (
         <div className="mt-5 flex justify-center gap-3">
           {github && (
-            <a href={github} target="_blank" rel="noopener noreferrer" className="rounded-xl border border-[#E2E8F0] px-3 py-2 text-sm font-semibold text-[#475569] transition hover:border-blue-200 hover:text-[#2563EB]">
+            <a href={github} target="_blank" rel="noopener noreferrer" className="rounded-xl border border-border px-3 py-2 text-sm font-semibold text-muted-foreground transition hover:border-primary/30 hover:text-primary">
               GitHub
             </a>
           )}
           {linkedin && (
-            <a href={linkedin} target="_blank" rel="noopener noreferrer" className="rounded-xl border border-[#E2E8F0] px-3 py-2 text-sm font-semibold text-[#475569] transition hover:border-blue-200 hover:text-[#2563EB]">
+            <a href={linkedin} target="_blank" rel="noopener noreferrer" className="rounded-xl border border-border px-3 py-2 text-sm font-semibold text-muted-foreground transition hover:border-primary/30 hover:text-primary">
               LinkedIn
             </a>
           )}

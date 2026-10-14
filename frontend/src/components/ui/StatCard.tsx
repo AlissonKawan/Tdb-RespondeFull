@@ -7,18 +7,18 @@ interface StatCardProps {
 
 function StatCard({ label, value, description, tone = 'blue' }: StatCardProps) {
   const tones = {
-    blue: 'text-[#2563EB] bg-blue-50',
-    green: 'text-[#059669] bg-emerald-50',
-    orange: 'text-[#F97316] bg-orange-50',
-    slate: 'text-[#0F172A] bg-slate-50',
+    blue: 'bg-primary/10 text-primary',
+    green: 'bg-success/10 text-success',
+    orange: 'bg-warning/10 text-warning',
+    slate: 'bg-muted text-foreground',
   };
 
   return (
-    <div className="rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm">
+    <div className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
       <div className={`mb-4 h-2 w-12 rounded-full ${tones[tone]}`} />
-      <p className="text-sm font-semibold text-[#475569]">{label}</p>
-      <p className="mt-2 text-3xl font-black text-[#0F172A]">{value}</p>
-      {description && <p className="mt-1 text-sm text-[#475569]">{description}</p>}
+      <p className="text-sm font-semibold text-muted-foreground">{label}</p>
+      <p className="mt-2 text-3xl font-black text-foreground">{value}</p>
+      {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
     </div>
   );
 }

@@ -80,24 +80,24 @@ function Home() {
 
   return (
     <div>
-      <section className="relative overflow-hidden border-b border-[#E2E8F0] bg-[linear-gradient(135deg,#F8FAFC_0%,#EFF6FF_48%,#FFFFFF_100%)]">
+      <section className="relative overflow-hidden border-b border-border bg-gradient-to-br from-background via-primary/5 to-surface">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(37,99,235,0.08)_1px,transparent_1px),linear-gradient(to_bottom,rgba(37,99,235,0.06)_1px,transparent_1px)] bg-[size:56px_56px]" />
         <div className="absolute left-1/2 top-0 h-72 w-[42rem] -translate-x-1/2 bg-[radial-gradient(circle_at_center,rgba(96,165,250,0.32),transparent_65%)]" />
 
         <Container className="relative grid max-w-7xl gap-10 py-16 lg:grid-cols-[1.04fr_0.86fr] lg:items-center">
           <div className="max-w-3xl">
-            <span className="inline-flex rounded-full border border-blue-100 bg-white/85 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[#2563EB] shadow-sm backdrop-blur">
+            <span className="inline-flex rounded-full border border-blue-100 bg-white/85 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-primary shadow-sm backdrop-blur">
               Visitas à plataforma: {visitas}
             </span>
 
-            <h1 className="mt-6 text-4xl font-black tracking-tight text-[#0F172A] sm:text-5xl lg:text-6xl">
+            <h1 className="mt-6 text-4xl font-black tracking-tight text-foreground sm:text-5xl lg:text-6xl">
               Atendimento social com{' '}
-              <span className="bg-gradient-to-r from-[#1E3A8A] via-[#2563EB] to-[#60A5FA] bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-foreground via-primary to-primary bg-clip-text text-transparent">
                 inteligência operacional
               </span>
             </h1>
 
-            <p className="mt-5 max-w-2xl text-lg leading-8 text-[#475569]">
+            <p className="mt-5 max-w-2xl text-lg leading-8 text-muted-foreground">
               O TDB Responde centraliza conversas, prioridades e histórico para ajudar voluntários
               a responder com mais velocidade, clareza e acolhimento.
             </p>
@@ -113,12 +113,12 @@ function Home() {
         </Container>
       </section>
 
-      <section className="border-b border-[#E2E8F0] bg-white py-16">
+      <section className="border-b border-border bg-surface py-16">
         <Container className="max-w-7xl">
           <div className="mb-8 max-w-2xl reveal">
-            <p className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">Benefícios</p>
-            <h2 className="mt-2 text-3xl font-bold text-[#0F172A] sm:text-4xl">Por que TDB Responde?</h2>
-            <p className="mt-3 text-base leading-7 text-[#475569]">
+            <p className="text-xs font-bold uppercase tracking-widest text-primary">Benefícios</p>
+            <h2 className="mt-2 text-3xl font-bold text-foreground sm:text-4xl">Por que TDB Responde?</h2>
+            <p className="mt-3 text-base leading-7 text-muted-foreground">
               Uma camada simples e profissional para transformar mensagens dispersas em atendimento acompanhável.
             </p>
           </div>
@@ -139,29 +139,29 @@ function Home() {
         </Container>
       </section>
 
-      <section className="border-b border-[#E2E8F0] bg-gradient-to-b from-[#F8FAFC] to-blue-50/60 py-16">
+      <section className="border-b border-border bg-gradient-to-b from-background to-primary/5 py-16">
         <Container className="grid max-w-7xl gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
           <div className="reveal">
-            <p className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">Missão</p>
-            <h2 className="mt-2 text-3xl font-bold text-[#0F172A]">Tecnologia para acolher melhor</h2>
+            <p className="text-xs font-bold uppercase tracking-widest text-primary">Missão</p>
+            <h2 className="mt-2 text-3xl font-bold text-foreground">Tecnologia para acolher melhor</h2>
           </div>
-          <div className="rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-sm reveal">
-            <p className="text-lg leading-8 text-[#475569]">
-              Transformar o atendimento da <strong className="text-[#0F172A]">Turma do Bem</strong> em uma
+          <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm reveal">
+            <p className="text-lg leading-8 text-muted-foreground">
+              Transformar o atendimento da <strong className="text-foreground">Turma do Bem</strong> em uma
               experiência mais rápida, eficiente e humana, unindo organização operacional e empatia em um único sistema.
             </p>
-            <p className="mt-4 font-bold text-[#2563EB]">
+            <p className="mt-4 font-bold text-primary">
               Tudo isso para servir melhor a quem mais precisa.
             </p>
           </div>
         </Container>
       </section>
 
-      <section className="bg-white py-16">
-        <Container className="flex max-w-7xl flex-col gap-6 rounded-2xl border border-blue-100 bg-gradient-to-br from-[#1E3A8A] to-[#2563EB] p-6 shadow-xl shadow-blue-950/15 md:flex-row md:items-center md:justify-between reveal">
+      <section className="bg-surface py-16">
+        <Container className="flex max-w-7xl flex-col gap-6 rounded-2xl border border-primary/20 bg-gradient-to-br from-foreground to-primary p-6 shadow-xl shadow-primary/15 md:flex-row md:items-center md:justify-between reveal">
           <div>
             <p className="text-xs font-bold uppercase tracking-widest text-blue-100">Próximo passo</p>
-            <h2 className="mt-2 text-3xl font-bold text-white">Pronto para começar?</h2>
+            <h2 className="mt-2 text-3xl font-bold text-primary-foreground">Pronto para começar?</h2>
             <p className="mt-3 max-w-2xl text-blue-100">
               Acesse o sistema, conheça o projeto ou fale com a equipe para entender como o TDB Responde organiza o atendimento.
             </p>

@@ -158,7 +158,7 @@ export default function DashboardAdmin() {
   if (loading) return <div className="p-10"><LoadingState title="Carregando sistema..." /></div>;
 
   return (
-    <div className="min-h-full bg-[#F8FAFC]">
+    <div className="min-h-full bg-muted/50">
       <PageHeader
         variant="compact"
         eyebrow="Administração"

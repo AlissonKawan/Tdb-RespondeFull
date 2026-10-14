@@ -210,11 +210,11 @@ export default function SolicitarAtendimento() {
 
       <Section tone="white">
         <Card className="mx-auto max-w-4xl overflow-hidden">
-          <div className="border-b border-[#E2E8F0] bg-slate-50 px-6 py-5 sm:px-8">
+          <div className="border-b border-border bg-slate-50 px-6 py-5 sm:px-8">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h2 className="text-xl font-bold text-[#0F172A]">Dados do relato</h2>
-                <p className="mt-1 text-sm text-[#475569]">Identificacao protegida e triagem inicial.</p>
+                <h2 className="text-xl font-bold text-foreground">Dados do relato</h2>
+                <p className="mt-1 text-sm text-muted-foreground">Identificacao protegida e triagem inicial.</p>
               </div>
               <Badge tone="info">{tipoSelecionado}</Badge>
             </div>
@@ -265,7 +265,7 @@ export default function SolicitarAtendimento() {
               <div className="rounded-xl border border-blue-100 bg-blue-50/60 p-5">
                 <div className="mb-4 flex flex-wrap items-center gap-2">
                   <Badge tone="info">Crianca ou adolescente</Badge>
-                  <p className="text-sm text-[#475569]">Campos específicos para cuidado odontológico e responsável.</p>
+                  <p className="text-sm text-muted-foreground">Campos específicos para cuidado odontológico e responsável.</p>
                 </div>
                 <div className="grid gap-5 md:grid-cols-2">
                   <Field label="Idade">
@@ -299,7 +299,7 @@ export default function SolicitarAtendimento() {
               <div className="rounded-xl border border-rose-100 bg-rose-50/60 p-5">
                 <div className="mb-4 flex flex-wrap items-center gap-2">
                   <Badge tone="danger">Sigilo sensivel</Badge>
-                  <p className="text-sm text-[#475569]">Essas respostas ajudam a proteger a seguranca da solicitante.</p>
+                  <p className="text-sm text-muted-foreground">Essas respostas ajudam a proteger a seguranca da solicitante.</p>
                 </div>
                 <div className="grid gap-5 md:grid-cols-2">
                   <Field label="Codinome">
@@ -355,8 +355,8 @@ export default function SolicitarAtendimento() {
               </div>
             )}
 
-            <div className="flex flex-col-reverse gap-3 border-t border-[#E2E8F0] pt-6 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-sm text-[#475569]">Campos de risco usam escala de 1 a 5.</p>
+            <div className="flex flex-col-reverse gap-3 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm text-muted-foreground">Campos de risco usam escala de 1 a 5.</p>
               <Button type="submit" size="large" disabled={enviando || carregandoCanais}>
                 {enviando ? 'Enviando...' : 'Enviar relato'}
               </Button>

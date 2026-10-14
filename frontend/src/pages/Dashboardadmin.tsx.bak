@@ -304,15 +304,15 @@ function DashboardAdmin() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
-      <header className="border-b border-[#E2E8F0] bg-white/90 backdrop-blur-xl">
+    <div className="min-h-screen bg-muted/50">
+      <header className="border-b border-border bg-white/90 backdrop-blur-xl">
         <Container className="flex flex-col gap-3 py-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <button onClick={() => navigate('/')} className="text-sm font-semibold text-[#2563EB] hover:text-[#1E3A8A]">
+            <button onClick={() => navigate('/')} className="text-sm font-semibold text-primary hover:text-primary">
               Voltar para o site
             </button>
-            <h1 className="mt-2 text-3xl font-black text-[#0F172A]">Painel do Voluntario</h1>
-            <p className="text-sm text-[#475569]">{user?.nome}</p>
+            <h1 className="mt-2 text-3xl font-black text-foreground">Painel do Voluntario</h1>
+            <p className="text-sm text-muted-foreground">{user?.nome}</p>
           </div>
           <Button variant="secondary" onClick={() => { logout(); navigate('/login'); }}>
             Sair

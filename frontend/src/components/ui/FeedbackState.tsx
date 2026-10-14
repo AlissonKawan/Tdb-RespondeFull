@@ -5,7 +5,7 @@ interface StateProps {
 
 export function LoadingState({ title = 'Carregando...' }: Partial<StateProps>) {
   return (
-    <div className="rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm font-medium text-[#2563EB]">
+    <div className="rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm font-medium text-primary">
       {title}
     </div>
   );
@@ -22,7 +22,7 @@ export function ErrorState({ title = 'Erro ao carregar dados', description }: Pa
 
 export function EmptyState({ title = 'Nenhum registro encontrado', description }: Partial<StateProps>) {
   return (
-    <div className="rounded-2xl border border-dashed border-[#E2E8F0] bg-white px-6 py-10 text-center">
+    <div className="rounded-2xl border border-dashed border-border bg-white px-6 py-10 text-center">
       <p className="font-semibold text-slate-700">{title}</p>
       {description && <p className="mt-1 text-sm text-slate-500">{description}</p>}
     </div>

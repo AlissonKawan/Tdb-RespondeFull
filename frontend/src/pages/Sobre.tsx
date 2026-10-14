@@ -51,7 +51,7 @@ function Sobre() {
       <Section tone="white" className="reveal">
         <Card className="p-8">
           <SectionHeader title="O que e o TDB Responde?" />
-          <div className="grid gap-6 text-lg leading-8 text-[#475569] lg:grid-cols-2">
+          <div className="grid gap-6 text-lg leading-8 text-muted-foreground lg:grid-cols-2">
             <p>
               O sistema unifica atendimentos da ONG em uma plataforma digital, facilitando a comunicação entre voluntários e beneficiários.
             </p>
@@ -71,11 +71,11 @@ function Sobre() {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {challenges.map(([title, desc], index) => (
             <Card key={title} className="p-6">
-              <span className="mb-4 flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 font-bold text-[#2563EB] ring-1 ring-blue-100">
+              <span className="mb-4 flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 font-bold text-primary ring-1 ring-primary/20">
                 {index + 1}
               </span>
-              <h3 className="text-lg font-bold text-[#0F172A]">{title}</h3>
-              <p className="mt-2 text-sm leading-6 text-[#475569]">{desc}</p>
+              <h3 className="text-lg font-bold text-foreground">{title}</h3>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">{desc}</p>
             </Card>
           ))}
         </div>
@@ -91,8 +91,8 @@ function Sobre() {
           {solutions.map(([title, desc], index) => (
             <Card key={title} className="p-6 transition-all hover:-translate-y-1 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-950/10">
               <Badge tone={index === 0 ? 'info' : 'neutral'}>{index === 0 ? 'Principal' : 'Modulo'}</Badge>
-              <h3 className="mt-4 text-lg font-bold text-[#0F172A]">{title}</h3>
-              <p className="mt-2 text-sm leading-6 text-[#475569]">{desc}</p>
+              <h3 className="mt-4 text-lg font-bold text-foreground">{title}</h3>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">{desc}</p>
             </Card>
           ))}
         </div>
@@ -103,12 +103,12 @@ function Sobre() {
         <div className="mx-auto max-w-4xl space-y-4">
           {flow.map(([step, title, desc]) => (
             <Card key={step} className="flex gap-4 p-5">
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#2563EB] text-lg font-black text-white shadow-lg shadow-blue-600/20">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary text-lg font-black text-primary-foreground shadow-lg shadow-primary/20">
                 {step}
               </span>
               <div>
-                <h3 className="font-bold text-[#0F172A]">{title}</h3>
-                <p className="mt-1 text-sm leading-6 text-[#475569]">{desc}</p>
+                <h3 className="font-bold text-foreground">{title}</h3>
+                <p className="mt-1 text-sm leading-6 text-muted-foreground">{desc}</p>
               </div>
             </Card>
           ))}
@@ -119,7 +119,7 @@ function Sobre() {
         <SectionHeader title="Pontos principais" align="center" />
         <div className="mx-auto flex max-w-4xl flex-wrap justify-center gap-3">
           {pillars.map((item) => (
-            <span key={item} className="rounded-full border border-blue-100 bg-blue-50 px-4 py-2 text-sm font-semibold text-[#2563EB]">
+            <span key={item} className="rounded-full border border-primary/20 bg-primary/10 px-4 py-2 text-sm font-semibold text-primary">
               {item}
             </span>
           ))}
@@ -129,9 +129,9 @@ function Sobre() {
       <Section tone="base" className="reveal">
         <Card className="flex flex-col gap-6 p-8 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">Colaborar</p>
-            <h2 className="mt-2 text-3xl font-bold text-[#0F172A]">Quer saber mais sobre o projeto?</h2>
-            <p className="mt-2 text-[#475569]">Fale com a equipe ou conheca os integrantes.</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-primary">Colaborar</p>
+            <h2 className="mt-2 text-3xl font-bold text-foreground">Quer saber mais sobre o projeto?</h2>
+            <p className="mt-2 text-muted-foreground">Fale com a equipe ou conheca os integrantes.</p>
           </div>
           <div className="flex flex-wrap gap-3">
             <Button href="/contato" size="large">Fale conosco</Button>

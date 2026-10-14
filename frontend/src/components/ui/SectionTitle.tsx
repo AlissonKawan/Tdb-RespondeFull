@@ -6,8 +6,8 @@ interface SectionTitleProps {
 function SectionTitle({ title, description }: SectionTitleProps) {
   return (
     <div className="mb-6">
-      <h2 className="text-2xl font-bold text-[#0F172A]">{title}</h2>
-      {description && <p className="mt-1 text-sm text-[#475569]">{description}</p>}
+      <h2 className="text-2xl font-bold text-foreground">{title}</h2>
+      {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
     </div>
   );
 }

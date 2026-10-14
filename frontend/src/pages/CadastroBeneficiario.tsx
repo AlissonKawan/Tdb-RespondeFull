@@ -67,7 +67,7 @@ function CadastroBeneficiario() {
       <Section tone="white">
         <Card className="mx-auto max-w-3xl p-6 lg:p-8">
           {sucesso && (
-            <div className="mb-5 rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm font-semibold text-[#059669]">
+            <div className="mb-5 rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm font-semibold text-success">
               {sucesso}
             </div>
           )}

@@ -96,7 +96,7 @@ function Roadmap() {
             <StatCard key={metric.label} {...metric} />
           ))}
         </div>
-        <p className="mt-4 text-sm text-[#475569]">
+        <p className="mt-4 text-sm text-muted-foreground">
           Indicadores visuais de demonstração do MVP. Eles representam o desenho da solução e não dados reais da ONG.
         </p>
       </Section>
@@ -110,14 +110,14 @@ function Roadmap() {
         <div className="grid gap-6 lg:grid-cols-2">
           {audiences.map((audience) => (
             <Card key={audience.title} className="p-6">
-              <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-lg font-black text-[#2563EB] ring-1 ring-blue-100">
+              <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-lg font-black text-primary ring-1 ring-primary/20">
                 {audience.title[0]}
               </div>
-              <h3 className="text-2xl font-bold text-[#0F172A]">{audience.title}</h3>
-              <p className="mt-3 leading-7 text-[#475569]">{audience.description}</p>
+              <h3 className="text-2xl font-bold text-foreground">{audience.title}</h3>
+              <p className="mt-3 leading-7 text-muted-foreground">{audience.description}</p>
               <div className="mt-5 grid gap-3">
                 {audience.details.map((detail) => (
-                  <div key={detail} className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 text-sm font-medium text-[#475569]">
+                  <div key={detail} className="rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm font-medium text-muted-foreground">
                     {detail}
                   </div>
                 ))}
@@ -136,19 +136,19 @@ function Roadmap() {
         <div className="grid gap-4 lg:grid-cols-4">
           {helpFlow.map(([title, description], index) => (
             <Card key={title} className="relative overflow-hidden p-6">
-              <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#2563EB] via-[#60A5FA] to-transparent" />
-              <span className="mb-5 flex h-10 w-10 items-center justify-center rounded-2xl bg-[#2563EB] text-sm font-black text-white shadow-lg shadow-blue-600/20">
+              <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary via-accent to-transparent" />
+              <span className="mb-5 flex h-10 w-10 items-center justify-center rounded-2xl bg-primary text-sm font-black text-primary-foreground shadow-lg shadow-primary/20">
                 {index + 1}
               </span>
-              <h3 className="text-lg font-bold text-[#0F172A]">{title}</h3>
-              <p className="mt-2 text-sm leading-6 text-[#475569]">{description}</p>
+              <h3 className="text-lg font-bold text-foreground">{title}</h3>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">{description}</p>
             </Card>
           ))}
         </div>
       </Section>
 
       <Section tone="white" className="reveal">
-        <Card className="flex flex-col gap-6 bg-gradient-to-br from-[#1E3A8A] to-[#2563EB] p-8 text-white md:flex-row md:items-center md:justify-between">
+        <Card className="flex flex-col gap-6 bg-gradient-to-br from-foreground to-primary p-8 text-primary-foreground md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-xs font-bold uppercase tracking-widest text-blue-100">Resultado esperado</p>
             <h2 className="mt-2 text-3xl font-black">Uma operação mais clara para quem cuida</h2>
