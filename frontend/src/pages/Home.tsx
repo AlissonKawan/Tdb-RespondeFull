@@ -1,4 +1,5 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import Button from '../components/ui/Button';
 import Container from '../components/ui/Container';
 import FeatureCard from '../components/ui/FeatureCard';
@@ -64,49 +65,50 @@ const features = [
 ];
 
 function Home() {
-  const [visitas, setVisitas] = useState(0);
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      const totalSalvo = localStorage.getItem('tdb_visitas');
-      const contagemAtual = totalSalvo ? parseInt(totalSalvo, 10) : 0;
-      const novaContagem = contagemAtual + 1;
-      localStorage.setItem('tdb_visitas', novaContagem.toString());
-      setVisitas(novaContagem);
-    }, 0);
-
-    return () => window.clearTimeout(timer);
-  }, []);
-
   return (
     <div>
-      <section className="relative overflow-hidden border-b border-border bg-gradient-to-br from-background via-primary/5 to-surface">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(37,99,235,0.08)_1px,transparent_1px),linear-gradient(to_bottom,rgba(37,99,235,0.06)_1px,transparent_1px)] bg-[size:56px_56px]" />
-        <div className="absolute left-1/2 top-0 h-72 w-[42rem] -translate-x-1/2 bg-[radial-gradient(circle_at_center,rgba(96,165,250,0.32),transparent_65%)]" />
+      <section className="relative isolate overflow-hidden border-b border-border bg-gradient-to-br from-white via-blue-50/70 to-sky-100/70">
+        <div className="absolute inset-0 -z-20 bg-[linear-gradient(to_right,rgba(37,99,235,0.055)_1px,transparent_1px),linear-gradient(to_bottom,rgba(37,99,235,0.055)_1px,transparent_1px)] bg-[size:48px_48px]" />
+        <div className="absolute -right-36 top-8 -z-10 h-80 w-80 rounded-full bg-sky-300/30 blur-3xl sm:h-[28rem] sm:w-[28rem]" />
+        <div className="absolute -left-36 bottom-0 -z-10 h-72 w-72 rounded-full bg-blue-200/40 blur-3xl" />
 
-        <Container className="relative grid max-w-7xl gap-10 py-16 lg:grid-cols-[1.04fr_0.86fr] lg:items-center">
-          <div className="max-w-3xl">
-            <span className="inline-flex rounded-full border border-blue-100 bg-white/85 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-primary shadow-sm backdrop-blur">
-              Visitas à plataforma: {visitas}
+        <Container className="relative grid max-w-7xl gap-12 py-12 sm:py-16 lg:grid-cols-[minmax(0,1fr)_minmax(26rem,0.9fr)] lg:items-center lg:gap-16 lg:py-24">
+          <div className="min-w-0 max-w-3xl">
+            <span className="inline-flex max-w-full items-center gap-2 rounded-full border border-blue-200/80 bg-white/90 px-3 py-2 text-sm font-semibold leading-5 text-blue-900 shadow-sm backdrop-blur sm:px-4">
+              <svg className="h-4 w-4 shrink-0 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+                <path d="M12 20.5S4 16.1 4 9.7A4.2 4.2 0 0 1 11.5 7a.7.7 0 0 0 1 0A4.2 4.2 0 0 1 20 9.7c0 6.4-8 10.8-8 10.8Z" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M8.8 11.8c.7 1.5 1.8 2.2 3.2 2.2s2.5-.7 3.2-2.2" strokeLinecap="round" />
+              </svg>
+              <span>Rede de Solidariedade Odontológica <span aria-hidden="true">•</span> Turma do Bem</span>
             </span>
 
-            <h1 className="mt-6 text-4xl font-black tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-              Atendimento social com{' '}
-              <span className="bg-gradient-to-r from-foreground via-primary to-primary bg-clip-text text-transparent">
-                inteligência operacional
-              </span>
+            <h1 className="mt-7 text-balance text-[2.5rem] font-black leading-[1.05] tracking-[-0.04em] text-slate-950 sm:text-5xl lg:text-[3.65rem]">
+              Cada pedido de ajuda merece chegar a quem pode cuidar.
             </h1>
 
-            <p className="mt-5 max-w-2xl text-lg leading-8 text-muted-foreground">
-              O TDB Responde centraliza conversas, prioridades e histórico para ajudar voluntários
-              a responder com mais velocidade, clareza e acolhimento.
+            <p className="mt-6 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">
+              O TDB Responde organiza a triagem, protege cada história e aproxima pessoas em
+              situação de vulnerabilidade de dentistas voluntários da Turma do Bem.
             </p>
 
-            <div className="mt-7 flex flex-wrap gap-3">
-              <Button href="/login" size="large">Acessar sistema</Button>
-              <Button href="/quero-ser-voluntario" variant="secondary" size="large">Quero ser voluntário</Button>
-              <Button href="/sobre" variant="ghost" size="large">Conhecer projeto</Button>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <Button href="/login" size="large" className="w-full shadow-lg shadow-blue-600/20 sm:w-auto">
+                Acessar Plataforma
+              </Button>
+              <Button href="/quero-ser-voluntario" variant="secondary" size="large" className="w-full border-blue-200 bg-white/90 text-blue-950 sm:w-auto">
+                Seja um Dentista Voluntário
+              </Button>
             </div>
+
+            <Link
+              to="/sobre"
+              className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-md py-2 font-semibold text-primary underline-offset-4 transition-colors hover:text-blue-800 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            >
+              Conheça a Turma do Bem
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </Link>
           </div>
 
           <HeroDashboardCard />

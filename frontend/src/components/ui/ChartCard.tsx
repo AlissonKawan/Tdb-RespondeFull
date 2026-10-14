@@ -6,7 +6,11 @@ import { mensagensService } from '../../services/mensagensService';
 
 
 
-function ChartCard() {
+interface ChartCardProps {
+  embedded?: boolean;
+}
+
+function ChartCard({ embedded = false }: ChartCardProps) {
   const [stats, setStats] = useState({
     atendimentos: '...',
     mensagens: '...',
@@ -64,32 +68,31 @@ function ChartCard() {
   }, []);
 
   return (
-    <div className="rounded-3xl border border-border/70 bg-surface/85 p-5 shadow-2xl shadow-primary/15 backdrop-blur-xl">
-      <div className="mb-5 flex items-center justify-between">
+    <div className={`${embedded ? 'border-t border-slate-200' : 'overflow-hidden rounded-3xl shadow-xl shadow-slate-950/10'} bg-slate-950 p-4 text-white sm:p-5`}>
+      <div className="mb-4 flex items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-bold uppercase tracking-widest text-primary">Operação Global</p>
-          <h3 className="mt-1 text-lg font-bold text-foreground">Estatísticas em Tempo Real</h3>
+          <p className="text-xs font-semibold text-sky-300">Acolhimento em números</p>
+          <h3 className="mt-1 text-base font-bold text-white">Impacto da rede</h3>
         </div>
-        <span className="rounded-full border border-success/20 bg-success/10 px-3 py-1 text-xs font-semibold text-success">
-          Online
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-1 text-xs font-semibold text-emerald-200">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" aria-hidden="true" />
+          Dados da plataforma
         </span>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3" aria-live="polite">
         {[
           [stats.atendimentos, 'atendimentos'],
-          [stats.mensagens, 'mensagens'],
+          [stats.mensagens, 'mensagens recentes'],
           [stats.voluntarios, 'voluntários'],
           [stats.beneficiarios, 'beneficiários'],
         ].map(([value, label]) => (
-          <div key={label} className="rounded-2xl border border-border bg-muted/50 p-3 text-center sm:text-left">
-            <p className="text-xl font-black text-foreground">{value}</p>
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</p>
+          <div key={label} className="min-w-0 rounded-xl border border-white/10 bg-white/[0.07] p-3">
+            <p className="text-xl font-black tabular-nums text-white">{value}</p>
+            <p className="mt-0.5 break-words text-[0.6875rem] font-medium leading-4 text-slate-300">{label}</p>
           </div>
         ))}
       </div>
-
-
     </div>
   );
 }
