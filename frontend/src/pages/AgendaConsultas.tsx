@@ -241,22 +241,19 @@ export default function AgendaConsultas() {
 
   return (
     <PageShell>
-      <header className="border-b border-[#E2E8F0] bg-white/90 backdrop-blur-xl">
-        <Container className="flex items-center justify-between py-4">
-          <div>
-            <button onClick={() => navigate('/portal-voluntario')} className="text-sm font-semibold text-[#2563EB] hover:text-[#1E3A8A]">
-              ← Voltar para o portal
-            </button>
-            <p className="mt-1 text-sm text-[#475569]">Agenda de {user?.nome || 'Voluntário'}</p>
-          </div>
-          <Button onClick={handleOpenNew}>+ Nova Consulta</Button>
-        </Container>
-      </header>
-
       <PageHeader
+        variant="compact"
         eyebrow="Agenda"
         title="Meus Horários"
         description="Acompanhe suas consultas marcadas com os beneficiários da ONG."
+        actions={
+          <>
+            <Button variant="secondary" onClick={() => navigate('/portal-voluntario')}>
+              Voltar para o portal
+            </Button>
+            <Button onClick={handleOpenNew}>Nova consulta</Button>
+          </>
+        }
       />
 
       <Container className="py-8">

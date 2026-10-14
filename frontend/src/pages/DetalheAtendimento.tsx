@@ -5,7 +5,6 @@ import PageShell from '../components/layout/PageShell';
 import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
-import Container from '../components/ui/Container';
 import { ErrorState, LoadingState } from '../components/ui/FeedbackState';
 import { Field, Select, Textarea } from '../components/ui/Input';
 import PageHeader from '../components/ui/PageHeader';
@@ -104,7 +103,7 @@ function iaPrevisaoConfig(previsao?: string) {
 function DetalheAtendimento() {
   const { id } = useParams();
   const atendimentoId = Number(id);
-  const { user, logout, isBeneficiario } = useAuth();
+  const { user, isBeneficiario } = useAuth();
   const navigate = useNavigate();
   const { confirm, confirmDialog } = useConfirm();
 
@@ -411,30 +410,16 @@ function DetalheAtendimento() {
 
   return (
     <PageShell>
-      <header className="border-b border-[#E2E8F0] bg-white/90 backdrop-blur-xl">
-        <Container className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <button onClick={() => navigate(-1)} className="text-sm font-semibold text-[#2563EB] hover:text-[#1E3A8A]">
-              Voltar
-            </button>
-            <p className="mt-1 text-sm text-[#475569]">Sessão de {user?.nome}</p>
-          </div>
-          <Button variant="secondary" onClick={() => {
-            confirm({
-              title: 'Sair da conta',
-              message: 'Tem certeza que deseja encerrar a sua sessão?',
-              confirmText: 'Sair',
-              tone: 'danger',
-              onConfirm: () => { logout(); navigate('/login'); }
-            });
-          }}>Sair</Button>
-        </Container>
-      </header>
-
       <PageHeader
+        variant="compact"
         eyebrow="Atendimento"
         title={atendimento ? `Atendimento de ${pessoaAtendida}` : 'Carregando detalhes...'}
         description="Acompanhe status, responsável e mensagens deste atendimento."
+        actions={
+          <Button variant="secondary" onClick={() => navigate(-1)}>
+            Voltar
+          </Button>
+        }
       />
 
       <Section tone="white">

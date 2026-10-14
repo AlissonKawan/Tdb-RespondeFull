@@ -9,6 +9,30 @@ interface NavigationItem {
   activeWhen?: (pathname: string) => boolean;
 }
 
+const ROUTE_LABELS: Array<{ matches: (pathname: string) => boolean; label: string }> = [
+  { matches: (path) => path === '/admin', label: 'Painel do administrador' },
+  { matches: (path) => path === '/inscricoes-pendentes' || path === '/inscricoes-voluntarios', label: 'Inscrições pendentes' },
+  { matches: (path) => path === '/portal-voluntario' || path === '/portal/voluntario', label: 'Portal do voluntário' },
+  { matches: (path) => path === '/portal-beneficiario' || path === '/portal/beneficiario', label: 'Portal do beneficiário' },
+  { matches: (path) => path === '/beneficiario/solicitar-atendimento', label: 'Solicitar atendimento' },
+  { matches: (path) => path.startsWith('/atendimentos/'), label: 'Detalhes do atendimento' },
+  { matches: (path) => path === '/cronograma', label: 'Cronograma' },
+  { matches: (path) => path === '/agenda', label: 'Minha agenda' },
+  { matches: (path) => path === '/ranking', label: 'Ranking' },
+  { matches: (path) => path === '/mensagens-contato', label: 'Mensagens de contato' },
+];
+
+function getRouteLabel(pathname: string) {
+  return ROUTE_LABELS.find((route) => route.matches(pathname))?.label ?? 'Sistema';
+}
+
+function getRoleLabel(role?: string) {
+  if (role === 'ADMIN') return 'Administrador';
+  if (role === 'VOLUNTARIO') return 'Voluntário';
+  if (role === 'BENEFICIARIO') return 'Beneficiário';
+  return 'Usuário';
+}
+
 export default function SystemLayout() {
   const { user, logout, isVoluntario, isBeneficiario, isAdmin } = useAuth();
   const navigate = useNavigate();
@@ -74,6 +98,7 @@ export default function SystemLayout() {
   }, [isSidebarOpen]);
 
   const closeSidebar = () => setIsSidebarOpen(false);
+  const currentRouteLabel = getRouteLabel(location.pathname);
 
   const handleLogout = () => {
     confirm({
@@ -111,7 +136,7 @@ export default function SystemLayout() {
         ref={sidebarRef}
         id="menu-sistema"
         aria-label="Navegação do sistema"
-        className={`fixed inset-y-0 left-0 z-50 flex w-72 max-w-[88vw] transform flex-col border-r border-border bg-surface shadow-xl transition-transform duration-normal ease-out md:relative md:w-64 md:translate-x-0 md:shadow-none ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-72 max-w-[88vw] transform flex-col border-r border-border bg-surface shadow-xl transition-transform duration-normal ease-out md:relative md:w-64 md:translate-x-0 md:transform-none md:shadow-none ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -149,11 +174,11 @@ export default function SystemLayout() {
           })}
         </nav>
 
-        <div className="border-t border-border bg-muted/45 p-4">
+        <div className="border-t border-border bg-muted/45 p-4 md:fixed md:right-8 md:top-[18px] md:z-20 md:border-0 md:bg-transparent md:p-0">
           <button
             type="button"
             onClick={handleLogout}
-            className="min-h-11 w-full rounded-ui px-4 py-3 text-left text-sm font-semibold text-danger transition-colors duration-fast hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger"
+            className="min-h-11 w-full rounded-ui px-4 py-3 text-left text-sm font-semibold text-danger transition-colors duration-fast hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger md:w-auto md:border md:border-border md:py-2"
           >
             Sair
           </button>
@@ -161,21 +186,36 @@ export default function SystemLayout() {
       </aside>
 
       <main id="conteudo-principal" className="flex min-w-0 flex-1 flex-col bg-background">
-        <header className="z-10 flex items-center border-b border-border bg-surface px-4 py-3 md:hidden">
-          <button
-            ref={menuButtonRef}
-            type="button"
-            onClick={() => setIsSidebarOpen(true)}
-            aria-label="Abrir menu do sistema"
-            aria-expanded={isSidebarOpen}
-            aria-controls="menu-sistema"
-            className="flex h-11 w-11 items-center justify-center rounded-ui text-muted-foreground transition-colors duration-fast hover:bg-muted hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-              <path strokeLinecap="round" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
-          <p className="ml-3 text-lg font-bold tracking-tight text-primary">Turma do Bem</p>
+        <header className="z-10 flex h-16 shrink-0 items-center border-b border-border bg-surface px-4 md:h-20 md:px-6 lg:px-8">
+          <div className="flex min-w-0 flex-1 items-center md:hidden">
+            <button
+              ref={menuButtonRef}
+              type="button"
+              onClick={() => setIsSidebarOpen(true)}
+              aria-label="Abrir menu do sistema"
+              aria-expanded={isSidebarOpen}
+              aria-controls="menu-sistema"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-ui text-muted-foreground transition-colors duration-fast hover:bg-muted hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <path strokeLinecap="round" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+            <p className="ml-3 truncate text-lg font-bold tracking-tight text-primary">Turma do Bem</p>
+          </div>
+
+          <div className="hidden min-w-0 flex-1 items-center justify-between gap-6 md:flex">
+            <div className="min-w-0">
+              <p className="truncate text-xs font-semibold text-muted-foreground">Área restrita / {currentRouteLabel}</p>
+              <p className="mt-0.5 truncate text-lg font-bold tracking-tight text-foreground">{currentRouteLabel}</p>
+            </div>
+            <div className="mr-20 flex shrink-0 items-center gap-4 lg:mr-24">
+              <div className="text-right">
+                <p className="max-w-32 truncate text-sm font-semibold text-foreground lg:max-w-56">{user?.nome ?? 'Usuário'}</p>
+                <p className="text-xs text-muted-foreground">{getRoleLabel(user?.tipoUsuario)}</p>
+              </div>
+            </div>
+          </div>
         </header>
 
         <div className="min-h-0 flex-1 overflow-auto">

@@ -5,7 +5,6 @@ import PageShell from '../components/layout/PageShell';
 import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
-import Container from '../components/ui/Container';
 import { ErrorState, LoadingState } from '../components/ui/FeedbackState';
 import PageHeader from '../components/ui/PageHeader';
 import SectionHeader from '../components/ui/SectionHeader';
@@ -114,7 +113,7 @@ function AtendimentoCard({ atendimento, onAssumir, assumindo, assumirBloqueado, 
 }
 
 function PortalVoluntario() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const { confirm, confirmDialog } = useConfirm();
   const [aba, setAba] = useState<Aba>('solicitados');
@@ -269,12 +268,13 @@ function PortalVoluntario() {
 
   return (
     <PageShell>
-      <header className="border-b border-[#E2E8F0] bg-white/90 backdrop-blur-xl">
-        <Container className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm text-[#475569]">Sessão de {user?.nome}</p>
-          </div>
-          <div className="flex gap-2">
+      <PageHeader
+        variant="compact"
+        eyebrow="Portal"
+        title="Portal do Voluntário"
+        description="Acompanhe atendimentos solicitados e veja os atendimentos vinculados ao seu usuário."
+        actions={
+          <>
             <Button variant="secondary" onClick={() => navigate('/agenda')}>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 text-blue-500">
                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
@@ -295,23 +295,8 @@ function PortalVoluntario() {
               </svg>
               Ranking de Indicações
             </Button>
-            <Button variant="secondary" onClick={() => {
-              confirm({
-                title: 'Sair da conta',
-                message: 'Tem certeza que deseja encerrar a sua sessão?',
-                confirmText: 'Sair',
-                tone: 'danger',
-                onConfirm: () => { logout(); navigate('/login'); }
-              });
-            }}>Sair</Button>
-          </div>
-        </Container>
-      </header>
-
-      <PageHeader
-        eyebrow="Portal"
-        title="Portal do Voluntário"
-        description="Acompanhe atendimentos solicitados e veja os atendimentos vinculados ao seu usuário."
+          </>
+        }
       />
 
       <Section tone="white">

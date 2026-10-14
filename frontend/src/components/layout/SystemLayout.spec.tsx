@@ -30,7 +30,7 @@ describe('SystemLayout', () => {
     });
 
     render(
-      <MemoryRouter>
+      <MemoryRouter initialEntries={['/agenda']}>
         <SystemLayout />
       </MemoryRouter>
     );
@@ -44,6 +44,7 @@ describe('SystemLayout', () => {
     expect(screen.queryByText('Inscrições Pendentes')).not.toBeInTheDocument();
 
     expect(screen.getByText('Sair')).toBeInTheDocument();
+    expect(screen.getByText('Área restrita / Minha agenda')).toBeInTheDocument();
   });
 
   it('renderiza links corretos para beneficiário', () => {

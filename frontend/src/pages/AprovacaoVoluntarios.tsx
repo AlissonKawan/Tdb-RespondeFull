@@ -1,12 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useConfirm } from '../hooks/useConfirm';
 import Section from '../components/layout/Section';
 import PageShell from '../components/layout/PageShell';
 import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
-import Container from '../components/ui/Container';
 import { EmptyState, ErrorState, LoadingState } from '../components/ui/FeedbackState';
 import PageHeader from '../components/ui/PageHeader';
 import SectionHeader from '../components/ui/SectionHeader';
@@ -14,9 +12,8 @@ import { useAuth } from '../context/useAuth';
 import { voluntariosService, type Voluntario } from '../services/voluntariosService';
 
 function AprovacaoVoluntarios() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
-  const { confirm, confirmDialog } = useConfirm();
   const [solicitacoes, setSolicitacoes] = useState<Voluntario[]>([]);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState('');
@@ -56,33 +53,16 @@ function AprovacaoVoluntarios() {
 
   return (
     <PageShell>
-      <header className="border-b border-[#E2E8F0] bg-white/90 backdrop-blur-xl">
-        <Container className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <button onClick={() => navigate('/admin')} className="text-sm font-semibold text-[#2563EB] hover:text-[#1E3A8A]">
-              Voltar para o Painel Admin
-            </button>
-            <p className="mt-1 text-sm text-[#475569]">Sessao de {user?.nome}</p>
-          </div>
-          <Button variant="secondary" onClick={() => {
-            confirm({
-              title: 'Sair da conta',
-              message: 'Você realmente quer sair da conta?',
-              confirmText: 'Sair',
-              tone: 'danger',
-              onConfirm: () => {
-                logout();
-                navigate('/login');
-              }
-            });
-          }}>Sair</Button>
-        </Container>
-      </header>
-
       <PageHeader
+        variant="compact"
         eyebrow="Voluntariado"
         title="Solicitações de novos voluntários"
         description="Analise os pedidos recebidos e libere o acesso apenas para pessoas aprovadas."
+        actions={
+          <Button variant="secondary" onClick={() => navigate('/admin')}>
+            Voltar para o painel
+          </Button>
+        }
       />
 
       <Section tone="white">
@@ -155,7 +135,6 @@ function AprovacaoVoluntarios() {
           ))}
         </div>
       </Section>
-      {confirmDialog}
     </PageShell>
   );
 }

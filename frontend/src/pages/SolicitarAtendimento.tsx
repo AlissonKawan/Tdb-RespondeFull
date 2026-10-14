@@ -5,7 +5,6 @@ import PageShell from '../components/layout/PageShell';
 import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
-import Container from '../components/ui/Container';
 import { Field, Input, Select, Textarea } from '../components/ui/Input';
 import PageHeader from '../components/ui/PageHeader';
 import { useAuth } from '../context/useAuth';
@@ -108,7 +107,7 @@ function validar(form: FormState) {
 }
 
 export default function SolicitarAtendimento() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const { confirm, confirmDialog } = useConfirm();
   const [form, setForm] = useState<FormState>(() => ({
@@ -197,30 +196,16 @@ export default function SolicitarAtendimento() {
 
   return (
     <PageShell>
-      <header className="border-b border-[#E2E8F0] bg-white/90 backdrop-blur-xl">
-        <Container className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <button onClick={() => navigate('/portal-beneficiario')} className="text-sm font-semibold text-[#2563EB] hover:text-[#1E3A8A]">
-              Voltar para o portal
-            </button>
-            <p className="mt-1 text-sm text-[#475569]">Sessao de {user?.nome}</p>
-          </div>
-          <Button variant="secondary" onClick={() => {
-            confirm({
-              title: 'Sair da conta',
-              message: 'Tem certeza que deseja encerrar a sua sessão?',
-              confirmText: 'Sair',
-              tone: 'danger',
-              onConfirm: () => { logout(); navigate('/login'); }
-            });
-          }}>Sair</Button>
-        </Container>
-      </header>
-
       <PageHeader
+        variant="compact"
         eyebrow="Atendimento"
-        title="Relatar uma situacao"
+        title="Relatar uma situação"
         description="Preencha as informações com cuidado. A equipe usa esses dados para priorizar e encaminhar o atendimento."
+        actions={
+          <Button variant="secondary" onClick={() => navigate('/portal-beneficiario')}>
+            Voltar para o portal
+          </Button>
+        }
       />
 
       <Section tone="white">

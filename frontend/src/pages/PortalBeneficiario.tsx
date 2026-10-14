@@ -5,14 +5,12 @@ import PageShell from '../components/layout/PageShell';
 import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
-import Container from '../components/ui/Container';
 import { ErrorState, LoadingState } from '../components/ui/FeedbackState';
 import PageHeader from '../components/ui/PageHeader';
 import SectionHeader from '../components/ui/SectionHeader';
 import { useAuth } from '../context/useAuth';
 import { atendimentoService } from '../services/atendimentoService';
 import { mensagensService } from '../services/mensagensService';
-import { useConfirm } from '../hooks/useConfirm';
 import { formatStatusLabel } from '../utils/formatters';
 import type { AtendimentoApi } from '../types/AtendimentoApi';
 
@@ -68,9 +66,8 @@ function BeneficiaryEmptyState({ onCreate }: { onCreate: () => void }) {
 }
 
 function PortalBeneficiario() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
-  const { confirm, confirmDialog } = useConfirm();
   const [atendimentos, setAtendimentos] = useState<AtendimentoApi[]>([]);
   const [novasMensagens, setNovasMensagens] = useState<Record<number, boolean>>({});
   const [loading, setLoading] = useState(true);
@@ -120,30 +117,11 @@ function PortalBeneficiario() {
 
   return (
     <PageShell>
-      <header className="border-b border-[#E2E8F0] bg-white/90 backdrop-blur-xl">
-        <Container className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm text-[#475569]">Portal do beneficiario | {user?.nome}</p>
-          </div>
-          <Button variant="secondary" onClick={() => {
-            confirm({
-              title: 'Sair da conta',
-              message: 'Você realmente quer sair da conta?',
-              confirmText: 'Sair',
-              tone: 'danger',
-              onConfirm: () => {
-                logout();
-                navigate('/login');
-              }
-            });
-          }}>Sair</Button>
-        </Container>
-      </header>
-
       <PageHeader
+        variant="compact"
         eyebrow="Portal"
-        title={`Ola, ${user?.nome ?? 'beneficiario'}`}
-        description="Solicite atendimentos, acompanhe status e converse com voluntarios pelo chat do atendimento."
+        title={`Olá, ${user?.nome ?? 'beneficiário'}`}
+        description="Solicite atendimentos, acompanhe status e converse com voluntários pelo chat do atendimento."
       />
 
       <Section tone="white">
@@ -199,7 +177,6 @@ function PortalBeneficiario() {
           ))}
         </div>
       </Section>
-      {confirmDialog}
     </PageShell>
   );
 }

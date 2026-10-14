@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 import { useConfirm } from '../hooks/useConfirm';
 import { voluntariosService, type Voluntario } from '../services/voluntariosService';
@@ -15,14 +14,14 @@ import Card from '../components/ui/Card';
 import Container from '../components/ui/Container';
 import { EmptyState, ErrorState, LoadingState } from '../components/ui/FeedbackState';
 import { Field, Input, Select } from '../components/ui/Input';
+import PageHeader from '../components/ui/PageHeader';
 import SectionTitle from '../components/ui/SectionTitle';
 import StatCard from '../components/ui/StatCard';
 
 type Aba = 'dashboard' | 'atendimentos' | 'voluntarios' | 'beneficiarios' | 'inscricoes';
 
 export default function DashboardAdmin() {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
+  const { user } = useAuth();
   const { confirm, confirmDialog } = useConfirm();
 
   const [aba, setAba] = useState<Aba>('dashboard');
@@ -160,27 +159,14 @@ export default function DashboardAdmin() {
 
   return (
     <div className="min-h-full bg-[#F8FAFC]">
-      <header className="border-b border-[#E2E8F0] bg-white/90 backdrop-blur-xl">
-        <Container className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="mt-2 text-3xl font-black text-[#0F172A]">Painel do Administrador</h1>
-            <p className="text-sm text-[#475569]">Logado como {user?.nome}</p>
-          </div>
-          <Button variant="secondary" onClick={() => {
-            confirm({
-              title: 'Sair da conta',
-              message: 'Tem certeza que deseja encerrar a sua sessão?',
-              confirmText: 'Sair',
-              tone: 'danger',
-              onConfirm: () => { logout(); navigate('/login'); }
-            });
-          }}>
-            Sair
-          </Button>
-        </Container>
-      </header>
+      <PageHeader
+        variant="compact"
+        eyebrow="Administração"
+        title="Painel do Administrador"
+        description={`Visão geral e gestão da operação${user?.nome ? ` para ${user.nome}` : ''}.`}
+      />
 
-      <Container className="py-4 md:py-8">
+      <Container className="py-6 md:py-8">
         <div className="mb-6 flex flex-wrap gap-2 overflow-x-auto pb-2 scrollbar-hide">
           {abas.map(([id, label]) => (
             <Button key={id} variant={aba === id ? 'primary' : 'secondary'} size="sm" onClick={() => setAba(id)}>
