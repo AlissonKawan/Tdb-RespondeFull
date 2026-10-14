@@ -8,35 +8,35 @@ import SectionHeader from '../components/ui/SectionHeader';
 
 const pillars = [
   'Atendimento organizado',
-  'Historico preservado',
-  'Priorizacao clara',
+  'Histórico preservado',
+  'Priorização clara',
   'Sigilo em casos sensíveis',
-  'Voluntarios por especialidade',
-  'Acompanhamento pelo beneficiario',
+  'Voluntários por especialidade',
+  'Acompanhamento pelo beneficiário',
 ];
 
 const challenges = [
-  ['Canais desconectados', 'WhatsApp, e-mail e redes sociais sem integracao geravam perda de mensagens e respostas duplicadas.'],
-  ['Historico fragmentado', 'Voluntarios tinham dificuldade para acompanhar o contexto de cada atendimento.'],
+  ['Canais desconectados', 'WhatsApp, e-mail e redes sociais sem integração geravam perda de mensagens e respostas duplicadas.'],
+  ['Histórico fragmentado', 'Voluntários tinham dificuldade para acompanhar o contexto de cada atendimento.'],
   ['Prioridade pouco clara', 'Casos urgentes precisavam de uma triagem mais visual e objetiva.'],
-  ['Captacao manual', 'Novos voluntarios precisavam de um fluxo simples para demonstrar interesse.'],
+  ['Captação manual', 'Novos voluntários precisavam de um fluxo simples para demonstrar interesse.'],
 ];
 
 const solutions = [
   ['Atendimento centralizado', 'Todos os canais aparecem em uma única operação visual.'],
   ['Protocolo de sigilo', 'Casos sensíveis podem ser tratados com mais cuidado e controle.'],
-  ['Painel operacional', 'Status, prioridades e responsaveis ficam visiveis para a equipe.'],
-  ['Triagem por prioridade', 'Demandas sao classificadas para orientar a proxima resposta.'],
-  ['Historico unificado', 'Mensagens e mudancas de status ficam registradas no fluxo.'],
+  ['Painel operacional', 'Status, prioridades e responsáveis ficam visíveis para a equipe.'],
+  ['Triagem por prioridade', 'Demandas são classificadas para orientar a próxima resposta.'],
+  ['Histórico unificado', 'Mensagens e mudanças de status ficam registradas no fluxo.'],
   ['Captação de voluntários', 'Formulário público registra candidatos para análise interna.'],
 ];
 
 const flow = [
-  ['1', 'Entrada do beneficiario', 'A demanda chega por canais como WhatsApp, e-mail, redes sociais ou atendimento presencial.'],
+  ['1', 'Entrada do beneficiário', 'A demanda chega por canais como WhatsApp, e-mail, redes sociais ou atendimento presencial.'],
   ['2', 'Triagem inicial', 'A equipe registra dados, classifica prioridade e protege informações sensíveis.'],
-  ['3', 'Atribuicao', 'O caso e direcionado ao voluntario adequado conforme disponibilidade e especialidade.'],
+  ['3', 'Atribuição', 'O caso é direcionado ao voluntário adequado conforme disponibilidade e especialidade.'],
   ['4', 'Acompanhamento', 'Mensagens, status e histórico permanecem em um fluxo único.'],
-  ['5', 'Encerramento', 'O atendimento e finalizado com contexto preservado para consultas futuras.'],
+  ['5', 'Encerramento', 'O atendimento é finalizado com contexto preservado para consultas futuras.'],
 ];
 
 function Sobre() {
@@ -50,7 +50,7 @@ function Sobre() {
 
       <Section tone="white" className="reveal">
         <Card className="p-8">
-          <SectionHeader title="O que e o TDB Responde?" />
+          <SectionHeader title="O que é o TDB Responde?" />
           <div className="grid gap-6 text-lg leading-8 text-muted-foreground lg:grid-cols-2">
             <p>
               O sistema unifica atendimentos da ONG em uma plataforma digital, facilitando a comunicação entre voluntários e beneficiários.
@@ -83,14 +83,14 @@ function Sobre() {
 
       <Section tone="white" className="reveal">
         <SectionHeader
-          eyebrow="Solucao"
+          eyebrow="Solução"
           title="Como o TDB Responde resolve"
           description="Funcionalidades pensadas para transformar mensagens dispersas em uma operação acompanhável."
         />
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {solutions.map(([title, desc], index) => (
             <Card key={title} className="p-6 transition-all hover:-translate-y-1 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-950/10">
-              <Badge tone={index === 0 ? 'info' : 'neutral'}>{index === 0 ? 'Principal' : 'Modulo'}</Badge>
+              <Badge tone={index === 0 ? 'info' : 'neutral'}>{index === 0 ? 'Principal' : 'Módulo'}</Badge>
               <h3 className="mt-4 text-lg font-bold text-foreground">{title}</h3>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">{desc}</p>
             </Card>
@@ -131,7 +131,7 @@ function Sobre() {
           <div>
             <p className="text-xs font-bold uppercase tracking-widest text-primary">Colaborar</p>
             <h2 className="mt-2 text-3xl font-bold text-foreground">Quer saber mais sobre o projeto?</h2>
-            <p className="mt-2 text-muted-foreground">Fale com a equipe ou conheca os integrantes.</p>
+            <p className="mt-2 text-muted-foreground">Fale com a equipe ou conheça os integrantes.</p>
           </div>
           <div className="flex flex-wrap gap-3">
             <Button href="/contato" size="large">Fale conosco</Button>

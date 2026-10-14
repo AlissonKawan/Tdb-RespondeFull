@@ -10,9 +10,9 @@ import StatCard from '../components/ui/StatCard';
 
 const visualImpactMetrics = [
   {
-    label: 'Publicos prioritarios',
+    label: 'Públicos prioritários',
     value: '2',
-    description: 'Criancas/adolescentes e mulheres em situacao de vulnerabilidade.',
+    description: 'Crianças, adolescentes e mulheres em situação de vulnerabilidade.',
     tone: 'blue' as const,
   },
   {
@@ -28,7 +28,7 @@ const visualImpactMetrics = [
     tone: 'orange' as const,
   },
   {
-    label: 'Historico',
+    label: 'Histórico',
     value: '1',
     description: 'Um registro centralizado para cada pessoa acompanhada.',
     tone: 'blue' as const,
@@ -37,24 +37,44 @@ const visualImpactMetrics = [
 
 const audiences = [
   {
-    title: 'Criancas e adolescentes',
+    title: 'Crianças e adolescentes',
     description:
       'Ajuda a organizar demandas odontológicas, responsáveis, escola, prioridade e histórico do atendimento em um único fluxo.',
     details: ['Dor ou urgência bucal', 'Acompanhamento com responsável', 'Registro por código protegido'],
   },
   {
-    title: 'Mulheres do Programa Apolonia',
+    title: 'Mulheres do Programa Apolônia',
     description:
-      'Apoia casos sensiveis com codinome, controle de sigilo e direcionamento para voluntarios autorizados.',
-    details: ['Atendimento com sigilo', 'Priorizacao por risco', 'Historico com acesso controlado'],
+      'Apoia casos sensíveis com codinome, controle de sigilo e direcionamento para voluntários autorizados.',
+    details: ['Atendimento com sigilo', 'Priorização por risco', 'Histórico com acesso controlado'],
   },
 ];
 
-const helpFlow = [
-  ['Entrada', 'A demanda chega por um canal da ONG e deixa de ficar perdida em conversas separadas.'],
-  ['Triagem', 'A equipe classifica tipo, prioridade, canal, contexto e necessidade de sigilo.'],
-  ['Encaminhamento', 'O atendimento e direcionado a um voluntario disponivel e com especialidade adequada.'],
-  ['Acompanhamento', 'Mensagens, status e histórico ficam registrados para continuidade do cuidado.'],
+const deliveryPhases = [
+  {
+    title: 'MVP',
+    subtitle: 'Base do atendimento',
+    status: 'Base funcional',
+    tone: 'success' as const,
+    description: 'Centraliza o relato, a triagem e o acompanhamento dos casos em um fluxo protegido.',
+    deliveries: ['Portais por perfil', 'Fila de atendimentos', 'Agenda e cronograma'],
+  },
+  {
+    title: 'Inteligência Operacional',
+    subtitle: 'Decisões com contexto',
+    status: 'Próxima evolução',
+    tone: 'warning' as const,
+    description: 'Transforma dados do atendimento em sinais claros para priorização e continuidade do cuidado.',
+    deliveries: ['Indicadores de triagem', 'Alertas operacionais', 'Visão consolidada da jornada'],
+  },
+  {
+    title: 'Expansão de Rede',
+    subtitle: 'Mais alcance com governança',
+    status: 'Visão futura',
+    tone: 'info' as const,
+    description: 'Prepara a plataforma para ampliar a rede de voluntários, unidades e canais de acolhimento.',
+    deliveries: ['Novos núcleos de atendimento', 'Integrações de comunicação', 'Gestão ampliada de voluntários'],
+  },
 ];
 
 function Roadmap() {
@@ -62,7 +82,7 @@ function Roadmap() {
     <PageShell>
       <PageHeader
         eyebrow="Solução"
-        title="Como o TDB Responde ajuda na pratica"
+        title="Como o TDB Responde ajuda na prática"
         description="Uma solução digital para reduzir dispersão, acelerar triagem e preservar contexto em atendimentos sociais sensíveis."
       />
 
@@ -76,7 +96,7 @@ function Roadmap() {
             />
             <div className="flex flex-wrap gap-2">
               <Badge tone="info">Triagem centralizada</Badge>
-              <Badge tone="info">Historico unificado</Badge>
+              <Badge tone="info">Histórico unificado</Badge>
               <Badge tone="warning">Sigilo orientado</Badge>
               <Badge tone="success">Fluxo ativo</Badge>
             </div>
@@ -88,7 +108,7 @@ function Roadmap() {
       <Section tone="blue" className="reveal">
         <SectionHeader
           eyebrow="Por que ajuda"
-          title="O problema deixa de ser invisivel"
+          title="O problema deixa de ser invisível"
           description="Quando tudo fica em mensagens soltas, a equipe perde prioridade, contexto e continuidade. O TDB Responde organiza isso em uma operação única."
         />
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -103,8 +123,8 @@ function Roadmap() {
 
       <Section tone="white" className="reveal">
         <SectionHeader
-          eyebrow="Quem e afetado"
-          title="Dois grupos precisam de resposta rapida e cuidadosa"
+          eyebrow="Quem é atendido"
+          title="Dois grupos precisam de resposta rápida e cuidadosa"
           description="A solução foi pensada para apoiar públicos com necessidades diferentes, mas com o mesmo desafio: atendimento que precisa de contexto, prioridade e acolhimento."
         />
         <div className="grid gap-6 lg:grid-cols-2">
@@ -129,22 +149,35 @@ function Roadmap() {
 
       <Section tone="blue" className="reveal">
         <SectionHeader
-          eyebrow="Como funciona"
-          title="Da primeira mensagem ate a resposta acompanhada"
-          description="O fluxo simplifica o trabalho da equipe sem esconder o que importa: prioridade, responsável, histórico e status."
+          eyebrow="Plano de evolução"
+          title="Três fases conectam a base atual ao crescimento da rede"
+          description="A evolução parte de um atendimento organizado, avança para decisões operacionais mais claras e prepara a ampliação responsável da rede."
         />
-        <div className="grid gap-4 lg:grid-cols-4">
-          {helpFlow.map(([title, description], index) => (
-            <Card key={title} className="relative overflow-hidden p-6">
-              <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary via-accent to-transparent" />
-              <span className="mb-5 flex h-10 w-10 items-center justify-center rounded-2xl bg-primary text-sm font-black text-primary-foreground shadow-lg shadow-primary/20">
+        <ol aria-label="Fases de entrega do TDB Responde" className="relative mx-auto max-w-5xl space-y-8 before:absolute before:bottom-6 before:left-6 before:top-6 before:w-px before:bg-primary/25 md:before:left-1/2">
+          {deliveryPhases.map((phase, index) => (
+            <li key={phase.title} className="relative pl-16 md:grid md:grid-cols-2 md:gap-16 md:pl-0">
+              <span className="absolute left-6 top-6 z-10 flex h-11 w-11 -translate-x-1/2 items-center justify-center rounded-full border-4 border-blue-50 bg-primary text-sm font-black text-primary-foreground shadow-md md:left-1/2" aria-hidden="true">
                 {index + 1}
               </span>
-              <h3 className="text-lg font-bold text-foreground">{title}</h3>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">{description}</p>
-            </Card>
+              <Card className={`p-6 md:p-7 ${index % 2 === 0 ? 'md:col-start-1' : 'md:col-start-2'}`}>
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <p className="text-sm font-semibold text-primary">{phase.subtitle}</p>
+                  <Badge tone={phase.tone}>{phase.status}</Badge>
+                </div>
+                <h3 className="mt-3 text-2xl font-bold text-foreground">{phase.title}</h3>
+                <p className="mt-3 leading-7 text-muted-foreground">{phase.description}</p>
+                <ul className="mt-5 space-y-3">
+                  {phase.deliveries.map(delivery => (
+                    <li key={delivery} className="flex items-start gap-3 text-sm text-muted-foreground">
+                      <svg className="mt-0.5 h-5 w-5 shrink-0 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="m5 12 4 4L19 6" /></svg>
+                      <span>{delivery}</span>
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            </li>
           ))}
-        </div>
+        </ol>
       </Section>
 
       <Section tone="white" className="reveal">
@@ -157,7 +190,7 @@ function Roadmap() {
             </p>
           </div>
           <Button href="/cadastro-voluntario" variant="secondary" size="large">
-            Quero ser voluntario
+            Quero ser voluntário
           </Button>
         </Card>
       </Section>

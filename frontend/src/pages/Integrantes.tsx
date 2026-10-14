@@ -25,7 +25,7 @@ function Integrantes() {
       linkedin: 'https://www.linkedin.com/in/alisson-kawan-evangelista-silva-5a3355219/',
     },
     {
-      name: 'Marcos Vinicius',
+      name: 'Marcos Vinícius',
       rm: '567214',
       course: '1TDSPS',
       image: '/img/marcos.jpeg',
@@ -47,7 +47,7 @@ function Integrantes() {
       <PageHeader
         eyebrow="Equipe"
         title="Integrantes do projeto"
-        description="Pessoas responsaveis pela criacao, evolucao e apresentacao do TDB Responde."
+        description="Pessoas responsáveis pela criação, evolução e apresentação do TDB Responde."
       />
 
       <Section tone="white" className="reveal">
