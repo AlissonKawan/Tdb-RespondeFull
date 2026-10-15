@@ -18,6 +18,8 @@ const programSlides = [
     impact: 'Mais de 90 mil jovens já foram transformados.',
     badgeClassName: 'border-blue-200 bg-blue-50/90 text-blue-800',
     accentClassName: 'text-primary',
+    overlayClassName:
+      'bg-gradient-to-t from-blue-50 via-white/95 via-[45%] to-blue-100/10 md:bg-gradient-to-l md:from-blue-50 md:via-white/95 md:via-[45%] md:to-blue-100/10',
   },
   {
     image: programImages.apoloniasDoBem,
@@ -29,24 +31,26 @@ const programSlides = [
     impact: 'Mais de 1.200 mulheres acolhidas.',
     badgeClassName: 'border-rose-200 bg-rose-50/90 text-rose-800',
     accentClassName: 'text-rose-700',
+    overlayClassName:
+      'bg-gradient-to-t from-rose-50 via-white/95 via-[45%] to-rose-100/10 md:bg-gradient-to-l md:from-rose-50 md:via-white/95 md:via-[45%] md:to-rose-100/10',
   },
 ];
 
 function HeroDashboardCard() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isManuallyPaused, setIsManuallyPaused] = useState(false);
-  const [isInteracting, setIsInteracting] = useState(false);
+  const [hasFocusWithin, setHasFocusWithin] = useState(false);
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (isManuallyPaused || isInteracting || prefersReducedMotion) return;
+    if (isManuallyPaused || hasFocusWithin || prefersReducedMotion) return;
 
     const intervalId = window.setInterval(() => {
       setCurrentSlide((current) => (current + 1) % programSlides.length);
     }, 3000);
 
     return () => window.clearInterval(intervalId);
-  }, [isInteracting, isManuallyPaused]);
+  }, [hasFocusWithin, isManuallyPaused]);
 
   const showPreviousSlide = () => {
     setCurrentSlide((current) => (current - 1 + programSlides.length) % programSlides.length);
@@ -61,11 +65,9 @@ function HeroDashboardCard() {
       className="relative min-w-0"
       aria-label="Programas de acolhimento social da Turma do Bem"
       aria-roledescription="carrossel"
-      onMouseEnter={() => setIsInteracting(true)}
-      onMouseLeave={() => setIsInteracting(false)}
-      onFocusCapture={() => setIsInteracting(true)}
+      onFocusCapture={() => setHasFocusWithin(true)}
       onBlurCapture={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget)) setIsInteracting(false);
+        if (!event.currentTarget.contains(event.relatedTarget)) setHasFocusWithin(false);
       }}
     >
       <div className="absolute -inset-4 -z-10 rounded-[2.75rem] bg-gradient-to-r from-blue-300/30 via-white/10 to-rose-300/25 blur-3xl" />
@@ -90,7 +92,7 @@ function HeroDashboardCard() {
                   className="absolute inset-0 h-full w-full object-cover object-left"
                 />
                 <div
-                  className="absolute inset-0 bg-gradient-to-t from-white via-white/95 via-[45%] to-white/5 md:bg-gradient-to-l md:from-white md:via-white/95 md:via-[45%] md:to-transparent"
+                  className={`absolute inset-0 ${slide.overlayClassName}`}
                   aria-hidden="true"
                 />
 
