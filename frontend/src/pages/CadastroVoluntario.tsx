@@ -139,18 +139,15 @@ function CadastroVoluntario() {
   const benefits = [
     {
       title: 'Atenda no seu consultório',
-      description: 'Você acolhe cada paciente no ambiente profissional que já conhece.',
       icon: <path d="M4 20V8l8-4 8 4v12M8 20v-5h8v5M9 10h6M12 7v6" strokeLinecap="round" strokeLinejoin="round" />,
     },
     {
       title: 'Flexibilidade total',
-      description: 'Sua agenda e sua disponibilidade orientam cada novo atendimento.',
       icon: <><circle cx="12" cy="12" r="8" /><path d="M12 8v4l3 2" strokeLinecap="round" strokeLinejoin="round" /></>,
     },
     {
-      title: 'Triagem antes do atendimento',
-      description: 'Os casos chegam organizados para uma decisão clínica mais segura.',
-      icon: <><path d="M7 4h10v16H7z" strokeLinejoin="round" /><path d="M9.5 9h5M9.5 13h5M9.5 17H12" strokeLinecap="round" /></>,
+      title: 'Reconhecimento internacional',
+      icon: <><circle cx="12" cy="9" r="5" /><path d="m9 13-1 8 4-2 4 2-1-8M10.5 9l1 1 2-2" strokeLinecap="round" strokeLinejoin="round" /></>,
     },
   ];
 
@@ -159,63 +156,45 @@ function CadastroVoluntario() {
       <section className="relative overflow-hidden px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-16">
         <div className="absolute inset-x-0 top-0 -z-0 h-80 bg-gradient-to-b from-blue-100/70 to-transparent" aria-hidden="true" />
 
-        <div className="relative z-10 mx-auto grid max-w-7xl overflow-hidden rounded-[1.75rem] border border-blue-100 bg-white shadow-[0_30px_90px_-42px_rgba(15,23,42,0.42)] lg:grid-cols-[0.92fr_1.08fr]">
-          <div className="relative min-h-[34rem] overflow-hidden bg-slate-950 lg:min-h-full">
+        <div className="relative z-10 mx-auto grid max-w-6xl items-start gap-8 lg:grid-cols-12">
+          <aside className="relative min-h-[540px] overflow-hidden rounded-3xl bg-slate-950 shadow-2xl lg:col-span-5 lg:min-h-[700px]">
             <img
-              src="https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=1000&q=80"
-              alt="Dentista acolhendo uma paciente durante atendimento odontológico"
-              className="absolute inset-0 h-full w-full object-cover opacity-55"
+              src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=800&q=80"
+              alt="Dentista profissional representando o voluntariado odontológico"
+              loading="lazy"
+              className="absolute inset-0 h-full w-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-blue-950/25 via-blue-950/65 to-slate-950/95" aria-hidden="true" />
+            <div className="absolute inset-0 bg-gradient-to-b from-blue-950/15 via-blue-950/65 to-slate-950/95" aria-hidden="true" />
 
-            <div className="relative flex h-full flex-col justify-end p-6 text-white sm:p-10 lg:p-12">
-              <img src="/img/logo-header.png" alt="Turma do Bem" className="mb-auto h-14 w-auto self-start rounded-xl bg-white/95 px-3 py-2 object-contain shadow-sm" />
+            <div className="relative flex min-h-[540px] flex-col justify-end p-6 text-white sm:p-8 lg:min-h-[700px] lg:p-10">
+              <span className="mb-auto inline-flex w-fit rounded-full border border-white/25 bg-white/15 px-3 py-1.5 text-xs font-bold text-white backdrop-blur-md">
+                Seja um Dentista do Bem
+              </span>
 
-              <h1 className="mt-16 max-w-xl text-4xl font-black leading-[1.04] tracking-tight sm:text-5xl">
-                Devolva a dignidade através de um sorriso
+              <h1 className="mt-16 max-w-md text-4xl font-black leading-[1.04] tracking-tight">
+                Devolva a dignidade através de um sorriso.
               </h1>
-              <p className="mt-4 max-w-lg text-base leading-7 text-blue-50/90">
-                Faça parte de uma rede que conecta cuidado odontológico, escuta e transformação social.
-              </p>
 
-              <div className="mt-8 grid gap-4">
+              <div className="mt-7 grid gap-3.5">
                 {benefits.map((benefit) => (
-                  <div key={benefit.title} className="flex items-start gap-3">
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/15 text-sky-200 ring-1 ring-white/20 backdrop-blur-sm">
+                  <div key={benefit.title} className="flex items-center gap-3">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/15 text-sky-200 ring-1 ring-white/20 backdrop-blur-sm">
                       <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
                         {benefit.icon}
                       </svg>
                     </span>
-                    <div>
-                      <h2 className="text-sm font-bold text-white">{benefit.title}</h2>
-                      <p className="mt-0.5 text-sm leading-5 text-slate-300">{benefit.description}</p>
-                    </div>
+                    <h2 className="text-sm font-bold text-white">{benefit.title}</h2>
                   </div>
                 ))}
               </div>
 
-              <figure className="mt-8 rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur-md">
-                <p className="mb-2 text-[0.6875rem] font-bold text-sky-200">Relato ilustrativo da experiência voluntária</p>
-                <blockquote className="text-sm leading-6 text-white">
-                  “Cada atendimento me lembra que técnica e humanidade podem mudar uma história inteira.”
-                </blockquote>
-                <figcaption className="mt-4 flex items-center gap-3">
-                  <img
-                    src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=120&q=80"
-                    alt="Retrato ilustrativo de uma dentista voluntária"
-                    className="h-11 w-11 rounded-full border-2 border-white/80 object-cover"
-                    loading="lazy"
-                  />
-                  <div>
-                    <p className="text-sm font-bold text-white">Dentista da rede</p>
-                    <p className="text-xs text-sky-200">CRO-SP • cadastro profissional validado</p>
-                  </div>
-                </figcaption>
-              </figure>
+              <blockquote className="mt-7 border-l-2 border-sky-300 pl-4 text-sm font-semibold leading-6 text-blue-50">
+                “A maior rede de voluntariado odontológico do mundo conta com você.”
+              </blockquote>
             </div>
-          </div>
+          </aside>
 
-          <div className="p-5 sm:p-8 lg:p-12 xl:p-14">
+          <div className="rounded-3xl border border-blue-100 bg-white p-5 shadow-[0_24px_70px_-36px_rgba(15,23,42,0.38)] sm:p-8 lg:col-span-7 lg:p-10">
             <div className="mx-auto max-w-2xl">
               <div className="mb-8">
                 <span className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-primary ring-1 ring-blue-100">

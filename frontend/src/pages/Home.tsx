@@ -142,19 +142,31 @@ function Home() {
       </section>
 
       <section className="border-b border-border bg-gradient-to-b from-background to-primary/5 py-16">
-        <Container className="grid max-w-7xl gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
+        <Container className="grid max-w-7xl gap-12 lg:grid-cols-2 lg:items-center">
+          <div className="relative reveal">
+            <img
+              src="https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=1000&q=80"
+              alt="Profissional realizando atendimento odontológico humanizado"
+              loading="lazy"
+              className="h-[380px] w-full rounded-3xl object-cover shadow-2xl"
+            />
+            <div className="absolute bottom-4 left-4 right-4 rounded-2xl border border-white/70 bg-white/90 p-4 shadow-lg backdrop-blur-md sm:right-auto sm:max-w-sm">
+              <p className="text-sm font-bold leading-6 text-blue-950">
+                Tecnologia a serviço de quem mais precisa <span className="text-primary" aria-hidden="true">•</span> +90.000 atendimentos realizados
+              </p>
+            </div>
+          </div>
+
           <div className="reveal">
             <p className="text-xs font-bold uppercase tracking-widest text-primary">Missão</p>
-            <h2 className="mt-2 text-3xl font-bold text-foreground">Tecnologia para acolher melhor</h2>
-          </div>
-          <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm reveal">
-            <p className="text-lg leading-8 text-muted-foreground">
+            <h2 className="mt-3 text-3xl font-black tracking-tight text-foreground sm:text-4xl">Tecnologia para acolher melhor</h2>
+            <p className="mt-5 text-lg leading-8 text-muted-foreground">
               Transformar o atendimento da <strong className="text-foreground">Turma do Bem</strong> em uma
               experiência mais rápida, eficiente e humana, unindo organização operacional e empatia em um único sistema.
             </p>
-            <p className="mt-4 font-bold text-primary">
-              Tudo isso para servir melhor a quem mais precisa.
-            </p>
+            <blockquote className="mt-7 border-l-4 border-primary bg-white/70 py-3 pl-5 pr-4 text-xl font-bold leading-8 text-blue-950">
+              “Tudo isso para servir melhor a quem mais precisa.”
+            </blockquote>
           </div>
         </Container>
       </section>

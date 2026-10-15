@@ -30,11 +30,19 @@ function HeroDashboardCard() {
         <div className="grid gap-3 p-4 sm:p-5">
           <article className="rounded-2xl border border-blue-200 bg-blue-50/70 p-4 sm:p-5">
             <div className="flex items-start gap-3.5">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-sm shadow-blue-600/20">
-                <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+              <div className="relative shrink-0">
+                <img
+                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80"
+                  alt="Jovem sorrindo, representando o programa Dentista do Bem"
+                  loading="lazy"
+                  className="h-14 w-14 rounded-2xl object-cover ring-2 ring-primary/20"
+                />
+                <span className="absolute -bottom-1.5 -right-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-white shadow-sm ring-2 ring-white">
+                  <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                   <path d="M7.2 11.4a3.8 3.8 0 1 1 5.4-5.4A3.8 3.8 0 1 1 18 11.4L12.6 17a.85.85 0 0 1-1.2 0l-5.5-5.6" strokeLinecap="round" strokeLinejoin="round" />
                   <path d="M8.8 11.1c.9 1.2 2 1.8 3.2 1.8s2.3-.6 3.2-1.8" strokeLinecap="round" />
-                </svg>
+                  </svg>
+                </span>
               </div>
 
               <div className="min-w-0 flex-1">
@@ -51,11 +59,19 @@ function HeroDashboardCard() {
 
           <article className="rounded-2xl border border-violet-200 bg-violet-50/65 p-4 sm:p-5">
             <div className="flex items-start gap-3.5">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-violet-700 text-white shadow-sm shadow-violet-700/20">
-                <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-                  <path d="M12 3 5 6v5c0 4.6 2.8 8.2 7 10 4.2-1.8 7-5.4 7-10V6l-7-3Z" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M9.2 12.1 11 14l4-4.2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
+              <div className="relative shrink-0">
+                <img
+                  src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=300&q=80"
+                  alt="Mulher em retrato profissional, representando dignidade e acolhimento"
+                  loading="lazy"
+                  className="h-14 w-14 rounded-2xl object-cover ring-2 ring-rose-200"
+                />
+                <span className="absolute -bottom-1.5 -right-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-violet-700 text-white shadow-sm ring-2 ring-white">
+                  <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                    <path d="M12 3 5 6v5c0 4.6 2.8 8.2 7 10 4.2-1.8 7-5.4 7-10V6l-7-3Z" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M9.2 12.1 11 14l4-4.2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </span>
               </div>
 
               <div className="min-w-0 flex-1">
