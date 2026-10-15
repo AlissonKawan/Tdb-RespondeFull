@@ -1,3 +1,5 @@
+import { programImages } from '../../config/programImages';
+
 const networkMetrics = [
   { value: '+18 mil', label: 'Dentistas Voluntários' },
   { value: '+90 mil', label: 'Jovens Atendidos' },
@@ -32,8 +34,8 @@ function HeroDashboardCard() {
             <div className="flex items-start gap-3.5">
               <div className="relative shrink-0">
                 <img
-                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80"
-                  alt="Jovem sorrindo, representando o programa Dentista do Bem"
+                  src={programImages.dentistaDoBem}
+                  alt="Adolescente sorrindo durante atendimento odontológico do programa Dentista do Bem"
                   loading="lazy"
                   className="h-14 w-14 rounded-2xl object-cover ring-2 ring-primary/20"
                 />
@@ -61,8 +63,8 @@ function HeroDashboardCard() {
             <div className="flex items-start gap-3.5">
               <div className="relative shrink-0">
                 <img
-                  src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=300&q=80"
-                  alt="Mulher em retrato profissional, representando dignidade e acolhimento"
+                  src={programImages.apoloniasDoBem}
+                  alt="Mulher sorrindo, representando acolhimento e dignidade no programa Apolônias do Bem"
                   loading="lazy"
                   className="h-14 w-14 rounded-2xl object-cover ring-2 ring-rose-200"
                 />

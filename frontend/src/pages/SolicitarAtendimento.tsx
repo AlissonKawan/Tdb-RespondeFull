@@ -7,6 +7,7 @@ import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import { Field, Input, Select, Textarea } from '../components/ui/Input';
 import PageHeader from '../components/ui/PageHeader';
+import { programImages } from '../config/programImages';
 import { useAuth } from '../context/useAuth';
 import { useConfirm } from '../hooks/useConfirm';
 import { listarCanais } from '../services/canaisService';
@@ -249,7 +250,7 @@ export default function SolicitarAtendimento() {
 
               <div className="mt-4 grid gap-4 md:grid-cols-2">
                 <label
-                  className={`group relative flex min-h-44 cursor-pointer flex-col rounded-ui-lg border-2 p-5 transition-[border-color,background-color,box-shadow] duration-fast focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 ${
+                  className={`group relative flex cursor-pointer flex-col overflow-hidden rounded-ui-lg border-2 transition-[border-color,background-color,box-shadow] duration-fast focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 ${
                     form.tipoPessoaAtendida === 'CRIANCA_ADOLESCENTE'
                       ? 'border-primary bg-blue-50/70 shadow-sm'
                       : 'border-border bg-surface hover:border-blue-200 hover:bg-blue-50/30'
@@ -263,24 +264,32 @@ export default function SolicitarAtendimento() {
                     checked={form.tipoPessoaAtendida === 'CRIANCA_ADOLESCENTE'}
                     onChange={() => selectCarePath('CRIANCA_ADOLESCENTE')}
                   />
-                  <span className="flex h-11 w-11 items-center justify-center rounded-ui bg-blue-100 text-primary ring-1 ring-blue-200" aria-hidden="true">
-                    <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                      <circle cx="9" cy="8" r="3" />
-                      <circle cx="17" cy="10" r="2.5" />
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M3.5 20c.4-4 2.2-6 5.5-6s5.1 2 5.5 6M14 15.5c3.7-.8 5.8.7 6.5 4.5" />
-                    </svg>
-                  </span>
-                  <span className="mt-4 text-base font-bold text-foreground">Criança ou Adolescente</span>
-                  <span className="mt-1 text-sm leading-6 text-muted-foreground">
-                    Atendimento odontológico com informações do responsável e contexto escolar.
-                  </span>
-                  <span className="mt-auto pt-3 text-xs font-bold uppercase tracking-wide text-primary">
-                    {form.tipoPessoaAtendida === 'CRIANCA_ADOLESCENTE' ? 'Selecionado' : 'Selecionar este atendimento'}
+                  <img
+                    src={programImages.dentistaDoBem}
+                    alt="Adolescente em atendimento odontológico do programa Dentista do Bem"
+                    loading="lazy"
+                    className="h-36 w-full object-cover object-center transition-transform duration-normal group-hover:scale-[1.02]"
+                  />
+                  <span className="flex flex-1 flex-col p-5">
+                    <span className="flex h-11 w-11 items-center justify-center rounded-ui bg-blue-100 text-primary ring-1 ring-blue-200" aria-hidden="true">
+                      <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                        <circle cx="9" cy="8" r="3" />
+                        <circle cx="17" cy="10" r="2.5" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3.5 20c.4-4 2.2-6 5.5-6s5.1 2 5.5 6M14 15.5c3.7-.8 5.8.7 6.5 4.5" />
+                      </svg>
+                    </span>
+                    <span className="mt-4 text-base font-bold text-foreground">Criança ou Adolescente</span>
+                    <span className="mt-1 text-sm leading-6 text-muted-foreground">
+                      Atendimento odontológico com informações do responsável e contexto escolar.
+                    </span>
+                    <span className="mt-auto pt-3 text-xs font-bold uppercase tracking-wide text-primary">
+                      {form.tipoPessoaAtendida === 'CRIANCA_ADOLESCENTE' ? 'Selecionado' : 'Selecionar este atendimento'}
+                    </span>
                   </span>
                 </label>
 
                 <label
-                  className={`group relative flex min-h-44 cursor-pointer flex-col rounded-ui-lg border-2 p-5 transition-[border-color,background-color,box-shadow] duration-fast focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 ${
+                  className={`group relative flex cursor-pointer flex-col overflow-hidden rounded-ui-lg border-2 transition-[border-color,background-color,box-shadow] duration-fast focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 ${
                     form.tipoPessoaAtendida === 'MULHER_APOLONIA'
                       ? 'border-rose-500 bg-rose-50/75 shadow-sm'
                       : 'border-border bg-surface hover:border-rose-200 hover:bg-rose-50/30'
@@ -294,19 +303,27 @@ export default function SolicitarAtendimento() {
                     checked={form.tipoPessoaAtendida === 'MULHER_APOLONIA'}
                     onChange={() => selectCarePath('MULHER_APOLONIA')}
                   />
-                  <span className="flex h-11 w-11 items-center justify-center rounded-ui bg-rose-100 text-rose-700 ring-1 ring-rose-200" aria-hidden="true">
-                    <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" d="m9 12 2 2 4-4" />
-                    </svg>
-                  </span>
-                  <span className="mt-4 text-base font-bold text-foreground">Mulher em Vulnerabilidade</span>
-                  <span className="text-sm font-semibold text-rose-700">Programa Apolônia</span>
-                  <span className="mt-1 text-sm leading-6 text-muted-foreground">
-                    Seu nome real não será solicitado. O atendimento usa codinome e informações protegidas por sigilo.
-                  </span>
-                  <span className="mt-auto pt-3 text-xs font-bold uppercase tracking-wide text-rose-700">
-                    {form.tipoPessoaAtendida === 'MULHER_APOLONIA' ? 'Selecionado com sigilo' : 'Selecionar atendimento sigiloso'}
+                  <img
+                    src={programImages.apoloniasDoBem}
+                    alt="Mulher sorrindo, representando o acolhimento do programa Apolônias do Bem"
+                    loading="lazy"
+                    className="h-36 w-full object-cover object-[center_32%] transition-transform duration-normal group-hover:scale-[1.02]"
+                  />
+                  <span className="flex flex-1 flex-col p-5">
+                    <span className="flex h-11 w-11 items-center justify-center rounded-ui bg-rose-100 text-rose-700 ring-1 ring-rose-200" aria-hidden="true">
+                      <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="m9 12 2 2 4-4" />
+                      </svg>
+                    </span>
+                    <span className="mt-4 text-base font-bold text-foreground">Mulher em Vulnerabilidade</span>
+                    <span className="text-sm font-semibold text-rose-700">Programa Apolônia</span>
+                    <span className="mt-1 text-sm leading-6 text-muted-foreground">
+                      Seu nome real não será solicitado. O atendimento usa codinome e informações protegidas por sigilo.
+                    </span>
+                    <span className="mt-auto pt-3 text-xs font-bold uppercase tracking-wide text-rose-700">
+                      {form.tipoPessoaAtendida === 'MULHER_APOLONIA' ? 'Selecionado com sigilo' : 'Selecionar atendimento sigiloso'}
+                    </span>
                   </span>
                 </label>
               </div>

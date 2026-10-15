@@ -7,6 +7,7 @@ import ChartCard from '../components/ui/ChartCard';
 import PageHeader from '../components/ui/PageHeader';
 import SectionHeader from '../components/ui/SectionHeader';
 import StatCard from '../components/ui/StatCard';
+import { programImages } from '../config/programImages';
 
 const visualImpactMetrics = [
   {
@@ -38,12 +39,18 @@ const visualImpactMetrics = [
 const audiences = [
   {
     title: 'Crianças e adolescentes',
+    image: programImages.dentistaDoBem,
+    imageAlt: 'Adolescente sorrindo durante atendimento odontológico do programa Dentista do Bem',
+    imageClassName: 'object-center',
     description:
       'Ajuda a organizar demandas odontológicas, responsáveis, escola, prioridade e histórico do atendimento em um único fluxo.',
     details: ['Dor ou urgência bucal', 'Acompanhamento com responsável', 'Registro por código protegido'],
   },
   {
     title: 'Mulheres do Programa Apolônia',
+    image: programImages.apoloniasDoBem,
+    imageAlt: 'Mulher sorrindo, representando acolhimento no programa Apolônias do Bem',
+    imageClassName: 'object-[center_30%]',
     description:
       'Apoia casos sensíveis com codinome, controle de sigilo e direcionamento para voluntários autorizados.',
     details: ['Atendimento com sigilo', 'Priorização por risco', 'Histórico com acesso controlado'],
@@ -129,18 +136,23 @@ function Roadmap() {
         />
         <div className="grid gap-6 lg:grid-cols-2">
           {audiences.map((audience) => (
-            <Card key={audience.title} className="p-6">
-              <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-lg font-black text-primary ring-1 ring-primary/20">
-                {audience.title[0]}
-              </div>
-              <h3 className="text-2xl font-bold text-foreground">{audience.title}</h3>
-              <p className="mt-3 leading-7 text-muted-foreground">{audience.description}</p>
-              <div className="mt-5 grid gap-3">
-                {audience.details.map((detail) => (
-                  <div key={detail} className="rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm font-medium text-muted-foreground">
-                    {detail}
-                  </div>
-                ))}
+            <Card key={audience.title} className="overflow-hidden p-0">
+              <img
+                src={audience.image}
+                alt={audience.imageAlt}
+                loading="lazy"
+                className={`h-52 w-full object-cover sm:h-60 ${audience.imageClassName}`}
+              />
+              <div className="p-6">
+                <h3 className="text-2xl font-bold text-foreground">{audience.title}</h3>
+                <p className="mt-3 leading-7 text-muted-foreground">{audience.description}</p>
+                <div className="mt-5 grid gap-3">
+                  {audience.details.map((detail) => (
+                    <div key={detail} className="rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm font-medium text-muted-foreground">
+                      {detail}
+                    </div>
+                  ))}
+                </div>
               </div>
             </Card>
           ))}
