@@ -58,6 +58,35 @@
   transition: opacity 500ms ease-out;
 }
 
+.hero-program-image {
+  filter: brightness(0.96) contrast(1.06) saturate(1.03);
+}
+
+/* A foto permanece livre de branco até a transição para o conteúdo. */
+.hero-program-overlay {
+  background: linear-gradient(
+    to bottom,
+    transparent 70%,
+    hsl(var(--background) / 0.16) 84%,
+    hsl(var(--background) / 0.65) 94%,
+    hsl(var(--background)) 100%
+  );
+}
+
+@media (min-width: 1024px) {
+  .hero-program-overlay {
+    background: linear-gradient(
+      to right,
+      transparent 0%,
+      transparent 38%,
+      hsl(var(--background) / 0.12) 44%,
+      hsl(var(--background) / 0.65) 51%,
+      hsl(var(--background) / 0.96) 58%,
+      hsl(var(--background)) 68%
+    );
+  }
+}
+
 .hero-program-slide--active {
   opacity: 1;
   animation: hero-program-reveal 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -69,10 +98,6 @@
 
 .hero-program-slide--active .hero-program-copy {
   animation: hero-program-copy-in 850ms 180ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.hero-program-slide--active .hero-program-light {
-  animation: hero-program-light-sweep 1100ms 80ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 @keyframes hero-program-reveal {
@@ -88,11 +113,9 @@
 
 @keyframes hero-program-image-in {
   from {
-    filter: saturate(0.82) blur(2px);
     transform: scale(1.075) translateX(-1.5%);
   }
   to {
-    filter: saturate(1) blur(0);
     transform: scale(1) translateX(0);
   }
 }
@@ -107,20 +130,6 @@
     filter: blur(0);
     opacity: 1;
     transform: translateX(0);
-  }
-}
-
-@keyframes hero-program-light-sweep {
-  from {
-    opacity: 0;
-    transform: translateX(-80%) skewX(-12deg);
-  }
-  45% {
-    opacity: 0.55;
-  }
-  to {
-    opacity: 0;
-    transform: translateX(160%) skewX(-12deg);
   }
 }
 
