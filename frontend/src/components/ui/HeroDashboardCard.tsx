@@ -20,6 +20,8 @@ const programSlides = [
     accentClassName: 'text-primary',
     overlayClassName:
       'bg-gradient-to-t from-blue-50 via-white/95 via-[45%] to-blue-100/10 md:bg-gradient-to-l md:from-blue-50 md:via-white/95 md:via-[45%] md:to-blue-100/10',
+    transitionTintClassName:
+      'bg-[linear-gradient(0deg,rgba(59,130,246,0.10)_0%,transparent_58%)] md:bg-[linear-gradient(90deg,transparent_28%,rgba(59,130,246,0.04)_40%,rgba(59,130,246,0.14)_57%,rgba(59,130,246,0.08)_72%,transparent_88%)]',
   },
   {
     image: programImages.apoloniasDoBem,
@@ -33,6 +35,8 @@ const programSlides = [
     accentClassName: 'text-rose-700',
     overlayClassName:
       'bg-gradient-to-t from-rose-50 via-white/95 via-[45%] to-rose-100/10 md:bg-gradient-to-l md:from-rose-50 md:via-white/95 md:via-[45%] md:to-rose-100/10',
+    transitionTintClassName:
+      'bg-[linear-gradient(0deg,rgba(244,63,94,0.10)_0%,transparent_58%)] md:bg-[linear-gradient(90deg,transparent_28%,rgba(244,63,94,0.04)_40%,rgba(244,63,94,0.14)_57%,rgba(244,63,94,0.08)_72%,transparent_88%)]',
   },
 ];
 
@@ -93,6 +97,10 @@ function HeroDashboardCard() {
                 />
                 <div
                   className={`absolute inset-0 ${slide.overlayClassName}`}
+                  aria-hidden="true"
+                />
+                <div
+                  className={`absolute inset-0 ${slide.transitionTintClassName}`}
                   aria-hidden="true"
                 />
 
