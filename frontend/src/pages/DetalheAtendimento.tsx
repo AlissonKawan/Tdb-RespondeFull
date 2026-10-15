@@ -169,7 +169,7 @@ function DetalheAtendimento() {
   const [atendimento, setAtendimento] = useState<AtendimentoApi | null>(null);
   const [mensagens, setMensagens] = useState<Mensagem[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   const [assumindo, setAssumindo] = useState(false);
 
   // Ref síncrona para rastrear IDs de mensagens já exibidas.
@@ -181,7 +181,7 @@ function DetalheAtendimento() {
   const seenIdsRef = useRef<Set<number>>(new Set());
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const composerRef = useRef<HTMLTextAreaElement>(null);
-  
+
   useEffect(() => {
     if (typeof messagesEndRef.current?.scrollIntoView === 'function') {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -192,7 +192,7 @@ function DetalheAtendimento() {
   const [feedback, setFeedback] = useState('');
   const [conteudo, setConteudo] = useState('');
   const isSubmittingRef = useRef(false);
-  
+
   const [salvando, setSalvando] = useState(false);
   const [salvandoCheckin, setSalvandoCheckin] = useState(false);
   const [statusEdit, setStatusEdit] = useState('ABERTO');
@@ -248,7 +248,7 @@ function DetalheAtendimento() {
       // Busca a previsao de checkin em background para não travar a tela
       atendimentoService.preverCheckinIA(atendimentoId).then(previsao => {
         setAtendimento(prev => prev ? { ...prev, ...previsao } : prev);
-      }).catch(() => {});
+      }).catch(() => { });
     } catch (error) {
       let msgErro = 'Não foi possível carregar os detalhes deste atendimento. Tente novamente mais tarde.';
       if (error instanceof Error) {
@@ -327,7 +327,7 @@ function DetalheAtendimento() {
                   setMensagens(msgs);
                 }
               })
-              .catch(() => {});
+              .catch(() => { });
             connect();
           }, delay);
         }
@@ -346,15 +346,15 @@ function DetalheAtendimento() {
 
   const pessoaAtendida = useMemo(() => (
     atendimento?.pessoaAtendidaNome
-      ?? atendimento?.beneficiarioNome
-      ?? atendimento?.pacienteNome
-      ?? (atendimento?.pessoaAtendidaId ? `Pessoa #${atendimento.pessoaAtendidaId}` : 'Não informada')
+    ?? atendimento?.beneficiarioNome
+    ?? atendimento?.pacienteNome
+    ?? (atendimento?.pessoaAtendidaId ? `Pessoa #${atendimento.pessoaAtendidaId}` : 'Não informada')
   ), [atendimento]);
 
   const semAlteracoes = Boolean(
     atendimento
-      && statusEdit === (atendimento.status ?? 'ABERTO')
-      && prioridadeEdit === String(atendimento.prioridade ?? 3),
+    && statusEdit === (atendimento.status ?? 'ABERTO')
+    && prioridadeEdit === String(atendimento.prioridade ?? 3),
   );
 
   const confirmarAssumirAtendimento = () => {
@@ -388,7 +388,7 @@ function DetalheAtendimento() {
         conteudo: texto,
         enviadoPor: remetenteAtual,
       });
-      
+
       if (!seenIdsRef.current.has(novaMensagem.id)) {
         seenIdsRef.current.add(novaMensagem.id);
         setMensagens((atuais) => {
@@ -467,7 +467,7 @@ function DetalheAtendimento() {
     try {
       const atualizado = await atendimentoService.atualizarCheckin(atendimento.id, status);
       setAtendimento((prev) => prev ? { ...prev, statusCheckin: atualizado.statusCheckin, horarioEnvioCheckin: atualizado.horarioEnvioCheckin } : prev);
-      
+
       if (abrirWhats && atualizado.pessoaAtendidaTelefone) {
         const telefone = normalizarTelefone(atualizado.pessoaAtendidaTelefone);
         const nome = atualizado.pessoaAtendidaNome || 'paciente';
@@ -556,11 +556,10 @@ function DetalheAtendimento() {
                     const minha = mensagem.enviadoPor === remetenteAtual;
                     return (
                       <div key={mensagem.id} className={`flex ${minha ? 'justify-end' : 'justify-start'}`}>
-                        <article className={`max-w-[88%] rounded-2xl px-4 py-3 text-sm shadow-sm sm:max-w-[78%] ${
-                          minha
+                        <article className={`max-w-[88%] rounded-2xl px-4 py-3 text-sm shadow-sm sm:max-w-[78%] ${minha
                             ? 'rounded-br-md bg-primary text-primary-foreground'
                             : 'rounded-bl-md border border-border bg-surface text-foreground'
-                        }`}
+                          }`}
                         >
                           <header className={`flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-xs ${minha ? 'text-blue-100' : 'text-muted-foreground'}`}>
                             <span className="font-semibold">
@@ -629,8 +628,8 @@ function DetalheAtendimento() {
                   <h2 className="text-xl font-bold text-foreground">Acolher caso</h2>
                   <p className="mt-1 text-sm text-muted-foreground">Este atendimento está aberto e aguardando um profissional voluntário.</p>
                   <div className="mt-4">
-                    <Button 
-                      fullWidth 
+                    <Button
+                      fullWidth
                       disabled={voluntarioSemVinculo}
                       isLoading={assumindo}
                       loadingText="Assumindo..."
@@ -707,7 +706,7 @@ function DetalheAtendimento() {
               {podeAlterar && (
                 <Card className="p-6">
                   <h2 className="text-xl font-bold text-foreground">Check-in via WhatsApp</h2>
-                  
+
                   <div className="mt-4 text-sm text-muted-foreground">
                     <p>Status atual: <strong>{labelStatusCheckin(atendimento.statusCheckin)}</strong></p>
                     {atendimento.horarioEnvioCheckin && (

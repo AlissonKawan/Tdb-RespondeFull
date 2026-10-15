@@ -83,13 +83,12 @@ function AtendimentoProgress({ atendimento }: { atendimento: AtendimentoApi }) {
               aria-current={current && !cancelled ? 'step' : undefined}
             >
               <span
-                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 text-xs font-bold sm:mx-auto ${
-                  cancelled && current
+                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 text-xs font-bold sm:mx-auto ${cancelled && current
                     ? 'border-danger bg-red-50 text-danger'
                     : emphasized
                       ? 'border-primary bg-primary text-primary-foreground'
                       : 'border-border bg-surface text-muted-foreground'
-                }`}
+                  }`}
                 aria-hidden="true"
               >
                 {complete ? (

@@ -55,12 +55,12 @@ export default function AgendaConsultas() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { confirm, confirmDialog } = useConfirm();
-  
+
   const [filtro, setFiltro] = useState<'Todos' | 'Hoje' | 'Amanhã'>('Todos');
   const [consultas, setConsultas] = useState<AgendaConsulta[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [feedback, setFeedback] = useState<{ tone: 'success' | 'danger'; message: string } | null>(null);
-  
+
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -69,7 +69,7 @@ export default function AgendaConsultas() {
   const [selectedProntuarioAgenda, setSelectedProntuarioAgenda] = useState<AgendaConsulta | null>(null);
   const [prontuariosList, setProntuariosList] = useState<Prontuario[]>([]);
   const [isProntuarioLoading, setIsProntuarioLoading] = useState(false);
-  
+
   // Modal Expirado
   const [resolveExpiredAgenda, setResolveExpiredAgenda] = useState<AgendaConsulta | null>(null);
 
@@ -292,14 +292,14 @@ export default function AgendaConsultas() {
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {consultasFiltradas.sort((a,b) => a.dataConsulta.localeCompare(b.dataConsulta) || a.horario.localeCompare(b.horario)).map((consulta) => (
+            {consultasFiltradas.sort((a, b) => a.dataConsulta.localeCompare(b.dataConsulta) || a.horario.localeCompare(b.horario)).map((consulta) => (
               <Card key={consulta.id} className="p-6 border-l-4 border-l-primary hover:shadow-lg transition-shadow relative group">
                 <div className="absolute top-4 right-4 flex gap-2">
                   <button onClick={() => handleOpenEdit(consulta)} className="p-2 text-blue-600 bg-blue-50 rounded-full hover:bg-blue-100 transition-colors" title="Editar">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
                   </button>
                   <button onClick={() => consulta.id && handleDelete(consulta.id)} className="p-2 text-red-600 bg-red-50 rounded-full hover:bg-red-100 transition-colors" title="Excluir">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /><line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" /></svg>
                   </button>
                 </div>
 
@@ -311,10 +311,10 @@ export default function AgendaConsultas() {
                     {formatDateLabel(consulta.dataConsulta)}
                   </span>
                 </div>
-                
+
                 <h3 className="text-xl font-bold text-foreground">{consulta.paciente}</h3>
                 <p className="text-sm text-muted-foreground mt-1">{consulta.tipo}</p>
-                
+
                 <div className="mt-6 flex items-center gap-2 text-primary font-semibold bg-blue-50 px-3 py-2 rounded-lg w-max">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -325,7 +325,7 @@ export default function AgendaConsultas() {
                 {consulta.dataConsulta < getTodayStr() && consulta.status !== 'CONCLUIDO' && consulta.status !== 'ENCERRADO' ? (
                   <div className="mt-6 pt-4 border-t border-slate-100">
                     <div className="bg-red-50 text-red-700 p-3 rounded-lg border border-red-100 mb-3 text-sm flex items-start gap-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" className="mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" className="mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" /><line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg>
                       <div>
                         <strong>Data Expirada!</strong>
                         <p>O paciente não compareceu ou a data passou.</p>
@@ -355,34 +355,34 @@ export default function AgendaConsultas() {
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold text-foreground">{editingId ? 'Editar Consulta' : 'Nova Consulta'}</h2>
               <button onClick={() => !isSaving && setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
               </button>
             </div>
-            
+
             <form onSubmit={handleSubmit(handleSave)} noValidate>
               <div className="space-y-4">
-              <Field label="Nome do Paciente" error={errors.paciente?.message}>
-                <Input autoFocus disabled={isSubmitting} {...register('paciente', { required: 'Informe o nome do paciente.' })} placeholder="Ex: Maria Silva" />
-              </Field>
-              <Field label="Tipo de Atendimento" error={errors.tipo?.message}>
-                <Input disabled={isSubmitting} {...register('tipo', { required: 'Informe o tipo de atendimento.' })} placeholder="Ex: Avaliação Inicial" />
-              </Field>
-              <div className="grid grid-cols-2 gap-4">
-                <Field label="Data" error={errors.dataConsulta?.message}>
-                  <Input disabled={isSubmitting} type="date" min={getTodayStr()} {...register('dataConsulta', { required: 'Informe a data da consulta.' })} />
+                <Field label="Nome do Paciente" error={errors.paciente?.message}>
+                  <Input autoFocus disabled={isSubmitting} {...register('paciente', { required: 'Informe o nome do paciente.' })} placeholder="Ex: Maria Silva" />
                 </Field>
-                <Field label="Horário" error={errors.horario?.message}>
-                  <Input disabled={isSubmitting} type="time" {...register('horario', { required: 'Informe o horário.' })} />
+                <Field label="Tipo de Atendimento" error={errors.tipo?.message}>
+                  <Input disabled={isSubmitting} {...register('tipo', { required: 'Informe o tipo de atendimento.' })} placeholder="Ex: Avaliação Inicial" />
                 </Field>
-              </div>
-              <Field label="Status">
-                <Select disabled={isSubmitting} {...register('status')}>
-                  <option value="AGUARDANDO">Aguardando</option>
-                  <option value="CONFIRMADO">Confirmado</option>
-                  <option value="CONCLUIDO">Concluído (Atendido)</option>
-                  <option value="ENCERRADO">Encerrado / Desistência</option>
-                </Select>
-              </Field>
+                <div className="grid grid-cols-2 gap-4">
+                  <Field label="Data" error={errors.dataConsulta?.message}>
+                    <Input disabled={isSubmitting} type="date" min={getTodayStr()} {...register('dataConsulta', { required: 'Informe a data da consulta.' })} />
+                  </Field>
+                  <Field label="Horário" error={errors.horario?.message}>
+                    <Input disabled={isSubmitting} type="time" {...register('horario', { required: 'Informe o horário.' })} />
+                  </Field>
+                </div>
+                <Field label="Status">
+                  <Select disabled={isSubmitting} {...register('status')}>
+                    <option value="AGUARDANDO">Aguardando</option>
+                    <option value="CONFIRMADO">Confirmado</option>
+                    <option value="CONCLUIDO">Concluído (Atendido)</option>
+                    <option value="ENCERRADO">Encerrado / Desistência</option>
+                  </Select>
+                </Field>
               </div>
 
               {errors.root?.server?.message && <p role="alert" className="mt-4 text-sm font-medium text-danger">{errors.root.server.message}</p>}
@@ -405,28 +405,28 @@ export default function AgendaConsultas() {
               <div className="flex justify-between items-start">
                 <div>
                   <h2 className="text-2xl font-bold flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M12 18v-6"/><path d="M9 15h6"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><path d="M12 18v-6" /><path d="M9 15h6" /></svg>
                     Prontuário Clínico
                   </h2>
                   <p className="mt-1 text-slate-300">Paciente: <strong className="text-white">{selectedProntuarioAgenda.paciente}</strong></p>
                 </div>
                 <button onClick={() => setSelectedProntuarioAgenda(null)} className="text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 p-2 rounded-full transition-colors">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
                 </button>
               </div>
             </div>
-            
+
             <div className="p-6 overflow-y-auto space-y-8 flex-1 bg-slate-50">
-              
+
               {/* Form de Nova Evolução */}
               <form onSubmit={handleSubmitProntuario(handleSaveProntuario)} noValidate className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
                 <h3 className="font-bold text-slate-800 flex items-center gap-2">
                   <span className="bg-blue-100 text-blue-600 p-1.5 rounded-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
                   </span>
                   Nova Evolução ({formatDateLabel(selectedProntuarioAgenda.dataConsulta)})
                 </h3>
-                
+
                 <div className="grid gap-4">
                   <Field label="Alertas Médicos / Anamnese" hint="Use vírgulas para separar as informações.">
                     <Input
@@ -446,7 +446,7 @@ export default function AgendaConsultas() {
                 </div>
 
                 {prontuarioErrors.root?.server?.message && <p role="alert" className="text-sm font-medium text-danger">{prontuarioErrors.root.server.message}</p>}
-                
+
                 <div className="flex justify-end">
                   <Button type="submit" disabled={isProntuarioLoading}>
                     {isProntuarioLoading ? 'Salvando...' : 'Salvar Evolução'}
@@ -477,7 +477,7 @@ export default function AgendaConsultas() {
                               {p.dataRegistro ? new Date(p.dataRegistro).toLocaleString('pt-BR') : 'Agora'}
                             </span>
                           </div>
-                          
+
                           {p.historicoMedico && (
                             <div className="mb-3 flex flex-wrap gap-1.5">
                               {p.historicoMedico.split(',').map((tag, i) => tag.trim() ? (
@@ -485,7 +485,7 @@ export default function AgendaConsultas() {
                               ) : null)}
                             </div>
                           )}
-                          
+
                           <p className="text-slate-700 text-sm whitespace-pre-wrap">{p.tratamentoAtual}</p>
                         </div>
                       </div>
@@ -504,11 +504,11 @@ export default function AgendaConsultas() {
         <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
           <Card className="w-full max-w-sm p-6 animate-in fade-in zoom-in duration-200 text-center border-t-4 border-t-red-500">
             <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" /><line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg>
             </div>
             <h2 className="text-lg font-bold text-slate-800 mb-2">Consulta Expirada</h2>
             <p className="text-slate-500 text-sm mb-6">A data de consulta de <strong>{resolveExpiredAgenda.paciente}</strong> passou. O que deseja fazer?</p>
-            
+
             <div className="flex flex-col gap-3">
               <Button disabled={isSaving} onClick={handleReagendarExpirada} className="w-full justify-center text-md">
                 Reagendar Consulta
@@ -523,7 +523,7 @@ export default function AgendaConsultas() {
           </Card>
         </div>
       )}
-      
+
       {confirmDialog}
     </PageShell>
   );

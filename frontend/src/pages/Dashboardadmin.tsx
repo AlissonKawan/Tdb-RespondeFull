@@ -34,7 +34,7 @@ export default function DashboardAdmin() {
   const { confirm, confirmDialog } = useConfirm();
 
   const [aba, setAba] = useState<Aba>('dashboard');
-  
+
   // States para APIs
   const [atendimentos, setAtendimentos] = useState<AtendimentoApi[]>([]);
   const [voluntarios, setVoluntarios] = useState<VoluntarioApi[]>([]);
@@ -49,7 +49,7 @@ export default function DashboardAdmin() {
   const [filtroStatus, setFiltroStatus] = useState('todos');
   const [buscaVoluntarios, setBuscaVoluntarios] = useState('');
   const [buscaBeneficiarios, setBuscaBeneficiarios] = useState('');
-  
+
   // States de Edicao Admin
   const [editingVoluntario, setEditingVoluntario] = useState<VoluntarioApi | null>(null);
   const [editingBeneficiario, setEditingBeneficiario] = useState<AuthUser | null>(null);
@@ -61,9 +61,9 @@ export default function DashboardAdmin() {
     setErro('');
     try {
       const [
-        atends, 
-        vols, 
-        users, 
+        atends,
+        vols,
+        users,
         pends
       ] = await Promise.all([
         atendimentoService.listarTodos().catch(() => []),
@@ -114,7 +114,7 @@ export default function DashboardAdmin() {
   };
 
   const handleSaveVoluntario = async () => {
-    if(!editingVoluntario) return;
+    if (!editingVoluntario) return;
     try {
       const atualizacao = {
         nome: editingVoluntario.nome,
@@ -136,7 +136,7 @@ export default function DashboardAdmin() {
   };
 
   const handleSaveBeneficiario = async () => {
-    if(!editingBeneficiario) return;
+    if (!editingBeneficiario) return;
     try {
       await usuarioService.atualizar(editingBeneficiario.id, {
         nome: editingBeneficiario.nome,
@@ -207,11 +207,10 @@ export default function DashboardAdmin() {
           <div
             role={feedback.tone === 'danger' ? 'alert' : 'status'}
             aria-live="polite"
-            className={`mb-4 rounded-ui border px-4 py-3 text-sm font-medium ${
-              feedback.tone === 'success'
+            className={`mb-4 rounded-ui border px-4 py-3 text-sm font-medium ${feedback.tone === 'success'
                 ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
                 : 'border-red-200 bg-red-50 text-red-800'
-            }`}
+              }`}
           >
             {feedback.message}
           </div>
@@ -454,16 +453,16 @@ export default function DashboardAdmin() {
         >
           <div className="grid gap-4">
             <Field label="Nome">
-              <Input ref={primeiroInputVoluntarioRef} value={editingVoluntario.nome} onChange={e => setEditingVoluntario({...editingVoluntario, nome: e.target.value})} />
+              <Input ref={primeiroInputVoluntarioRef} value={editingVoluntario.nome} onChange={e => setEditingVoluntario({ ...editingVoluntario, nome: e.target.value })} />
             </Field>
             <Field label="CRO">
-              <Input value={editingVoluntario.cro || ''} onChange={e => setEditingVoluntario({...editingVoluntario, cro: e.target.value})} />
+              <Input value={editingVoluntario.cro || ''} onChange={e => setEditingVoluntario({ ...editingVoluntario, cro: e.target.value })} />
             </Field>
             <Field label="UF CRO">
-              <Input value={editingVoluntario.ufCro || ''} onChange={e => setEditingVoluntario({...editingVoluntario, ufCro: e.target.value})} />
+              <Input value={editingVoluntario.ufCro || ''} onChange={e => setEditingVoluntario({ ...editingVoluntario, ufCro: e.target.value })} />
             </Field>
             <Field label="Disponível">
-              <Select value={editingVoluntario.disponivel ? 'true' : 'false'} onChange={e => setEditingVoluntario({...editingVoluntario, disponivel: e.target.value === 'true'})}>
+              <Select value={editingVoluntario.disponivel ? 'true' : 'false'} onChange={e => setEditingVoluntario({ ...editingVoluntario, disponivel: e.target.value === 'true' })}>
                 <option value="true">Sim</option>
                 <option value="false">Não</option>
               </Select>
@@ -492,13 +491,13 @@ export default function DashboardAdmin() {
         >
           <div className="grid gap-4">
             <Field label="Nome">
-              <Input ref={primeiroInputBeneficiarioRef} value={editingBeneficiario.nome} onChange={e => setEditingBeneficiario({...editingBeneficiario, nome: e.target.value})} />
+              <Input ref={primeiroInputBeneficiarioRef} value={editingBeneficiario.nome} onChange={e => setEditingBeneficiario({ ...editingBeneficiario, nome: e.target.value })} />
             </Field>
             <Field label="E-mail">
-              <Input type="email" value={editingBeneficiario.email} onChange={e => setEditingBeneficiario({...editingBeneficiario, email: e.target.value})} />
+              <Input type="email" value={editingBeneficiario.email} onChange={e => setEditingBeneficiario({ ...editingBeneficiario, email: e.target.value })} />
             </Field>
             <Field label="Status (Ativo)">
-              <Select value={editingBeneficiario.ativo ? 'true' : 'false'} onChange={e => setEditingBeneficiario({...editingBeneficiario, ativo: e.target.value === 'true'})}>
+              <Select value={editingBeneficiario.ativo ? 'true' : 'false'} onChange={e => setEditingBeneficiario({ ...editingBeneficiario, ativo: e.target.value === 'true' })}>
                 <option value="true">Sim (Ativo)</option>
                 <option value="false">Não (Inativo)</option>
               </Select>

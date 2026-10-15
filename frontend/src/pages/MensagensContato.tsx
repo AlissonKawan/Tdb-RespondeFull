@@ -31,7 +31,7 @@ export default function MensagensContato() {
     <PageShell>
       <Section className="py-8 md:py-12">
         <SectionHeader title="Mensagens de Contato" description="Mensagens recebidas pelo site." />
-        
+
         {loading && <LoadingState title="Carregando mensagens..." />}
         {erro && <ErrorState title="Erro ao carregar mensagens" description={erro} />}
         {!loading && !erro && contatos.length === 0 && (

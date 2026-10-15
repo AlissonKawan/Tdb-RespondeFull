@@ -151,7 +151,7 @@ export default function Cronograma() {
             }
           }
 
-          const payload = { 
+          const payload = {
             id_tarefa: tarefaEmEdicao?.id_tarefa,
             id_voluntario: targetId,
             tipo: data.tipo,
@@ -306,46 +306,46 @@ export default function Cronograma() {
                                 </button>
                               )}
                               <button title="Editar tarefa" onClick={() => abrirModalEdicao(tarefa)} className="text-blue-500 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 p-1 rounded transition">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" /><path d="m15 5 4 4" /></svg>
                               </button>
                               <button title="Excluir tarefa" onClick={() => excluirTarefa(tarefa.id_tarefa!)} className="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-1 rounded transition">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /></svg>
                               </button>
                             </div>
                           </div>
-                           {tarefa.descricao && <p className="text-sm text-slate-500 mb-2">{tarefa.descricao}</p>}
-                           
-                           {tarefa.data_atividade && (() => {
-                             const aviso = getStatusVencimento(tarefa.data_atividade, tarefa.status);
-                             let corBg = 'bg-slate-50 border-slate-100 text-slate-500';
-                             let corIcone = 'text-slate-400';
-                             let labelSecundario = '';
-                             
-                             if (aviso === 'Vencido') {
-                               corBg = 'bg-red-50 border-red-100 text-red-600';
-                               corIcone = 'text-red-500';
-                               labelSecundario = ' (Vencida)';
-                             } else if (aviso === 'Próximo') {
-                               corBg = 'bg-amber-50 border-amber-200 text-amber-700';
-                               corIcone = 'text-amber-500';
-                               labelSecundario = ' (Vence em breve)';
-                             }
+                          {tarefa.descricao && <p className="text-sm text-slate-500 mb-2">{tarefa.descricao}</p>}
 
-                             return (
-                               <div className={`mt-1 mb-2.5 flex items-center gap-1.5 text-[11px] font-medium border rounded-md py-1 px-2.5 w-fit ${corBg}`}>
-                                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={corIcone}><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
-                                 <span>Previsão: {formatarData(tarefa.data_atividade)}{labelSecundario}</span>
-                               </div>
-                             );
-                           })()}
+                          {tarefa.data_atividade && (() => {
+                            const aviso = getStatusVencimento(tarefa.data_atividade, tarefa.status);
+                            let corBg = 'bg-slate-50 border-slate-100 text-slate-500';
+                            let corIcone = 'text-slate-400';
+                            let labelSecundario = '';
 
-                           <div className="mt-2 flex flex-wrap gap-2 text-xs">
-                             <Badge tone={statusTone(tarefa.status)}>{tarefa.status}</Badge>
-                             <Badge tone={prioridadeTone(tarefa.prioridade)}>{tarefa.prioridade}</Badge>
-                             <span className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 font-medium text-slate-800">
-                               {tarefa.tipo}
-                             </span>
-                           </div>
+                            if (aviso === 'Vencido') {
+                              corBg = 'bg-red-50 border-red-100 text-red-600';
+                              corIcone = 'text-red-500';
+                              labelSecundario = ' (Vencida)';
+                            } else if (aviso === 'Próximo') {
+                              corBg = 'bg-amber-50 border-amber-200 text-amber-700';
+                              corIcone = 'text-amber-500';
+                              labelSecundario = ' (Vence em breve)';
+                            }
+
+                            return (
+                              <div className={`mt-1 mb-2.5 flex items-center gap-1.5 text-[11px] font-medium border rounded-md py-1 px-2.5 w-fit ${corBg}`}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={corIcone}><rect width="18" height="18" x="3" y="4" rx="2" ry="2" /><line x1="16" x2="16" y1="2" y2="6" /><line x1="8" x2="8" y1="2" y2="6" /><line x1="3" x2="21" y1="10" y2="10" /></svg>
+                                <span>Previsão: {formatarData(tarefa.data_atividade)}{labelSecundario}</span>
+                              </div>
+                            );
+                          })()}
+
+                          <div className="mt-2 flex flex-wrap gap-2 text-xs">
+                            <Badge tone={statusTone(tarefa.status)}>{tarefa.status}</Badge>
+                            <Badge tone={prioridadeTone(tarefa.prioridade)}>{tarefa.prioridade}</Badge>
+                            <span className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 font-medium text-slate-800">
+                              {tarefa.tipo}
+                            </span>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -364,7 +364,7 @@ export default function Cronograma() {
             <h3 className="mb-4 text-xl font-bold text-slate-900">
               {tarefaEmEdicao ? 'Editar Tarefa' : 'Nova Tarefa'}
             </h3>
-            
+
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
               <Field label="Título da Tarefa" error={errors.titulo?.message}>
                 <Input

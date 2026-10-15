@@ -138,10 +138,10 @@ export default function SolicitarAtendimento() {
     async function carregarCanais() {
       setCarregandoCanais(true);
       const canaisDisponiveis = await listarCanais();
-      
-      const canalWeb = canaisDisponiveis.find(c => 
-        c.nome.toLowerCase().includes('form') || 
-        c.nome.toLowerCase().includes('web') || 
+
+      const canalWeb = canaisDisponiveis.find(c =>
+        c.nome.toLowerCase().includes('form') ||
+        c.nome.toLowerCase().includes('web') ||
         c.nome.toLowerCase().includes('sistema')
       );
 
@@ -250,11 +250,10 @@ export default function SolicitarAtendimento() {
 
               <div className="mt-4 grid gap-4 md:grid-cols-2">
                 <label
-                  className={`group relative flex cursor-pointer flex-col overflow-hidden rounded-ui-lg border-2 transition-[border-color,background-color,box-shadow] duration-fast focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 ${
-                    form.tipoPessoaAtendida === 'CRIANCA_ADOLESCENTE'
+                  className={`group relative flex cursor-pointer flex-col overflow-hidden rounded-ui-lg border-2 transition-[border-color,background-color,box-shadow] duration-fast focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 ${form.tipoPessoaAtendida === 'CRIANCA_ADOLESCENTE'
                       ? 'border-primary bg-blue-50/70 shadow-sm'
                       : 'border-border bg-surface hover:border-blue-200 hover:bg-blue-50/30'
-                  }`}
+                    }`}
                 >
                   <input
                     className="sr-only"
@@ -289,11 +288,10 @@ export default function SolicitarAtendimento() {
                 </label>
 
                 <label
-                  className={`group relative flex cursor-pointer flex-col overflow-hidden rounded-ui-lg border-2 transition-[border-color,background-color,box-shadow] duration-fast focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 ${
-                    form.tipoPessoaAtendida === 'MULHER_APOLONIA'
+                  className={`group relative flex cursor-pointer flex-col overflow-hidden rounded-ui-lg border-2 transition-[border-color,background-color,box-shadow] duration-fast focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 ${form.tipoPessoaAtendida === 'MULHER_APOLONIA'
                       ? 'border-rose-500 bg-rose-50/75 shadow-sm'
                       : 'border-border bg-surface hover:border-rose-200 hover:bg-rose-50/30'
-                  }`}
+                    }`}
                 >
                   <input
                     className="sr-only"
