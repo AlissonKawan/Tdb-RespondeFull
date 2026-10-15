@@ -1,4 +1,5 @@
 package br.com.tdbresponde.dao;
+//primeiro commit da feature/otimizacao-daos
 
 import br.com.tdbresponde.model.AgendaConsulta;
 import br.com.tdbresponde.exception.DatabaseException;
