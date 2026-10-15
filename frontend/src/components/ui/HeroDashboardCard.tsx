@@ -78,8 +78,8 @@ function HeroDashboardCard() {
             return (
               <article
                 key={slide.title}
-                className={`absolute inset-0 transition-opacity duration-1000 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none ${
-                  isActive ? 'z-10 opacity-100' : 'pointer-events-none opacity-0'
+                className={`hero-program-slide absolute inset-0 ${
+                  isActive ? 'hero-program-slide--active z-10' : 'pointer-events-none opacity-0'
                 }`}
                 aria-hidden={!isActive}
               >
@@ -87,29 +87,20 @@ function HeroDashboardCard() {
                   src={slide.image}
                   alt={slide.imageAlt}
                   loading="lazy"
-                  className={`absolute inset-0 h-full w-full object-cover object-left transition-[transform,filter] duration-[1400ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transform-none motion-reduce:transition-none ${
-                    isActive ? 'translate-x-0 scale-100 blur-0' : '-translate-x-2 scale-[1.035] blur-[1px]'
-                  }`}
+                  className="hero-program-image absolute inset-0 h-full w-full object-cover object-left"
                 />
                 <div
                   className={`absolute inset-0 ${slide.overlayClassName}`}
                   aria-hidden="true"
                 />
                 <div
-                  className={`absolute inset-0 transition-opacity duration-1000 motion-reduce:transition-none ${slide.transitionTintClassName} ${
-                    isActive ? 'opacity-100' : 'opacity-40'
-                  }`}
+                  className={`absolute inset-0 ${slide.transitionTintClassName}`}
                   aria-hidden="true"
                 />
+                <div className="hero-program-light absolute inset-y-0 left-[38%] w-[28%] -skew-x-12 bg-gradient-to-r from-transparent via-white/55 to-transparent blur-xl" aria-hidden="true" />
 
                 <div className="relative z-10 flex min-h-[42rem] items-end px-6 pb-24 pt-72 sm:min-h-[36rem] sm:px-10 sm:pt-64 md:items-center md:justify-end md:px-14 md:py-16 lg:min-h-[33rem] lg:px-20">
-                  <div
-                    className={`w-full transition-[opacity,transform,filter] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transform-none motion-reduce:transition-none md:max-w-[48%] ${
-                      isActive
-                        ? 'translate-x-0 opacity-100 blur-0 delay-200'
-                        : 'translate-x-8 opacity-0 blur-[2px] delay-0'
-                    }`}
-                  >
+                  <div className="hero-program-copy w-full md:max-w-[48%]">
                     <span className="inline-flex items-center gap-2 rounded-full border border-blue-200/80 bg-white/90 px-3 py-1.5 text-xs font-bold text-blue-900 shadow-sm backdrop-blur">
                       <svg className="h-3.5 w-3.5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                         <path d="M12 3 5 6v5c0 4.6 2.8 8.2 7 10 4.2-1.8 7-5.4 7-10V6l-7-3Z" strokeLinecap="round" strokeLinejoin="round" />

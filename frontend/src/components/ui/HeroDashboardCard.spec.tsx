@@ -19,7 +19,12 @@ describe('HeroDashboardCard', () => {
 
     act(() => vi.advanceTimersByTime(3000));
 
-    expect(screen.getByRole('heading', { name: 'Apolônias do Bem' })).toBeInTheDocument();
+    const activeHeading = screen.getByRole('heading', { name: 'Apolônias do Bem' });
+    const activeSlide = activeHeading.closest('article');
+
+    expect(activeSlide).toHaveClass('hero-program-slide--active');
+    expect(activeSlide?.querySelector('.hero-program-image')).toBeInTheDocument();
+    expect(activeSlide?.querySelector('.hero-program-copy')).toBeInTheDocument();
   });
 
   it('continua avançando quando o ponteiro está sobre o carrossel', () => {
