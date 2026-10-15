@@ -5,16 +5,6 @@ import HeroDashboardCard from './HeroDashboardCard';
 describe('HeroDashboardCard', () => {
   beforeEach(() => {
     vi.useFakeTimers();
-    vi.stubGlobal('matchMedia', vi.fn().mockReturnValue({
-      matches: false,
-      media: '',
-      onchange: null,
-      addListener: vi.fn(),
-      removeListener: vi.fn(),
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-      dispatchEvent: vi.fn(),
-    }));
   });
 
   afterEach(() => {
@@ -36,6 +26,15 @@ describe('HeroDashboardCard', () => {
     render(<HeroDashboardCard />);
 
     fireEvent.mouseEnter(screen.getByLabelText('Programas de acolhimento social da Turma do Bem'));
+    act(() => vi.advanceTimersByTime(3000));
+
+    expect(screen.getByRole('heading', { name: 'Apolônias do Bem' })).toBeInTheDocument();
+  });
+
+  it('continua avançando quando um controle do carrossel mantém o foco', () => {
+    render(<HeroDashboardCard />);
+
+    screen.getByRole('button', { name: 'Mostrar próximo programa' }).focus();
     act(() => vi.advanceTimersByTime(3000));
 
     expect(screen.getByRole('heading', { name: 'Apolônias do Bem' })).toBeInTheDocument();

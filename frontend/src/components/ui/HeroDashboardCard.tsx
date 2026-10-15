@@ -43,18 +43,16 @@ const programSlides = [
 function HeroDashboardCard() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isManuallyPaused, setIsManuallyPaused] = useState(false);
-  const [hasFocusWithin, setHasFocusWithin] = useState(false);
 
   useEffect(() => {
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (isManuallyPaused || hasFocusWithin || prefersReducedMotion) return;
+    if (isManuallyPaused) return;
 
     const intervalId = window.setInterval(() => {
       setCurrentSlide((current) => (current + 1) % programSlides.length);
     }, 3000);
 
     return () => window.clearInterval(intervalId);
-  }, [hasFocusWithin, isManuallyPaused]);
+  }, [isManuallyPaused]);
 
   const showPreviousSlide = () => {
     setCurrentSlide((current) => (current - 1 + programSlides.length) % programSlides.length);
@@ -69,10 +67,6 @@ function HeroDashboardCard() {
       className="relative min-w-0"
       aria-label="Programas de acolhimento social da Turma do Bem"
       aria-roledescription="carrossel"
-      onFocusCapture={() => setHasFocusWithin(true)}
-      onBlurCapture={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget)) setHasFocusWithin(false);
-      }}
     >
       <div className="absolute -inset-4 -z-10 rounded-[2.75rem] bg-gradient-to-r from-blue-300/30 via-white/10 to-rose-300/25 blur-3xl" />
 
