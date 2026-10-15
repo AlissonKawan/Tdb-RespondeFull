@@ -72,7 +72,7 @@ function Home() {
         <div className="absolute -right-36 top-8 -z-10 h-80 w-80 rounded-full bg-sky-300/30 blur-3xl sm:h-[28rem] sm:w-[28rem]" />
         <div className="absolute -left-36 bottom-0 -z-10 h-72 w-72 rounded-full bg-blue-200/40 blur-3xl" />
 
-        <Container className="relative grid max-w-7xl gap-12 py-12 sm:py-16 lg:grid-cols-[minmax(0,1fr)_minmax(26rem,0.9fr)] lg:items-center lg:gap-16 lg:py-24">
+        <Container className="relative grid max-w-7xl gap-12 py-12 sm:py-16 lg:grid-cols-[minmax(0,0.85fr)_minmax(30rem,1.15fr)] lg:items-center lg:gap-12 lg:py-20 xl:grid-cols-[minmax(0,0.8fr)_minmax(36rem,1.2fr)] xl:gap-16">
           <div className="min-w-0 max-w-3xl">
             <span className="inline-flex max-w-full items-center gap-2 rounded-full border border-blue-200/80 bg-white/90 px-3 py-2 text-sm font-semibold leading-5 text-blue-900 shadow-sm backdrop-blur sm:px-4">
               <svg className="h-4 w-4 shrink-0 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
