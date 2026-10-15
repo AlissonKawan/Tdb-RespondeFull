@@ -118,9 +118,15 @@ export interface Mensagem {
   conteudo: string;
   dataHora: string;
   enviadoPor: 'BENEFICIARIO' | 'VOLUNTARIO' | 'ADMIN' | string;
+  tipoMensagem?: 'TEXTO' | 'IMAGEM' | 'AUDIO';
+  arquivoUrl?: string;
+  mimeType?: string;
 }
 
 export interface MensagemRequest {
   conteudo: string;
   enviadoPor: 'BENEFICIARIO' | 'VOLUNTARIO' | 'ADMIN';
+  tipoMensagem?: 'TEXTO' | 'IMAGEM' | 'AUDIO';
+  arquivoUrl?: string;
+  mimeType?: string;
 }

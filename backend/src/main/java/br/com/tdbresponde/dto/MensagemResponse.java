@@ -13,6 +13,9 @@ public class MensagemResponse {
     public LocalDateTime dataHora;
     public String enviadoPor;
     public CanalComunicacaoResponse canal;
+    public String tipoMensagem;
+    public String arquivoUrl;
+    public String mimeType;
 
     public static MensagemResponse from(Mensagem mensagem) {
         MensagemResponse response = new MensagemResponse();
@@ -23,6 +26,9 @@ public class MensagemResponse {
         response.conteudo = mensagem.getConteudo();
         response.dataHora = mensagem.getDataHora();
         response.enviadoPor = mensagem.getEnviadoPor();
+        response.tipoMensagem = mensagem.getTipoMensagem() == null ? "TEXTO" : mensagem.getTipoMensagem();
+        response.arquivoUrl = mensagem.getArquivoUrl();
+        response.mimeType = mensagem.getMimeType();
         if (mensagem.getCanal() != null) {
             response.canal = CanalComunicacaoResponse.from(mensagem.getCanal());
         }

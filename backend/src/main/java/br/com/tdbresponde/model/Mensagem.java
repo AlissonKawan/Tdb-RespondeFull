@@ -10,6 +10,9 @@ public class Mensagem {
     private LocalDateTime dataHora; //guardar data e hora
     private String enviadoPor; //Voluntario ou Pessoa atendida
     private CanalComunicacao canal; //por onde foi enviada a mensagem
+    private String tipoMensagem;
+    private String arquivoUrl;
+    private String mimeType;
 
     public Mensagem() {}
 
@@ -68,6 +71,30 @@ public class Mensagem {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getTipoMensagem() {
+        return tipoMensagem;
+    }
+
+    public void setTipoMensagem(String tipoMensagem) {
+        this.tipoMensagem = tipoMensagem;
+    }
+
+    public String getArquivoUrl() {
+        return arquivoUrl;
+    }
+
+    public void setArquivoUrl(String arquivoUrl) {
+        this.arquivoUrl = arquivoUrl;
+    }
+
+    public String getMimeType() {
+        return mimeType;
+    }
+
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
     }
 
     @Override

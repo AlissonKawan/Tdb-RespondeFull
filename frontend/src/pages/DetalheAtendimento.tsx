@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useRef, type FormEvent, type KeyboardEvent, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, useRef, type ChangeEvent, type FormEvent, type KeyboardEvent, type ReactNode } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Section from '../components/layout/Section';
 import PageShell from '../components/layout/PageShell';
@@ -159,6 +159,52 @@ function iaPrevisaoConfig(previsao?: string) {
   return map[previsao] ?? map.SEM_RESPOSTA;
 }
 
+function MidiaMensagem({ mensagem }: { mensagem: Mensagem }) {
+  const [src, setSrc] = useState('');
+  const [erro, setErro] = useState(false);
+
+  useEffect(() => {
+    if (!mensagem.arquivoUrl) return;
+    let ativo = true;
+    let objectUrl = '';
+
+    mensagensService.carregarMidia(mensagem.arquivoUrl)
+      .then((blob) => {
+        if (!ativo) return;
+        objectUrl = URL.createObjectURL(blob);
+        setSrc(objectUrl);
+      })
+      .catch(() => {
+        if (ativo) setErro(true);
+      });
+
+    return () => {
+      ativo = false;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [mensagem.arquivoUrl]);
+
+  if (erro) {
+    return <p className="mt-2 text-xs font-semibold">Não foi possível carregar esta mídia.</p>;
+  }
+  if (!src) {
+    return <p className="mt-2 text-xs opacity-75">Carregando mídia...</p>;
+  }
+  if (mensagem.tipoMensagem === 'IMAGEM') {
+    return (
+      <button
+        type="button"
+        className="mt-2 block overflow-hidden rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        onClick={() => window.open(src, '_blank', 'noopener,noreferrer')}
+        aria-label="Abrir foto em uma nova aba"
+      >
+        <img src={src} alt="Foto enviada" className="max-h-60 max-w-full cursor-pointer object-cover sm:max-w-xs" />
+      </button>
+    );
+  }
+  return <audio controls src={src} className="mt-2 max-w-full" preload="metadata" />;
+}
+
 function DetalheAtendimento() {
   const { id } = useParams();
   const atendimentoId = Number(id);
@@ -181,6 +227,10 @@ function DetalheAtendimento() {
   const seenIdsRef = useRef<Set<number>>(new Set());
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const composerRef = useRef<HTMLTextAreaElement>(null);
+  const inputFotoRef = useRef<HTMLInputElement>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const mediaStreamRef = useRef<MediaStream | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
   
   useEffect(() => {
     if (typeof messagesEndRef.current?.scrollIntoView === 'function') {
@@ -188,9 +238,18 @@ function DetalheAtendimento() {
     }
   }, [mensagens]);
 
+  useEffect(() => () => {
+    if (mediaRecorderRef.current?.state === 'recording') {
+      mediaRecorderRef.current.stop();
+    }
+    mediaStreamRef.current?.getTracks().forEach((track) => track.stop());
+  }, []);
+
   const [erro, setErro] = useState('');
   const [feedback, setFeedback] = useState('');
   const [conteudo, setConteudo] = useState('');
+  const [gravando, setGravando] = useState(false);
+  const [enviandoMidia, setEnviandoMidia] = useState(false);
   const isSubmittingRef = useRef(false);
   
   const [salvando, setSalvando] = useState(false);
@@ -371,9 +430,24 @@ function DetalheAtendimento() {
     });
   };
 
+  const adicionarMensagem = (novaMensagem: Mensagem) => {
+    if (seenIdsRef.current.has(novaMensagem.id)) return;
+    seenIdsRef.current.add(novaMensagem.id);
+    setMensagens((atuais) => (
+      atuais.some((mensagem) => mensagem.id === novaMensagem.id)
+        ? atuais
+        : [...atuais, novaMensagem]
+    ));
+  };
+
+  const enviarPayload = async (payload: MensagemRequest) => {
+    const novaMensagem = await mensagensService.enviarMensagem(atendimentoId, payload);
+    adicionarMensagem(novaMensagem);
+  };
+
   const enviarMensagem = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!conteudo.trim() || chatBloqueado || isSubmittingRef.current) return;
+    if (!conteudo.trim() || chatBloqueado || enviandoMidia || gravando || isSubmittingRef.current) return;
 
     isSubmittingRef.current = true;
     setTimeout(() => { isSubmittingRef.current = false; }, 500);
@@ -384,23 +458,138 @@ function DetalheAtendimento() {
     setFeedback('');
 
     try {
-      const novaMensagem = await mensagensService.enviarMensagem(atendimentoId, {
+      await enviarPayload({
         conteudo: texto,
         enviadoPor: remetenteAtual,
       });
-      
-      if (!seenIdsRef.current.has(novaMensagem.id)) {
-        seenIdsRef.current.add(novaMensagem.id);
-        setMensagens((atuais) => {
-          if (!atuais.some(m => m.id === novaMensagem.id)) {
-            return [...atuais, novaMensagem];
-          }
-          return atuais;
-        });
-      }
     } catch (error) {
       setFeedback(error instanceof Error ? error.message : 'Não foi possível enviar a mensagem.');
       setConteudo(texto); // Restaura o texto
+    }
+  };
+
+  const selecionarFoto = async (event: ChangeEvent<HTMLInputElement>) => {
+    const arquivo = event.target.files?.[0];
+    event.target.value = '';
+    if (!arquivo || chatBloqueado || enviandoMidia) return;
+    if (!arquivo.type.startsWith('image/')) {
+      setFeedback('Selecione um arquivo de imagem válido.');
+      return;
+    }
+
+    const legenda = conteudo.trim();
+    setEnviandoMidia(true);
+    setFeedback('');
+    try {
+      const upload = await mensagensService.uploadMidia(arquivo);
+      await enviarPayload({
+        conteudo: legenda,
+        enviadoPor: remetenteAtual,
+        tipoMensagem: 'IMAGEM',
+        arquivoUrl: upload.arquivoUrl,
+        mimeType: upload.mimeType,
+      });
+      setConteudo('');
+      if (composerRef.current) composerRef.current.style.height = '44px';
+    } catch (error) {
+      setFeedback(error instanceof Error ? error.message : 'Não foi possível enviar a foto.');
+    } finally {
+      setEnviandoMidia(false);
+    }
+  };
+
+  const liberarMicrofone = () => {
+    mediaStreamRef.current?.getTracks().forEach((track) => track.stop());
+    mediaStreamRef.current = null;
+  };
+
+  const iniciarGravacao = async () => {
+    if (chatBloqueado || enviandoMidia || gravando) return;
+    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') {
+      setFeedback('A gravação de áudio não é compatível com este navegador.');
+      return;
+    }
+
+    setFeedback('');
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm')
+        ? 'audio/webm'
+        : MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : '';
+      const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+      mediaStreamRef.current = stream;
+      mediaRecorderRef.current = recorder;
+      audioChunksRef.current = [];
+      recorder.ondataavailable = (evento) => {
+        if (evento.data.size > 0) audioChunksRef.current.push(evento.data);
+      };
+      recorder.start();
+      setGravando(true);
+    } catch {
+      liberarMicrofone();
+      setFeedback('Não foi possível acessar o microfone. Verifique a permissão do navegador.');
+    }
+  };
+
+  const pararGravacao = () => new Promise<Blob>((resolve, reject) => {
+    const recorder = mediaRecorderRef.current;
+    if (!recorder || recorder.state !== 'recording') {
+      reject(new Error('Nenhuma gravação está em andamento.'));
+      return;
+    }
+    recorder.onstop = () => {
+      const blob = new Blob(audioChunksRef.current, { type: recorder.mimeType || 'audio/webm' });
+      mediaRecorderRef.current = null;
+      audioChunksRef.current = [];
+      liberarMicrofone();
+      setGravando(false);
+      if (blob.size === 0) reject(new Error('O áudio gravado ficou vazio. Tente novamente.'));
+      else resolve(blob);
+    };
+    recorder.onerror = () => {
+      mediaRecorderRef.current = null;
+      audioChunksRef.current = [];
+      liberarMicrofone();
+      setGravando(false);
+      reject(new Error('A gravação de áudio foi interrompida.'));
+    };
+    recorder.stop();
+  });
+
+  const cancelarGravacao = () => {
+    const recorder = mediaRecorderRef.current;
+    if (recorder?.state === 'recording') {
+      recorder.onstop = () => {
+        mediaRecorderRef.current = null;
+        audioChunksRef.current = [];
+        liberarMicrofone();
+      };
+      recorder.stop();
+    } else {
+      liberarMicrofone();
+    }
+    setGravando(false);
+  };
+
+  const enviarAudio = async () => {
+    if (!gravando || enviandoMidia) return;
+    setEnviandoMidia(true);
+    setFeedback('');
+    try {
+      const audio = await pararGravacao();
+      const extensao = audio.type.includes('mp4') ? 'mp4' : 'webm';
+      const upload = await mensagensService.uploadMidia(audio, extensao);
+      await enviarPayload({
+        conteudo: '',
+        enviadoPor: remetenteAtual,
+        tipoMensagem: 'AUDIO',
+        arquivoUrl: upload.arquivoUrl,
+        mimeType: upload.mimeType,
+      });
+    } catch (error) {
+      setFeedback(error instanceof Error ? error.message : 'Não foi possível enviar o áudio.');
+    } finally {
+      setEnviandoMidia(false);
     }
   };
 
@@ -412,7 +601,7 @@ function DetalheAtendimento() {
   const handleComposerKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key !== 'Enter' || event.shiftKey || event.nativeEvent.isComposing) return;
     event.preventDefault();
-    if (!conteudo.trim() || chatBloqueado) return;
+    if (!conteudo.trim() || chatBloqueado || enviandoMidia || gravando) return;
     event.currentTarget.form?.requestSubmit();
   };
 
@@ -554,6 +743,7 @@ function DetalheAtendimento() {
 
                   {mensagens.map((mensagem) => {
                     const minha = mensagem.enviadoPor === remetenteAtual;
+                    const tipoMensagem = mensagem.tipoMensagem ?? 'TEXTO';
                     return (
                       <div key={mensagem.id} className={`flex ${minha ? 'justify-end' : 'justify-start'}`}>
                         <article className={`max-w-[88%] rounded-2xl px-4 py-3 text-sm shadow-sm sm:max-w-[78%] ${
@@ -568,7 +758,15 @@ function DetalheAtendimento() {
                             </span>
                             <time dateTime={mensagem.dataHora}>{formatTime(mensagem.dataHora)}</time>
                           </header>
-                          <p className="mt-1.5 whitespace-pre-wrap break-words leading-6">{mensagem.conteudo}</p>
+                          {tipoMensagem === 'TEXTO' && (
+                            <p className="mt-1.5 whitespace-pre-wrap break-words leading-6">{mensagem.conteudo}</p>
+                          )}
+                          {(tipoMensagem === 'IMAGEM' || tipoMensagem === 'AUDIO') && mensagem.arquivoUrl && (
+                            <MidiaMensagem mensagem={mensagem} />
+                          )}
+                          {tipoMensagem === 'IMAGEM' && mensagem.conteudo?.trim() && (
+                            <p className="mt-2 whitespace-pre-wrap break-words leading-6">{mensagem.conteudo}</p>
+                          )}
                         </article>
                       </div>
                     );
@@ -582,8 +780,55 @@ function DetalheAtendimento() {
                       Este atendimento está {labelStatus(atendimento.status).toLowerCase()}. O envio de mensagens está bloqueado.
                     </div>
                   )}
+                  <input
+                    ref={inputFotoRef}
+                    type="file"
+                    accept="image/jpeg,image/png"
+                    className="hidden"
+                    onChange={selecionarFoto}
+                    disabled={chatBloqueado || enviandoMidia || gravando}
+                    aria-label="Selecionar foto"
+                  />
+                  {gravando && (
+                    <div className="mb-3 flex flex-wrap items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800" role="status">
+                      <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-red-500" aria-hidden="true" />
+                      <span className="mr-auto font-semibold">Gravando...</span>
+                      <Button type="button" variant="secondary" onClick={cancelarGravacao} disabled={enviandoMidia}>
+                        Cancelar
+                      </Button>
+                      <Button type="button" onClick={() => void enviarAudio()} disabled={enviandoMidia}>
+                        {enviandoMidia ? 'Enviando...' : 'Enviar áudio'}
+                      </Button>
+                    </div>
+                  )}
                   <label htmlFor="chat-composer" className="sr-only">Nova mensagem</label>
                   <div className="flex items-end gap-2 rounded-2xl border border-border bg-background p-2 shadow-sm transition-[border-color,box-shadow] duration-fast focus-within:border-primary focus-within:ring-2 focus-within:ring-ring/20">
+                    <button
+                      type="button"
+                      onClick={() => inputFotoRef.current?.click()}
+                      disabled={chatBloqueado || enviandoMidia || gravando}
+                      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                      aria-label="Enviar foto"
+                      title="Enviar foto"
+                    >
+                      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                        <path d="M12 5v14M5 12h14" strokeLinecap="round" />
+                        <path d="M19 13.5V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5.5" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void iniciarGravacao()}
+                      disabled={chatBloqueado || enviandoMidia || gravando}
+                      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                      aria-label="Gravar áudio"
+                      title="Gravar áudio"
+                    >
+                      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                        <rect x="9" y="3" width="6" height="11" rx="3" />
+                        <path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6" strokeLinecap="round" />
+                      </svg>
+                    </button>
                     <textarea
                       ref={composerRef}
                       id="chat-composer"
@@ -594,13 +839,13 @@ function DetalheAtendimento() {
                         ajustarAlturaComposer(event.target);
                       }}
                       onKeyDown={handleComposerKeyDown}
-                      disabled={chatBloqueado}
+                      disabled={chatBloqueado || enviandoMidia || gravando}
                       placeholder="Escreva sua mensagem..."
                       className="min-h-11 max-h-32 flex-1 resize-none overflow-y-auto bg-transparent px-3 py-2.5 text-base leading-6 text-foreground outline-none placeholder:text-slate-400 disabled:cursor-not-allowed disabled:text-muted-foreground"
                     />
                     <Button
                       type="submit"
-                      disabled={chatBloqueado || !conteudo.trim()}
+                      disabled={chatBloqueado || enviandoMidia || gravando || !conteudo.trim()}
                       className="h-11 w-11 shrink-0 rounded-full !px-0"
                       aria-label="Enviar mensagem"
                       title="Enviar mensagem"
@@ -612,7 +857,9 @@ function DetalheAtendimento() {
                       <span className="sr-only">Enviar mensagem</span>
                     </Button>
                   </div>
-                  <p className="mt-2 px-1 text-xs text-muted-foreground">Enter envia · Shift + Enter adiciona uma nova linha</p>
+                  <p className="mt-2 px-1 text-xs text-muted-foreground">
+                    {enviandoMidia ? 'Enviando mídia...' : 'Enter envia · Shift + Enter adiciona uma nova linha'}
+                  </p>
                 </form>
               </Card>
             </div>

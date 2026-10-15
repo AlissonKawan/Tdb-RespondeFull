@@ -77,6 +77,11 @@ public class MensagemBO {
             }
             mensagem.setConteudo(request.conteudo);
             mensagem.setEnviadoPor(normalizarEnviadoPor(request.enviadoPor));
+            mensagem.setTipoMensagem(request.tipoMensagem == null || request.tipoMensagem.trim().isEmpty()
+                    ? "TEXTO"
+                    : request.tipoMensagem.trim().toUpperCase());
+            mensagem.setArquivoUrl(request.arquivoUrl);
+            mensagem.setMimeType(request.mimeType);
             mensagem.setDataHora(LocalDateTime.now());
         }
         return mensagem;
@@ -86,7 +91,9 @@ public class MensagemBO {
         if (mensagem.getAtendimento() == null || mensagem.getAtendimento().getId() <= 0) {
             throw new BusinessException("ID do atendimento e obrigatorio");
         }
-        if (mensagem.getConteudo() == null || mensagem.getConteudo().trim().isEmpty()) {
+        boolean conteudoVazio = mensagem.getConteudo() == null || mensagem.getConteudo().trim().isEmpty();
+        boolean arquivoVazio = mensagem.getArquivoUrl() == null || mensagem.getArquivoUrl().trim().isEmpty();
+        if (conteudoVazio && arquivoVazio) {
             throw new BusinessException("Conteudo da mensagem e obrigatorio");
         }
         if (mensagem.getEnviadoPor() == null) {
