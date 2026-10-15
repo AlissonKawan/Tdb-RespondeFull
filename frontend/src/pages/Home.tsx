@@ -72,46 +72,50 @@ function Home() {
         <div className="absolute -right-36 top-8 -z-10 h-80 w-80 rounded-full bg-sky-300/30 blur-3xl sm:h-[28rem] sm:w-[28rem]" />
         <div className="absolute -left-36 bottom-0 -z-10 h-72 w-72 rounded-full bg-blue-200/40 blur-3xl" />
 
-        <Container className="relative grid max-w-7xl gap-12 py-12 sm:py-16 lg:grid-cols-[minmax(0,0.85fr)_minmax(30rem,1.15fr)] lg:items-center lg:gap-12 lg:py-20 xl:grid-cols-[minmax(0,0.8fr)_minmax(36rem,1.2fr)] xl:gap-16">
-          <div className="min-w-0 max-w-3xl">
-            <span className="inline-flex max-w-full items-center gap-2 rounded-full border border-blue-200/80 bg-white/90 px-3 py-2 text-sm font-semibold leading-5 text-blue-900 shadow-sm backdrop-blur sm:px-4">
-              <svg className="h-4 w-4 shrink-0 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-                <path d="M12 20.5S4 16.1 4 9.7A4.2 4.2 0 0 1 11.5 7a.7.7 0 0 0 1 0A4.2 4.2 0 0 1 20 9.7c0 6.4-8 10.8-8 10.8Z" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M8.8 11.8c.7 1.5 1.8 2.2 3.2 2.2s2.5-.7 3.2-2.2" strokeLinecap="round" />
-              </svg>
-              <span>Rede de Solidariedade Odontológica <span aria-hidden="true">•</span> Turma do Bem</span>
-            </span>
+        <Container className="relative max-w-7xl py-10 sm:py-14 lg:py-16">
+          <HeroDashboardCard />
 
-            <h1 className="mt-7 text-balance text-[2.5rem] font-black leading-[1.05] tracking-[-0.04em] text-slate-950 sm:text-5xl lg:text-[3.65rem]">
-              Cada pedido de ajuda merece chegar a quem pode cuidar.
-            </h1>
+          <div className="mt-14 grid min-w-0 gap-8 lg:grid-cols-[1.08fr_0.92fr] lg:items-end lg:gap-16">
+            <div>
+              <span className="inline-flex max-w-full items-center gap-2 rounded-full border border-blue-200/80 bg-white/90 px-3 py-2 text-sm font-semibold leading-5 text-blue-900 shadow-sm backdrop-blur sm:px-4">
+                <svg className="h-4 w-4 shrink-0 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+                  <path d="M12 20.5S4 16.1 4 9.7A4.2 4.2 0 0 1 11.5 7a.7.7 0 0 0 1 0A4.2 4.2 0 0 1 20 9.7c0 6.4-8 10.8-8 10.8Z" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M8.8 11.8c.7 1.5 1.8 2.2 3.2 2.2s2.5-.7 3.2-2.2" strokeLinecap="round" />
+                </svg>
+                <span>Rede de Solidariedade Odontológica <span aria-hidden="true">•</span> Turma do Bem</span>
+              </span>
 
-            <p className="mt-6 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">
-              O TDB Responde organiza a triagem, protege cada história e aproxima pessoas em
-              situação de vulnerabilidade de dentistas voluntários da Turma do Bem.
-            </p>
-
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-              <Button href="/login" size="large" className="w-full shadow-lg shadow-blue-600/20 sm:w-auto">
-                Acessar Plataforma
-              </Button>
-              <Button href="/quero-ser-voluntario" variant="secondary" size="large" className="w-full border-blue-200 bg-white/90 text-blue-950 sm:w-auto">
-                Seja um Dentista Voluntário
-              </Button>
+              <h1 className="mt-7 text-balance text-[2.5rem] font-black leading-[1.05] tracking-[-0.04em] text-slate-950 sm:text-5xl lg:text-[3.65rem]">
+                Cada pedido de ajuda merece chegar a quem pode cuidar.
+              </h1>
             </div>
 
-            <Link
-              to="/sobre"
-              className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-md py-2 font-semibold text-primary underline-offset-4 transition-colors hover:text-blue-800 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            >
-              Conheça a Turma do Bem
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                <path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </Link>
-          </div>
+            <div className="lg:pb-1">
+              <p className="max-w-2xl text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">
+                O TDB Responde organiza a triagem, protege cada história e aproxima pessoas em
+                situação de vulnerabilidade de dentistas voluntários da Turma do Bem.
+              </p>
 
-          <HeroDashboardCard />
+              <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                <Button href="/login" size="large" className="w-full shadow-lg shadow-blue-600/20 sm:w-auto">
+                  Acessar Plataforma
+                </Button>
+                <Button href="/quero-ser-voluntario" variant="secondary" size="large" className="w-full border-blue-200 bg-white/90 text-blue-950 sm:w-auto">
+                  Seja um Dentista Voluntário
+                </Button>
+              </div>
+
+              <Link
+                to="/sobre"
+                className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-md py-2 font-semibold text-primary underline-offset-4 transition-colors hover:text-blue-800 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                Conheça a Turma do Bem
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                  <path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </Link>
+            </div>
+          </div>
         </Container>
       </section>
 
