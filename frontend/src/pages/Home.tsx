@@ -64,6 +64,38 @@ const features = [
   },
 ];
 
+const impactos = [
+  { value: '+18 mil', label: 'Dentistas voluntários' },
+  { value: '+90 mil', label: 'Jovens atendidos' },
+  { value: '+1.200', label: 'Mulheres acolhidas' },
+  { value: '12 países', label: 'América Latina e Portugal' },
+];
+
+const perfis = [
+  {
+    eyebrow: 'Para quem precisa de atendimento',
+    title: 'Peça ajuda e acompanhe cada etapa',
+    description:
+      'Crie sua conta, conte sua situação com segurança e veja o andamento do atendimento em um só lugar, sem precisar repetir sua história.',
+    itens: ['Solicitação feita em poucos minutos', 'Mensagens e histórico organizados', 'Status sempre visível'],
+    image: '/img/cadastro-beneficiario.jpg',
+    imageAlt: 'Jovem sorrindo na cadeira de um consultório odontológico',
+    imageClass: 'object-center',
+    cta: { label: 'Criar conta de beneficiário', href: '/cadastro-beneficiario' },
+  },
+  {
+    eyebrow: 'Para dentistas voluntários',
+    title: 'Cuide de quem mais precisa, no seu consultório',
+    description:
+      'No programa Dentista do Bem, voluntários atendem crianças e jovens de 11 a 17 anos. A plataforma entrega a triagem pronta para você assumir o caso.',
+    itens: ['Casos já triados e priorizados', 'Cronograma e agenda em um só painel', 'Ranking de voluntários'],
+    image: '/img/programas/dentista-do-bem-jovem.png',
+    imageAlt: 'Adolescente sorrindo durante atendimento odontológico do programa Dentista do Bem',
+    imageClass: 'object-left',
+    cta: { label: 'Quero atender como voluntário', href: '/quero-ser-voluntario' },
+  },
+];
+
 function Home() {
   return (
     <div>
@@ -119,6 +151,19 @@ function Home() {
         </Container>
       </section>
 
+      <section className="border-b border-border bg-surface">
+        <Container className="max-w-7xl py-10">
+          <div className="grid grid-cols-2 gap-y-8 lg:grid-cols-4 lg:divide-x lg:divide-border">
+            {impactos.map(item => (
+              <div key={item.label} className="px-4 text-center lg:px-8">
+                <p className="text-3xl font-black tracking-tight text-primary sm:text-4xl">{item.value}</p>
+                <p className="mt-1 text-sm font-medium text-muted-foreground">{item.label}</p>
+              </div>
+            ))}
+          </div>
+        </Container>
+      </section>
+
       <section className="border-b border-border bg-surface py-16">
         <Container className="max-w-7xl">
           <div className="mb-8 max-w-2xl reveal">
@@ -139,6 +184,41 @@ function Home() {
                   destaque={index === 0}
                   tone={feature.tone}
                 />
+              </div>
+            ))}
+          </div>
+        </Container>
+      </section>
+
+      <section className="border-b border-border bg-background py-16">
+        <Container className="max-w-7xl">
+          <div className="space-y-16 lg:space-y-20">
+            {perfis.map((perfil, index) => (
+              <div key={perfil.title} className="grid gap-8 reveal lg:grid-cols-2 lg:items-center lg:gap-16">
+                <img
+                  src={perfil.image}
+                  alt={perfil.imageAlt}
+                  loading="lazy"
+                  className={`aspect-[4/3] w-full rounded-3xl object-cover shadow-xl ${perfil.imageClass} ${index % 2 === 1 ? 'lg:order-2' : ''}`}
+                />
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-widest text-primary">{perfil.eyebrow}</p>
+                  <h2 className="mt-3 text-3xl font-black tracking-tight text-foreground sm:text-4xl">{perfil.title}</h2>
+                  <p className="mt-4 text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">{perfil.description}</p>
+                  <ul className="mt-6 space-y-3">
+                    {perfil.itens.map(item => (
+                      <li key={item} className="flex items-start gap-3 text-sm font-medium text-foreground sm:text-base">
+                        <svg className="mt-0.5 h-5 w-5 shrink-0 text-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                          <path d="m5 12 4.5 4.5L19 7" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                  <Button href={perfil.cta.href} variant="secondary" size="large" className="mt-7 w-full sm:w-auto">
+                    {perfil.cta.label}
+                  </Button>
+                </div>
               </div>
             ))}
           </div>
