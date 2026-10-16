@@ -3,11 +3,50 @@ import PageShell from '../components/layout/PageShell';
 import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
-import ChartCard from '../components/ui/ChartCard';
-import PageHeader from '../components/ui/PageHeader';
 import SectionHeader from '../components/ui/SectionHeader';
 import StatCard from '../components/ui/StatCard';
 import { programImages } from '../config/programImages';
+
+const solutionBadges = [
+  {
+    label: 'Triagem centralizada',
+    className: 'bg-blue-50 text-blue-700 border-blue-200',
+    path: 'M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z',
+  },
+  {
+    label: 'Histórico unificado',
+    className: 'bg-purple-50 text-purple-700 border-purple-200',
+    path: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Zm0 0v6h6M8 13h8M8 17h6',
+  },
+  {
+    label: 'Sigilo orientado',
+    className: 'bg-amber-50 text-amber-800 border-amber-200',
+    path: 'M7 11V7a5 5 0 0 1 10 0v4M5 11h14v10H5V11Zm7 4v2',
+  },
+  {
+    label: 'Fluxo ativo',
+    className: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    path: 'M4 20h16M7 16v-5M12 16V4M17 16V8',
+  },
+];
+
+const impactHighlights = [
+  {
+    title: 'Conversa centralizada',
+    description: 'Todos os atendimentos em um só lugar.',
+    path: solutionBadges[0].path,
+  },
+  {
+    title: 'Triagem organizada',
+    description: 'Prioriza o que precisa de atenção primeiro.',
+    path: 'M9 6h11M9 12h11M9 18h11M3 6l1 1 2-2M3 12l1 1 2-2M3 18l1 1 2-2',
+  },
+  {
+    title: 'Cuidado contínuo',
+    description: 'Mantém o histórico e o acompanhamento da jornada.',
+    path: 'M3 12a9 9 0 1 0 3-6.7L3 8m0-5v5h5m4-1v5l3 2',
+  },
+];
 
 const visualImpactMetrics = [
   {
@@ -87,28 +126,73 @@ const deliveryPhases = [
 function Roadmap() {
   return (
     <PageShell>
-      <PageHeader
-        eyebrow="Solução"
-        title="Como o TDB Responde ajuda na prática"
-        description="Uma solução digital para reduzir dispersão, acelerar triagem e preservar contexto em atendimentos sociais sensíveis."
-      />
+      <Section tone="white">
+        <div className="grid lg:grid-cols-2 items-center gap-10">
+          <div className="min-w-0">
+            <p className="mb-3 text-sm font-semibold text-primary">Solução</p>
+            <h1 className="text-pretty text-4xl font-black tracking-tight text-foreground sm:text-5xl">
+              Como o TDB Responde ajuda <span className="text-primary">na prática</span>
+            </h1>
+            <p className="mt-4 text-pretty text-lg leading-8 text-muted-foreground">
+              Uma solução digital para reduzir dispersão, acelerar triagem e preservar contexto em atendimentos sociais sensíveis.
+            </p>
+            <ul className="mt-6 flex flex-wrap gap-2" aria-label="Benefícios da solução">
+              {solutionBadges.map((badge) => (
+                <li key={badge.label} className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-medium ${badge.className}`}>
+                  <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d={badge.path} />
+                  </svg>
+                  {badge.label}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <img
+            src="/img/solucao-hero.png"
+            alt="Como o TDB Responde ajuda na prática"
+            width="1024"
+            height="507"
+            className="w-full h-auto object-contain rounded-2xl drop-shadow-sm"
+          />
+        </div>
+      </Section>
 
       <Section tone="white" className="reveal">
-        <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
-          <div>
-            <SectionHeader
-              eyebrow="Impacto"
-              title="Menos mensagens perdidas, mais continuidade no cuidado"
-              description="O valor da solução não está em criar mais uma tela, mas em transformar canais separados em um fluxo operacional simples, visível e rastreável."
-            />
-            <div className="flex flex-wrap gap-2">
-              <Badge tone="info">Triagem centralizada</Badge>
-              <Badge tone="info">Histórico unificado</Badge>
-              <Badge tone="warning">Sigilo orientado</Badge>
-              <Badge tone="success">Fluxo ativo</Badge>
+        <div className="bg-blue-50/60 border border-blue-100 rounded-3xl p-8 lg:p-12">
+          <div className="grid lg:grid-cols-[1fr_1.1fr] items-center gap-10">
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-primary">Impacto</p>
+              <h2 className="mt-2 text-pretty text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+                Menos mensagens perdidas, <span className="text-primary">mais continuidade</span> no cuidado
+              </h2>
+              <p className="mt-3 text-pretty leading-7 text-muted-foreground">
+                O TDB Responde transforma canais separados em um fluxo operacional simples, visível e rastreável, ajudando a equipe a manter o foco em atendimentos que realmente importam.
+              </p>
+              <ul className="mt-6 space-y-5">
+                {impactHighlights.map((highlight) => (
+                  <li key={highlight.title} className="flex items-start gap-3">
+                    <span className="w-10 h-10 shrink-0 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center" aria-hidden="true">
+                      <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d={highlight.path} />
+                      </svg>
+                    </span>
+                    <div>
+                      <h3 className="font-bold text-foreground">{highlight.title}</h3>
+                      <p className="mt-1 text-sm leading-6 text-muted-foreground">{highlight.description}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
             </div>
+            <img
+              src="/img/solucao-mockup.png"
+              alt="Interface do TDB Responde com fluxo de atendimentos e mensagens"
+              width="1024"
+              height="507"
+              loading="lazy"
+              className="w-full h-auto object-contain rounded-2xl"
+            />
           </div>
-          <ChartCard />
         </div>
       </Section>
 
