@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, waitFor, act, fireEvent, within } from '@testing-library/react';
+import { cleanup, render, screen, waitFor, act, fireEvent, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import DetalheAtendimento from '../DetalheAtendimento';
@@ -114,6 +114,7 @@ describe('DetalheAtendimento - Deduplicação de Mensagens', () => {
   });
 
   afterEach(() => {
+    cleanup();
     window.WebSocket = originalWebSocket;
     HTMLElement.prototype.scrollIntoView = originalScrollIntoView;
     window.matchMedia = originalMatchMedia;
@@ -583,6 +584,26 @@ describe('DetalheAtendimento - Deduplicação de Mensagens', () => {
     expect(await screen.findByRole('img', { name: 'Foto enviada' })).toHaveAttribute('src', 'blob:foto-autenticada');
     expect(mensagensService.carregarMidia).toHaveBeenCalledWith('/mensagens/midia/foto.png');
     expect(within(screen.getByRole('log')).getByText('Orientações')).toBeInTheDocument();
+    const abrirGuia = vi.spyOn(window, 'open');
+    const foto = screen.getByRole('button', { name: 'Ampliar foto na conversa' });
+    const composer = screen.getByRole('textbox', { name: 'Nova mensagem' });
+    await user.type(composer, 'Rascunho preservado');
+    await user.click(foto);
+    const visualizador = screen.getByRole('dialog', { name: 'Imagem da conversa' });
+    expect(within(visualizador).getByRole('img', { name: 'Imagem ampliada da conversa' })).toHaveAttribute('src', 'blob:foto-autenticada');
+    expect(within(visualizador).getByText('Orientações')).toBeInTheDocument();
+    expect(abrirGuia).not.toHaveBeenCalled();
+    expect(mensagensService.carregarMidia).toHaveBeenCalledTimes(1);
+    expect(revokeObjectURL).not.toHaveBeenCalled();
+    await user.click(within(visualizador).getByRole('button', { name: 'Voltar à conversa' }));
+    expect(screen.queryByRole('dialog', { name: 'Imagem da conversa' })).not.toBeInTheDocument();
+    expect(foto).toHaveFocus();
+    expect(composer).toHaveValue('Rascunho preservado');
+    await user.click(foto);
+    fireEvent(screen.getByRole('dialog', { name: 'Imagem da conversa' }), new Event('cancel', { cancelable: true }));
+    expect(screen.queryByRole('dialog', { name: 'Imagem da conversa' })).not.toBeInTheDocument();
+    expect(foto).toHaveFocus();
+    abrirGuia.mockRestore();
     unmount();
     expect(revokeObjectURL).toHaveBeenCalledWith('blob:foto-autenticada');
   });

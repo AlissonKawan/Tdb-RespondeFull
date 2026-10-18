@@ -9,6 +9,7 @@ import { Field, Input, Select, Textarea } from '../components/ui/Input';
 import { Dialog } from '../components/ui/ConfirmDialog';
 import AtendimentoIcon from '../components/atendimento/AtendimentoIcon';
 import AtendimentoPanel, { PainelSecao } from '../components/atendimento/AtendimentoPanel';
+import ImagemAmpliada from '../components/chat/ImagemAmpliada';
 import './DetalheAtendimento.css';
 import { useAuth } from '../context/useAuth';
 import { useConfirm } from '../hooks/useConfirm';
@@ -112,6 +113,7 @@ function labelStatusCheckin(status?: string) {
 function MidiaMensagem({ mensagem }: { mensagem: Mensagem }) {
   const [src, setSrc] = useState('');
   const [erro, setErro] = useState(false);
+  const [visualizando, setVisualizando] = useState(false);
 
   useEffect(() => {
     if (!mensagem.arquivoUrl) return;
@@ -142,14 +144,17 @@ function MidiaMensagem({ mensagem }: { mensagem: Mensagem }) {
   }
   if (mensagem.tipoMensagem === 'IMAGEM') {
     return (
-      <button
-        type="button"
-        className="mt-2 block overflow-hidden rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        onClick={() => window.open(src, '_blank', 'noopener,noreferrer')}
-        aria-label="Abrir foto em uma nova aba"
-      >
-        <img src={src} alt="Foto enviada" className="max-h-60 max-w-full cursor-pointer object-cover sm:max-w-xs" />
-      </button>
+      <>
+        <button
+          type="button"
+          className="mt-2 block overflow-hidden rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          onClick={() => setVisualizando(true)}
+          aria-label="Ampliar foto na conversa"
+        >
+          <img src={src} alt="Foto enviada" className="max-h-60 max-w-full cursor-zoom-in object-cover sm:max-w-xs" />
+        </button>
+        {visualizando && <ImagemAmpliada src={src} legenda={mensagem.conteudo} onClose={() => setVisualizando(false)} />}
+      </>
     );
   }
   return <audio controls src={src} className="mt-2 max-w-full" preload="metadata" />;
