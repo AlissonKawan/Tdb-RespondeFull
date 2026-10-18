@@ -6,6 +6,8 @@ import DetalheAtendimento from '../DetalheAtendimento';
 import { useAuth } from '../../context/useAuth';
 import { atendimentoService } from '../../services/atendimentoService';
 import { mensagensService } from '../../services/mensagensService';
+import { agendaService } from '../../services/agendaService';
+import { prontuarioService } from '../../services/prontuarioService';
 import type { AtendimentoApi, Mensagem } from '../../types/AtendimentoApi';
 
 // Mock routing params so that useParams returns { id: '1' }
@@ -39,6 +41,21 @@ vi.mock('../../services/mensagensService', () => ({
   mensagensService: {
     getMensagensAtendimento: vi.fn(),
     enviarMensagem: vi.fn(),
+  },
+}));
+
+vi.mock('../../services/agendaService', () => ({
+  agendaService: {
+    buscarPorAtendimento: vi.fn().mockResolvedValue([]),
+    criar: vi.fn(),
+    atualizar: vi.fn(),
+  },
+}));
+
+vi.mock('../../services/prontuarioService', () => ({
+  prontuarioService: {
+    buscarPorAtendimento: vi.fn().mockResolvedValue([]),
+    registrarEvolucao: vi.fn(),
   },
 }));
 
@@ -79,6 +96,8 @@ describe('DetalheAtendimento - Deduplicação de Mensagens', () => {
       user: { id: 10, nome: 'Voluntário Teste', tipoUsuario: 'VOLUNTARIO' },
       logout: vi.fn(),
     } as any);
+    vi.mocked(agendaService.buscarPorAtendimento).mockResolvedValue([]);
+    vi.mocked(prontuarioService.buscarPorAtendimento).mockResolvedValue([]);
   });
 
   afterEach(() => {
@@ -291,4 +310,137 @@ describe('DetalheAtendimento - Deduplicação de Mensagens', () => {
     expect(screen.queryByText('[X]')).not.toBeInTheDocument();
     expect(screen.queryByText('[~]')).not.toBeInTheDocument();
   });
+
+  it('permite agendar consulta vinculada diretamente pelo atendimento com validação de campos', async () => {
+    const user = userEvent.setup();
+    vi.mocked(atendimentoService.buscarPorId).mockResolvedValue(mockAtendimento);
+    vi.mocked(mensagensService.getMensagensAtendimento).mockResolvedValue([]);
+    vi.mocked(agendaService.buscarPorAtendimento).mockResolvedValue([]);
+    vi.mocked(agendaService.criar).mockResolvedValue({
+      id: 300,
+      voluntarioId: 10,
+      atendimentoId: 1,
+      paciente: 'Maria Souza',
+      tipo: 'Urgência Endodôntica',
+      dataConsulta: '2026-10-20',
+      horario: '15:00',
+      status: 'CONFIRMADO',
+      tipoPessoa: 'OUTRO',
+    });
+
+    render(
+      <MemoryRouter>
+        <DetalheAtendimento />
+      </MemoryRouter>
+    );
+
+    expect(await screen.findByText('Agenda do Atendimento')).toBeInTheDocument();
+    expect(screen.getByText('Nenhuma consulta agendada para este atendimento.')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Agendar Consulta' }));
+
+    const inputTipo = screen.getByPlaceholderText('Ex: Avaliação Inicial');
+    await user.clear(inputTipo);
+    await user.click(screen.getByRole('button', { name: 'Salvar Agendamento' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Informe o tipo da consulta.');
+    expect(agendaService.criar).not.toHaveBeenCalled();
+
+    await user.type(inputTipo, 'Urgência Endodôntica');
+    await user.click(screen.getByRole('button', { name: 'Salvar Agendamento' }));
+
+    await waitFor(() => {
+      expect(agendaService.criar).toHaveBeenCalledWith(
+        expect.objectContaining({
+          atendimentoId: 1,
+          paciente: 'Maria Souza',
+          tipo: 'Urgência Endodôntica',
+        })
+      );
+    });
+
+    expect(await screen.findByText('Urgência Endodôntica')).toBeInTheDocument();
+    expect(screen.getByText('Vinculada')).toBeInTheDocument();
+  });
+
+  it('exibe situação atual do prontuário do paciente no atendimento e registra nova evolução', async () => {
+    const user = userEvent.setup();
+    vi.mocked(atendimentoService.buscarPorId).mockResolvedValue(mockAtendimento);
+    vi.mocked(mensagensService.getMensagensAtendimento).mockResolvedValue([]);
+    vi.mocked(agendaService.buscarPorAtendimento).mockResolvedValue([
+      {
+        id: 300,
+        voluntarioId: 10,
+        atendimentoId: 1,
+        paciente: 'Maria Souza',
+        tipo: 'Avaliação Inicial',
+        dataConsulta: '2026-10-18',
+        horario: '09:00',
+        status: 'CONFIRMADO',
+        tipoPessoa: 'OUTRO',
+      },
+    ]);
+    vi.mocked(prontuarioService.buscarPorAtendimento).mockResolvedValue([
+      {
+        id: 801,
+        voluntarioId: 10,
+        agendaId: 300,
+        atendimentoId: 1,
+        paciente: 'Maria Souza',
+        historicoMedico: 'Alérgica a Dipirona, Gestante',
+        tratamentoAtual: 'Abertura coronária do dente 26 e medicação intracanal.',
+        dataRegistro: '2026-10-18T10:00:00Z',
+      },
+    ]);
+
+    vi.mocked(prontuarioService.registrarEvolucao).mockResolvedValue({
+      id: 802,
+      voluntarioId: 10,
+      agendaId: 300,
+      atendimentoId: 1,
+      paciente: 'Maria Souza',
+      historicoMedico: 'Alérgica a Dipirona, Gestante',
+      tratamentoAtual: 'Obturação endodôntica do dente 26 e restauração provisória.',
+      dataRegistro: '2026-10-18T11:30:00Z',
+    });
+
+    render(
+      <MemoryRouter>
+        <DetalheAtendimento />
+      </MemoryRouter>
+    );
+
+    expect(await screen.findByText('Prontuário Clínico do Paciente')).toBeInTheDocument();
+    expect(screen.getAllByText('Alérgica a Dipirona').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Gestante').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Abertura coronária do dente 26 e medicação intracanal.').length).toBeGreaterThan(0);
+
+    // Tenta salvar evolução vazia -> deve disparar validação
+    await user.click(screen.getByRole('button', { name: 'Salvar Evolução no Prontuário' }));
+    expect(await screen.findByText('Descreva o procedimento ou evolução clínica realizada.')).toBeInTheDocument();
+    expect(prontuarioService.registrarEvolucao).not.toHaveBeenCalled();
+
+    // Preenche nova evolução e salva
+    const inputProcedimento = screen.getByPlaceholderText(
+      'Descreva a situação atual do prontuário, dentes avaliados/tratados e conduta...'
+    );
+    await user.type(inputProcedimento, 'Obturação endodôntica do dente 26 e restauração provisória.');
+    await user.click(screen.getByRole('button', { name: 'Salvar Evolução no Prontuário' }));
+
+    await waitFor(() => {
+      expect(prontuarioService.registrarEvolucao).toHaveBeenCalledWith({
+        voluntarioId: 10,
+        atendimentoId: 1,
+        agendaId: 300,
+        paciente: 'Maria Souza',
+        historicoMedico: '',
+        tratamentoAtual: 'Obturação endodôntica do dente 26 e restauração provisória.',
+      });
+    });
+
+    expect(
+      (await screen.findAllByText('Obturação endodôntica do dente 26 e restauração provisória.')).length
+    ).toBeGreaterThan(0);
+  });
 });
+

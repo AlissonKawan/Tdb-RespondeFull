@@ -3,7 +3,8 @@ import { apiClient } from './apiClient';
 export interface Prontuario {
   id?: number;
   voluntarioId: number;
-  agendaId: number;
+  agendaId?: number | null;
+  atendimentoId?: number | null;
   paciente: string;
   historicoMedico: string;
   tratamentoAtual: string;
@@ -16,8 +17,14 @@ export const prontuarioService = {
     return response;
   },
 
+  buscarPorAtendimento: async (atendimentoId: number): Promise<Prontuario[]> => {
+    const response = await apiClient.get<Prontuario[]>(`/prontuarios/atendimento/${atendimentoId}`);
+    return response;
+  },
+
   registrarEvolucao: async (prontuario: Prontuario): Promise<Prontuario> => {
     const response = await apiClient.post<Prontuario>('/prontuarios', prontuario);
     return response;
   }
 };
+

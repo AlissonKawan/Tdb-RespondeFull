@@ -6,11 +6,13 @@ import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import { ErrorState, LoadingState } from '../components/ui/FeedbackState';
-import { Field, Select } from '../components/ui/Input';
+import { Field, Input, Select, Textarea } from '../components/ui/Input';
 import PageHeader from '../components/ui/PageHeader';
 import { useAuth } from '../context/useAuth';
 import { useConfirm } from '../hooks/useConfirm';
 import { atendimentoService } from '../services/atendimentoService';
+import { agendaService, type AgendaConsulta } from '../services/agendaService';
+import { prontuarioService, type Prontuario } from '../services/prontuarioService';
 import { mensagensService } from '../services/mensagensService';
 import { openChatSocket } from '../services/chatSocket';
 import type { AtendimentoApi, Mensagem, MensagemRequest } from '../types/AtendimentoApi';
@@ -257,12 +259,55 @@ function DetalheAtendimento() {
   const [statusEdit, setStatusEdit] = useState('ABERTO');
   const [prioridadeEdit, setPrioridadeEdit] = useState('3');
 
+  // --- Estados de Agenda e Prontuário no Atendimento ---
+  const [agendasAtendimento, setAgendasAtendimento] = useState<AgendaConsulta[]>([]);
+  const [loadingAgenda, setLoadingAgenda] = useState(false);
+  const [modalAgendaAberto, setModalAgendaAberto] = useState(false);
+  const [editandoAgendaId, setEditandoAgendaId] = useState<number | null>(null);
+  const [agendaTipo, setAgendaTipo] = useState('Avaliação Inicial');
+  const [agendaData, setAgendaData] = useState(() => new Date().toISOString().split('T')[0]);
+  const [agendaHorario, setAgendaHorario] = useState('08:00');
+  const [agendaStatus, setAgendaStatus] = useState('AGUARDANDO');
+  const [erroFormAgenda, setErroFormAgenda] = useState('');
+  const [salvandoAgenda, setSalvandoAgenda] = useState(false);
+
+  const [prontuarios, setProntuarios] = useState<Prontuario[]>([]);
+  const [loadingProntuario, setLoadingProntuario] = useState(false);
+  const [historicoMedicoInput, setHistoricoMedicoInput] = useState('');
+  const [tratamentoAtualInput, setTratamentoAtualInput] = useState('');
+  const [erroFormProntuario, setErroFormProntuario] = useState('');
+  const [salvandoProntuario, setSalvandoProntuario] = useState(false);
+
   const podeAlterar = user?.tipoUsuario === 'VOLUNTARIO' || user?.tipoUsuario === 'ADMIN';
   const remetenteAtual = getSender(user?.tipoUsuario);
   const chatBloqueado = atendimento?.status === 'ENCERRADO' || atendimento?.status === 'CANCELADO';
 
   const voluntarioId = user?.voluntarioId;
   const voluntarioSemVinculo = user?.tipoUsuario === 'VOLUNTARIO' && !voluntarioId;
+
+  const carregarAgendaEProntuario = (idAtend: number) => {
+    if (!podeAlterar || !Number.isFinite(idAtend) || idAtend <= 0) return;
+
+    if (typeof agendaService?.buscarPorAtendimento === 'function') {
+      setLoadingAgenda(true);
+      agendaService.buscarPorAtendimento(idAtend)
+        .then(lista => {
+          if (Array.isArray(lista)) setAgendasAtendimento(lista);
+        })
+        .catch(() => {})
+        .finally(() => setLoadingAgenda(false));
+    }
+
+    if (typeof prontuarioService?.buscarPorAtendimento === 'function') {
+      setLoadingProntuario(true);
+      prontuarioService.buscarPorAtendimento(idAtend)
+        .then(lista => {
+          if (Array.isArray(lista)) setProntuarios(lista);
+        })
+        .catch(() => {})
+        .finally(() => setLoadingProntuario(false));
+    }
+  };
 
   const assumirEsteAtendimento = async () => {
     if (!voluntarioId) {
@@ -303,6 +348,8 @@ function DetalheAtendimento() {
       setMensagens(dadosMensagens);
       setStatusEdit(dadosAtendimento.status ?? 'ABERTO');
       setPrioridadeEdit(String(dadosAtendimento.prioridade ?? 3));
+
+      carregarAgendaEProntuario(atendimentoId);
 
       // Busca a previsao de checkin em background para não travar a tela
       atendimentoService.preverCheckinIA(atendimentoId).then(previsao => {
@@ -670,6 +717,122 @@ function DetalheAtendimento() {
     }
   };
 
+  const abrirModalNovaAgenda = () => {
+    setEditandoAgendaId(null);
+    setAgendaTipo('Avaliação Inicial');
+    setAgendaData(new Date().toISOString().split('T')[0]);
+    setAgendaHorario('08:00');
+    setAgendaStatus('AGUARDANDO');
+    setErroFormAgenda('');
+    setModalAgendaAberto(true);
+  };
+
+  const abrirModalEditarAgenda = (agenda: AgendaConsulta) => {
+    setEditandoAgendaId(agenda.id ?? null);
+    setAgendaTipo(agenda.tipo || 'Avaliação Inicial');
+    setAgendaData(agenda.dataConsulta || new Date().toISOString().split('T')[0]);
+    setAgendaHorario(agenda.horario || '08:00');
+    setAgendaStatus(agenda.status || 'AGUARDANDO');
+    setErroFormAgenda('');
+    setModalAgendaAberto(true);
+  };
+
+  const salvarAgendaDoAtendimento = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!atendimento || !podeAlterar) return;
+
+    if (!agendaTipo.trim()) {
+      setErroFormAgenda('Informe o tipo da consulta.');
+      return;
+    }
+    if (!agendaData.trim()) {
+      setErroFormAgenda('Informe a data da consulta.');
+      return;
+    }
+    if (!agendaHorario.trim() || !/^([01]\d|2[0-3]):[0-5]\d$/.test(agendaHorario.trim())) {
+      setErroFormAgenda('Informe um horário válido no formato HH:mm.');
+      return;
+    }
+
+    setSalvandoAgenda(true);
+    setErroFormAgenda('');
+    try {
+      const payload: AgendaConsulta = {
+        voluntarioId: user?.id ?? user?.voluntarioId ?? atendimento.voluntarioId ?? 1,
+        atendimentoId: atendimento.id,
+        paciente: pessoaAtendida,
+        tipo: agendaTipo.trim(),
+        dataConsulta: agendaData.trim(),
+        horario: agendaHorario.trim(),
+        status: agendaStatus,
+        tipoPessoa: atendimento.tipoPessoa || 'OUTRO',
+      };
+
+      if (editandoAgendaId) {
+        const atualizada = await agendaService.atualizar(editandoAgendaId, payload);
+        setAgendasAtendimento(prev => prev.map(a => a.id === editandoAgendaId ? atualizada : a));
+        setFeedback('Consulta da agenda atualizada com sucesso!');
+      } else {
+        const criada = await agendaService.criar(payload);
+        setAgendasAtendimento(prev => [...prev, criada]);
+        setFeedback('Consulta agendada e vinculada ao atendimento com sucesso!');
+      }
+      setModalAgendaAberto(false);
+    } catch (error) {
+      setErroFormAgenda(error instanceof Error && error.message ? error.message : 'Erro ao salvar consulta na agenda.');
+    } finally {
+      setSalvandoAgenda(false);
+    }
+  };
+
+  const salvarEvolucaoProntuario = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!atendimento || !podeAlterar) return;
+
+    if (!tratamentoAtualInput.trim()) {
+      setErroFormProntuario('Descreva o procedimento ou evolução clínica realizada.');
+      return;
+    }
+
+    setSalvandoProntuario(true);
+    setErroFormProntuario('');
+    try {
+      const agendaPrincipal = agendasAtendimento[agendasAtendimento.length - 1];
+      const novoProntuario: Prontuario = {
+        voluntarioId: user?.id ?? user?.voluntarioId ?? atendimento.voluntarioId ?? 1,
+        atendimentoId: atendimento.id,
+        agendaId: agendaPrincipal?.id ?? null,
+        paciente: pessoaAtendida,
+        historicoMedico: historicoMedicoInput.trim(),
+        tratamentoAtual: tratamentoAtualInput.trim(),
+      };
+      const criado = await prontuarioService.registrarEvolucao(novoProntuario);
+      setProntuarios(prev => [criado, ...prev]);
+      setHistoricoMedicoInput('');
+      setTratamentoAtualInput('');
+      setFeedback('Evolução registrada no prontuário com sucesso!');
+    } catch (error) {
+      setErroFormProntuario(error instanceof Error && error.message ? error.message : 'Erro ao registrar evolução no prontuário.');
+    } finally {
+      setSalvandoProntuario(false);
+    }
+  };
+
+  const alertasMedicosAtuais = useMemo(() => {
+    const tags = new Set<string>();
+    prontuarios.forEach(p => {
+      if (p.historicoMedico) {
+        p.historicoMedico.split(',').forEach(tag => {
+          const t = tag.trim();
+          if (t) tags.add(t);
+        });
+      }
+    });
+    return Array.from(tags);
+  }, [prontuarios]);
+
+  const ultimaEvolucao = prontuarios.length > 0 ? prontuarios[0] : null;
+
   return (
     <PageShell>
       <PageHeader
@@ -715,6 +878,131 @@ function DetalheAtendimento() {
                   <InfoItem label="Telefone da pessoa" value={atendimento.pessoaAtendidaTelefone} />
                 </div>
               </Card>
+
+              {podeAlterar && (
+                <Card className="p-6 border border-slate-200 shadow-sm">
+                  <div className="flex flex-col gap-2 border-b border-border pb-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h2 className="text-xl font-bold text-foreground">Prontuário Clínico do Paciente</h2>
+                        <Badge tone={prontuarios.length > 0 ? 'success' : 'neutral'}>
+                          {prontuarios.length > 0 ? `${prontuarios.length} registro(s)` : 'Sem registros'}
+                        </Badge>
+                      </div>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        Situação clínica atual e evoluções odontológicas vinculadas a este atendimento e agenda.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Situação Atual do Prontuário */}
+                  <div className="mt-5 grid gap-4 md:grid-cols-2">
+                    <div className="rounded-xl border border-red-100 bg-red-50/50 p-4">
+                      <p className="text-xs font-bold uppercase tracking-widest text-red-700">
+                        Alertas Médicos / Anamnese
+                      </p>
+                      {alertasMedicosAtuais.length > 0 ? (
+                        <div className="mt-2.5 flex flex-wrap gap-1.5">
+                          {alertasMedicosAtuais.map((alerta, idx) => (
+                            <Badge key={idx} tone="danger">{alerta}</Badge>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="mt-2 text-sm text-slate-600">Nenhum alerta médico ou alergia registrado até o momento.</p>
+                      )}
+                    </div>
+
+                    <div className="rounded-xl border border-blue-100 bg-blue-50/50 p-4">
+                      <p className="text-xs font-bold uppercase tracking-widest text-blue-700">
+                        Situação Atual / Último Tratamento
+                      </p>
+                      {ultimaEvolucao ? (
+                        <div className="mt-2">
+                          <p className="text-sm font-semibold text-slate-800 whitespace-pre-wrap">{ultimaEvolucao.tratamentoAtual}</p>
+                          <p className="mt-1 text-xs text-slate-500">
+                            Registrado em: {ultimaEvolucao.dataRegistro ? formatDate(ultimaEvolucao.dataRegistro) : 'Recente'}
+                          </p>
+                        </div>
+                      ) : (
+                        <p className="mt-2 text-sm text-slate-600">Nenhuma evolução clínica registrada para este paciente ainda.</p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Formulário para Registrar Nova Evolução Direto no Atendimento */}
+                  <form onSubmit={salvarEvolucaoProntuario} noValidate className="mt-6 rounded-xl border border-slate-200 bg-slate-50/70 p-4 space-y-4">
+                    <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700">
+                      Registrar Evolução no Prontuário
+                    </h3>
+                    <div className="grid gap-4">
+                      <Field label="Alertas Médicos / Anamnese" hint="Separe múltiplos alertas por vírgula (ex: Alérgico a Penicilina, Hipertenso)">
+                        <Input
+                          disabled={salvandoProntuario}
+                          value={historicoMedicoInput}
+                          onChange={(e) => setHistoricoMedicoInput(e.target.value)}
+                          placeholder="Ex: Alérgico a Dipirona, Diabético"
+                        />
+                      </Field>
+                      <Field label="Procedimento / Evolução Clínica Realizada" error={erroFormProntuario || undefined}>
+                        <Textarea
+                          disabled={salvandoProntuario}
+                          value={tratamentoAtualInput}
+                          onChange={(e) => {
+                            setTratamentoAtualInput(e.target.value);
+                            if (erroFormProntuario) setErroFormProntuario('');
+                          }}
+                          className="min-h-[88px]"
+                          placeholder="Descreva a situação atual do prontuário, dentes avaliados/tratados e conduta..."
+                        />
+                      </Field>
+                    </div>
+                    <div className="flex justify-end">
+                      <Button type="submit" disabled={salvandoProntuario}>
+                        {salvandoProntuario ? 'Salvando evolução...' : 'Salvar Evolução no Prontuário'}
+                      </Button>
+                    </div>
+                  </form>
+
+                  {/* Histórico de Evoluções */}
+                  <div className="mt-6">
+                    <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700 mb-3">
+                      Histórico Clínico do Caso
+                    </h3>
+                    {loadingProntuario && prontuarios.length === 0 ? (
+                      <p className="text-sm text-muted-foreground">Carregando prontuário...</p>
+                    ) : prontuarios.length === 0 ? (
+                      <div className="rounded-xl border border-dashed border-slate-300 bg-white px-4 py-6 text-center text-sm text-slate-500">
+                        Nenhum histórico clínico registrado neste atendimento.
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {prontuarios.map((item, idx) => (
+                          <div key={item.id ?? idx} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                            <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                              <span className="text-xs font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded">
+                                {item.dataRegistro ? formatDate(item.dataRegistro) : 'Agora'}
+                              </span>
+                              {item.agendaId ? (
+                                <span className="text-xs font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">
+                                  Consulta #{item.agendaId}
+                                </span>
+                              ) : null}
+                            </div>
+                            {item.historicoMedico && (
+                              <div className="mb-2 flex flex-wrap gap-1.5">
+                                {item.historicoMedico.split(',').map((tag, i) => tag.trim() ? (
+                                  <Badge key={i} tone="danger">{tag.trim()}</Badge>
+                                ) : null)}
+                              </div>
+                            )}
+                            <p className="text-sm text-slate-800 whitespace-pre-wrap">{item.tratamentoAtual}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </Card>
+              )}
 
               <Card className="overflow-hidden shadow-sm">
                 <div className="flex items-center justify-between gap-4 border-b border-border bg-surface px-5 py-4 sm:px-6">
@@ -893,6 +1181,61 @@ function DetalheAtendimento() {
               )}
 
               {podeAlterar && (
+                <Card className="p-6 border-l-4 border-l-primary">
+                  <div className="flex items-center justify-between gap-2">
+                    <h2 className="text-xl font-bold text-foreground">Agenda do Atendimento</h2>
+                    <Badge tone={agendasAtendimento.length > 0 ? 'success' : 'warning'}>
+                      {agendasAtendimento.length > 0 ? 'Vinculada' : 'Pendente'}
+                    </Badge>
+                  </div>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Todo atendimento deve possuir um agendamento de consulta vinculado.
+                  </p>
+
+                  {loadingAgenda && agendasAtendimento.length === 0 ? (
+                    <p className="mt-4 text-sm text-muted-foreground">Verificando agenda...</p>
+                  ) : agendasAtendimento.length === 0 ? (
+                    <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+                      <p className="font-semibold">Nenhuma consulta agendada para este atendimento.</p>
+                      <p className="mt-1 text-xs text-amber-800">
+                        Agende a consulta deste paciente para integrá-lo à sua agenda clínica.
+                      </p>
+                      <Button fullWidth className="mt-3" onClick={abrirModalNovaAgenda}>
+                        Agendar Consulta
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="mt-4 space-y-3">
+                      {agendasAtendimento.map((ag) => (
+                        <div key={ag.id} className="rounded-xl border border-slate-200 bg-slate-50 p-3.5 text-sm">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="font-bold text-slate-900">{ag.tipo}</span>
+                            <Badge tone={ag.status === 'CONCLUIDO' ? 'success' : ag.status === 'AGUARDANDO' ? 'warning' : 'info'}>
+                              {ag.status}
+                            </Badge>
+                          </div>
+                          <p className="mt-1.5 text-slate-700 font-medium">
+                            Data: <strong>{ag.dataConsulta}</strong> às <strong>{ag.horario}</strong>
+                          </p>
+                          <div className="mt-3 flex gap-2">
+                            <Button variant="secondary" onClick={() => abrirModalEditarAgenda(ag)}>
+                              Editar Horário
+                            </Button>
+                            <Button variant="ghost" onClick={() => navigate('/agenda')}>
+                              Ver na Agenda
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                      <Button variant="secondary" fullWidth onClick={abrirModalNovaAgenda}>
+                        Agendar Nova Consulta / Retorno
+                      </Button>
+                    </div>
+                  )}
+                </Card>
+              )}
+
+              {podeAlterar && (
                 <Card className="p-6">
                   <h2 className="text-xl font-bold text-foreground">Acoes do atendimento</h2>
                   <p className="mt-1 text-sm text-muted-foreground">Somente voluntários e administradores podem alterar estes campos.</p>
@@ -1049,9 +1392,85 @@ function DetalheAtendimento() {
           </div>
         )}
       </Section>
+
+      {modalAgendaAberto && atendimento && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
+          <Card className="w-full max-w-md p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-foreground">
+                {editandoAgendaId ? 'Editar Consulta do Atendimento' : 'Agendar Consulta para Atendimento'}
+              </h2>
+              <button
+                type="button"
+                onClick={() => !salvandoAgenda && setModalAgendaAberto(false)}
+                className="text-slate-400 hover:text-slate-600"
+                aria-label="Fechar modal"
+              >
+                ✕
+              </button>
+            </div>
+            <p className="mb-4 text-sm text-muted-foreground">
+              Paciente: <strong>{pessoaAtendida}</strong> · Atendimento <strong>#{atendimento.id}</strong>
+            </p>
+            <form onSubmit={salvarAgendaDoAtendimento} noValidate className="space-y-4">
+              <Field label="Tipo de Consulta">
+                <Input
+                  disabled={salvandoAgenda}
+                  value={agendaTipo}
+                  onChange={(e) => setAgendaTipo(e.target.value)}
+                  placeholder="Ex: Avaliação Inicial"
+                />
+              </Field>
+              <div className="grid grid-cols-2 gap-4">
+                <Field label="Data da Consulta">
+                  <Input
+                    type="date"
+                    disabled={salvandoAgenda}
+                    value={agendaData}
+                    onChange={(e) => setAgendaData(e.target.value)}
+                  />
+                </Field>
+                <Field label="Horário">
+                  <Input
+                    type="time"
+                    disabled={salvandoAgenda}
+                    value={agendaHorario}
+                    onChange={(e) => setAgendaHorario(e.target.value)}
+                  />
+                </Field>
+              </div>
+              <Field label="Status da Consulta">
+                <Select
+                  disabled={salvandoAgenda}
+                  value={agendaStatus}
+                  onChange={(e) => setAgendaStatus(e.target.value)}
+                >
+                  <option value="AGUARDANDO">Aguardando</option>
+                  <option value="CONFIRMADO">Confirmado</option>
+                  <option value="CONCLUIDO">Concluído (Atendido)</option>
+                  <option value="ENCERRADO">Encerrado / Desistência</option>
+                </Select>
+              </Field>
+              {erroFormAgenda && (
+                <p role="alert" className="text-sm font-medium text-danger">{erroFormAgenda}</p>
+              )}
+              <div className="mt-6 flex justify-end gap-3">
+                <Button type="button" variant="secondary" disabled={salvandoAgenda} onClick={() => setModalAgendaAberto(false)}>
+                  Cancelar
+                </Button>
+                <Button type="submit" disabled={salvandoAgenda}>
+                  {salvandoAgenda ? 'Salvando...' : 'Salvar Agendamento'}
+                </Button>
+              </div>
+            </form>
+          </Card>
+        </div>
+      )}
+
       {confirmDialog}
     </PageShell>
   );
 }
 
 export default DetalheAtendimento;
+

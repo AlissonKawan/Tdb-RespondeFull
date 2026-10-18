@@ -15,6 +15,8 @@ import { agendaService } from '../services/agendaService';
 import type { AgendaConsulta } from '../services/agendaService';
 import { prontuarioService } from '../services/prontuarioService';
 import type { Prontuario } from '../services/prontuarioService';
+import { atendimentoService } from '../services/atendimentoService';
+import type { AtendimentoApi } from '../types/AtendimentoApi';
 
 // Utils para Datas
 const getTodayStr = () => {
@@ -43,6 +45,7 @@ type AgendaFormData = Omit<AgendaConsulta, 'id' | 'voluntarioId'>;
 type ProntuarioFormData = Pick<Prontuario, 'historicoMedico' | 'tratamentoAtual'>;
 
 const agendaDefaultValues = (): AgendaFormData => ({
+  atendimentoId: null,
   paciente: '',
   tipo: 'Avaliação Inicial',
   dataConsulta: getTodayStr(),
@@ -58,6 +61,7 @@ export default function AgendaConsultas() {
   
   const [filtro, setFiltro] = useState<'Todos' | 'Hoje' | 'Amanhã'>('Todos');
   const [consultas, setConsultas] = useState<AgendaConsulta[]>([]);
+  const [atendimentosDisponiveis, setAtendimentosDisponiveis] = useState<AtendimentoApi[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [feedback, setFeedback] = useState<{ tone: 'success' | 'danger'; message: string } | null>(null);
   
@@ -77,6 +81,7 @@ export default function AgendaConsultas() {
     register,
     handleSubmit,
     reset,
+    setValue,
     setError,
     formState: { errors, isSubmitting },
   } = useForm<AgendaFormData>({ mode: 'onBlur', defaultValues: agendaDefaultValues() });
@@ -109,7 +114,15 @@ export default function AgendaConsultas() {
 
   useEffect(() => {
     carregarAgendas();
-  }, [user?.id]);
+    const volId = user?.voluntarioId ?? user?.id;
+    if (volId && typeof atendimentoService?.listarPorVoluntario === 'function') {
+      atendimentoService.listarPorVoluntario(volId)
+        .then(lista => {
+          if (Array.isArray(lista)) setAtendimentosDisponiveis(lista);
+        })
+        .catch(() => {});
+    }
+  }, [user?.id, user?.voluntarioId]);
 
   const consultasFiltradas = consultas.filter(c => {
     if (filtro === 'Todos') return true;
@@ -128,6 +141,7 @@ export default function AgendaConsultas() {
     if (!c.id) return;
     setEditingId(c.id);
     reset({
+      atendimentoId: c.atendimentoId ?? null,
       paciente: c.paciente,
       tipo: c.tipo,
       dataConsulta: c.dataConsulta,
@@ -136,6 +150,26 @@ export default function AgendaConsultas() {
       tipoPessoa: c.tipoPessoa || 'OUTRO'
     });
     setIsModalOpen(true);
+  };
+
+  const handleSelectAtendimentoRapido = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = event.target.value;
+    if (!val) {
+      setValue('atendimentoId', null, { shouldValidate: true });
+      return;
+    }
+    const idEscolhido = Number(val);
+    setValue('atendimentoId', idEscolhido, { shouldValidate: true });
+    const atend = atendimentosDisponiveis.find(a => a.id === idEscolhido);
+    if (atend) {
+      const nomePaciente = atend.pessoaAtendidaNome || atend.beneficiarioNome || atend.pacienteNome || '';
+      if (nomePaciente) {
+        setValue('paciente', nomePaciente, { shouldValidate: true });
+      }
+      if (atend.tipoPessoa) {
+        setValue('tipoPessoa', atend.tipoPessoa);
+      }
+    }
   };
 
   const handleDelete = (id: number) => {
@@ -162,8 +196,13 @@ export default function AgendaConsultas() {
 
     try {
       setIsSaving(true);
+      const parsedAtendimentoId =
+        formData.atendimentoId !== null && formData.atendimentoId !== undefined && Number(formData.atendimentoId) > 0
+          ? Number(formData.atendimentoId)
+          : null;
       const agendaPayload: AgendaConsulta = {
         ...formData,
+        atendimentoId: parsedAtendimentoId,
         voluntarioId: user.id
       };
 
@@ -178,7 +217,8 @@ export default function AgendaConsultas() {
       setFeedback({ tone: 'success', message: editingId ? 'Consulta atualizada com sucesso.' : 'Consulta criada com sucesso.' });
     } catch (error) {
       console.error(error);
-      setError('root.server', { message: 'Erro ao salvar agendamento. Tente novamente.' });
+      const msg = error instanceof Error && error.message ? error.message : 'Erro ao salvar agendamento. Tente novamente.';
+      setError('root.server', { message: msg });
     } finally {
       setIsSaving(false);
     }
@@ -209,6 +249,7 @@ export default function AgendaConsultas() {
       const novo: Prontuario = {
         voluntarioId: user.id,
         agendaId: selectedProntuarioAgenda.id,
+        atendimentoId: selectedProntuarioAgenda.atendimentoId ?? null,
         paciente: selectedProntuarioAgenda.paciente,
         historicoMedico: prontuarioForm.historicoMedico,
         tratamentoAtual: prontuarioForm.tratamentoAtual
@@ -218,7 +259,8 @@ export default function AgendaConsultas() {
       resetProntuario({ historicoMedico: '', tratamentoAtual: '' });
     } catch (e) {
       console.error(e);
-      setProntuarioError('root.server', { message: 'Erro ao salvar evolução. Tente novamente.' });
+      const msg = e instanceof Error && e.message ? e.message : 'Erro ao salvar evolução. Tente novamente.';
+      setProntuarioError('root.server', { message: msg });
     } finally {
       setIsProntuarioLoading(false);
     }
@@ -314,8 +356,25 @@ export default function AgendaConsultas() {
                 
                 <h3 className="text-xl font-bold text-foreground">{consulta.paciente}</h3>
                 <p className="text-sm text-muted-foreground mt-1">{consulta.tipo}</p>
+
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  {consulta.atendimentoId ? (
+                    <button
+                      type="button"
+                      onClick={() => navigate(`/atendimento/${consulta.atendimentoId}`)}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50/80 px-2.5 py-1 text-xs font-bold text-blue-700 hover:bg-blue-100 transition-colors"
+                    >
+                      <span>Atendimento #{consulta.atendimentoId}</span>
+                      <span aria-hidden="true">↗</span>
+                    </button>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800">
+                      Sem atendimento vinculado
+                    </span>
+                  )}
+                </div>
                 
-                <div className="mt-6 flex items-center gap-2 text-primary font-semibold bg-blue-50 px-3 py-2 rounded-lg w-max">
+                <div className="mt-4 flex items-center gap-2 text-primary font-semibold bg-blue-50 px-3 py-2 rounded-lg w-max">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
@@ -336,7 +395,12 @@ export default function AgendaConsultas() {
                     </Button>
                   </div>
                 ) : (
-                  <div className="mt-6 pt-4 border-t border-slate-100 flex justify-end">
+                  <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between gap-2">
+                    {consulta.atendimentoId ? (
+                      <Button variant="secondary" onClick={() => navigate(`/atendimento/${consulta.atendimentoId}`)}>
+                        Ir para Atendimento
+                      </Button>
+                    ) : <span />}
                     <Button variant="ghost" onClick={() => handleOpenProntuario(consulta)}>
                       Ver Prontuário
                     </Button>
@@ -351,7 +415,7 @@ export default function AgendaConsultas() {
       {/* Modal de Criar/Editar */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
-          <Card className="w-full max-w-md p-6 animate-in fade-in zoom-in duration-200">
+          <Card className="w-full max-w-md p-6 animate-in fade-in zoom-in duration-200 max-h-[92vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold text-foreground">{editingId ? 'Editar Consulta' : 'Nova Consulta'}</h2>
               <button onClick={() => !isSaving && setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600">
@@ -361,6 +425,37 @@ export default function AgendaConsultas() {
             
             <form onSubmit={handleSubmit(handleSave)} noValidate>
               <div className="space-y-4">
+              {atendimentosDisponiveis.length > 0 && (
+                <Field label="Selecionar dos Meus Atendimentos">
+                  <Select disabled={isSubmitting} defaultValue="" onChange={handleSelectAtendimentoRapido}>
+                    <option value="">Selecionar caso para preencher automaticamente...</option>
+                    {atendimentosDisponiveis.map((atend) => {
+                      const nome = atend.pessoaAtendidaNome || atend.beneficiarioNome || atend.pacienteNome || `Caso #${atend.id}`;
+                      return (
+                        <option key={atend.id} value={atend.id}>
+                          #{atend.id} - {nome} ({atend.status || 'ABERTO'})
+                        </option>
+                      );
+                    })}
+                  </Select>
+                </Field>
+              )}
+              <Field label="Atendimento Vinculado (ID)" error={errors.atendimentoId?.message} hint="Vincule o número do atendimento correspondente a esta consulta.">
+                <Input
+                  disabled={isSubmitting}
+                  type="number"
+                  min={1}
+                  placeholder="Ex: 1001"
+                  {...register('atendimentoId', {
+                    setValueAs: (v) => (v === '' || v === null || v === undefined ? null : Number(v)),
+                    validate: (v) =>
+                      v === null ||
+                      v === undefined ||
+                      (Number.isInteger(v) && v > 0) ||
+                      'Informe um ID de atendimento válido maior que zero.',
+                  })}
+                />
+              </Field>
               <Field label="Nome do Paciente" error={errors.paciente?.message}>
                 <Input autoFocus disabled={isSubmitting} {...register('paciente', { required: 'Informe o nome do paciente.' })} placeholder="Ex: Maria Silva" />
               </Field>
@@ -408,7 +503,14 @@ export default function AgendaConsultas() {
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M12 18v-6"/><path d="M9 15h6"/></svg>
                     Prontuário Clínico
                   </h2>
-                  <p className="mt-1 text-slate-300">Paciente: <strong className="text-white">{selectedProntuarioAgenda.paciente}</strong></p>
+                  <p className="mt-1 text-slate-300">
+                    Paciente: <strong className="text-white">{selectedProntuarioAgenda.paciente}</strong>
+                    {selectedProntuarioAgenda.atendimentoId ? (
+                      <span className="ml-2 inline-flex items-center rounded bg-blue-500/20 px-2 py-0.5 text-xs font-semibold text-blue-200">
+                        Atendimento #{selectedProntuarioAgenda.atendimentoId}
+                      </span>
+                    ) : null}
+                  </p>
                 </div>
                 <button onClick={() => setSelectedProntuarioAgenda(null)} className="text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 p-2 rounded-full transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>

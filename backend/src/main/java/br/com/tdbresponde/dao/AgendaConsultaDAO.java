@@ -18,25 +18,33 @@ public class AgendaConsultaDAO {
     DataSource dataSource;
 
     public AgendaConsulta inserir(AgendaConsulta agenda) {
+        if (agenda == null) {
+            throw new DatabaseException("Não é possível inserir uma agenda nula.", new IllegalArgumentException("Agenda nula"));
+        }
         String sql = "INSERT INTO AGENDA_CONSULTA " +
-                "(VOLUNTARIO_ID, PACIENTE, TIPO, DATA_CONSULTA, HORARIO, STATUS, TIPO_PESSOA) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?)";
+                "(VOLUNTARIO_ID, ATENDIMENTO_ID, PACIENTE, TIPO, DATA_CONSULTA, HORARIO, STATUS, TIPO_PESSOA) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, new String[]{"ID"})) {
 
             stmt.setInt(1, agenda.getVoluntarioId());
-            stmt.setString(2, agenda.getPaciente());
-            stmt.setString(3, agenda.getTipo());
-            stmt.setObject(4, agenda.getDataConsulta());
-            stmt.setString(5, agenda.getHorario());
-            stmt.setString(6, agenda.getStatus());
-            stmt.setString(7, agenda.getTipoPessoa());
+            if (agenda.getAtendimentoId() != null && agenda.getAtendimentoId() > 0) {
+                stmt.setInt(2, agenda.getAtendimentoId());
+            } else {
+                stmt.setNull(2, Types.INTEGER);
+            }
+            stmt.setString(3, agenda.getPaciente());
+            stmt.setString(4, agenda.getTipo());
+            stmt.setObject(5, agenda.getDataConsulta());
+            stmt.setString(6, agenda.getHorario());
+            stmt.setString(7, agenda.getStatus());
+            stmt.setString(8, agenda.getTipoPessoa());
 
             stmt.executeUpdate();
 
             try (ResultSet rs = stmt.getGeneratedKeys()) {
-                if (rs.next()) {
+                if (rs != null && rs.next()) {
                     agenda.setId(rs.getInt(1));
                 }
             }
@@ -57,16 +65,7 @@ public class AgendaConsultaDAO {
             stmt.setInt(1, voluntarioId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    AgendaConsulta a = new AgendaConsulta();
-                    a.setId(rs.getInt("ID"));
-                    a.setVoluntarioId(rs.getInt("VOLUNTARIO_ID"));
-                    a.setPaciente(rs.getString("PACIENTE"));
-                    a.setTipo(rs.getString("TIPO"));
-                    a.setDataConsulta(rs.getObject("DATA_CONSULTA", LocalDate.class));
-                    a.setHorario(rs.getString("HORARIO"));
-                    a.setStatus(rs.getString("STATUS"));
-                    a.setTipoPessoa(rs.getString("TIPO_PESSOA"));
-                    lista.add(a);
+                    lista.add(mapearResultSet(rs));
                 }
             }
 
@@ -76,19 +75,66 @@ public class AgendaConsultaDAO {
         return lista;
     }
 
-    public AgendaConsulta atualizar(AgendaConsulta agenda) {
-        String sql = "UPDATE AGENDA_CONSULTA SET PACIENTE = ?, TIPO = ?, DATA_CONSULTA = ?, HORARIO = ?, STATUS = ?, TIPO_PESSOA = ? WHERE ID = ?";
+    public List<AgendaConsulta> buscarPorAtendimento(int atendimentoId) {
+        String sql = "SELECT * FROM AGENDA_CONSULTA WHERE ATENDIMENTO_ID = ? ORDER BY DATA_CONSULTA ASC, HORARIO ASC";
+        List<AgendaConsulta> lista = new ArrayList<>();
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, agenda.getPaciente());
-            stmt.setString(2, agenda.getTipo());
-            stmt.setObject(3, agenda.getDataConsulta());
-            stmt.setString(4, agenda.getHorario());
-            stmt.setString(5, agenda.getStatus());
-            stmt.setString(6, agenda.getTipoPessoa());
-            stmt.setInt(7, agenda.getId());
+            stmt.setInt(1, atendimentoId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(mapearResultSet(rs));
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new DatabaseException("Erro ao buscar agendas do atendimento: " + e.getMessage(), e);
+        }
+        return lista;
+    }
+
+    public AgendaConsulta buscarPorId(int id) {
+        String sql = "SELECT * FROM AGENDA_CONSULTA WHERE ID = ?";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapearResultSet(rs);
+                }
+            }
+            return null;
+
+        } catch (SQLException e) {
+            throw new DatabaseException("Erro ao buscar agenda por ID: " + e.getMessage(), e);
+        }
+    }
+
+    public AgendaConsulta atualizar(AgendaConsulta agenda) {
+        if (agenda == null) {
+            throw new DatabaseException("Não é possível atualizar uma agenda nula.", new IllegalArgumentException("Agenda nula"));
+        }
+        String sql = "UPDATE AGENDA_CONSULTA SET ATENDIMENTO_ID = ?, PACIENTE = ?, TIPO = ?, DATA_CONSULTA = ?, HORARIO = ?, STATUS = ?, TIPO_PESSOA = ? WHERE ID = ?";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            if (agenda.getAtendimentoId() != null && agenda.getAtendimentoId() > 0) {
+                stmt.setInt(1, agenda.getAtendimentoId());
+            } else {
+                stmt.setNull(1, Types.INTEGER);
+            }
+            stmt.setString(2, agenda.getPaciente());
+            stmt.setString(3, agenda.getTipo());
+            stmt.setObject(4, agenda.getDataConsulta());
+            stmt.setString(5, agenda.getHorario());
+            stmt.setString(6, agenda.getStatus());
+            stmt.setString(7, agenda.getTipoPessoa());
+            stmt.setInt(8, agenda.getId());
 
             stmt.executeUpdate();
             return agenda;
@@ -98,17 +144,35 @@ public class AgendaConsultaDAO {
         }
     }
 
-    public void excluir(int id) {
+    public boolean excluir(int id) {
         String sql = "DELETE FROM AGENDA_CONSULTA WHERE ID = ?";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
-            stmt.executeUpdate();
+            return stmt.executeUpdate() > 0;
 
         } catch (SQLException e) {
             throw new DatabaseException("Erro ao excluir agenda: " + e.getMessage(), e);
         }
     }
+
+    private AgendaConsulta mapearResultSet(ResultSet rs) throws SQLException {
+        AgendaConsulta a = new AgendaConsulta();
+        a.setId(rs.getInt("ID"));
+        a.setVoluntarioId(rs.getInt("VOLUNTARIO_ID"));
+        int atendimentoId = rs.getInt("ATENDIMENTO_ID");
+        if (!rs.wasNull() && atendimentoId > 0) {
+            a.setAtendimentoId(atendimentoId);
+        }
+        a.setPaciente(rs.getString("PACIENTE"));
+        a.setTipo(rs.getString("TIPO"));
+        a.setDataConsulta(rs.getObject("DATA_CONSULTA", LocalDate.class));
+        a.setHorario(rs.getString("HORARIO"));
+        a.setStatus(rs.getString("STATUS"));
+        a.setTipoPessoa(rs.getString("TIPO_PESSOA"));
+        return a;
+    }
 }
+

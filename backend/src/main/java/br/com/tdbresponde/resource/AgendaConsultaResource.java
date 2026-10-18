@@ -30,6 +30,7 @@ public class AgendaConsultaResource {
             String createTable = "CREATE TABLE AGENDA_CONSULTA (" +
                 "ID NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
                 "VOLUNTARIO_ID NUMBER NOT NULL, " +
+                "ATENDIMENTO_ID NUMBER, " +
                 "PACIENTE VARCHAR2(255) NOT NULL, " +
                 "TIPO VARCHAR2(100) NOT NULL, " +
                 "DATA_CONSULTA DATE NOT NULL, " +
@@ -42,6 +43,14 @@ public class AgendaConsultaResource {
         } catch (Exception e) {
             result.append("Erro ao criar tabela: ").append(e.getMessage()).append("\n");
         }
+
+        try (Connection conn = dataSource.getConnection(); Statement stmt = conn.createStatement()) {
+            stmt.execute("ALTER TABLE AGENDA_CONSULTA ADD ATENDIMENTO_ID NUMBER");
+        } catch (Exception e) {}
+
+        try (Connection conn = dataSource.getConnection(); Statement stmt = conn.createStatement()) {
+            stmt.execute("ALTER TABLE AGENDA_CONSULTA ADD CONSTRAINT FK_AGENDA_ATENDIMENTO FOREIGN KEY (ATENDIMENTO_ID) REFERENCES ATENDIMENTO(ID) ON DELETE SET NULL");
+        } catch (Exception e) {}
 
         try (Connection conn = dataSource.getConnection(); Statement stmt = conn.createStatement()) {
             stmt.execute("CREATE INDEX IDX_AGENDA_VOL ON AGENDA_CONSULTA(VOLUNTARIO_ID)");
@@ -57,12 +66,17 @@ public class AgendaConsultaResource {
             result.append("Erro ao criar índice DATA_CONSULTA: ").append(e.getMessage()).append("\n");
         }
 
+        try (Connection conn = dataSource.getConnection(); Statement stmt = conn.createStatement()) {
+            stmt.execute("CREATE INDEX IDX_AGENDA_ATEND ON AGENDA_CONSULTA(ATENDIMENTO_ID)");
+        } catch (Exception e) {}
+
         // --- PRONTUARIO ---
         try (Connection conn = dataSource.getConnection(); Statement stmt = conn.createStatement()) {
             String createTable = "CREATE TABLE PRONTUARIO (" +
                 "ID NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, " +
                 "VOLUNTARIO_ID NUMBER NOT NULL, " +
-                "AGENDA_ID NUMBER NOT NULL, " +
+                "AGENDA_ID NUMBER, " +
+                "ATENDIMENTO_ID NUMBER, " +
                 "PACIENTE VARCHAR2(255) NOT NULL, " +
                 "HISTORICO_MEDICO VARCHAR2(1000), " +
                 "TRATAMENTO_ATUAL VARCHAR2(2000), " +
@@ -75,11 +89,27 @@ public class AgendaConsultaResource {
         }
 
         try (Connection conn = dataSource.getConnection(); Statement stmt = conn.createStatement()) {
+            stmt.execute("ALTER TABLE PRONTUARIO ADD ATENDIMENTO_ID NUMBER");
+        } catch (Exception e) {}
+
+        try (Connection conn = dataSource.getConnection(); Statement stmt = conn.createStatement()) {
+            stmt.execute("ALTER TABLE PRONTUARIO MODIFY AGENDA_ID NUMBER NULL");
+        } catch (Exception e) {}
+
+        try (Connection conn = dataSource.getConnection(); Statement stmt = conn.createStatement()) {
+            stmt.execute("ALTER TABLE PRONTUARIO ADD CONSTRAINT FK_PRONTUARIO_ATENDIMENTO FOREIGN KEY (ATENDIMENTO_ID) REFERENCES ATENDIMENTO(ID) ON DELETE SET NULL");
+        } catch (Exception e) {}
+
+        try (Connection conn = dataSource.getConnection(); Statement stmt = conn.createStatement()) {
             stmt.execute("CREATE INDEX IDX_PRONTUARIO_VOL ON PRONTUARIO(VOLUNTARIO_ID)");
         } catch (Exception e) {}
 
         try (Connection conn = dataSource.getConnection(); Statement stmt = conn.createStatement()) {
             stmt.execute("CREATE INDEX IDX_PRONTUARIO_AGE ON PRONTUARIO(AGENDA_ID)");
+        } catch (Exception e) {}
+
+        try (Connection conn = dataSource.getConnection(); Statement stmt = conn.createStatement()) {
+            stmt.execute("CREATE INDEX IDX_PRONTUARIO_ATEND ON PRONTUARIO(ATENDIMENTO_ID)");
         } catch (Exception e) {}
         
         return Response.ok(result.toString()).build();
@@ -90,6 +120,20 @@ public class AgendaConsultaResource {
     public Response buscarPorVoluntario(@PathParam("voluntarioId") int voluntarioId) {
         List<AgendaConsulta> agendas = agendaBO.buscarPorVoluntario(voluntarioId);
         return Response.ok(agendas).build();
+    }
+
+    @GET
+    @Path("/atendimento/{atendimentoId}")
+    public Response buscarPorAtendimento(@PathParam("atendimentoId") int atendimentoId) {
+        List<AgendaConsulta> agendas = agendaBO.buscarPorAtendimento(atendimentoId);
+        return Response.ok(agendas).build();
+    }
+
+    @GET
+    @Path("/{id}")
+    public Response buscarPorId(@PathParam("id") int id) {
+        AgendaConsulta agenda = agendaBO.buscarPorId(id);
+        return Response.ok(agenda).build();
     }
 
     @POST
@@ -112,3 +156,4 @@ public class AgendaConsultaResource {
         return Response.noContent().build();
     }
 }
+

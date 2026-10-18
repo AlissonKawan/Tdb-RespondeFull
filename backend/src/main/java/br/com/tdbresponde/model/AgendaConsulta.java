@@ -5,6 +5,7 @@ import java.time.LocalDate;
 public class AgendaConsulta {
     private int id;
     private int voluntarioId;
+    private Integer atendimentoId;
     private String paciente;
     private String tipo;
     private LocalDate dataConsulta;
@@ -19,6 +20,9 @@ public class AgendaConsulta {
 
     public int getVoluntarioId() { return voluntarioId; }
     public void setVoluntarioId(int voluntarioId) { this.voluntarioId = voluntarioId; }
+
+    public Integer getAtendimentoId() { return atendimentoId; }
+    public void setAtendimentoId(Integer atendimentoId) { this.atendimentoId = atendimentoId; }
 
     public String getPaciente() { return paciente; }
     public void setPaciente(String paciente) { this.paciente = paciente; }
@@ -38,3 +42,4 @@ public class AgendaConsulta {
     public String getTipoPessoa() { return tipoPessoa; }
     public void setTipoPessoa(String tipoPessoa) { this.tipoPessoa = tipoPessoa; }
 }
+
