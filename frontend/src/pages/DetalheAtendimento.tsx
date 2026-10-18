@@ -1,13 +1,15 @@
-import { useEffect, useMemo, useState, useRef, type ChangeEvent, type FormEvent, type KeyboardEvent, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, useRef, type ChangeEvent, type FormEvent, type KeyboardEvent } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import Section from '../components/layout/Section';
 import PageShell from '../components/layout/PageShell';
 import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import { ErrorState, LoadingState } from '../components/ui/FeedbackState';
 import { Field, Input, Select, Textarea } from '../components/ui/Input';
-import PageHeader from '../components/ui/PageHeader';
+import { Dialog } from '../components/ui/ConfirmDialog';
+import AtendimentoIcon from '../components/atendimento/AtendimentoIcon';
+import AtendimentoPanel, { PainelSecao } from '../components/atendimento/AtendimentoPanel';
+import './DetalheAtendimento.css';
 import { useAuth } from '../context/useAuth';
 import { useConfirm } from '../hooks/useConfirm';
 import { atendimentoService } from '../services/atendimentoService';
@@ -20,9 +22,9 @@ import type { AtendimentoApi, Mensagem, MensagemRequest } from '../types/Atendim
 const STATUS_OPTIONS = ['ABERTO', 'EM_ATENDIMENTO', 'ENCERRADO', 'CANCELADO'] as const;
 
 function statusTone(status?: string) {
-  if (status === 'ENCERRADO') return 'success';
+  if (status === 'ENCERRADO') return 'neutral';
   if (status === 'CANCELADO') return 'danger';
-  if (status === 'EM_ATENDIMENTO') return 'warning';
+  if (status === 'EM_ATENDIMENTO') return 'success';
   return 'info';
 }
 
@@ -54,7 +56,7 @@ function labelPrioridade(prioridade?: string | number) {
   const labels: Record<string, string> = {
     '1': '1 - Urgente',
     '2': '2 - Alta',
-    '3': '3 - Media',
+    '3': '3 - Média',
     '4': '4 - Baixa',
     '5': '5 - Acompanhamento',
   };
@@ -78,9 +80,9 @@ function labelRemetente(remetente?: string) {
 
 function InfoItem({ label, value }: { label: string; value?: string | number | null }) {
   return (
-    <div>
-      <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{label}</p>
-      <p className="mt-1 break-words text-sm font-semibold text-foreground">{value || 'Não informado'}</p>
+    <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,3fr)] gap-3 border-b border-border/60 py-1 last:border-0">
+      <dt className="text-xs leading-5 text-muted-foreground">{label}</dt>
+      <dd className="break-words text-xs font-medium leading-5 text-foreground">{value || 'Não informado'}</dd>
     </div>
   );
 }
@@ -105,60 +107,6 @@ function labelStatusCheckin(status?: string) {
     AGUARDANDO_RESPOSTA: 'Aguardando resposta',
   };
   return status ? labels[status] ?? status : 'Não enviado';
-}
-
-function iaPrevisaoConfig(previsao?: string) {
-  if (!previsao) return null;
-  const iconClass = 'h-5 w-5';
-  const map: Record<string, { cor: string; bg: string; border: string; iconBg: string; icone: ReactNode }> = {
-    CONFIRMADO: {
-      cor: 'text-emerald-800', bg: 'bg-emerald-50', border: 'border-emerald-200', iconBg: 'bg-emerald-100',
-      icone: (
-        <svg viewBox="0 0 24 24" fill="none" className={iconClass} stroke="currentColor" strokeWidth="2" aria-hidden="true">
-          <circle cx="12" cy="12" r="9" />
-          <path d="m8 12 2.5 2.5L16 9" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      ),
-    },
-    NAO_COMPARECERA: {
-      cor: 'text-red-800', bg: 'bg-red-50', border: 'border-red-200', iconBg: 'bg-red-100',
-      icone: (
-        <svg viewBox="0 0 24 24" fill="none" className={iconClass} stroke="currentColor" strokeWidth="2" aria-hidden="true">
-          <circle cx="12" cy="12" r="9" />
-          <path d="m9 9 6 6m0-6-6 6" strokeLinecap="round" />
-        </svg>
-      ),
-    },
-    REAGENDAMENTO_SOLICITADO: {
-      cor: 'text-amber-800', bg: 'bg-amber-50', border: 'border-amber-200', iconBg: 'bg-amber-100',
-      icone: (
-        <svg viewBox="0 0 24 24" fill="none" className={iconClass} stroke="currentColor" strokeWidth="2" aria-hidden="true">
-          <rect x="4" y="5.5" width="16" height="14" rx="2" />
-          <path d="M8 3.5v4m8-4v4M4 10h16m-5 3-3 3-2-2" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      ),
-    },
-    SEM_RESPOSTA: {
-      cor: 'text-slate-700', bg: 'bg-slate-50', border: 'border-slate-200', iconBg: 'bg-slate-200',
-      icone: (
-        <svg viewBox="0 0 24 24" fill="none" className={iconClass} stroke="currentColor" strokeWidth="2" aria-hidden="true">
-          <circle cx="12" cy="12" r="9" />
-          <circle cx="8" cy="12" r="1" fill="currentColor" stroke="none" />
-          <circle cx="12" cy="12" r="1" fill="currentColor" stroke="none" />
-          <circle cx="16" cy="12" r="1" fill="currentColor" stroke="none" />
-        </svg>
-      ),
-    },
-    AGUARDANDO_RESPOSTA: {
-      cor: 'text-blue-800', bg: 'bg-blue-50', border: 'border-blue-200', iconBg: 'bg-blue-100',
-      icone: (
-        <svg viewBox="0 0 24 24" fill="none" className={iconClass} stroke="currentColor" strokeWidth="2" aria-hidden="true">
-          <path d="M8 3h8M8 21h8M9 3v3.2c0 1.3.6 2.5 1.6 3.2L12 10.5l1.4-1.1c1-.8 1.6-2 1.6-3.2V3m0 18v-3.2c0-1.3-.6-2.5-1.6-3.2L12 13.5l-1.4 1.1c-1 .8-1.6 2-1.6 3.2V21" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      ),
-    },
-  };
-  return map[previsao] ?? map.SEM_RESPOSTA;
 }
 
 function MidiaMensagem({ mensagem }: { mensagem: Mensagem }) {
@@ -210,14 +158,19 @@ function MidiaMensagem({ mensagem }: { mensagem: Mensagem }) {
 function DetalheAtendimento() {
   const { id } = useParams();
   const atendimentoId = Number(id);
-  const { user, isBeneficiario } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const { confirm, confirmDialog } = useConfirm();
 
   const [atendimento, setAtendimento] = useState<AtendimentoApi | null>(null);
   const [mensagens, setMensagens] = useState<Mensagem[]>([]);
   const [loading, setLoading] = useState(true);
-  
+  const [painelAberto, setPainelAberto] = useState(() => window.matchMedia('(min-width: 1280px)').matches);
+  const painelButtonRef = useRef<HTMLButtonElement>(null);
+  const [modalProntuario, setModalProntuario] = useState<'historico' | 'evolucao' | null>(null);
+  const [erroAgenda, setErroAgenda] = useState('');
+  const [erroProntuario, setErroProntuario] = useState('');
+
   const [assumindo, setAssumindo] = useState(false);
 
   // Ref síncrona para rastrear IDs de mensagens já exibidas.
@@ -233,10 +186,10 @@ function DetalheAtendimento() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
-  
+
   useEffect(() => {
     if (typeof messagesEndRef.current?.scrollIntoView === 'function') {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      messagesEndRef.current.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'nearest' });
     }
   }, [mensagens]);
 
@@ -253,7 +206,7 @@ function DetalheAtendimento() {
   const [gravando, setGravando] = useState(false);
   const [enviandoMidia, setEnviandoMidia] = useState(false);
   const isSubmittingRef = useRef(false);
-  
+
   const [salvando, setSalvando] = useState(false);
   const [salvandoCheckin, setSalvandoCheckin] = useState(false);
   const [statusEdit, setStatusEdit] = useState('ABERTO');
@@ -261,6 +214,7 @@ function DetalheAtendimento() {
 
   // --- Estados de Agenda e Prontuário no Atendimento ---
   const [agendasAtendimento, setAgendasAtendimento] = useState<AgendaConsulta[]>([]);
+  const [referenciaAgenda, setReferenciaAgenda] = useState(() => Date.now());
   const [loadingAgenda, setLoadingAgenda] = useState(false);
   const [modalAgendaAberto, setModalAgendaAberto] = useState(false);
   const [editandoAgendaId, setEditandoAgendaId] = useState<number | null>(null);
@@ -290,21 +244,26 @@ function DetalheAtendimento() {
 
     if (typeof agendaService?.buscarPorAtendimento === 'function') {
       setLoadingAgenda(true);
+      setErroAgenda('');
       agendaService.buscarPorAtendimento(idAtend)
         .then(lista => {
-          if (Array.isArray(lista)) setAgendasAtendimento(lista);
+          if (Array.isArray(lista)) {
+            setAgendasAtendimento(lista);
+            setReferenciaAgenda(Date.now());
+          }
         })
-        .catch(() => {})
+        .catch(() => setErroAgenda('Não foi possível carregar a agenda. Tente novamente.'))
         .finally(() => setLoadingAgenda(false));
     }
 
     if (typeof prontuarioService?.buscarPorAtendimento === 'function') {
       setLoadingProntuario(true);
+      setErroProntuario('');
       prontuarioService.buscarPorAtendimento(idAtend)
         .then(lista => {
           if (Array.isArray(lista)) setProntuarios(lista);
         })
-        .catch(() => {})
+        .catch(() => setErroProntuario('Não foi possível carregar o prontuário. Tente novamente.'))
         .finally(() => setLoadingProntuario(false));
     }
   };
@@ -351,10 +310,6 @@ function DetalheAtendimento() {
 
       carregarAgendaEProntuario(atendimentoId);
 
-      // Busca a previsao de checkin em background para não travar a tela
-      atendimentoService.preverCheckinIA(atendimentoId).then(previsao => {
-        setAtendimento(prev => prev ? { ...prev, ...previsao } : prev);
-      }).catch(() => {});
     } catch (error) {
       let msgErro = 'Não foi possível carregar os detalhes deste atendimento. Tente novamente mais tarde.';
       if (error instanceof Error) {
@@ -433,7 +388,7 @@ function DetalheAtendimento() {
                   setMensagens(msgs);
                 }
               })
-              .catch(() => {});
+              .catch(() => { });
             connect();
           }, delay);
         }
@@ -452,15 +407,15 @@ function DetalheAtendimento() {
 
   const pessoaAtendida = useMemo(() => (
     atendimento?.pessoaAtendidaNome
-      ?? atendimento?.beneficiarioNome
-      ?? atendimento?.pacienteNome
-      ?? (atendimento?.pessoaAtendidaId ? `Pessoa #${atendimento.pessoaAtendidaId}` : 'Não informada')
+    ?? atendimento?.beneficiarioNome
+    ?? atendimento?.pacienteNome
+    ?? (atendimento?.pessoaAtendidaId ? `Pessoa #${atendimento.pessoaAtendidaId}` : 'Não informada')
   ), [atendimento]);
 
   const semAlteracoes = Boolean(
     atendimento
-      && statusEdit === (atendimento.status ?? 'ABERTO')
-      && prioridadeEdit === String(atendimento.prioridade ?? 3),
+    && statusEdit === (atendimento.status ?? 'ABERTO')
+    && prioridadeEdit === String(atendimento.prioridade ?? 3),
   );
 
   const confirmarAssumirAtendimento = () => {
@@ -703,7 +658,7 @@ function DetalheAtendimento() {
     try {
       const atualizado = await atendimentoService.atualizarCheckin(atendimento.id, status);
       setAtendimento((prev) => prev ? { ...prev, statusCheckin: atualizado.statusCheckin, horarioEnvioCheckin: atualizado.horarioEnvioCheckin } : prev);
-      
+
       if (abrirWhats && atualizado.pessoaAtendidaTelefone) {
         const telefone = normalizarTelefone(atualizado.pessoaAtendidaTelefone);
         const nome = atualizado.pessoaAtendidaNome || 'paciente';
@@ -778,6 +733,7 @@ function DetalheAtendimento() {
         setFeedback('Consulta agendada e vinculada ao atendimento com sucesso!');
       }
       setModalAgendaAberto(false);
+      setReferenciaAgenda(Date.now());
     } catch (error) {
       setErroFormAgenda(error instanceof Error && error.message ? error.message : 'Erro ao salvar consulta na agenda.');
     } finally {
@@ -811,6 +767,7 @@ function DetalheAtendimento() {
       setHistoricoMedicoInput('');
       setTratamentoAtualInput('');
       setFeedback('Evolução registrada no prontuário com sucesso!');
+      setModalProntuario(null);
     } catch (error) {
       setErroFormProntuario(error instanceof Error && error.message ? error.message : 'Erro ao registrar evolução no prontuário.');
     } finally {
@@ -818,231 +775,155 @@ function DetalheAtendimento() {
     }
   };
 
-  const alertasMedicosAtuais = useMemo(() => {
-    const tags = new Set<string>();
-    prontuarios.forEach(p => {
-      if (p.historicoMedico) {
-        p.historicoMedico.split(',').forEach(tag => {
-          const t = tag.trim();
-          if (t) tags.add(t);
-        });
-      }
+  const ultimaEvolucao = prontuarios[0] ?? null;
+  const consultaFutura = (agenda: AgendaConsulta) => !['CONCLUIDO', 'ENCERRADO'].includes(agenda.status)
+    && new Date(`${agenda.dataConsulta}T${agenda.horario}`).getTime() >= referenciaAgenda;
+  const agendasOrdenadas = [...agendasAtendimento].sort((a, b) => {
+    const aFutura = consultaFutura(a);
+    const bFutura = consultaFutura(b);
+    if (aFutura !== bFutura) return aFutura ? -1 : 1;
+    const ordem = `${a.dataConsulta}T${a.horario}`.localeCompare(`${b.dataConsulta}T${b.horario}`);
+    return aFutura ? ordem : -ordem;
+  });
+  const proximaAgenda = agendasOrdenadas.find(consultaFutura);
+  const responsavel = atendimento?.nomeVoluntario ?? atendimento?.voluntario?.nome ?? 'Aguardando voluntário';
+  const canalOriginal = atendimento?.canalOrigem?.nome ?? atendimento?.canal;
+  const canal = canalOriginal?.toLowerCase().includes('sistema web') ? 'TDB - Responde' : canalOriginal;
+  const statusClass = (status: string) => status === 'EM_ATENDIMENTO' ? 'bg-success/10 text-success' : status === 'CANCELADO' ? 'bg-danger/10 text-danger' : status === 'ENCERRADO' ? 'bg-muted text-muted-foreground' : 'bg-primary/10 text-primary';
+  const fecharPainel = () => {
+    setPainelAberto(false);
+    painelButtonRef.current?.focus();
+  };
+  const copiarDados = async () => {
+    if (!atendimento) return;
+    try {
+      await navigator.clipboard.writeText([
+        `Atendimento #${atendimento.id}`, `Beneficiário: ${pessoaAtendida}`,
+        `E-mail: ${atendimento.pessoaAtendidaEmail || 'Não informado'}`,
+        `Telefone: ${atendimento.pessoaAtendidaTelefone || 'Não informado'}`,
+        `Status: ${labelStatus(atendimento.status)}`, `Prioridade: ${labelPrioridade(atendimento.prioridade)}`,
+        `Canal: ${canal || 'Não informado'}`, `Responsável: ${responsavel}`,
+        `Abertura: ${formatDate(atendimento.dataAbertura ?? atendimento.dataCriacao)}`,
+      ].join('\n'));
+      setFeedback('Dados do atendimento copiados.');
+    } catch {
+      setFeedback('Não foi possível copiar os dados. Verifique a permissão da área de transferência.');
+    }
+  };
+  const confirmarEncerramento = () => {
+    if (!atendimento) return;
+    confirm({
+      title: 'Encerrar Atendimento',
+      message: 'Tem certeza que deseja encerrar este atendimento? Ele ficará como somente leitura e não será possível enviar novas mensagens.',
+      confirmText: 'Confirmar e encerrar', tone: 'danger',
+      details: [
+        { label: 'Status atual', value: labelStatus(atendimento.status) },
+        { label: 'Novo status', value: labelStatus('ENCERRADO'), tone: 'danger' },
+        { label: 'Impacto', value: 'Atendimento e chat finalizados', tone: 'danger' },
+      ],
+      onConfirm: () => void salvarAtendimento(true),
     });
-    return Array.from(tags);
-  }, [prontuarios]);
-
-  const ultimaEvolucao = prontuarios.length > 0 ? prontuarios[0] : null;
+  };
 
   return (
     <PageShell>
-      <PageHeader
-        variant="compact"
-        eyebrow="Atendimento"
-        title={atendimento ? `Atendimento de ${pessoaAtendida}` : 'Carregando detalhes...'}
-        description="Acompanhe status, responsável e mensagens deste atendimento."
-        actions={
-          <Button variant="secondary" onClick={() => navigate(-1)}>
-            Voltar
-          </Button>
-        }
-      />
-
-      <Section tone="white">
-        {loading && <LoadingState title="Carregando atendimento..." count={1} className="md:grid-cols-1 xl:grid-cols-1" />}
-        {erro && <ErrorState title="Não foi possível abrir o atendimento" description={erro} />}
-
-        {!loading && !erro && atendimento && (
-          <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
-            <div className="space-y-6">
-              <Card className="p-6">
-                <div className="flex flex-col gap-4 border-b border-border pb-5 sm:flex-row sm:items-start sm:justify-between">
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h2 className="text-2xl font-bold text-foreground">Detalhes do Atendimento</h2>
-                      <Badge tone={statusTone(atendimento.status)}>{labelStatus(atendimento.status)}</Badge>
-                    </div>
-                    <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">
-                      {atendimento.descricao || 'Sem descricao cadastrada.'}
-                    </p>
-                  </div>
+      {loading && <div className="p-4"><LoadingState title="Carregando atendimento..." count={1} className="md:grid-cols-1 xl:grid-cols-1" /></div>}
+      {erro && <div className="p-4">
+        <ErrorState title="Não foi possível abrir o atendimento" description={erro} />
+        <Button variant="secondary" onClick={() => void carregarDados()}>Tentar novamente</Button>
+      </div>}
+      {!loading && !erro && atendimento && (
+        <div className="atendimento-workspace" data-panel-open={painelAberto}>
+          <div className="flex min-h-0 min-w-0 flex-col gap-3">
+            <header className="flex shrink-0 items-start gap-3">
+              <button type="button" onClick={() => navigate(-1)} className="atendimento-icon-button" aria-label="Voltar"><AtendimentoIcon name="back" /></button>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-semibold text-primary">Atendimento #{atendimento.id}</p>
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                  <h1 className="break-words text-xl font-bold leading-tight tracking-tight text-foreground lg:text-2xl">Atendimento de {pessoaAtendida}</h1>
+                  <Badge tone={statusTone(atendimento.status)}>{labelStatus(atendimento.status)}</Badge>
                 </div>
+                <p className="mt-1 hidden text-sm text-muted-foreground sm:block">Acompanhe a conversa e ajude no que for necessário.</p>
+              </div>
+              <button ref={painelButtonRef} type="button" onClick={() => painelAberto ? fecharPainel() : setPainelAberto(true)} aria-expanded={painelAberto} aria-controls="detalhes-atendimento" aria-label={painelAberto ? 'Ocultar detalhes do atendimento' : 'Abrir detalhes do atendimento'} className="atendimento-icon-button"><AtendimentoIcon name="panel" /></button>
+            </header>
 
-                <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                  {!isBeneficiario && <InfoItem label="Prioridade" value={labelPrioridade(atendimento.prioridade)} />}
-                  <InfoItem label="Data de abertura" value={formatDate(atendimento.dataAbertura ?? atendimento.dataCriacao)} />
-                  <InfoItem label="Data de encerramento" value={atendimento.dataEncerramento ? formatDate(atendimento.dataEncerramento) : 'Em aberto'} />
-                  <InfoItem label="Canal" value={(atendimento.canalOrigem?.nome ?? atendimento.canal)?.toLowerCase().includes('sistema web') ? 'TDB - Responde' : (atendimento.canalOrigem?.nome ?? atendimento.canal)} />
-                  <InfoItem label="Voluntário responsável" value={atendimento.nomeVoluntario ?? atendimento.voluntario?.nome ?? 'Aguardando voluntário'} />
-                  <InfoItem label="Pessoa atendida" value={pessoaAtendida} />
-                  <InfoItem label="Email da pessoa" value={atendimento.pessoaAtendidaEmail} />
-                  <InfoItem label="Telefone da pessoa" value={atendimento.pessoaAtendidaTelefone} />
+            <div className="grid shrink-0 grid-cols-2 gap-x-4 gap-y-2 rounded-xl border border-border bg-surface px-4 py-3 text-xs sm:grid-cols-3 2xl:grid-cols-4">
+              <div className="flex min-w-0 items-center gap-2.5">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-warning/10 text-warning"><AtendimentoIcon name="priority" className="h-4 w-4" /></span>
+                <div>
+                  <p className="text-muted-foreground">Prioridade</p>
+                  <p className="font-semibold">{labelPrioridade(atendimento.prioridade)}</p>
                 </div>
-              </Card>
-
-              {podeAlterar && (
-                <Card className="p-6 border border-slate-200 shadow-sm">
-                  <div className="flex flex-col gap-2 border-b border-border pb-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h2 className="text-xl font-bold text-foreground">Prontuário Clínico do Paciente</h2>
-                        <Badge tone={prontuarios.length > 0 ? 'success' : 'neutral'}>
-                          {prontuarios.length > 0 ? `${prontuarios.length} registro(s)` : 'Sem registros'}
-                        </Badge>
-                      </div>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        Situação clínica atual e evoluções odontológicas vinculadas a este atendimento e agenda.
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Situação Atual do Prontuário */}
-                  <div className="mt-5 grid gap-4 md:grid-cols-2">
-                    <div className="rounded-xl border border-red-100 bg-red-50/50 p-4">
-                      <p className="text-xs font-bold uppercase tracking-widest text-red-700">
-                        Alertas Médicos / Anamnese
-                      </p>
-                      {alertasMedicosAtuais.length > 0 ? (
-                        <div className="mt-2.5 flex flex-wrap gap-1.5">
-                          {alertasMedicosAtuais.map((alerta, idx) => (
-                            <Badge key={idx} tone="danger">{alerta}</Badge>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="mt-2 text-sm text-slate-600">Nenhum alerta médico ou alergia registrado até o momento.</p>
-                      )}
-                    </div>
-
-                    <div className="rounded-xl border border-blue-100 bg-blue-50/50 p-4">
-                      <p className="text-xs font-bold uppercase tracking-widest text-blue-700">
-                        Situação Atual / Último Tratamento
-                      </p>
-                      {ultimaEvolucao ? (
-                        <div className="mt-2">
-                          <p className="text-sm font-semibold text-slate-800 whitespace-pre-wrap">{ultimaEvolucao.tratamentoAtual}</p>
-                          <p className="mt-1 text-xs text-slate-500">
-                            Registrado em: {ultimaEvolucao.dataRegistro ? formatDate(ultimaEvolucao.dataRegistro) : 'Recente'}
-                          </p>
-                        </div>
-                      ) : (
-                        <p className="mt-2 text-sm text-slate-600">Nenhuma evolução clínica registrada para este paciente ainda.</p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Formulário para Registrar Nova Evolução Direto no Atendimento */}
-                  <form onSubmit={salvarEvolucaoProntuario} noValidate className="mt-6 rounded-xl border border-slate-200 bg-slate-50/70 p-4 space-y-4">
-                    <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700">
-                      Registrar Evolução no Prontuário
-                    </h3>
-                    <div className="grid gap-4">
-                      <Field label="Alertas Médicos / Anamnese" hint="Separe múltiplos alertas por vírgula (ex: Alérgico a Penicilina, Hipertenso)">
-                        <Input
-                          disabled={salvandoProntuario}
-                          value={historicoMedicoInput}
-                          onChange={(e) => setHistoricoMedicoInput(e.target.value)}
-                          placeholder="Ex: Alérgico a Dipirona, Diabético"
-                        />
-                      </Field>
-                      <Field label="Procedimento / Evolução Clínica Realizada" error={erroFormProntuario || undefined}>
-                        <Textarea
-                          disabled={salvandoProntuario}
-                          value={tratamentoAtualInput}
-                          onChange={(e) => {
-                            setTratamentoAtualInput(e.target.value);
-                            if (erroFormProntuario) setErroFormProntuario('');
-                          }}
-                          className="min-h-[88px]"
-                          placeholder="Descreva a situação atual do prontuário, dentes avaliados/tratados e conduta..."
-                        />
-                      </Field>
-                    </div>
-                    <div className="flex justify-end">
-                      <Button type="submit" disabled={salvandoProntuario}>
-                        {salvandoProntuario ? 'Salvando evolução...' : 'Salvar Evolução no Prontuário'}
-                      </Button>
-                    </div>
-                  </form>
-
-                  {/* Histórico de Evoluções */}
-                  <div className="mt-6">
-                    <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700 mb-3">
-                      Histórico Clínico do Caso
-                    </h3>
-                    {loadingProntuario && prontuarios.length === 0 ? (
-                      <p className="text-sm text-muted-foreground">Carregando prontuário...</p>
-                    ) : prontuarios.length === 0 ? (
-                      <div className="rounded-xl border border-dashed border-slate-300 bg-white px-4 py-6 text-center text-sm text-slate-500">
-                        Nenhum histórico clínico registrado neste atendimento.
-                      </div>
-                    ) : (
-                      <div className="space-y-3">
-                        {prontuarios.map((item, idx) => (
-                          <div key={item.id ?? idx} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-                            <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                              <span className="text-xs font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded">
-                                {item.dataRegistro ? formatDate(item.dataRegistro) : 'Agora'}
-                              </span>
-                              {item.agendaId ? (
-                                <span className="text-xs font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">
-                                  Consulta #{item.agendaId}
-                                </span>
-                              ) : null}
-                            </div>
-                            {item.historicoMedico && (
-                              <div className="mb-2 flex flex-wrap gap-1.5">
-                                {item.historicoMedico.split(',').map((tag, i) => tag.trim() ? (
-                                  <Badge key={i} tone="danger">{tag.trim()}</Badge>
-                                ) : null)}
-                              </div>
-                            )}
-                            <p className="text-sm text-slate-800 whitespace-pre-wrap">{item.tratamentoAtual}</p>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </Card>
-              )}
-
-              <Card className="overflow-hidden shadow-sm">
-                <div className="flex items-center justify-between gap-4 border-b border-border bg-surface px-5 py-4 sm:px-6">
-                  <div>
-                    <h2 className="text-xl font-bold text-foreground">Mensagens</h2>
-                    <p className="mt-1 text-sm text-muted-foreground">Conversa vinculada ao atendimento.</p>
-                  </div>
-                  <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-800">
-                    <span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden="true" />
-                    Canal ativo
-                  </span>
+              </div>
+              <div className="flex min-w-0 items-center gap-2.5">
+                <span className="hidden h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary sm:flex"><AtendimentoIcon name="chat" className="h-4 w-4" /></span>
+                <div>
+                  <p className="text-muted-foreground">Canal</p>
+                  <p className="break-words font-semibold">{canal || 'Não informado'}</p>
                 </div>
+              </div>
+              <div className="col-span-2 flex min-w-0 items-center gap-2.5 sm:col-span-1">
+                <span className="hidden h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary sm:flex"><AtendimentoIcon name="user" className="h-4 w-4" /></span>
+                <div>
+                  <p className="text-muted-foreground">Responsável</p>
+                  <p className="break-words font-semibold">{responsavel}</p>
+                </div>
+              </div>
+              <div className="hidden min-w-0 items-center gap-2.5 2xl:flex">
+                <AtendimentoIcon name="calendar" className="h-4 w-4 text-primary" />
+                <div>
+                  <p className="text-muted-foreground">Aberto em</p>
+                  <p className="font-semibold">{formatDate(atendimento.dataAbertura ?? atendimento.dataCriacao)}</p>
+                </div>
+              </div>
+            </div>
+            {feedback && <p role="status" className="shrink-0 rounded-xl border border-primary/20 bg-primary/5 px-3 py-2 text-sm text-foreground">{feedback}</p>}
+            <Card className="flex min-h-0 flex-1 flex-col overflow-hidden shadow-sm">
+              <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border bg-surface px-4 py-2">
+                <div>
+                  <h2 className="flex items-center gap-2 text-sm font-bold text-foreground"><AtendimentoIcon name="chat" className="h-4 w-4 text-primary" />Conversa</h2>
+                </div>
+                <span className="text-xs text-muted-foreground">
+                  {mensagens.length}{' '}
+                  {mensagens.length === 1 ? 'mensagem' : 'mensagens'}
+                </span>
+              </div>
 
-                <div
-                  className="max-h-[540px] min-h-72 space-y-3 overflow-y-auto bg-muted/35 p-4 sm:p-6"
-                  role="log"
-                  aria-live="polite"
-                  aria-relevant="additions"
-                  aria-label="Histórico de mensagens"
-                >
-                  {mensagens.length === 0 && (
-                    <div className="rounded-2xl border border-dashed border-border bg-surface/80 px-4 py-10 text-center text-sm text-muted-foreground">
-                      Nenhuma mensagem enviada ainda.
-                    </div>
-                  )}
+              <div
+                className="atendimento-chat-background min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain p-3 sm:p-5"
+                role="log"
+                aria-live="polite"
+                aria-relevant="additions"
+                aria-label="Histórico de mensagens"
+              >
+                {mensagens.length === 0 && (
+                  <div className="rounded-2xl border border-dashed border-border bg-surface/80 px-4 py-10 text-center text-sm text-muted-foreground">
+                    Nenhuma mensagem enviada ainda.
+                  </div>
+                )}
 
-                  {mensagens.map((mensagem) => {
-                    const minha = mensagem.enviadoPor === remetenteAtual;
-                    const tipoMensagem = mensagem.tipoMensagem ?? 'TEXTO';
-                    return (
-                      <div key={mensagem.id} className={`flex ${minha ? 'justify-end' : 'justify-start'}`}>
-                        <article className={`max-w-[88%] rounded-2xl px-4 py-3 text-sm shadow-sm sm:max-w-[78%] ${
-                          minha
-                            ? 'rounded-br-md bg-primary text-primary-foreground'
-                            : 'rounded-bl-md border border-border bg-surface text-foreground'
-                        }`}
+                {mensagens.map((mensagem, index) => {
+                  const minha = mensagem.enviadoPor === remetenteAtual;
+                  const novaData = index === 0 || new Date(mensagens[index - 1].dataHora).toDateString() !== new Date(mensagem.dataHora).toDateString();
+                  const tipoMensagem = mensagem.tipoMensagem ?? 'TEXTO';
+                  return (
+                    <div key={mensagem.id}>
+                      {novaData && <div className="mb-4 text-center">
+                        <span className="inline-block rounded-full border border-border bg-surface px-3 py-1 text-xs text-muted-foreground">{new Date(mensagem.dataHora).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                      </div>}
+                      <div className={`flex items-start gap-2 ${minha ? 'flex-row-reverse' : ''}`}>
+                        <span aria-hidden="true" className={`mt-1 hidden h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold sm:flex ${minha ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'}`}>
+                          {(minha ? user?.nome : mensagem.enviadoPor === 'BENEFICIARIO' ? pessoaAtendida : labelRemetente(mensagem.enviadoPor))?.trim().split(/\s+/).slice(0, 2).map(n => n[0]).join('').toUpperCase()}
+                        </span>
+                        <article className={`min-w-0 max-w-[92%] rounded-2xl px-3.5 py-2.5 text-sm shadow-sm sm:max-w-[80%] 2xl:max-w-[72%] ${minha
+                            ? 'rounded-tr-md border border-primary/10 bg-primary/10 text-foreground'
+                            : 'rounded-tl-md border border-border bg-surface text-foreground'
+                          }`}
                         >
-                          <header className={`flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-xs ${minha ? 'text-blue-100' : 'text-muted-foreground'}`}>
+                          <header className={`flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-xs ${minha ? 'text-primary' : 'text-muted-foreground'}`}>
                             <span className="font-semibold">
-                              {minha ? 'Você · ' : ''}{labelRemetente(mensagem.enviadoPor)}
+                              {minha ? `Você · ${labelRemetente(mensagem.enviadoPor)}` : mensagem.enviadoPor === 'BENEFICIARIO' ? pessoaAtendida : labelRemetente(mensagem.enviadoPor)}
                             </span>
                             <time dateTime={mensagem.dataHora}>{formatTime(mensagem.dataHora)}</time>
                           </header>
@@ -1057,420 +938,321 @@ function DetalheAtendimento() {
                           )}
                         </article>
                       </div>
-                    );
-                  })}
-                  <div ref={messagesEndRef} aria-hidden="true" />
-                </div>
-
-                <form onSubmit={enviarMensagem} className="border-t border-border bg-surface p-4 sm:p-5">
-                  {chatBloqueado && (
-                    <div className="mb-4 rounded-xl border border-orange-100 bg-orange-50 px-4 py-3 text-sm font-semibold text-orange-800">
-                      Este atendimento está {labelStatus(atendimento.status).toLowerCase()}. O envio de mensagens está bloqueado.
                     </div>
-                  )}
-                  <input
-                    ref={inputFotoRef}
-                    type="file"
-                    accept="image/jpeg,image/png"
-                    className="hidden"
-                    onChange={selecionarFoto}
-                    disabled={chatBloqueado || enviandoMidia || gravando}
-                    aria-label="Selecionar foto"
-                  />
-                  {gravando && (
-                    <div className="mb-3 flex flex-wrap items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800" role="status">
-                      <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-red-500" aria-hidden="true" />
-                      <span className="mr-auto font-semibold">Gravando...</span>
-                      <Button type="button" variant="secondary" onClick={cancelarGravacao} disabled={enviandoMidia}>
-                        Cancelar
-                      </Button>
-                      <Button type="button" onClick={() => void enviarAudio()} disabled={enviandoMidia}>
-                        {enviandoMidia ? 'Enviando...' : 'Enviar áudio'}
-                      </Button>
-                    </div>
-                  )}
-                  <label htmlFor="chat-composer" className="sr-only">Nova mensagem</label>
-                  <div className="flex items-end gap-2 rounded-2xl border border-border bg-background p-2 shadow-sm transition-[border-color,box-shadow] duration-fast focus-within:border-primary focus-within:ring-2 focus-within:ring-ring/20">
-                    <button
-                      type="button"
-                      onClick={() => inputFotoRef.current?.click()}
-                      disabled={chatBloqueado || enviandoMidia || gravando}
-                      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                      aria-label="Enviar foto"
-                      title="Enviar foto"
-                    >
-                      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                        <path d="M12 5v14M5 12h14" strokeLinecap="round" />
-                        <path d="M19 13.5V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5.5" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => void iniciarGravacao()}
-                      disabled={chatBloqueado || enviandoMidia || gravando}
-                      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                      aria-label="Gravar áudio"
-                      title="Gravar áudio"
-                    >
-                      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                        <rect x="9" y="3" width="6" height="11" rx="3" />
-                        <path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6" strokeLinecap="round" />
-                      </svg>
-                    </button>
-                    <textarea
-                      ref={composerRef}
-                      id="chat-composer"
-                      rows={1}
-                      value={conteudo}
-                      onChange={(event) => {
-                        setConteudo(event.target.value);
-                        ajustarAlturaComposer(event.target);
-                      }}
-                      onKeyDown={handleComposerKeyDown}
-                      disabled={chatBloqueado || enviandoMidia || gravando}
-                      placeholder="Escreva sua mensagem..."
-                      className="min-h-11 max-h-32 flex-1 resize-none overflow-y-auto bg-transparent px-3 py-2.5 text-base leading-6 text-foreground outline-none placeholder:text-slate-400 disabled:cursor-not-allowed disabled:text-muted-foreground"
-                    />
-                    <Button
-                      type="submit"
-                      disabled={chatBloqueado || enviandoMidia || gravando || !conteudo.trim()}
-                      className="h-11 w-11 shrink-0 rounded-full !px-0"
-                      aria-label="Enviar mensagem"
-                      title="Enviar mensagem"
-                    >
-                      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                        <path d="m4 4 16 8-16 8 3-8-3-8Z" strokeLinecap="round" strokeLinejoin="round" />
-                        <path d="M7 12h13" strokeLinecap="round" />
-                      </svg>
-                      <span className="sr-only">Enviar mensagem</span>
-                    </Button>
+                  );
+                })}
+                <div ref={messagesEndRef} aria-hidden="true" />
+              </div>
+
+              <form onSubmit={enviarMensagem} className="shrink-0 border-t border-border bg-surface p-2.5 sm:p-3">
+                {chatBloqueado && (
+                  <div className="mb-4 rounded-xl border border-warning/20 bg-warning/10 px-4 py-3 text-sm font-semibold text-warning">
+                    Este atendimento está {labelStatus(atendimento.status).toLowerCase()}. O envio de mensagens está bloqueado.
                   </div>
-                  <p className="mt-2 px-1 text-xs text-muted-foreground">
-                    {enviandoMidia ? 'Enviando mídia...' : 'Enter envia · Shift + Enter adiciona uma nova linha'}
-                  </p>
-                </form>
-              </Card>
-            </div>
-
-            <aside className="space-y-6">
-              {feedback && (
-                <div className="rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm font-semibold text-primary">
-                  {feedback}
-                </div>
-              )}
-
-              {podeAlterar && atendimento.status === 'ABERTO' && !atendimento.voluntarioId && (
-                <Card className="p-6 border border-blue-200 bg-blue-50/50">
-                  <h2 className="text-xl font-bold text-foreground">Acolher caso</h2>
-                  <p className="mt-1 text-sm text-muted-foreground">Este atendimento está aberto e aguardando um profissional voluntário.</p>
-                  <div className="mt-4">
-                    <Button 
-                      fullWidth 
-                      disabled={voluntarioSemVinculo}
-                      isLoading={assumindo}
-                      loadingText="Assumindo..."
-                      onClick={confirmarAssumirAtendimento}
-                    >
-                      Assumir atendimento
-                    </Button>
-                    {voluntarioSemVinculo && (
-                      <p className="mt-2 text-xs text-red-500">Sua conta de voluntário precisa estar vinculada para assumir casos.</p>
-                    )}
-                  </div>
-                </Card>
-              )}
-
-              {podeAlterar && (
-                <Card className="p-6 border-l-4 border-l-primary">
-                  <div className="flex items-center justify-between gap-2">
-                    <h2 className="text-xl font-bold text-foreground">Agenda do Atendimento</h2>
-                    <Badge tone={agendasAtendimento.length > 0 ? 'success' : 'warning'}>
-                      {agendasAtendimento.length > 0 ? 'Vinculada' : 'Pendente'}
-                    </Badge>
-                  </div>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    Todo atendimento deve possuir um agendamento de consulta vinculado.
-                  </p>
-
-                  {loadingAgenda && agendasAtendimento.length === 0 ? (
-                    <p className="mt-4 text-sm text-muted-foreground">Verificando agenda...</p>
-                  ) : agendasAtendimento.length === 0 ? (
-                    <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
-                      <p className="font-semibold">Nenhuma consulta agendada para este atendimento.</p>
-                      <p className="mt-1 text-xs text-amber-800">
-                        Agende a consulta deste paciente para integrá-lo à sua agenda clínica.
-                      </p>
-                      <Button fullWidth className="mt-3" onClick={abrirModalNovaAgenda}>
-                        Agendar Consulta
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="mt-4 space-y-3">
-                      {agendasAtendimento.map((ag) => (
-                        <div key={ag.id} className="rounded-xl border border-slate-200 bg-slate-50 p-3.5 text-sm">
-                          <div className="flex items-center justify-between gap-2">
-                            <span className="font-bold text-slate-900">{ag.tipo}</span>
-                            <Badge tone={ag.status === 'CONCLUIDO' ? 'success' : ag.status === 'AGUARDANDO' ? 'warning' : 'info'}>
-                              {ag.status}
-                            </Badge>
-                          </div>
-                          <p className="mt-1.5 text-slate-700 font-medium">
-                            Data: <strong>{ag.dataConsulta}</strong> às <strong>{ag.horario}</strong>
-                          </p>
-                          <div className="mt-3 flex gap-2">
-                            <Button variant="secondary" onClick={() => abrirModalEditarAgenda(ag)}>
-                              Editar Horário
-                            </Button>
-                            <Button variant="ghost" onClick={() => navigate('/agenda')}>
-                              Ver na Agenda
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                      <Button variant="secondary" fullWidth onClick={abrirModalNovaAgenda}>
-                        Agendar Nova Consulta / Retorno
-                      </Button>
-                    </div>
-                  )}
-                </Card>
-              )}
-
-              {podeAlterar && (
-                <Card className="p-6">
-                  <h2 className="text-xl font-bold text-foreground">Acoes do atendimento</h2>
-                  <p className="mt-1 text-sm text-muted-foreground">Somente voluntários e administradores podem alterar estes campos.</p>
-
-                  <div className="mt-5 space-y-4">
-                    <Field label="Status">
-                      <Select value={statusEdit} onChange={(event) => setStatusEdit(event.target.value)}>
-                        {STATUS_OPTIONS.map((status) => (
-                          <option key={status} value={status}>{labelStatus(status)}</option>
-                        ))}
-                      </Select>
-                    </Field>
-
-                    <Field label="Prioridade">
-                      <Select value={prioridadeEdit} onChange={(event) => setPrioridadeEdit(event.target.value)}>
-                        <option value="1">1 - Urgente</option>
-                        <option value="2">2 - Alta</option>
-                        <option value="3">3 - Media</option>
-                        <option value="4">4 - Baixa</option>
-                        <option value="5">5 - Acompanhamento</option>
-                      </Select>
-                    </Field>
-
-                    <Button
-                      fullWidth
-                      disabled={semAlteracoes}
-                      isLoading={salvando}
-                      loadingText="Salvando..."
-                      onClick={confirmarAlteracaoAtendimento}
-                    >
-                      Salvar alterações
-                    </Button>
-
-                    <Button
-                      fullWidth
-                      variant="danger"
-                      disabled={salvando || atendimento.status === 'ENCERRADO'}
-                      onClick={() => {
-                        confirm({
-                          title: 'Encerrar Atendimento',
-                          message: 'Tem certeza que deseja encerrar este atendimento? Ele ficará como somente leitura e não será possível enviar novas mensagens.',
-                          confirmText: 'Confirmar e encerrar',
-                          tone: 'danger',
-                          details: [
-                            { label: 'Status atual', value: labelStatus(atendimento.status) },
-                            { label: 'Novo status', value: labelStatus('ENCERRADO'), tone: 'danger' },
-                            { label: 'Impacto', value: 'Atendimento e chat finalizados', tone: 'danger' },
-                          ],
-                          onConfirm: () => void salvarAtendimento(true)
-                        });
-                      }}
-                    >
-                      Encerrar atendimento
-                    </Button>
-                  </div>
-                </Card>
-              )}
-
-              {podeAlterar && (
-                <Card className="p-6">
-                  <h2 className="text-xl font-bold text-foreground">Check-in via WhatsApp</h2>
-                  
-                  <div className="mt-4 text-sm text-muted-foreground">
-                    <p>Status atual: <strong>{labelStatusCheckin(atendimento.statusCheckin)}</strong></p>
-                    {atendimento.horarioEnvioCheckin && (
-                      <p>Enviado em: {formatDate(atendimento.horarioEnvioCheckin)}</p>
-                    )}
-                  </div>
-
-                  {(() => {
-                    const cfg = iaPrevisaoConfig(atendimento.previsaoCheckin);
-                    if (!cfg) return null;
-                    const pct = atendimento.confiancaCheckin !== undefined
-                      ? Math.round(atendimento.confiancaCheckin * 100)
-                      : null;
-                    return (
-                      <div className={`mt-4 flex gap-3 rounded-xl border px-4 py-3 ${cfg.bg} ${cfg.border}`}>
-                        <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${cfg.iconBg} ${cfg.cor}`}>
-                          {cfg.icone}
-                        </span>
-                        <div className="min-w-0">
-                          <p className={`text-xs font-bold uppercase tracking-widest ${cfg.cor}`}>
-                            Previsão da Inteligência Artificial
-                          </p>
-                          <p className={`mt-1 text-sm font-semibold ${cfg.cor}`}>
-                            {labelStatusCheckin(atendimento.previsaoCheckin)}
-                            {pct !== null && <span className="ml-2 font-medium opacity-75">({pct}% de confiança)</span>}
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })()}
-
-                  <div className="mt-5 space-y-3">
-                    <Button
-                      fullWidth
-                      disabled={salvandoCheckin || !atendimento.pessoaAtendidaTelefone}
-                      onClick={() => void handleAlterarCheckin('AGUARDANDO_RESPOSTA', true)}
-                    >
-                      {salvandoCheckin ? 'Processando...' : 'Abrir WhatsApp'}
-                    </Button>
-
-                    {!atendimento.pessoaAtendidaTelefone && (
-                      <p className="text-xs text-red-500">Telefone não preenchido para abrir WhatsApp.</p>
-                    )}
-
-                    <div className="mt-4 grid grid-cols-2 gap-2">
-                      <Button
-                        variant="secondary"
-                        disabled={salvandoCheckin}
-                        onClick={() => void handleAlterarCheckin('CONFIRMADO')}
-                        className="!border-emerald-200 !bg-emerald-50 !text-emerald-800 hover:!bg-emerald-100"
-                      >
-                        Confirmou
-                      </Button>
-                      <Button
-                        variant="secondary"
-                        disabled={salvandoCheckin}
-                        onClick={() => void handleAlterarCheckin('NAO_COMPARECERA')}
-                        className="!border-red-200 !bg-red-50 !text-red-800 hover:!bg-red-100"
-                      >
-                        Não vai
-                      </Button>
-                      <Button
-                        variant="secondary"
-                        disabled={salvandoCheckin}
-                        onClick={() => void handleAlterarCheckin('REAGENDAMENTO_SOLICITADO')}
-                        className="!border-amber-200 !bg-amber-50 !text-amber-800 hover:!bg-amber-100"
-                      >
-                        Reagendar
-                      </Button>
-                      <Button
-                        variant="secondary"
-                        disabled={salvandoCheckin}
-                        onClick={() => void handleAlterarCheckin('SEM_RESPOSTA')}
-                        className="!border-slate-200 !bg-slate-50 !text-slate-700 hover:!bg-slate-100"
-                      >
-                        Sem resposta
-                      </Button>
-                    </div>
-                  </div>
-                </Card>
-              )}
-
-              {!podeAlterar && (
-                <Card className="p-6">
-                  <h2 className="text-xl font-bold text-foreground">Acompanhamento</h2>
-                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                    Você pode acompanhar os detalhes e conversar pelo chat. Alterações de status e prioridade ficam com a equipe responsável.
-                  </p>
-                </Card>
-              )}
-            </aside>
-          </div>
-        )}
-      </Section>
-
-      {modalAgendaAberto && atendimento && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
-          <Card className="w-full max-w-md p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-foreground">
-                {editandoAgendaId ? 'Editar Consulta do Atendimento' : 'Agendar Consulta para Atendimento'}
-              </h2>
-              <button
-                type="button"
-                onClick={() => !salvandoAgenda && setModalAgendaAberto(false)}
-                className="text-slate-400 hover:text-slate-600"
-                aria-label="Fechar modal"
-              >
-                ✕
-              </button>
-            </div>
-            <p className="mb-4 text-sm text-muted-foreground">
-              Paciente: <strong>{pessoaAtendida}</strong> · Atendimento <strong>#{atendimento.id}</strong>
-            </p>
-            <form onSubmit={salvarAgendaDoAtendimento} noValidate className="space-y-4">
-              <Field label="Tipo de Consulta">
-                <Input
-                  disabled={salvandoAgenda}
-                  value={agendaTipo}
-                  onChange={(e) => setAgendaTipo(e.target.value)}
-                  placeholder="Ex: Avaliação Inicial"
+                )}
+                <input
+                  ref={inputFotoRef}
+                  type="file"
+                  accept="image/jpeg,image/png"
+                  className="hidden"
+                  onChange={selecionarFoto}
+                  disabled={chatBloqueado || enviandoMidia || gravando}
+                  aria-label="Selecionar foto"
                 />
-              </Field>
-              <div className="grid grid-cols-2 gap-4">
-                <Field label="Data da Consulta">
+                {gravando && (
+                  <div className="mb-3 flex flex-wrap items-center gap-2 rounded-xl border border-danger/20 bg-danger/10 px-3 py-2 text-sm text-danger" role="status">
+                    <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-danger motion-reduce:animate-none" aria-hidden="true" />
+                    <span className="mr-auto font-semibold">Gravando...</span>
+                    <Button type="button" variant="secondary" onClick={cancelarGravacao} disabled={enviandoMidia}>
+                      Cancelar
+                    </Button>
+                    <Button type="button" onClick={() => void enviarAudio()} disabled={enviandoMidia}>
+                      {enviandoMidia ? 'Enviando...' : 'Enviar áudio'}
+                    </Button>
+                  </div>
+                )}
+                <label htmlFor="chat-composer" className="sr-only">Nova mensagem</label>
+                <div className="flex items-end gap-1 rounded-2xl border border-border bg-background p-2 shadow-sm transition-[border-color,box-shadow] duration-fast focus-within:border-primary focus-within:ring-2 focus-within:ring-ring/20">
+                  <button
+                    type="button"
+                    onClick={() => inputFotoRef.current?.click()}
+                    disabled={chatBloqueado || enviandoMidia || gravando}
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                    aria-label="Enviar foto"
+                    title="Enviar foto"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                      <path d="M12 5v14M5 12h14" strokeLinecap="round" />
+                      <path d="M19 13.5V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void iniciarGravacao()}
+                    disabled={chatBloqueado || enviandoMidia || gravando}
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                    aria-label="Gravar áudio"
+                    title="Gravar áudio"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                      <rect x="9" y="3" width="6" height="11" rx="3" />
+                      <path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6" strokeLinecap="round" />
+                    </svg>
+                  </button>
+                  <textarea
+                    ref={composerRef}
+                    id="chat-composer"
+                    rows={1}
+                    value={conteudo}
+                    onChange={(event) => {
+                      setConteudo(event.target.value);
+                      ajustarAlturaComposer(event.target);
+                    }}
+                    onKeyDown={handleComposerKeyDown}
+                    disabled={chatBloqueado || enviandoMidia || gravando}
+                    placeholder="Escreva sua mensagem..."
+                    className="min-h-11 min-w-0 max-h-32 flex-1 resize-none overflow-y-auto bg-transparent px-3 py-2.5 text-base leading-6 text-foreground outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:text-muted-foreground"
+                  />
+                  <Button
+                    type="submit"
+                    disabled={chatBloqueado || enviandoMidia || gravando || !conteudo.trim()}
+                    className="h-11 w-11 shrink-0 rounded-full !px-0"
+                    aria-label="Enviar mensagem"
+                    title="Enviar mensagem"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                      <path d="m4 4 16 8-16 8 3-8-3-8Z" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M7 12h13" strokeLinecap="round" />
+                    </svg>
+                    <span className="sr-only">Enviar mensagem</span>
+                  </Button>
+                </div>
+                <p className="mt-2 px-1 text-xs text-muted-foreground">
+                  {enviandoMidia ? 'Enviando mídia...' : 'Enter envia · Shift + Enter adiciona uma nova linha'}
+                </p>
+              </form>
+            </Card>
+          </div>
+          <AtendimentoPanel open={painelAberto} onClose={fecharPainel}>
+            {podeAlterar ? (
+              <section className="atendimento-section space-y-3 p-3" aria-label="Status e prioridade">
+                <div className="grid grid-cols-[minmax(0,3fr)_minmax(0,2fr)] items-end gap-2">
+                  <div>
+                    <label htmlFor="atendimento-status" className="mb-2 block text-sm font-bold">Status do atendimento</label>
+                    <div className={`atendimento-status rounded-xl ${statusClass(statusEdit)}`}>
+                      <Select id="atendimento-status" value={statusEdit} disabled={salvando} onChange={event => setStatusEdit(event.target.value)}>{STATUS_OPTIONS.map(status => <option key={status} value={status}>{labelStatus(status)}</option>)}</Select>
+                      <AtendimentoIcon name="chevron" className="h-4 w-4" />
+                    </div>
+                  </div>
+                  <Field label="Prioridade">
+                    <Select value={prioridadeEdit} disabled={salvando} onChange={event => setPrioridadeEdit(event.target.value)} className="!py-2 !text-sm">{[1, 2, 3, 4, 5].map(value => <option key={value} value={value}>{labelPrioridade(value)}</option>)}</Select>
+                  </Field>
+                </div>
+                {!semAlteracoes && <p className="text-xs text-muted-foreground">Alterações pendentes. Salve para aplicar.</p>}
+                {(!semAlteracoes || salvando) && <Button fullWidth size="sm" disabled={semAlteracoes} isLoading={salvando} loadingText="Salvando..." onClick={confirmarAlteracaoAtendimento}>Salvar alterações</Button>}
+              </section>
+            ) : <div className="atendimento-section p-3">
+              <p className="text-sm font-bold">Status do atendimento</p>
+              <p className="mt-2">
+                <Badge tone={statusTone(atendimento.status)}>{labelStatus(atendimento.status)}</Badge>
+              </p>
+              <p className="mt-2 text-xs leading-5 text-muted-foreground">Status e prioridade são gerenciados pela equipe responsável.</p>
+            </div>}
+
+            <section className="atendimento-section p-3" aria-labelledby="informacoes-atendimento">
+              <h3 id="informacoes-atendimento" className="mb-1 text-sm font-bold">Informações do atendimento</h3>
+              <dl>
+                <InfoItem label="Nome" value={pessoaAtendida} />
+                <InfoItem label="E-mail" value={atendimento.pessoaAtendidaEmail} />
+                <InfoItem label="Telefone" value={atendimento.pessoaAtendidaTelefone} />
+                <InfoItem label="Canal" value={canal} />
+                <InfoItem label="Prioridade" value={labelPrioridade(atendimento.prioridade)} />
+                <InfoItem label="Responsável" value={responsavel} />
+                <InfoItem label="Aberto em" value={formatDate(atendimento.dataAbertura ?? atendimento.dataCriacao)} />
+                {atendimento.dataEncerramento && <InfoItem label="Encerrado em" value={formatDate(atendimento.dataEncerramento)} />}
+              </dl>
+            </section>
+            <PainelSecao title="Descrição do atendimento" icon="chat" defaultOpen={false}>
+              <p className="whitespace-pre-wrap break-words text-sm leading-6 text-muted-foreground">{atendimento.descricao || 'Sem descrição cadastrada.'}</p>
+            </PainelSecao>
+
+            {podeAlterar && atendimento.status === 'ABERTO' && !atendimento.voluntarioId && <section className="atendimento-section space-y-2 p-3">
+              <h3 className="text-sm font-bold">Acolher caso</h3>
+              <p className="text-xs leading-5 text-muted-foreground">Este atendimento aguarda um profissional voluntário.</p>
+              <Button fullWidth disabled={voluntarioSemVinculo} isLoading={assumindo} loadingText="Assumindo..." onClick={confirmarAssumirAtendimento}>Assumir atendimento</Button>
+              {voluntarioSemVinculo && <p className="text-xs text-danger">Sua conta precisa estar vinculada a um voluntário para assumir casos.</p>}
+            </section>}
+
+            {podeAlterar && <>
+              <PainelSecao title="Agenda vinculada" icon="calendar">
+                {loadingAgenda ? <p role="status" className="text-xs text-muted-foreground">Carregando agenda...</p> : erroAgenda ? <div>
+                  <p role="alert" className="text-xs text-danger">{erroAgenda}</p>
+                  <Button variant="ghost" size="sm" onClick={() => carregarAgendaEProntuario(atendimento.id)}>Tentar novamente</Button>
+                </div> : agendasAtendimento.length === 0 ? <div className="rounded-xl border border-dashed border-border bg-muted/40 p-3">
+                  <p className="text-sm font-medium">Nenhuma consulta agendada para este atendimento.</p>
+                  <p className="mt-1 text-xs leading-5 text-muted-foreground">Vincule uma consulta para acompanhar os próximos passos.</p>
+                </div> : <>
+                  <Badge tone="success">Vinculada</Badge>
+                  {agendasOrdenadas.map(ag => <article key={ag.id} className="rounded-xl border border-border bg-muted/30 p-3">
+                    {ag === proximaAgenda && <p className="mb-2 text-xs font-semibold text-primary">Próxima consulta</p>}
+                    <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+                      <h4 className="text-sm font-bold">{ag.tipo}</h4>
+                      <Badge tone={ag.status === 'CONCLUIDO' ? 'success' : 'info'}>{{ AGUARDANDO: 'Aguardando', CONFIRMADO: 'Confirmado', CONCLUIDO: 'Concluído', ENCERRADO: 'Encerrado' }[ag.status] ?? ag.status}</Badge>
+                    </div>
+                    <dl>
+                      <InfoItem label="Data e horário" value={`${ag.dataConsulta.split('-').reverse().join('/')} às ${ag.horario}`} />
+                      <InfoItem label="Profissional" value={ag.voluntarioId === atendimento.voluntarioId ? responsavel : `Profissional #${ag.voluntarioId}`} />
+                    </dl>
+                    <Button variant="secondary" size="sm" fullWidth className="mt-2" onClick={() => abrirModalEditarAgenda(ag)}>Visualizar / reagendar</Button>
+                  </article>)}
+                </>}
+                <div className="flex flex-wrap gap-2">
+                  <Button variant="secondary" size="sm" onClick={abrirModalNovaAgenda}>{agendasAtendimento.length ? 'Agendar retorno' : 'Agendar Consulta'}</Button>
+                  <Button variant="ghost" size="sm" onClick={() => navigate('/agenda')}>Ver agenda</Button>
+                </div>
+              </PainelSecao>
+
+              <PainelSecao title="Prontuário rápido" icon="record">
+                {loadingProntuario ? <p role="status" className="text-xs text-muted-foreground">Carregando prontuário...</p> : erroProntuario ? <div>
+                  <p role="alert" className="text-xs text-danger">{erroProntuario}</p>
+                  <Button variant="ghost" size="sm" onClick={() => carregarAgendaEProntuario(atendimento.id)}>Tentar novamente</Button>
+                </div> : ultimaEvolucao ? <dl>
+                  <InfoItem label="Histórico / anamnese" value={ultimaEvolucao.historicoMedico} />
+                  <InfoItem label="Última evolução" value={ultimaEvolucao.tratamentoAtual} />
+                  <InfoItem label="Registrada em" value={formatDate(ultimaEvolucao.dataRegistro)} />
+                </dl> : <p className="rounded-xl border border-dashed border-border bg-muted/40 p-3 text-xs leading-5 text-muted-foreground">Nenhum histórico clínico registrado neste atendimento.</p>}
+                <div className="flex flex-wrap gap-2">
+                  <Button variant="secondary" size="sm" onClick={() => setModalProntuario('evolucao')}>Registrar evolução</Button>
+                  <Button variant="ghost" size="sm" onClick={() => setModalProntuario('historico')}>Ver prontuário completo</Button>
+                </div>
+              </PainelSecao>
+            </>}
+
+            <section className="atendimento-section space-y-3 p-3" aria-labelledby="acoes-atendimento">
+              <h3 id="acoes-atendimento" className="text-sm font-bold">Ações rápidas</h3>
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                {podeAlterar && <Button variant="secondary" size="sm" disabled={salvandoCheckin || !atendimento.pessoaAtendidaTelefone} onClick={() => void handleAlterarCheckin('AGUARDANDO_RESPOSTA', true)} className="!border-success/20 !bg-success/10 !text-success">
+                  <AtendimentoIcon name="phone" className="h-4 w-4" />
+                  {salvandoCheckin ? 'Processando...' : 'Abrir WhatsApp'}
+                </Button>}
+                <Button variant="secondary" size="sm" onClick={() => void copiarDados()}><AtendimentoIcon name="copy" className="h-4 w-4" />Copiar dados</Button>
+                {podeAlterar && <Button variant="secondary" size="sm" disabled={salvando || atendimento.status === 'ENCERRADO'} onClick={confirmarEncerramento} className="!border-danger/20 !bg-danger/10 !text-danger sm:col-span-2"><AtendimentoIcon name="end" className="h-4 w-4" />Encerrar atendimento</Button>}
+              </div>
+              {podeAlterar && !atendimento.pessoaAtendidaTelefone && <p className="text-xs text-muted-foreground">Cadastre um telefone para abrir o WhatsApp.</p>}
+            </section>
+
+            {podeAlterar && <PainelSecao title="Confirmação via WhatsApp" icon="phone" defaultOpen={false}>
+              <p className="text-xs text-muted-foreground">Status atual: <strong className="text-foreground">{labelStatusCheckin(atendimento.statusCheckin)}</strong></p>
+              {atendimento.horarioEnvioCheckin && <p className="text-xs text-muted-foreground">Enviado em: {formatDate(atendimento.horarioEnvioCheckin)}</p>}
+              <div className="grid grid-cols-2 gap-2">
+                {[['CONFIRMADO', 'Confirmou'], ['NAO_COMPARECERA', 'Não vai'], ['REAGENDAMENTO_SOLICITADO', 'Solicitar reagendamento'], ['SEM_RESPOSTA', 'Sem resposta']].map(([value, label]) => <Button key={value} variant="secondary" size="sm" disabled={salvandoCheckin} onClick={() => void handleAlterarCheckin(value)}>{label}</Button>)}
+              </div>
+            </PainelSecao>}
+
+            <PainelSecao title="Histórico de atividades" icon="history">
+              <ol className="space-y-3 border-l border-border pl-3 text-xs">
+                {(atendimento.dataAbertura || atendimento.dataCriacao) && <li>
+                  <p className="font-semibold">Atendimento aberto</p>
+                  <time className="text-muted-foreground">{formatDate(atendimento.dataAbertura ?? atendimento.dataCriacao)}</time>
+                </li>}
+                {atendimento.dataAtualizacao && <li>
+                  <p className="font-semibold">Última atualização registrada</p>
+                  <time className="text-muted-foreground">{formatDate(atendimento.dataAtualizacao)}</time>
+                </li>}
+                {atendimento.dataEncerramento && <li>
+                  <p className="font-semibold">Encerramento registrado</p>
+                  <time className="text-muted-foreground">{formatDate(atendimento.dataEncerramento)}</time>
+                </li>}
+              </ol>
+              <p className="text-xs leading-5 text-muted-foreground">O histórico detalhado de alterações de status e responsável ainda não está disponível.</p>
+            </PainelSecao>
+
+            {modalAgendaAberto && <Dialog title={editandoAgendaId ? 'Editar Consulta do Atendimento' : 'Agendar Consulta para Atendimento'} description={`Paciente: ${pessoaAtendida} · Atendimento #${atendimento.id}`} onClose={() => { if (!salvandoAgenda) setModalAgendaAberto(false); }}>
+              <form onSubmit={salvarAgendaDoAtendimento} noValidate className="space-y-4">
+                <Field label="Tipo de Consulta">
                   <Input
-                    type="date"
                     disabled={salvandoAgenda}
-                    value={agendaData}
-                    onChange={(e) => setAgendaData(e.target.value)}
+                    value={agendaTipo}
+                    onChange={(e) => setAgendaTipo(e.target.value)}
+                    placeholder="Ex: Avaliação Inicial"
                   />
                 </Field>
-                <Field label="Horário">
-                  <Input
-                    type="time"
+                <div className="grid grid-cols-2 gap-4">
+                  <Field label="Data da Consulta">
+                    <Input
+                      type="date"
+                      disabled={salvandoAgenda}
+                      value={agendaData}
+                      onChange={(e) => setAgendaData(e.target.value)}
+                    />
+                  </Field>
+                  <Field label="Horário">
+                    <Input
+                      type="time"
+                      disabled={salvandoAgenda}
+                      value={agendaHorario}
+                      onChange={(e) => setAgendaHorario(e.target.value)}
+                    />
+                  </Field>
+                </div>
+                <Field label="Status da Consulta">
+                  <Select
                     disabled={salvandoAgenda}
-                    value={agendaHorario}
-                    onChange={(e) => setAgendaHorario(e.target.value)}
-                  />
+                    value={agendaStatus}
+                    onChange={(e) => setAgendaStatus(e.target.value)}
+                  >
+                    <option value="AGUARDANDO">Aguardando</option>
+                    <option value="CONFIRMADO">Confirmado</option>
+                    <option value="CONCLUIDO">Concluído (Atendido)</option>
+                    <option value="ENCERRADO">Encerrado / Desistência</option>
+                  </Select>
                 </Field>
-              </div>
-              <Field label="Status da Consulta">
-                <Select
-                  disabled={salvandoAgenda}
-                  value={agendaStatus}
-                  onChange={(e) => setAgendaStatus(e.target.value)}
-                >
-                  <option value="AGUARDANDO">Aguardando</option>
-                  <option value="CONFIRMADO">Confirmado</option>
-                  <option value="CONCLUIDO">Concluído (Atendido)</option>
-                  <option value="ENCERRADO">Encerrado / Desistência</option>
-                </Select>
-              </Field>
-              {erroFormAgenda && (
-                <p role="alert" className="text-sm font-medium text-danger">{erroFormAgenda}</p>
-              )}
-              <div className="mt-6 flex justify-end gap-3">
-                <Button type="button" variant="secondary" disabled={salvandoAgenda} onClick={() => setModalAgendaAberto(false)}>
-                  Cancelar
-                </Button>
-                <Button type="submit" disabled={salvandoAgenda}>
-                  {salvandoAgenda ? 'Salvando...' : 'Salvar Agendamento'}
-                </Button>
-              </div>
-            </form>
-          </Card>
+                {erroFormAgenda && (
+                  <p role="alert" className="text-sm font-medium text-danger">{erroFormAgenda}</p>
+                )}
+                <div className="mt-6 flex justify-end gap-3">
+                  <Button type="button" variant="secondary" disabled={salvandoAgenda} onClick={() => setModalAgendaAberto(false)}>
+                    Cancelar
+                  </Button>
+                  <Button type="submit" disabled={salvandoAgenda}>
+                    {salvandoAgenda ? 'Salvando...' : 'Salvar Agendamento'}
+                  </Button>
+                </div>
+              </form>
+            </Dialog>}
+
+            {modalProntuario && podeAlterar && <Dialog title={modalProntuario === 'evolucao' ? 'Registrar evolução no prontuário' : 'Prontuário do atendimento'} description={`Paciente: ${pessoaAtendida} · Registros vinculados a este atendimento`} maxWidthClassName="max-w-2xl" onClose={() => { if (!salvandoProntuario) setModalProntuario(null); }}>
+              {modalProntuario === 'evolucao' ? <form onSubmit={salvarEvolucaoProntuario} noValidate className="space-y-4">
+                <Field label="Histórico médico / anamnese" hint="Informe os alertas clínicos relevantes, separados por vírgula.">
+                  <Input disabled={salvandoProntuario} value={historicoMedicoInput} onChange={event => setHistoricoMedicoInput(event.target.value)} placeholder="Ex: Alérgico a Dipirona, Diabético" />
+                </Field>
+                <Field label="Procedimento / evolução clínica realizada" error={erroFormProntuario || undefined}>
+                  <Textarea disabled={salvandoProntuario} value={tratamentoAtualInput} onChange={event => { setTratamentoAtualInput(event.target.value); if (erroFormProntuario) setErroFormProntuario(''); }} className="min-h-32" placeholder="Descreva a situação atual do prontuário, dentes avaliados/tratados e conduta..." />
+                </Field>
+                <Button type="submit" isLoading={salvandoProntuario} loadingText="Salvando evolução...">Salvar Evolução no Prontuário</Button>
+              </form> : loadingProntuario ? <p role="status">Carregando prontuário...</p> : erroProntuario ? <p role="alert" className="text-sm text-danger">{erroProntuario}</p> : prontuarios.length === 0 ? <p className="text-sm text-muted-foreground">Nenhum histórico clínico registrado neste atendimento.</p> : <div className="space-y-3">
+                {prontuarios.map((item, index) => <article key={item.id ?? index} className="space-y-2 rounded-xl border border-border bg-muted/30 p-4">
+                  <p className="text-xs font-semibold text-muted-foreground">
+                    {formatDate(item.dataRegistro)}
+                    {item.agendaId ? ` · Consulta #${item.agendaId}` : ''}
+                  </p>
+                  <p className="whitespace-pre-wrap break-words text-sm">
+                    <strong>Histórico / anamnese: </strong>
+                    {item.historicoMedico || 'Não informado'}
+                  </p>
+                  <p className="whitespace-pre-wrap break-words text-sm">
+                    <strong>Evolução: </strong>
+                    {item.tratamentoAtual}
+                  </p>
+                </article>)}
+              </div>}
+            </Dialog>}
+            {confirmDialog}
+          </AtendimentoPanel>
         </div>
       )}
-
-      {confirmDialog}
     </PageShell>
   );
 }
 
 export default DetalheAtendimento;
-
