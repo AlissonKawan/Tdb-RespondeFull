@@ -18,6 +18,17 @@ type Aba = 'solicitados' | 'meus';
 type FiltroFila = 'todos' | 'urgentes' | 'apolonia';
 type BadgeTone = 'neutral' | 'success' | 'warning' | 'danger' | 'info';
 
+const PRIORIDADE_LABELS: Record<string, string> = {
+  '1': 'Urgente',
+  '2': 'Alta',
+  '3': 'Média',
+  '4': 'Baixa',
+  '5': 'Acompanhamento',
+  ALTA: 'Alta',
+  MEDIA: 'Média',
+  BAIXA: 'Baixa',
+};
+
 type PortalIconName = 'document' | 'alert' | 'users' | 'chart' | 'megaphone' | 'link' | 'copy' | 'calendar' | 'trophy' | 'tooth' | 'clock' | 'eye';
 
 function PortalIcon({ name, className = 'h-5 w-5' }: { name: PortalIconName; className?: string }) {
@@ -95,7 +106,8 @@ function statusTone(status?: string): BadgeTone {
 
 function isUrgente(atendimento: AtendimentoApi) {
   return atendimento.prioridade === 'ALTA'
-    || (typeof atendimento.prioridade === 'number' && atendimento.prioridade >= 4);
+    || atendimento.prioridade === 1
+    || atendimento.prioridade === 2;
 }
 
 function matchesFiltro(atendimento: AtendimentoApi, filtro: FiltroFila) {
@@ -136,9 +148,7 @@ function AtendimentoCard({ atendimento, onAssumir, assumindo, assumirBloqueado, 
   const navigate = useNavigate();
   const aguardandoAcolhimento = ['ABERTO', 'Aberto'].includes(atendimento.status ?? 'ABERTO');
   const prioridadeUrgente = isUrgente(atendimento);
-  const prioridadeLabel = prioridadeUrgente
-    ? 'Alta / Urgente'
-    : atendimento.prioridade === 'MEDIA' || atendimento.prioridade === 3 ? 'Média' : 'Normal';
+  const prioridadeLabel = PRIORIDADE_LABELS[String(atendimento.prioridade)] ?? 'Não informada';
 
   return (
     <article className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm transition-shadow hover:shadow-md motion-reduce:transition-none">

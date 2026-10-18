@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import PortalVoluntario from '../PortalVoluntario';
 import { useAuth } from '../../context/useAuth';
@@ -10,6 +10,7 @@ import { BrowserRouter } from 'react-router-dom';
 import type { AuthContextType } from '../../context/authContextInstance';
 import type { AuthUser } from '../../types/auth';
 import type { VoluntarioApi } from '../../types/api';
+import type { AtendimentoApi } from '../../types/AtendimentoApi';
 
 vi.mock('../../context/useAuth', () => ({
   useAuth: vi.fn(),
@@ -70,6 +71,13 @@ function voluntario(codigoIndicacao?: string): VoluntarioApi {
 }
 
 describe('PortalVoluntario', () => {
+  const prioridadesNumericas: AtendimentoApi[] = [
+    { id: 101, beneficiarioNome: 'Paciente urgente', prioridade: 1, status: 'ABERTO' },
+    { id: 102, beneficiarioNome: 'Paciente alta', prioridade: 2, status: 'ABERTO' },
+    { id: 103, beneficiarioNome: 'Paciente média', prioridade: 3, status: 'ABERTO' },
+    { id: 104, beneficiarioNome: 'Paciente baixa', prioridade: 4, status: 'ABERTO' },
+    { id: 105, beneficiarioNome: 'Paciente acompanhamento', prioridade: 5, status: 'ABERTO' },
+  ];
   beforeEach(() => {
     vi.clearAllMocks();
     Object.defineProperty(navigator, 'clipboard', {
@@ -187,6 +195,51 @@ describe('PortalVoluntario', () => {
     await user.click(screen.getByRole('button', { name: /Casos Apol.nia \(1\)/i }));
     expect(screen.getByText('Caso Protegido')).toBeInTheDocument();
     expect(screen.queryByText('Caso Urgente')).not.toBeInTheDocument();
+  });
+
+  it('filtra prioridades numéricas 1 e 2 como urgentes nas duas abas, excluindo 3, 4 e 5', async () => {
+    const user = userEvent.setup();
+    vi.mocked(useAuth).mockReturnValue(authContext());
+    vi.mocked(voluntariosService.buscarPorId).mockResolvedValue(voluntario());
+    vi.mocked(atendimentoService.listarSolicitados).mockResolvedValue(prioridadesNumericas);
+    vi.mocked(atendimentoService.listarPorVoluntario).mockResolvedValue([prioridadesNumericas[1], prioridadesNumericas[3], prioridadesNumericas[4]]);
+
+    render(<BrowserRouter><PortalVoluntario /></BrowserRouter>);
+    await screen.findByText('Paciente urgente');
+    await user.click(screen.getByRole('button', { name: 'Urgentes (2)' }));
+    expect(screen.getByText('Paciente urgente')).toBeInTheDocument();
+    expect(screen.getByText('Paciente alta')).toBeInTheDocument();
+    expect(screen.queryByText('Paciente média')).not.toBeInTheDocument();
+    expect(screen.queryByText('Paciente baixa')).not.toBeInTheDocument();
+    expect(screen.queryByText('Paciente acompanhamento')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /Meus atendimentos/i }));
+    await user.click(await screen.findByRole('button', { name: 'Urgentes (1)' }));
+    expect(screen.getByText('Paciente alta')).toBeInTheDocument();
+    expect(screen.queryByText('Paciente baixa')).not.toBeInTheDocument();
+    expect(screen.queryByText('Paciente acompanhamento')).not.toBeInTheDocument();
+  });
+
+  it('exibe os cinco rótulos reais de prioridade e não presume prioridade ausente', async () => {
+    vi.mocked(useAuth).mockReturnValue(authContext());
+    vi.mocked(voluntariosService.buscarPorId).mockResolvedValue(voluntario());
+    vi.mocked(atendimentoService.listarSolicitados).mockResolvedValue([
+      ...prioridadesNumericas,
+      { id: 106, beneficiarioNome: 'Paciente sem prioridade', status: 'ABERTO' },
+    ]);
+    vi.mocked(atendimentoService.listarPorVoluntario).mockResolvedValue([]);
+
+    render(<BrowserRouter><PortalVoluntario /></BrowserRouter>);
+    await screen.findByText('Paciente urgente');
+    for (const [nome, label] of [
+      ['Paciente urgente', 'Urgente'], ['Paciente alta', 'Alta'],
+      ['Paciente média', 'Média'], ['Paciente baixa', 'Baixa'],
+      ['Paciente acompanhamento', 'Acompanhamento'], ['Paciente sem prioridade', 'Não informada'],
+    ]) {
+      const card = screen.getByRole('heading', { name: nome }).closest('article');
+      expect(card).not.toBeNull();
+      expect(within(card!).getByText(label)).toBeInTheDocument();
+    }
   });
 
   it('deve mostrar Copiado por dois segundos ao copiar o link', async () => {
