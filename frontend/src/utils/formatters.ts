@@ -2,20 +2,25 @@ export function formatStatusLabel(status?: string): string {
   if (!status) return 'Não informado';
   const labels: Record<string, string> = {
     ABERTO: 'Aberto',
-    EM_ATENDIMENTO: 'Em Atendimento',
+    EM_ATENDIMENTO: 'Em andamento',
+    EM_ANDAMENTO: 'Em andamento',
+    AGUARDANDO: 'Aguardando',
+    CONCLUIDO: 'Concluído',
     ENCERRADO: 'Encerrado',
     CANCELADO: 'Cancelado',
-    AGUARDANDO_RESPOSTA: 'Aguardando Resposta',
-    REAGENDAMENTO_SOLICITADO: 'Reagendamento Solicitado',
-    NAO_COMPARECERA: 'Não Comparecerá',
-    SEM_RESPOSTA: 'Sem Resposta',
+    AGUARDANDO_RESPOSTA: 'Aguardando resposta',
+    REAGENDAMENTO_SOLICITADO: 'Reagendamento solicitado',
+    NAO_COMPARECERA: 'Não comparecerá',
+    SEM_RESPOSTA: 'Sem resposta',
     CONFIRMADO: 'Confirmado'
   };
-  return labels[status.toUpperCase()] || status;
+  const normalized = status.trim().toUpperCase().replace(/\s+/g, '_');
+  if (!normalized) return 'Não informado';
+  return labels[normalized] || status.trim().replace(/_/g, ' ').toLocaleLowerCase('pt-BR').replace(/^./, letter => letter.toLocaleUpperCase('pt-BR'));
 }
 
 
-export function formatDate(value?: string | null | number[] | any): string {
+export function formatDate(value?: string | null | number[]): string {
   if (!value) return '';
   try {
     if (Array.isArray(value)) {

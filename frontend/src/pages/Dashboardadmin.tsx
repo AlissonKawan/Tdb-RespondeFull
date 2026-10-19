@@ -45,6 +45,8 @@ export default function DashboardAdmin() {
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState('');
   const [feedback, setFeedback] = useState<Feedback | null>(null);
+  const [isChangingStatus, setIsChangingStatus] = useState(false);
+  const statusSaveRef = useRef(false);
   const [busca, setBusca] = useState('');
   const [filtroStatus, setFiltroStatus] = useState('todos');
   const [buscaVoluntarios, setBuscaVoluntarios] = useState('');
@@ -105,11 +107,17 @@ export default function DashboardAdmin() {
   );
 
   const mudarStatusAtendimento = async (id: number, novoStatus: AtendimentoStatus) => {
+    if (statusSaveRef.current) return;
+    statusSaveRef.current = true;
+    setIsChangingStatus(true);
     try {
       await atendimentoService.atualizarStatusPrioridade(id, { status: novoStatus });
       setAtendimentos(atendimentos.map(a => a.id === id ? { ...a, status: novoStatus } : a));
     } catch {
       setFeedback({ message: 'Não foi possível atualizar o status.', tone: 'danger' });
+    } finally {
+      statusSaveRef.current = false;
+      setIsChangingStatus(false);
     }
   };
 
@@ -234,9 +242,9 @@ export default function DashboardAdmin() {
               <Input value={busca} onChange={(e) => setBusca(e.target.value)} placeholder="Buscar por nome ou canal" />
               <Select value={filtroStatus} onChange={(e) => setFiltroStatus(e.target.value)}>
                 <option value="todos">Todos os status</option>
-                <option value="ABERTO">ABERTO</option>
-                <option value="EM_ATENDIMENTO">EM_ATENDIMENTO</option>
-                <option value="ENCERRADO">ENCERRADO</option>
+                <option value="ABERTO">{formatStatusLabel('ABERTO')}</option>
+                <option value="EM_ATENDIMENTO">{formatStatusLabel('EM_ATENDIMENTO')}</option>
+                <option value="ENCERRADO">{formatStatusLabel('ENCERRADO')}</option>
               </Select>
             </Card>
             {atendimentosFiltrados.length === 0 ? <EmptyState /> : (
@@ -246,23 +254,27 @@ export default function DashboardAdmin() {
                     <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                       <div>
                         <div className="flex flex-wrap items-center gap-2">
-                          <h3 className="font-bold text-slate-900">#{item.id} {item.pessoaAtendidaNome || item.beneficiarioNome || 'Sem Nome'}</h3>
+                          <h3 className="font-bold text-slate-900">{item.pessoaAtendidaNome || item.beneficiarioNome || 'Paciente não informado'}</h3>
                           <Badge tone={item.status === 'ENCERRADO' ? 'success' : item.status === 'ABERTO' ? 'info' : 'warning'}>{formatStatusLabel(item.status)}</Badge>
                         </div>
                         <p className="mt-1 text-sm text-slate-500">Canal: {(item.canal === 'Sistema Web' || item.canal === 'sistemas web' || item.canal === 'sistema web' || item.canal === 'Sistemas Web') ? 'TDB - Responde' : (item.canal || 'Padrão')} | Criado em {formatDate(item.dataCriacao)}</p>
                         <p className="mt-1 text-sm text-slate-600">Responsável: {item.nomeVoluntario || 'Não atribuído'}</p>
                       </div>
-                      <Select value={item.status || 'ABERTO'} onChange={(e) => {
+                      <Select aria-label={`Status do atendimento de ${item.pessoaAtendidaNome || item.beneficiarioNome || 'paciente não informado'}`} disabled={isChangingStatus || Boolean(confirmDialog)} value={item.status || 'ABERTO'} onChange={(e) => {
                         const novoStatus = e.target.value as AtendimentoStatus;
                         confirm({
                           title: 'Alterar Status',
-                          message: `Deseja realmente alterar o status deste atendimento para ${novoStatus}?`,
+                          message: `Deseja realmente alterar o status deste atendimento para ${formatStatusLabel(novoStatus)}?`,
+                          details: [
+                            { label: 'Paciente', value: item.pessoaAtendidaNome || item.beneficiarioNome || 'Paciente não informado' },
+                            { label: 'Status', value: `${formatStatusLabel(item.status)} → ${formatStatusLabel(novoStatus)}` },
+                          ],
                           onConfirm: () => mudarStatusAtendimento(item.id, novoStatus)
                         });
                       }} className="md:w-48">
-                        <option value="ABERTO">ABERTO</option>
-                        <option value="EM_ATENDIMENTO">EM ATENDIMENTO</option>
-                        <option value="ENCERRADO">ENCERRADO</option>
+                        <option value="ABERTO">{formatStatusLabel('ABERTO')}</option>
+                        <option value="EM_ATENDIMENTO">{formatStatusLabel('EM_ATENDIMENTO')}</option>
+                        <option value="ENCERRADO">{formatStatusLabel('ENCERRADO')}</option>
                       </Select>
                     </div>
                   </Card>

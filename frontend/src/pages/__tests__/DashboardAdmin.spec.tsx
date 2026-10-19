@@ -6,6 +6,7 @@ import DashboardAdmin from '../Dashboardadmin';
 import * as useAuthHook from '../../context/useAuth';
 import { usuarioService } from '../../services/usuarioService';
 import { voluntariosService } from '../../services/voluntariosService';
+import { atendimentoService } from '../../services/atendimentoService';
 
 vi.mock('../../context/useAuth', () => ({
   useAuth: vi.fn(),
@@ -179,5 +180,28 @@ describe('DashboardAdmin', () => {
 
     expect(screen.queryByRole('dialog', { name: 'Editar Beneficiário' })).not.toBeInTheDocument();
     expect(document.body.style.overflow).toBe('');
+  });
+
+  it('traduz status e confirma a mudança com paciente e valores anterior e novo', async () => {
+    const user = userEvent.setup();
+    vi.mocked(useAuthHook.useAuth).mockReturnValue({
+      user: { id: 3, nome: 'Admin', email: '', tipoUsuario: 'ADMIN', ativo: true },
+      isVoluntario: false, isBeneficiario: false, isAdmin: true, isAuthenticated: true,
+      isLoading: false, authError: '', logout: vi.fn(), login: vi.fn(), register: vi.fn(),
+    });
+    vi.mocked(atendimentoService.listarTodos).mockResolvedValueOnce([{ id: 777, pessoaAtendidaNome: 'Eduardo Boni', status: 'ABERTO' }]);
+    render(<MemoryRouter><DashboardAdmin /></MemoryRouter>);
+    await user.click(await screen.findByRole('button', { name: 'Atendimentos' }));
+    const status = screen.getByRole('combobox', { name: 'Status do atendimento de Eduardo Boni' });
+    await user.selectOptions(status, 'EM_ATENDIMENTO');
+    expect(await screen.findByText('Aberto → Em andamento')).toBeInTheDocument();
+    expect(screen.getByText('Deseja realmente alterar o status deste atendimento para Em andamento?')).toBeInTheDocument();
+    expect(document.body.textContent).not.toMatch(/EM_ATENDIMENTO|ABERTO|#777/);
+    expect(atendimentoService.atualizarStatusPrioridade).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('button', { name: 'Cancelar' }));
+    expect(status).toHaveValue('ABERTO');
+    await user.selectOptions(status, 'EM_ATENDIMENTO');
+    await user.click(await screen.findByRole('button', { name: 'Confirmar' }));
+    await waitFor(() => expect(atendimentoService.atualizarStatusPrioridade).toHaveBeenCalledWith(777, { status: 'EM_ATENDIMENTO' }));
   });
 });

@@ -6,12 +6,13 @@ import {
   type AriaAttributes,
   type InputHTMLAttributes,
   type ReactElement,
+  type ReactNode,
   type SelectHTMLAttributes,
   type TextareaHTMLAttributes,
 } from 'react';
 
 interface FieldProps {
-  label?: string;
+  label?: ReactNode;
   error?: string;
   hint?: string;
   children: ReactElement<{

@@ -58,14 +58,33 @@ Este arquivo define regras obrigatórias para qualquer agente de IA que analise,
 - No front-end, tratar estados de carregamento, falha e retorno vazio, evitando telas quebradas ou falhas silenciosas.
 - Incluir testes automatizados para os cenários de erro relevantes, não apenas para o fluxo de sucesso.
 
-## 7. Checklist obrigatório antes de concluir uma tarefa
+## 7. Priorizar a experiência do usuário (UX) e nunca expor dados técnicos de banco/back-end na interface
+
+- **É proibido exibir códigos, enums ou constantes cruas do banco de dados/back-end na interface**: valores técnicos como `EM_ATENDIMENTO`, `ENCERRADO`, `AGUARDANDO`, `CONCLUIDO`, `ABERTO`, `CRIANCA_ADOLESCENTE`, `MULHER_APOLONIA`, `AGUARDANDO_RESPOSTA`, entre outros, nunca devem aparecer diretamente em badges, selects, modais, tabelas, confirmações ou mensagens ao usuário.
+- **Traduzir sempre para linguagem humana e amigável**: utilizar e manter funções utilitárias centralizadas (como em `src/utils/formatters.ts`) para converter qualquer status, tipo ou código interno em rótulos claros em português (por exemplo: `"Em andamento"`, `"Aguardando"`, `"Confirmado"`, `"Concluído"`, `"Encerrado"`).
+- **Nunca exigir que o usuário escolha, digite ou interprete IDs de banco de dados**: é proibido criar ou manter campos visíveis de formulário que peçam IDs técnicos (como `"Atendimento Vinculado (ID)"`, `"Ex: 1001"`, `#163`) ou listar opções identificadas por chave primária (`#163 - Nome (EM_ATENDIMENTO)`). O `id` deve trafegar exclusivamente de forma interna no estado do componente e nos payloads da API.
+- **Apresentar seletores e vínculos com contexto real do usuário**: em listas e campos de seleção (como ao selecionar um atendimento na agenda), exibir informações compreensíveis e úteis ao cliente/usuário — como **Nome do Paciente, Data, Horário e Tipo de Atendimento** (ex.: `Eduardo Boni — 20/10/2026 às 08:00 — Avaliação Inicial`) — preenchendo automaticamente os demais campos relacionados para facilitar o fluxo.
+- **Pensar sempre na melhoria visual e na usabilidade do cliente/usuário**: organizar formulários e modais com hierarquia visual limpa, agrupamento semântico, ícones de apoio, estados visuais claros (como badges/pills com indicadores de cor) e rótulos intuitivos que melhorem a experiência de ponta a ponta.
+
+## 8. Exigir confirmação explícita e detalhada em alterações e ações importantes
+
+- **Toda alteração relevante deve pedir confirmação antes de ser salva**: qualquer edição ou ação importante em qualquer página do sistema — como editar uma consulta na agenda, reagendar/encerrar consulta, alterar status ou prioridade de atendimento, registrar evolução clínica, aprovar/rejeitar cadastros, editar dados de voluntários/beneficiários ou excluir registros — **deve exibir um modal de confirmação** antes de enviar a requisição ao back-end.
+- **Explicitar exatamente o que está sendo alterado ("de -> para" ou resumo claro dos campos)**: a confirmação nunca deve ser genérica. Utilize o padrão do projeto (`useConfirm` / `ConfirmDialog` com a propriedade `details`) para mostrar de forma clara e amigável ao usuário **quais dados serão modificados** (ex.: Paciente, Data/Horário anterior vs. novo, Tipo de Atendimento, Status anterior vs. novo Status traduzido), perguntando explicitamente se ele deseja confirmar aquelas alterações.
+- **Manter linguagem humana na confirmação**: todos os valores exibidos no resumo de confirmação (status, datas, horários, tipos) devem estar formatados em português claro (`dd/mm/aaaa`, `"Em andamento"`, `"Confirmado"`, etc.), nunca exibindo enums crus ou IDs técnicos.
+- **Prevenir cliques acidentais**: bloquear submissões duplicadas enquanto a confirmação ou o salvamento estiver em andamento e permitir que o usuário cancele a confirmação voltando ao formulário sem perder os dados preenchidos.
+
+## 9. Checklist obrigatório antes de concluir uma tarefa
 
 - [ ] A funcionalidade foi solicitada e seu escopo está claro.
 - [ ] Foi verificado se a mudança conflita com outros fluxos.
 - [ ] A logo, o layout e a estrutura existentes foram preservados.
 - [ ] Para mudança visual no front-end, existe imagem de referência aprovada.
+- [ ] Nenhum enum, constante de banco (`EM_ATENDIMENTO`, etc.) ou ID técnico (`#123`, input de ID) está exposto ao usuário na interface.
+- [ ] Seletores, formulários e modais priorizam a experiência visual do usuário com rótulos humanos e preenchimento inteligente.
+- [ ] Alterações em consultas e demais ações importantes pedem confirmação explícita detalhando exatamente o que será modificado.
 - [ ] Nenhum script ou alteração automática de banco foi introduzido na inicialização.
 - [ ] Alterações de banco, quando necessárias, foram explicadas e autorizadas antes da execução.
 - [ ] Exceptions e erros são tratados conforme os padrões existentes, sem expor dados sensíveis.
 - [ ] Testes automatizados relevantes foram escritos/atualizados e executados, ou limitações foram relatadas.
 - [ ] O resumo final informa arquivos alterados, testes executados, resultados e eventuais riscos pendentes.
+
