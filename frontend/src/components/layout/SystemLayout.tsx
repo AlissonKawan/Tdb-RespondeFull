@@ -187,7 +187,7 @@ export default function SystemLayout() {
         <div className="p-5 pb-2">
           <div className="flex items-center justify-between gap-3">
             <Link to="/" className="flex min-h-11 items-center gap-2.5 rounded-lg text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" aria-label="TDB Responde — página inicial">
-              <svg className="h-10 w-10 shrink-0 text-blue-600" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M16 7C9 1 3 5 5 13c1 4 3 5 3.5 11 .5 6 4.5 5 4.5 0 0-7 6-7 6 0 0 5 4 6 4.5 0 .5-6 2.5-7 3.5-11 2-8-4-12-11-6Zm0 0 4 3" /><path d="m3 23 3 1M28 3l2 1" stroke="#06B6D4" /></svg>
+              <img src="/img/logo-simbolo.png" alt="" width="512" height="492" className="h-12 w-12 shrink-0 object-contain" />
               <span className="text-lg font-extrabold leading-5 tracking-tight">TDB<br />Responde</span>
             </Link>
             <button
@@ -251,7 +251,7 @@ export default function SystemLayout() {
         </nav>
 
         <div className="border-t border-slate-100 p-4">
-          <img src="/img/logo-header.png" alt="Turma do Bem" className="mb-3 ml-3 h-8 w-auto max-w-32 object-contain object-left" />
+          <img src="/img/turmadobem.png" alt="Turma do Bem" width="159" height="90" className="mb-3 ml-3 h-8 w-auto max-w-32 object-contain object-left" />
           <button
             type="button"
             onClick={handleLogout}

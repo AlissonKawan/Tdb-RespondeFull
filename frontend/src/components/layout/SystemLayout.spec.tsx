@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, vi } from 'vitest';
 import SystemLayout from './SystemLayout';
@@ -35,7 +35,10 @@ describe('SystemLayout', () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByAltText('Turma do Bem')).toBeInTheDocument();
+    expect(screen.getByAltText('Turma do Bem')).toHaveAttribute('src', '/img/turmadobem.png');
+    const brandLink = screen.getByRole('link', { name: 'TDB Responde — página inicial' });
+    expect(within(brandLink).getByRole('presentation')).toHaveAttribute('src', '/img/logo-simbolo.png');
+    expect(brandLink).toHaveAttribute('href', '/');
     expect(screen.getAllByText('João Silva')[0]).toBeInTheDocument();
     expect(screen.getByText('VOLUNTÁRIO')).toBeInTheDocument();
     expect(screen.getByText('Portal Voluntário')).toBeInTheDocument();

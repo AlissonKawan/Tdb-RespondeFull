@@ -23,18 +23,15 @@ function Footer() {
     <footer className="border-t border-blue-950/20 bg-foreground text-white">
       <Container className="grid gap-8 py-10 md:grid-cols-[1.2fr_0.8fr_0.8fr]">
         <div>
-          <div className="flex items-center gap-4">
-            <div className="rounded-2xl bg-white p-2.5 shadow-lg shadow-blue-500/10 flex items-center justify-center">
-              <img
-                src="/img/logo.png"
-                alt="TDB Responde Logo"
-                className="h-16 w-16 object-contain"
-              />
-            </div>
-            <div>
-              <p className="font-bold text-lg tracking-wide text-white">TDB Responde</p>
-              <p className="text-xs text-slate-400">Atendimento social organizado</p>
-            </div>
+          <div className="w-fit max-w-full rounded-2xl bg-white p-3">
+            <img
+              src="/img/logo-completa.png"
+              alt="TDB Responde — Unificando atendimentos que fazem o bem."
+              width="840"
+              height="672"
+              loading="lazy"
+              className="h-auto w-56 max-w-full object-contain md:w-64"
+            />
           </div>
           <p className="mt-4 max-w-md text-sm leading-6 text-slate-300">
             Plataforma criada para centralizar canais, organizar históricos e apoiar voluntários com uma operação mais clara.

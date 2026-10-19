@@ -64,6 +64,9 @@ describe('login sem seleção prévia de perfil', () => {
     renderLogin();
 
     expect(screen.getByRole('link', { name: 'Voltar para a página inicial' })).toHaveAttribute('href', '/');
+    screen.getAllByAltText('TDB Responde').forEach((logo) => {
+      expect(logo).toHaveAttribute('src', '/img/logo-completa.png');
+    });
   });
 
   it.each([

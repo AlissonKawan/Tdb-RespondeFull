@@ -85,11 +85,11 @@ function Login() {
             aria-label="Ir para a página inicial"
           >
             <img
-              src="/img/logo-header.png"
+              src="/img/logo-completa.png"
               alt="TDB Responde"
               className="h-auto w-40 sm:w-48"
-              width="192"
-              height="192"
+              width="840"
+              height="672"
             />
           </Link>
 
@@ -138,11 +138,11 @@ function Login() {
               aria-label="Ir para a página inicial"
             >
               <img
-                src="/img/logo-header.png"
+                src="/img/logo-completa.png"
                 alt="TDB Responde"
                 className="h-auto w-32"
-                width="128"
-                height="128"
+                width="840"
+                height="672"
               />
             </Link>
             <div className="rounded-[1.25rem] border border-border bg-surface p-6 shadow-xl shadow-blue-950/[0.07] sm:p-8">
