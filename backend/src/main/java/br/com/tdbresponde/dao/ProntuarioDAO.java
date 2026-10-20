@@ -45,7 +45,12 @@ public class ProntuarioDAO {
     }
 
     public List<Prontuario> buscarPorAgenda(int agendaId) {
-        String sql = "SELECT * FROM PRONTUARIO WHERE AGENDA_ID = ? ORDER BY DATA_REGISTRO DESC";
+        String sql = "SELECT ID, VOLUNTARIO_ID, AGENDA_ID, PACIENTE, " +
+                "HISTORICO_MEDICO, TRATAMENTO_ATUAL, DATA_REGISTRO " +
+                "FROM PRONTUARIO " +
+                "WHERE AGENDA_ID = ? " +
+                "ORDER BY DATA_REGISTRO DESC, ID DESC";
+
         List<Prontuario> lista = new ArrayList<>();
 
         try (Connection conn = dataSource.getConnection();

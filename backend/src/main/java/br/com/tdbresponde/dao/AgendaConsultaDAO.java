@@ -48,7 +48,11 @@ public class AgendaConsultaDAO {
     }
 
     public List<AgendaConsulta> buscarPorVoluntario(int voluntarioId) {
-        String sql = "SELECT * FROM AGENDA_CONSULTA WHERE VOLUNTARIO_ID = ? ORDER BY DATA_CONSULTA ASC, HORARIO ASC";
+        String sql = "SELECT ID, VOLUNTARIO_ID, PACIENTE, TIPO, " +
+                "DATA_CONSULTA, HORARIO, STATUS, TIPO_PESSOA " +
+                "FROM AGENDA_CONSULTA " +
+                "WHERE VOLUNTARIO_ID = ? " +
+                "ORDER BY DATA_CONSULTA ASC, HORARIO ASC, ID ASC";
         List<AgendaConsulta> lista = new ArrayList<>();
 
         try (Connection conn = dataSource.getConnection();
