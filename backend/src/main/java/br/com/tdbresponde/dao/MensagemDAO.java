@@ -43,8 +43,27 @@ public class MensagemDAO {
                 System.out.println("Aviso na conversao para CLOB (pode ja ser CLOB): " + e.getMessage());
             }
 
+            adicionarColunaSeNecessario(stmt,
+                    "ALTER TABLE MENSAGEM ADD (TIPO_MENSAGEM VARCHAR2(20) DEFAULT 'TEXTO' NOT NULL)",
+                    "TIPO_MENSAGEM");
+            adicionarColunaSeNecessario(stmt,
+                    "ALTER TABLE MENSAGEM ADD (ARQUIVO_URL VARCHAR2(1000))",
+                    "ARQUIVO_URL");
+            adicionarColunaSeNecessario(stmt,
+                    "ALTER TABLE MENSAGEM ADD (MIME_TYPE VARCHAR2(100))",
+                    "MIME_TYPE");
+
         } catch (Exception e) {
             System.out.println("Erro na inicializacao da tabela MENSAGEM: " + e.getMessage());
+        }
+    }
+
+    private void adicionarColunaSeNecessario(Statement stmt, String sql, String coluna) {
+        try {
+            stmt.execute(sql);
+            System.out.println("Coluna " + coluna + " adicionada a tabela MENSAGEM");
+        } catch (SQLException e) {
+            System.out.println("Aviso ao adicionar " + coluna + " (pode ja existir): " + e.getMessage());
         }
     }
 
@@ -53,14 +72,15 @@ public class MensagemDAO {
 
     private static final String SELECT_BASE = 
             "SELECT M.ID, M.ATENDIMENTO_ID, M.CONTEUDO, M.DATA_HORA, M.ENVIADO_POR, " +
+            "M.TIPO_MENSAGEM, M.ARQUIVO_URL, M.MIME_TYPE, " +
             "C.ID AS CANAL_ID, C.NOME AS CANAL_NOME, C.DESCRICAO AS CANAL_DESC " +
             "FROM MENSAGEM M " +
             "LEFT JOIN MENSAGEM_CANAL MC ON MC.MENSAGEM_ID = M.ID " +
             "LEFT JOIN CANAL_COMUNICACAO C ON MC.CANAL_ID = C.ID ";
             
     public void inserir(Mensagem mensagem) {
-        String sql = "INSERT INTO MENSAGEM (ATENDIMENTO_ID, CONTEUDO, DATA_HORA, ENVIADO_POR) " +
-                "VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO MENSAGEM (ATENDIMENTO_ID, CONTEUDO, DATA_HORA, ENVIADO_POR, " +
+                "TIPO_MENSAGEM, ARQUIVO_URL, MIME_TYPE) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = dataSource.getConnection()) {
             try (PreparedStatement stmt = conn.prepareStatement(sql, new String[] { "ID" })) {
@@ -68,6 +88,9 @@ public class MensagemDAO {
                 stmt.setString(2, mensagem.getConteudo());
                 stmt.setObject(3, mensagem.getDataHora());
                 stmt.setString(4, mensagem.getEnviadoPor());
+                stmt.setString(5, mensagem.getTipoMensagem() == null ? "TEXTO" : mensagem.getTipoMensagem());
+                stmt.setString(6, mensagem.getArquivoUrl());
+                stmt.setString(7, mensagem.getMimeType());
                 stmt.executeUpdate();
 
                 try (ResultSet rs = stmt.getGeneratedKeys()) {
@@ -164,6 +187,10 @@ public class MensagemDAO {
         mensagem.setConteudo(rs.getString("CONTEUDO"));
         mensagem.setDataHora(rs.getObject("DATA_HORA", LocalDateTime.class));
         mensagem.setEnviadoPor(rs.getString("ENVIADO_POR"));
+        String tipoMensagem = rs.getString("TIPO_MENSAGEM");
+        mensagem.setTipoMensagem(tipoMensagem == null ? "TEXTO" : tipoMensagem);
+        mensagem.setArquivoUrl(rs.getString("ARQUIVO_URL"));
+        mensagem.setMimeType(rs.getString("MIME_TYPE"));
 
         int atendimentoId = rs.getInt("ATENDIMENTO_ID");
         if (!rs.wasNull()) {

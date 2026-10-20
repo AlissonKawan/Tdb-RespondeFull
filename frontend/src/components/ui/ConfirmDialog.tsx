@@ -29,6 +29,8 @@ interface DialogProps {
   initialFocusRef?: RefObject<HTMLElement>;
   role?: 'dialog' | 'alertdialog';
   maxWidthClassName?: string;
+  headerIcon?: ReactNode;
+  variant?: 'default' | 'form';
 }
 
 const focusableSelector = [
@@ -49,6 +51,8 @@ export function Dialog({
   initialFocusRef,
   role = 'dialog',
   maxWidthClassName = 'max-w-md',
+  headerIcon,
+  variant = 'default',
 }: DialogProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const onCloseRef = useRef(onClose);
@@ -69,9 +73,10 @@ export function Dialog({
     const previousBodyOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
 
-    const focusTarget = initialFocusRef?.current
-      ?? dialog.querySelector<HTMLElement>(focusableSelector)
-      ?? dialog;
+    const requestedFocus = initialFocusRef?.current;
+    const focusTarget = requestedFocus && !requestedFocus.matches(':disabled')
+      ? requestedFocus
+      : dialog.querySelector<HTMLElement>(focusableSelector) ?? dialog;
     focusTarget.focus();
 
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -110,7 +115,7 @@ export function Dialog({
   }, [initialFocusRef]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overscroll-contain p-4">
+    <div className={`fixed inset-0 flex items-center justify-center overscroll-contain p-4 ${role === 'alertdialog' ? 'z-[80]' : 'z-50'}`}>
       <div className="fixed inset-0 bg-slate-950/55 backdrop-blur-sm" aria-hidden="true" />
 
       <div
@@ -120,20 +125,21 @@ export function Dialog({
         aria-labelledby={titleId}
         aria-describedby={description ? descriptionId : undefined}
         tabIndex={-1}
-        className={`relative z-10 flex max-h-[90vh] w-full flex-col overflow-hidden rounded-ui-lg border border-border bg-surface text-left shadow-2xl ${maxWidthClassName}`}
+        className={`relative z-10 flex w-full flex-col overflow-hidden border border-border bg-surface text-left shadow-2xl ${variant === 'form' ? 'max-h-[94dvh] rounded-3xl' : 'max-h-[90dvh] rounded-ui-lg'} ${maxWidthClassName}`}
       >
-        <div className="flex items-start justify-between gap-4 border-b border-border bg-muted/45 px-6 py-5">
-          <div className="min-w-0">
-            <h2 id={titleId} className="text-pretty text-xl font-bold leading-7 text-foreground">{title}</h2>
+        <div className={`shrink-0 ${variant === 'form' ? 'grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 gap-y-2 bg-white px-6 pb-5 pt-6 sm:px-8 sm:pt-8' : 'flex items-start justify-between gap-3 border-b border-border bg-muted/45 px-6 py-5'}`}>
+          {headerIcon ? <div className={`shrink-0 ${variant === 'form' ? 'col-start-1 row-start-1 sm:row-span-2' : ''}`}>{headerIcon}</div> : null}
+          <div className={variant === 'form' ? 'contents' : 'min-w-0 flex-1'}>
+            <h2 id={titleId} className={`text-pretty font-bold text-foreground ${variant === 'form' ? 'col-start-2 row-start-1 text-xl tracking-tight sm:text-3xl' : 'text-xl leading-7'}`}>{title}</h2>
             {description ? (
-              <p id={descriptionId} className="mt-1 text-sm leading-6 text-muted-foreground">{description}</p>
+              <p id={descriptionId} className={`text-sm leading-6 text-muted-foreground ${variant === 'form' ? 'col-span-3 row-start-2 sm:col-span-1 sm:col-start-2' : 'mt-1'}`}>{description}</p>
             ) : null}
           </div>
           <button
             type="button"
             aria-label={`Fechar ${title}`}
             onClick={onClose}
-            className="-mr-2 inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-ui text-muted-foreground transition-colors duration-fast hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className={`-mr-2 inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-ui text-muted-foreground transition-colors duration-fast hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${variant === 'form' ? 'col-start-3 row-start-1 self-start sm:row-span-2' : ''}`}
           >
             <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 6l12 12M18 6 6 18" />
@@ -141,9 +147,9 @@ export function Dialog({
           </button>
         </div>
 
-        <div className="overflow-y-auto px-6 py-5">{children}</div>
+        <div className={`min-h-0 overflow-y-auto px-6 ${variant === 'form' ? 'pb-4 sm:px-8' : 'py-5'}`}>{children}</div>
         {footer ? (
-          <div className="flex flex-col-reverse gap-3 border-t border-border bg-muted/30 px-6 py-4 sm:flex-row sm:justify-end">
+          <div className={`flex shrink-0 flex-col-reverse gap-3 border-t border-border px-6 py-4 sm:flex-row sm:justify-end ${variant === 'form' ? 'bg-white sm:px-8' : 'bg-muted/30'}`}>
             {footer}
           </div>
         ) : null}

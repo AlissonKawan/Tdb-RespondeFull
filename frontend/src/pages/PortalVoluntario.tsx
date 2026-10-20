@@ -1,13 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Section from '../components/layout/Section';
 import PageShell from '../components/layout/PageShell';
 import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import { ErrorState, LoadingState } from '../components/ui/FeedbackState';
-import PageHeader from '../components/ui/PageHeader';
-import SectionHeader from '../components/ui/SectionHeader';
 import { Input } from '../components/ui/Input';
 import { atendimentoService } from '../services/atendimentoService';
 import { voluntariosService } from '../services/voluntariosService';
@@ -20,6 +17,67 @@ import { formatStatusLabel, formatDate } from '../utils/formatters';
 type Aba = 'solicitados' | 'meus';
 type FiltroFila = 'todos' | 'urgentes' | 'apolonia';
 type BadgeTone = 'neutral' | 'success' | 'warning' | 'danger' | 'info';
+
+const PRIORIDADE_LABELS: Record<string, string> = {
+  '1': 'Urgente',
+  '2': 'Alta',
+  '3': 'Média',
+  '4': 'Baixa',
+  '5': 'Acompanhamento',
+  ALTA: 'Alta',
+  MEDIA: 'Média',
+  BAIXA: 'Baixa',
+};
+
+type PortalIconName = 'document' | 'alert' | 'users' | 'chart' | 'megaphone' | 'link' | 'copy' | 'calendar' | 'trophy' | 'tooth' | 'clock' | 'eye';
+
+function PortalIcon({ name, className = 'h-5 w-5' }: { name: PortalIconName; className?: string }) {
+  const paths: Record<PortalIconName, ReactNode> = {
+    document: <><path d="M8 3H5v18h14V7l-4-4H8Z" /><path d="M14 3v5h5M8 11h8M8 15h8M8 18h5" /></>,
+    alert: <><path d="m10.3 4-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3l-8-14a2 2 0 0 0-3.4 0Z" /><path d="M12 9v4m0 4h.01" /></>,
+    users: <><circle cx="9" cy="7" r="3" /><path d="M2 21v-3a6 6 0 0 1 12 0v3M16 4a3 3 0 0 1 0 6m2 4a5 5 0 0 1 4 5v2" /></>,
+    chart: <><path d="M5 20v-6m7 6V9m7 11V3" strokeWidth="4" /></>,
+    megaphone: <><path d="m3 11 14-6v14L3 15v-4Zm14-3 3-2v12l-3-2M6 16l2 6h3l-2-5M22 10v4" /></>,
+    link: <><path d="m10 13 4-4M8 16l-1 1a4 4 0 0 1-6-6l4-4a4 4 0 0 1 6 0m2 1 1-1a4 4 0 0 1 6 6l-4 4a4 4 0 0 1-6 0" /></>,
+    copy: <><rect x="8" y="7" width="12" height="15" rx="2" /><path d="M15 7V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4" /></>,
+    calendar: <><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M7 2v6m10-6v6M3 11h18m-13 4h3m-3 3h6" /></>,
+    trophy: <><path d="M7 3h10v5a5 5 0 0 1-10 0V3Zm0 2H3v2a4 4 0 0 0 4 4m10-6h4v2a4 4 0 0 1-4 4M12 13v5m-5 3h10m-8 0v-3h6v3" /></>,
+    tooth: <path d="M12 5C7 1 3 4 4 10c.4 2.5 2 4 2.5 8 .6 5 3.5 4 3.5 0 0-5 4-5 4 0 0 4 2.9 5 3.5 0 .5-4 2.1-5.5 2.5-8 1-6-3-9-8-5Zm0 0 3 2" />,
+    clock: <><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></>,
+    eye: <><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /></>,
+  };
+  return <svg className={`shrink-0 ${className}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>;
+}
+
+function CareIllustration() {
+  const id = useId();
+  return (
+    <svg className="pointer-events-none absolute -right-16 bottom-0 h-full w-80 opacity-25 sm:right-4 sm:opacity-60 lg:right-32 lg:w-96" viewBox="0 0 360 240" fill="none" aria-hidden="true">
+      <defs>
+        <linearGradient id={`${id}-heart`} x1="140" y1="30" x2="220" y2="120" gradientUnits="userSpaceOnUse"><stop stopColor="#7DD3FC" /><stop offset="1" stopColor="#0284C7" /></linearGradient>
+        <linearGradient id={`${id}-hands`} x1="110" y1="80" x2="250" y2="235" gradientUnits="userSpaceOnUse"><stop stopColor="#BAE6FD" /><stop offset="1" stopColor="#60A5FA" /></linearGradient>
+        <radialGradient id={`${id}-glow`}><stop stopColor="#FFF" stopOpacity=".95" /><stop offset="1" stopColor="#BAE6FD" stopOpacity="0" /></radialGradient>
+      </defs>
+      <ellipse cx="180" cy="113" rx="160" ry="110" fill={`url(#${id}-glow)`} />
+      <path d="M180 101c-14-13-43-30-38-51 5-23 31-22 38-6 11-21 36-18 39 1 4 23-23 44-39 56Z" fill={`url(#${id}-heart)`} />
+      <g fill={`url(#${id}-hands)`}>
+        <path d="M123 240c10-30-3-51-23-77-20-28-23-53-17-83 3-17 14-17 15 0 2 24 8 43 23 55-13-26-19-42-11-46 9-5 11 21 28 40-7-18-15-26-8-30 9-5 14 10 25 25 25 32 14 57-2 116Z" />
+        <path d="M237 240c-10-30 3-51 23-77 20-28 23-53 17-83-3-17-14-17-15 0-2 24-8 43-23 55 13-26 19-42 11-46-9-5-11 21-28 40 7-18 15-26 8-30-9-5-14 10-25 25-25 32-14 57 2 116Z" />
+      </g>
+      <path d="m123 40 5 9m102-21-5 9m-45-17v-9" stroke="white" strokeWidth="7" strokeLinecap="round" opacity=".7" />
+    </svg>
+  );
+}
+
+function QueueHeading({ mine = false }: { mine?: boolean }) {
+  return (
+    <div className="mb-4 flex items-center gap-3">
+      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-100/80 text-blue-600"><PortalIcon name="document" className="h-6 w-6" /></span>
+      <div><h2 className="text-xl font-bold tracking-tight text-slate-900 md:text-2xl">{mine ? 'Meus atendimentos' : 'Atendimentos solicitados'}</h2>
+        <p className="mt-1 text-sm text-slate-500">{mine ? 'Casos que já estão vinculados ao seu acompanhamento.' : 'Casos aguardando acolhimento da equipe voluntária.'}</p></div>
+    </div>
+  );
+}
 
 function getPessoa(atendimento: AtendimentoApi) {
   return atendimento.pessoaAtendidaNome
@@ -48,7 +106,8 @@ function statusTone(status?: string): BadgeTone {
 
 function isUrgente(atendimento: AtendimentoApi) {
   return atendimento.prioridade === 'ALTA'
-    || (typeof atendimento.prioridade === 'number' && atendimento.prioridade >= 4);
+    || atendimento.prioridade === 1
+    || atendimento.prioridade === 2;
 }
 
 function matchesFiltro(atendimento: AtendimentoApi, filtro: FiltroFila) {
@@ -87,42 +146,61 @@ function AtendimentoCard({ atendimento, onAssumir, assumindo, assumirBloqueado, 
   hasNovaMensagem?: boolean;
 }) {
   const navigate = useNavigate();
+  const aguardandoAcolhimento = ['ABERTO', 'Aberto'].includes(atendimento.status ?? 'ABERTO');
+  const prioridadeUrgente = isUrgente(atendimento);
+  const prioridadeLabel = PRIORIDADE_LABELS[String(atendimento.prioridade)] ?? 'Não informada';
 
   return (
-    <Card className="p-5 hover:-translate-y-0.5 hover:border-blue-200 md:p-6">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-        <div>
-          <div className="flex flex-wrap items-center gap-2">
-            <h3 className="text-lg font-bold text-foreground">{getPessoa(atendimento)}</h3>
-            {atendimento.status && <Badge tone={statusTone(atendimento.status)}>{formatStatusLabel(atendimento.status)}</Badge>}
-            {hasNovaMensagem && <Badge tone="danger">Nova Mensagem</Badge>}
+    <article className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm transition-shadow hover:shadow-md motion-reduce:transition-none">
+      <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+        <div className="flex min-w-0 items-start gap-4">
+          <span className="mt-1 flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600 md:h-16 md:w-16"><PortalIcon name="tooth" className="h-7 w-7" /></span>
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge tone={aguardandoAcolhimento ? 'warning' : statusTone(atendimento.status)}>
+                <PortalIcon name="clock" className="mr-1 h-3.5 w-3.5" />
+                {aguardandoAcolhimento ? 'Aguardando acolhimento' : formatStatusLabel(atendimento.status)}
+              </Badge>
+              {hasNovaMensagem && <Badge tone="danger">Nova Mensagem</Badge>}
+            </div>
+            <h3 className="mt-2 break-words text-lg font-bold text-slate-900">{getPessoa(atendimento)}</h3>
+            <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs leading-6 text-slate-600 sm:text-sm">
+              <span>Especialidade: Clínica geral</span><span aria-hidden="true">•</span>
+              <span>Região: Não informada</span><span aria-hidden="true">•</span>
+              <span className="inline-flex items-center gap-1.5">Prioridade:
+                <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${prioridadeUrgente ? 'bg-rose-50 text-rose-700' : 'bg-emerald-50 text-emerald-700'}`}>{prioridadeLabel}</span>
+              </span>
+            </div>
+            <div className="mt-2 space-y-1 text-xs leading-5 text-slate-500">
+              <p><strong className="text-foreground">Contexto:</strong> <span className="line-clamp-1">{getAtendimentoDescricaoContexto(atendimento)}</span></p>
+              {atendimento.canal && <p><strong className="text-foreground">Canal:</strong> {atendimento.canal?.toLowerCase().includes('sistema web') ? 'TDB - Responde' : atendimento.canal}</p>}
+              {(atendimento.dataAtualizacao || atendimento.dataCriacao || atendimento.dataAbertura) && (
+                <p><strong className="text-foreground">Última Atividade:</strong> {formatDate(atendimento.dataAtualizacao ?? atendimento.dataCriacao ?? atendimento.dataAbertura)}</p>
+              )}
+            </div>
           </div>
-          <div className="mt-3 grid gap-2 text-sm text-muted-foreground md:grid-cols-2">
-            <p><strong className="text-foreground">Contexto:</strong> <span className="line-clamp-1">{getAtendimentoDescricaoContexto(atendimento)}</span></p>
-            {atendimento.canal && <p><strong className="text-foreground">Canal:</strong> {atendimento.canal?.toLowerCase().includes('sistema web') ? 'TDB - Responde' : atendimento.canal}</p>}
-            {atendimento.prioridade && <p><strong className="text-foreground">Prioridade:</strong> {atendimento.prioridade}</p>}
-            {(atendimento.dataAtualizacao || atendimento.dataCriacao || atendimento.dataAbertura) && (
-              <p><strong className="text-foreground">Última Atividade:</strong> {formatDate(atendimento.dataAtualizacao ?? atendimento.dataCriacao ?? atendimento.dataAbertura)}</p>
+        </div>
+        <div className="shrink-0 xl:max-w-xs xl:text-right">
+          <p className="text-sm font-bold text-slate-500">#TDB-{atendimento.id.toString().padStart(3, '0')}</p>
+          {(atendimento.dataCriacao || atendimento.dataAbertura) && <p className="mt-0.5 text-xs text-slate-500">Recebido em {formatDate(atendimento.dataCriacao ?? atendimento.dataAbertura)}</p>}
+          <div className="mt-4 flex flex-wrap gap-2 xl:justify-end">
+            <Button onClick={() => navigate(`/atendimentos/${atendimento.id}`)} className="rounded-xl"><PortalIcon name="eye" />Abrir atendimento</Button>
+            {onAssumir && (
+              <Button
+                variant="secondary"
+                className="rounded-xl"
+                disabled={assumirBloqueado}
+                isLoading={assumindo}
+                loadingText="Assumindo..."
+                onClick={() => onAssumir(atendimento)}
+              >
+                Assumir atendimento
+              </Button>
             )}
           </div>
         </div>
-        <div className="flex flex-wrap gap-2">
-          {onAssumir && (
-            <Button
-              disabled={assumirBloqueado}
-              isLoading={assumindo}
-              loadingText="Assumindo..."
-              onClick={() => onAssumir(atendimento)}
-            >
-              Assumir atendimento
-            </Button>
-          )}
-          <Button variant="secondary" onClick={() => navigate(`/atendimentos/${atendimento.id}`)}>
-            Abrir atendimento
-          </Button>
-        </div>
       </div>
-    </Card>
+    </article>
   );
 }
 
@@ -302,45 +380,45 @@ function PortalVoluntario() {
   };
 
   return (
-    <PageShell>
-      <PageHeader
-        variant="compact"
-        eyebrow="Portal"
-        title="Portal do Voluntário"
-        description="Acompanhe atendimentos solicitados e veja os atendimentos vinculados ao seu usuário."
-        actions={
-          <>
-            <Button variant="secondary" onClick={() => navigate('/agenda')}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 text-blue-500">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                <line x1="16" y1="2" x2="16" y2="6" />
-                <line x1="8" y1="2" x2="8" y2="6" />
-                <line x1="3" y1="10" x2="21" y2="10" />
-              </svg>
-              Minha Agenda
-            </Button>
-            <Button variant="secondary" onClick={() => navigate('/ranking')}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 text-blue-500">
-                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
-                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
-                <path d="M4 22h16"/>
-                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
-                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
-                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
-              </svg>
-              Ranking de Indicações
-            </Button>
-          </>
-        }
-      />
+    <PageShell className="mx-auto max-w-7xl space-y-6 p-6 md:p-8">
+      <section aria-labelledby="portal-titulo" className="relative isolate overflow-hidden rounded-2xl border border-blue-100 bg-gradient-to-r from-blue-50/80 via-sky-50/50 to-blue-100/40 p-6 md:p-7">
+        <CareIllustration />
+        <div className="relative max-w-2xl">
+          <p className="text-xs font-bold uppercase tracking-widest text-blue-600">Portal</p>
+          <h1 id="portal-titulo" className="mt-2 text-2xl font-extrabold tracking-tight text-slate-900 md:text-3xl">Seu painel de atendimentos</h1>
+          <p className="mt-2 max-w-xl text-sm leading-6 text-slate-600 md:text-base">Acompanhe atendimentos solicitados, gerencie sua agenda e acompanhe o impacto do seu trabalho voluntário.</p>
+        </div>
+        <div className="relative mt-5 flex flex-wrap gap-3 lg:justify-end">
+          <Button variant="secondary" onClick={() => navigate('/agenda')} className="rounded-xl bg-white"><PortalIcon name="calendar" className="h-5 w-5 text-blue-600" />Minha Agenda</Button>
+          <Button variant="secondary" onClick={() => navigate('/ranking')} className="rounded-xl bg-white"><PortalIcon name="trophy" className="h-5 w-5 text-blue-600" />Ranking de Indicações</Button>
+        </div>
+      </section>
 
-      <Section tone="white">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3" aria-label="Resumo dos atendimentos">
+        {([
+          { label: 'Solicitações disponíveis', value: solicitados.length, description: 'Casos aguardando voluntários', icon: 'document', decoration: 'users', surface: 'border-blue-100 bg-blue-50/60', color: 'bg-blue-100 text-blue-600', watermark: 'text-blue-200', loading: loadingSolicitados, error: erroSolicitados },
+          { label: 'Urgentes', value: totalUrgentes, description: 'Casos que precisam de atenção', icon: 'alert', decoration: 'alert', surface: 'border-rose-100 bg-rose-50/50', color: 'bg-rose-100 text-rose-600', watermark: 'text-rose-200', loading: aba === 'solicitados' ? loadingSolicitados : loadingMeus, error: aba === 'solicitados' ? erroSolicitados : erroMeus },
+          { label: 'Meus atendimentos', value: meusAtendimentos.length, description: 'Casos em acompanhamento', icon: 'users', decoration: 'chart', surface: 'border-emerald-100 bg-emerald-50/50', color: 'bg-emerald-100 text-emerald-600', watermark: 'text-emerald-200', loading: loadingMeus, error: erroMeus },
+        ] as const).map(metric => (
+          <div key={metric.label} className={`relative flex items-start gap-4 overflow-hidden rounded-2xl border p-5 md:flex-col xl:flex-row ${metric.surface}`}>
+            <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${metric.color}`}><PortalIcon name={metric.icon} className="h-6 w-6" /></span>
+            <div className="relative z-10 min-w-0">
+              <p className="text-sm font-semibold text-slate-700">{metric.label}</p>
+              <p className="mt-1 text-3xl font-extrabold tabular-nums text-slate-900" aria-label={metric.error ? 'Indisponível' : metric.loading ? 'Carregando' : undefined}>{metric.loading || metric.error ? '—' : metric.value}</p>
+              <p className="mt-1 text-xs leading-5 text-slate-500">{metric.description}</p>
+            </div>
+            <PortalIcon name={metric.decoration} className={`absolute bottom-5 right-4 h-11 w-11 opacity-60 ${metric.watermark}`} />
+          </div>
+        ))}
+      </div>
+
+      <div className="space-y-5">
         {user?.tipoUsuario === 'VOLUNTARIO' && (
-          <Card className="mb-5 overflow-hidden border-blue-100 bg-gradient-to-r from-blue-50 via-white to-emerald-50 p-4">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="rounded-2xl border border-blue-100 bg-blue-50/40 p-4 shadow-sm md:p-5">
+            <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
               <div className="flex min-w-0 items-center gap-3">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-primary shadow-sm ring-1 ring-blue-100">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                  <PortalIcon name="megaphone" className="h-6 w-6" />
                 </div>
                 <div className="min-w-0">
                   <h2 className="font-bold text-foreground">Campanha de Indicações</h2>
@@ -348,21 +426,25 @@ function PortalVoluntario() {
                 </div>
               </div>
               {codigoIndicacao ? (
-                <div className="flex w-full flex-col gap-2 sm:flex-row lg:max-w-xl">
-                  <Input aria-label="Link de indicação" readOnly value={`${window.location.origin}/cadastro?ref=${codigoIndicacao}`} className="min-w-0 bg-white py-2 text-sm" />
+                <div className="flex w-full flex-col gap-3 sm:flex-row xl:max-w-lg">
+                  <div className="flex min-w-0 flex-1 items-center gap-2 rounded-xl border border-slate-200 bg-white pl-3 text-blue-600">
+                    <PortalIcon name="link" />
+                    <Input aria-label="Link de indicação" readOnly value={`${window.location.origin}/cadastro?ref=${codigoIndicacao}`} className="min-w-0 border-0 bg-transparent py-2 pl-0 text-sm shadow-none" />
+                  </div>
                   <Button
-                    variant={copiado ? 'primary' : 'secondary'}
+                    variant="primary"
                     onClick={copiarLink}
-                    className={`min-w-28 justify-center transition-[transform,background-color,color] motion-reduce:transition-none ${copiado ? 'scale-[1.02] bg-emerald-600 text-white hover:bg-emerald-700 motion-reduce:scale-100' : ''}`}
+                    className={`min-w-28 shrink-0 justify-center rounded-xl motion-reduce:transition-none ${copiado ? 'bg-emerald-600 text-white hover:bg-emerald-700' : ''}`}
                   >
                     {copiado ? (
                       <><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>Copiado!</>
-                    ) : 'Copiar link'}
+                    ) : <><PortalIcon name="copy" />Copiar link</>}
                   </Button>
                 </div>
               ) : (
                 <Button
-                  variant="secondary"
+                  variant="primary"
+                  className="shrink-0 rounded-xl"
                   onClick={async () => {
                     if (!user?.voluntarioId) return;
                     try {
@@ -374,30 +456,33 @@ function PortalVoluntario() {
                     }
                   }}
                 >
-                  Gerar meu link
+                  Gerar meu Link
                 </Button>
               )}
             </div>
             <div className="sr-only" role="status" aria-live="polite">{copiado ? 'Link de indicação copiado.' : ''}</div>
             {erroCopia && <p role="alert" className="mt-2 text-sm font-medium text-danger">{erroCopia}</p>}
-          </Card>
+          </div>
         )}
 
-        <div className="mb-6">
-          <Card className="flex flex-col gap-4 p-4 md:flex-row md:items-center md:justify-between md:p-6">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-widest text-primary">Bem-vindo</p>
-              <h2 className="mt-2 text-2xl font-bold text-foreground">{user?.nome}</h2>
-              <p className="mt-1 text-muted-foreground">{user?.email}</p>
+        <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm md:p-5">
+          <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+            <div className="flex min-w-0 items-center gap-4">
+              <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-blue-50 text-2xl font-bold text-blue-600" aria-hidden="true">{user?.nome?.trim().charAt(0).toUpperCase() || 'U'}</span>
+              <div className="min-w-0">
+                <p className="text-xs font-bold uppercase tracking-widest text-primary">Bem-vindo</p>
+                <h2 className="mt-1 break-words text-xl font-bold text-slate-900">{user?.nome}</h2>
+                <p className="break-words text-sm text-slate-500">{user?.email}</p>
+              </div>
             </div>
-            <div className="flex flex-wrap gap-2">
-              <Button variant={aba === 'solicitados' ? 'primary' : 'secondary'} onClick={() => selecionarAba('solicitados')}>Atendimentos solicitados</Button>
-              <Button variant={aba === 'meus' ? 'primary' : 'secondary'} onClick={() => selecionarAba('meus')}>Meus atendimentos</Button>
+            <div className="flex flex-wrap gap-2 rounded-2xl bg-slate-50 p-1" role="group" aria-label="Filas de atendimentos">
+              <Button className="rounded-xl" aria-pressed={aba === 'solicitados'} variant={aba === 'solicitados' ? 'primary' : 'ghost'} onClick={() => selecionarAba('solicitados')}>Atendimentos solicitados</Button>
+              <Button className="rounded-xl" aria-pressed={aba === 'meus'} variant={aba === 'meus' ? 'primary' : 'ghost'} onClick={() => selecionarAba('meus')}>Meus atendimentos</Button>
             </div>
-          </Card>
+          </div>
         </div>
 
-        <div className="mb-5 flex flex-wrap items-center gap-2" aria-label="Filtros da fila de atendimentos">
+        <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Filtros da fila de atendimentos">
           {([
             ['todos', `Todos (${atendimentosAtuais.length})`],
             ['urgentes', `Urgentes (${totalUrgentes})`],
@@ -407,6 +492,7 @@ function PortalVoluntario() {
               key={value}
               type="button"
               variant={filtroFila === value ? 'primary' : 'secondary'}
+              className="rounded-full px-4 py-1.5"
               aria-pressed={filtroFila === value}
               onClick={() => setFiltroFila(value)}
             >
@@ -423,7 +509,7 @@ function PortalVoluntario() {
 
         {aba === 'solicitados' && (
           <div>
-            <SectionHeader title="Atendimentos solicitados" description="Casos aguardando acolhimento da equipe voluntária." />
+            <QueueHeading />
             {loadingSolicitados && <LoadingState title="Carregando atendimentos solicitados..." count={3} />}
             {erroSolicitados && <ErrorState title="Erro ao carregar atendimentos" description={erroSolicitados} />}
             {!loadingSolicitados && !erroSolicitados && solicitados.length === 0 && (
@@ -451,7 +537,7 @@ function PortalVoluntario() {
 
         {aba === 'meus' && (
           <div>
-            <SectionHeader title="Meus atendimentos" description="Casos que já estão vinculados ao seu acompanhamento." />
+            <QueueHeading mine />
             {loadingMeus && <LoadingState title="Carregando seus atendimentos..." count={3} />}
             {erroMeus && <ErrorState title="Erro ao carregar seus atendimentos" description={erroMeus} />}
             {!loadingMeus && !erroMeus && meusAtendimentos.length === 0 && (
@@ -470,7 +556,7 @@ function PortalVoluntario() {
             </div>
           </div>
         )}
-      </Section>
+      </div>
       {confirmDialog}
     </PageShell>
   );

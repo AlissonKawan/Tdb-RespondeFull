@@ -11,7 +11,6 @@ export const atendimentoService = {
   listarPorContaBeneficiario: (contaId: number) =>
     apiClient.get<AtendimentoApi[]>(`/atendimentos/beneficiario/conta/${contaId}`),
   buscarPorId: (id: number) => apiClient.get<AtendimentoApi>(`/atendimentos/${id}`),
-  preverCheckinIA: (id: number) => apiClient.get<Partial<AtendimentoApi>>(`/atendimentos/${id}/previsao-ia`),
   solicitar: (payload: SolicitarAtendimentoRequest) =>
     apiClient.post<AtendimentoApi>('/atendimentos/solicitar', payload),
   assumirAtendimento: (atendimentoId: number, voluntarioId: number) =>

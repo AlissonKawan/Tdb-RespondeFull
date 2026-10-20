@@ -18,10 +18,6 @@ const programSlides = [
     impact: 'Mais de 90 mil jovens já foram transformados.',
     badgeClassName: 'border-blue-200 bg-blue-50/90 text-blue-800',
     accentClassName: 'text-primary',
-    overlayClassName:
-      'bg-gradient-to-t from-blue-50 via-white/95 via-[45%] to-blue-100/10 md:bg-gradient-to-l md:from-blue-50 md:via-white/95 md:via-[45%] md:to-blue-100/10',
-    transitionTintClassName:
-      'bg-[linear-gradient(0deg,rgba(59,130,246,0.10)_0%,transparent_58%)] md:bg-[linear-gradient(90deg,transparent_28%,rgba(59,130,246,0.04)_40%,rgba(59,130,246,0.14)_57%,rgba(59,130,246,0.08)_72%,transparent_88%)]',
   },
   {
     image: programImages.apoloniasDoBem,
@@ -33,10 +29,6 @@ const programSlides = [
     impact: 'Mais de 1.200 mulheres acolhidas.',
     badgeClassName: 'border-rose-200 bg-rose-50/90 text-rose-800',
     accentClassName: 'text-rose-700',
-    overlayClassName:
-      'bg-gradient-to-t from-rose-50 via-white/95 via-[45%] to-rose-100/10 md:bg-gradient-to-l md:from-rose-50 md:via-white/95 md:via-[45%] md:to-rose-100/10',
-    transitionTintClassName:
-      'bg-[linear-gradient(0deg,rgba(244,63,94,0.10)_0%,transparent_58%)] md:bg-[linear-gradient(90deg,transparent_28%,rgba(244,63,94,0.04)_40%,rgba(244,63,94,0.14)_57%,rgba(244,63,94,0.08)_72%,transparent_88%)]',
   },
 ];
 
@@ -49,7 +41,7 @@ function HeroDashboardCard() {
 
     const intervalId = window.setInterval(() => {
       setCurrentSlide((current) => (current + 1) % programSlides.length);
-    }, 3000);
+    }, 7000);
 
     return () => window.clearInterval(intervalId);
   }, [isManuallyPaused]);
@@ -68,39 +60,33 @@ function HeroDashboardCard() {
       aria-label="Programas de acolhimento social da Turma do Bem"
       aria-roledescription="carrossel"
     >
-      <div className="absolute -inset-4 -z-10 rounded-[2.75rem] bg-gradient-to-r from-blue-300/30 via-white/10 to-rose-300/25 blur-3xl" />
+      <div className="absolute -inset-4 -z-10 rounded-[2.75rem] bg-primary/10 blur-3xl" />
 
-      <div className="overflow-hidden rounded-[1.75rem] border border-white/90 bg-white shadow-[0_32px_90px_-35px_rgba(15,23,42,0.55)] ring-1 ring-blue-950/10 sm:rounded-[2.25rem]">
-        <div className="relative min-h-[42rem] overflow-hidden bg-slate-100 sm:min-h-[36rem] lg:min-h-[33rem]">
+      <div className="overflow-hidden rounded-[1.75rem] border border-border bg-surface shadow-[0_32px_90px_-35px_rgba(15,23,42,0.55)] ring-1 ring-primary/10 sm:rounded-[2.25rem]">
+        <div className="relative grid min-h-[33rem] grid-cols-1 overflow-hidden bg-background">
           {programSlides.map((slide, index) => {
             const isActive = index === currentSlide;
 
             return (
               <article
                 key={slide.title}
-                className={`hero-program-slide absolute inset-0 ${
+                className={`hero-program-slide relative col-start-1 row-start-1 min-w-0 ${
                   isActive ? 'hero-program-slide--active z-10' : 'pointer-events-none opacity-0'
                 }`}
                 aria-hidden={!isActive}
               >
-                <img
-                  src={slide.image}
-                  alt={slide.imageAlt}
-                  loading="lazy"
-                  className="hero-program-image absolute inset-0 h-full w-full object-cover object-left"
-                />
-                <div
-                  className={`absolute inset-0 ${slide.overlayClassName}`}
-                  aria-hidden="true"
-                />
-                <div
-                  className={`absolute inset-0 ${slide.transitionTintClassName}`}
-                  aria-hidden="true"
-                />
-                <div className="hero-program-light absolute inset-y-0 left-[38%] w-[28%] -skew-x-12 bg-gradient-to-r from-transparent via-white/55 to-transparent blur-xl" aria-hidden="true" />
+                <div className="relative h-64 overflow-hidden sm:h-80 lg:absolute lg:inset-0 lg:h-full">
+                  <img
+                    src={slide.image}
+                    alt={slide.imageAlt}
+                    loading="lazy"
+                    className="hero-program-image absolute inset-0 h-full w-full object-cover object-left lg:object-[25%_center]"
+                  />
+                  <div className="hero-program-overlay absolute inset-0" aria-hidden="true" />
+                </div>
 
-                <div className="relative z-10 flex min-h-[42rem] items-end px-6 pb-24 pt-72 sm:min-h-[36rem] sm:px-10 sm:pt-64 md:items-center md:justify-end md:px-14 md:py-16 lg:min-h-[33rem] lg:px-20">
-                  <div className="hero-program-copy w-full md:max-w-[48%]">
+                <div className="relative z-10 flex px-6 pb-24 pt-6 sm:px-10 sm:pt-8 lg:min-h-[33rem] lg:items-center lg:justify-end lg:px-14 lg:py-14 xl:px-20">
+                  <div className="hero-program-copy w-full lg:max-w-[48%]">
                     <span className="inline-flex items-center gap-2 rounded-full border border-blue-200/80 bg-white/90 px-3 py-1.5 text-xs font-bold text-blue-900 shadow-sm backdrop-blur">
                       <svg className="h-3.5 w-3.5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                         <path d="M12 3 5 6v5c0 4.6 2.8 8.2 7 10 4.2-1.8 7-5.4 7-10V6l-7-3Z" strokeLinecap="round" strokeLinejoin="round" />
@@ -112,13 +98,13 @@ function HeroDashboardCard() {
                     <p className={`mt-5 text-xs font-black uppercase tracking-[0.16em] ${slide.accentClassName}`}>
                       Programas de Acolhimento Social
                     </p>
-                    <h2 className="mt-2 text-4xl font-black tracking-[-0.04em] text-slate-950 sm:text-5xl lg:text-[3.5rem]">
+                    <h2 className="mt-2 text-4xl font-black tracking-[-0.04em] text-foreground sm:text-5xl xl:text-[3.5rem]">
                       {slide.title}
                     </h2>
                     <span className={`mt-4 inline-flex rounded-full border px-3 py-1.5 text-xs font-bold sm:text-sm ${slide.badgeClassName}`}>
                       {slide.audience}
                     </span>
-                    <p className="mt-5 text-base leading-7 text-slate-700 sm:text-lg sm:leading-8">
+                    <p className="mt-5 text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
                       {slide.description}
                     </p>
                     <p className={`mt-4 text-lg font-black sm:text-xl ${slide.accentClassName}`}>
@@ -133,7 +119,7 @@ function HeroDashboardCard() {
           <button
             type="button"
             onClick={showPreviousSlide}
-            className="absolute left-3 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/80 bg-white/90 text-slate-800 shadow-lg backdrop-blur transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 sm:left-5"
+            className="absolute left-3 top-56 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/80 bg-white/90 text-slate-800 shadow-lg backdrop-blur transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 sm:left-5 sm:top-72 lg:top-1/2"
             aria-label="Mostrar programa anterior"
           >
             <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
@@ -144,7 +130,7 @@ function HeroDashboardCard() {
           <button
             type="button"
             onClick={showNextSlide}
-            className="absolute right-3 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/80 bg-white/90 text-slate-800 shadow-lg backdrop-blur transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 sm:right-5"
+            className="absolute right-3 top-56 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/80 bg-white/90 text-slate-800 shadow-lg backdrop-blur transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 sm:right-5 sm:top-72 lg:top-1/2"
             aria-label="Mostrar próximo programa"
           >
             <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">

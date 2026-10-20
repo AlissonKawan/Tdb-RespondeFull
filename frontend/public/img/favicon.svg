@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title>TDB Responde</title>
+  <rect width="64" height="64" rx="16" fill="#1599f5"/>
+  <path d="M19 16c5-4 9 1 13 1s8-5 13-1c6 4 5 12 2 18-2 4-3 11-7 15-3 3-5-1-8-7-3 6-5 10-8 7-4-4-5-11-7-15-3-6-4-14 2-18Z" fill="#fff" stroke="#075da8" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M25 28c2-2 4-2 6 0M39 28c-2-2-4-2-6 0M27 35c3 4 7 4 10 0" fill="none" stroke="#1599f5" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M48 10c1.5 3 3 4.5 6 5.5-3 .8-4.5 2.3-5.5 5.5-.8-3-2.3-4.5-5.5-5.5 3-.8 4.5-2.3 5-5.5Z" fill="#fff"/>
+</svg>

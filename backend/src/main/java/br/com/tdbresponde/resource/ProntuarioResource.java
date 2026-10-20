@@ -23,9 +23,17 @@ public class ProntuarioResource {
         return Response.ok(prontuarios).build();
     }
 
+    @GET
+    @Path("/atendimento/{atendimentoId}")
+    public Response buscarPorAtendimento(@PathParam("atendimentoId") int atendimentoId) {
+        List<Prontuario> prontuarios = prontuarioBO.buscarPorAtendimento(atendimentoId);
+        return Response.ok(prontuarios).build();
+    }
+
     @POST
     public Response registrarEvolucao(Prontuario prontuario) {
         Prontuario novo = prontuarioBO.registrarEvolucao(prontuario);
         return Response.status(Response.Status.CREATED).entity(novo).build();
     }
 }
+

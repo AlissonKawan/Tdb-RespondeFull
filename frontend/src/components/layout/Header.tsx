@@ -12,10 +12,10 @@ function Header() {
           aria-label="Ir para a página inicial"
         >
           <img
-            src="/img/logo-header.png"
+            src="/img/logo-completa.png"
             alt="TDB Responde"
-            width="1024"
-            height="1024"
+            width="840"
+            height="672"
             fetchPriority="high"
             className="h-[64px] w-auto object-contain md:h-[80px] lg:h-[110px]"
           />

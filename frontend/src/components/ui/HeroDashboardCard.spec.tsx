@@ -12,12 +12,15 @@ describe('HeroDashboardCard', () => {
     vi.unstubAllGlobals();
   });
 
-  it('avança automaticamente para o próximo programa depois de três segundos', () => {
+  it('mantém o programa por sete segundos antes de avançar automaticamente', () => {
     render(<HeroDashboardCard />);
 
     expect(screen.getByRole('heading', { name: 'Dentista do Bem' })).toBeInTheDocument();
 
-    act(() => vi.advanceTimersByTime(3000));
+    act(() => vi.advanceTimersByTime(6999));
+    expect(screen.getByRole('heading', { name: 'Dentista do Bem' })).toBeInTheDocument();
+
+    act(() => vi.advanceTimersByTime(1));
 
     const activeHeading = screen.getByRole('heading', { name: 'Apolônias do Bem' });
     const activeSlide = activeHeading.closest('article');
@@ -31,7 +34,7 @@ describe('HeroDashboardCard', () => {
     render(<HeroDashboardCard />);
 
     fireEvent.mouseEnter(screen.getByLabelText('Programas de acolhimento social da Turma do Bem'));
-    act(() => vi.advanceTimersByTime(3000));
+    act(() => vi.advanceTimersByTime(7000));
 
     expect(screen.getByRole('heading', { name: 'Apolônias do Bem' })).toBeInTheDocument();
   });
@@ -40,7 +43,7 @@ describe('HeroDashboardCard', () => {
     render(<HeroDashboardCard />);
 
     screen.getByRole('button', { name: 'Mostrar próximo programa' }).focus();
-    act(() => vi.advanceTimersByTime(3000));
+    act(() => vi.advanceTimersByTime(7000));
 
     expect(screen.getByRole('heading', { name: 'Apolônias do Bem' })).toBeInTheDocument();
   });
