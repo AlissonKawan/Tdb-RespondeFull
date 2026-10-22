@@ -103,6 +103,18 @@ public class VoluntarioDAO {
         return voluntario;
     }
 
+    public Integer buscarIdPorContaId(int contaId) {
+        String sql = "SELECT ID FROM VOLUNTARIO WHERE ID_CONTA = ?";
+        try (Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, contaId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next() ? rs.getInt("ID") : null;
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException("Erro ao verificar o vinculo do voluntario.", e);
+        }
+    }
+
     public Voluntario buscarPorContaId(int contaId) {
         String sql = "SELECT " + COLUNAS_VOLUNTARIO + " " +
                 "FROM VOLUNTARIO WHERE ID_CONTA = ?";

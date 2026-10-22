@@ -6,6 +6,7 @@ import br.com.tdbresponde.dto.MensagemRequest;
 import br.com.tdbresponde.exception.BusinessException;
 import br.com.tdbresponde.exception.ForbiddenException;
 import br.com.tdbresponde.model.Mensagem;
+import br.com.tdbresponde.model.Atendimento;
 import br.com.tdbresponde.security.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,8 @@ class MensagemResourceTest {
         var atendimentos = mock(AtendimentoBO.class);
         when(atendimentos.buscarPorId(1)).thenReturn(AtendimentoAuthorizationTest.atendimento(1, 7, 80));
         when(atendimentos.buscarPorId(2)).thenReturn(AtendimentoAuthorizationTest.atendimento(2, 70, 800));
+        when(atendimentos.buscarParaAutorizacao(1)).thenReturn(AtendimentoAuthorizationTest.atendimento(1, 7, 80));
+        when(atendimentos.buscarParaAutorizacao(2)).thenReturn(AtendimentoAuthorizationTest.atendimento(2, 70, 800));
         resource = new MensagemResource();
         resource.bo = bo = mock(MensagemBO.class);
         resource.media = media = mock(ChatMediaAccess.class);
@@ -42,14 +45,16 @@ class MensagemResourceTest {
         var request = new MensagemRequest(); request.atendimentoId = 2;
         assertThrows(ForbiddenException.class, () -> resource.inserir(request));
         verify(bo, never()).inserir(any());
+        verify(bo, never()).inserir(any(), any(Atendimento.class));
         verify(bo, never()).listarPorAtendimento(anyInt());
+        verify(bo, never()).listarPorAtendimento(any(Atendimento.class));
     }
 
     @Test void endpointAlternativoTambemDerivaRemetenteDaSessao() {
         var request = new MensagemRequest(); request.atendimentoId = 1; request.enviadoPor = "ADMIN";
-        when(bo.inserir(any())).thenReturn(new Mensagem());
+        when(bo.inserir(any(), any(Atendimento.class))).thenReturn(new Mensagem());
         assertEquals(201, resource.inserir(request).getStatus());
-        verify(bo).inserir(argThat(r -> "BENEFICIARIO".equals(r.enviadoPor)));
+        verify(bo).inserir(argThat(r -> "BENEFICIARIO".equals(r.enviadoPor)), argThat(a -> a.getId() == 1));
     }
 
     @Test void uploadRejeitaCasoAlheioAntesDeGravarArquivo() {

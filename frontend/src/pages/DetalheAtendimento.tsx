@@ -17,6 +17,7 @@ import { atendimentoService } from '../services/atendimentoService';
 import { agendaService, type AgendaConsulta } from '../services/agendaService';
 import { prontuarioService, type Prontuario } from '../services/prontuarioService';
 import { mensagensService } from '../services/mensagensService';
+import { ApiError } from '../services/apiClient';
 import { openChatSocket } from '../services/chatSocket';
 import type { AtendimentoApi, Mensagem, MensagemRequest } from '../types/AtendimentoApi';
 
@@ -307,13 +308,22 @@ function DetalheAtendimento() {
     setLoading(true);
     setErro('');
     try {
-      const dadosAtendimento = await atendimentoService.buscarPorId(atendimentoId);
+      // As permissoes sao verificadas no servidor; as duas leituras podem iniciar juntas.
+      const [dadosAtendimento, resultadoMensagens] = await Promise.all([
+        atendimentoService.buscarPorId(atendimentoId),
+        mensagensService.getMensagensAtendimento(atendimentoId).then(
+          mensagens => ({ mensagens, erro: undefined as unknown }),
+          (erro: unknown) => ({ mensagens: [] as Mensagem[], erro }),
+        ),
+      ]);
       const podeConversar = user?.tipoUsuario === 'ADMIN'
         || user?.tipoUsuario === 'BENEFICIARIO'
         || (user?.tipoUsuario === 'VOLUNTARIO' && user.voluntarioId != null && user.voluntarioId === dadosAtendimento.voluntarioId);
-      const dadosMensagens = podeConversar
-        ? await mensagensService.getMensagensAtendimento(atendimentoId)
-        : [];
+      if (resultadoMensagens.erro && (podeConversar
+        || !(resultadoMensagens.erro instanceof ApiError && resultadoMensagens.erro.status === 403))) {
+        throw resultadoMensagens.erro;
+      }
+      const dadosMensagens = podeConversar ? resultadoMensagens.mensagens : [];
       seenIdsRef.current = new Set(dadosMensagens.map(m => m.id));
       setAtendimento(dadosAtendimento);
       setMensagens(dadosMensagens);
@@ -707,6 +717,11 @@ function DetalheAtendimento() {
   const salvarAgendaDoAtendimento = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!atendimento || !podeAlterar) return;
+    const responsavel = user?.voluntarioId ?? (user?.tipoUsuario === 'ADMIN' ? atendimento.voluntarioId : undefined);
+    if (!responsavel) {
+      setErroFormAgenda('É necessário um voluntário responsável para agendar a consulta.');
+      return;
+    }
 
     if (!agendaTipo.trim()) {
       setErroFormAgenda('Informe o tipo da consulta.');
@@ -725,7 +740,7 @@ function DetalheAtendimento() {
     setErroFormAgenda('');
     try {
       const payload: AgendaConsulta = {
-        voluntarioId: user?.id ?? user?.voluntarioId ?? atendimento.voluntarioId ?? 1,
+        voluntarioId: responsavel,
         atendimentoId: atendimento.id,
         paciente: pessoaAtendida,
         tipo: agendaTipo.trim(),
@@ -756,6 +771,11 @@ function DetalheAtendimento() {
   const salvarEvolucaoProntuario = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!atendimento || !podeAlterar) return;
+    const responsavel = user?.voluntarioId ?? (user?.tipoUsuario === 'ADMIN' ? atendimento.voluntarioId : undefined);
+    if (!responsavel) {
+      setErroFormProntuario('É necessário um voluntário responsável para registrar a evolução.');
+      return;
+    }
 
     if (!tratamentoAtualInput.trim()) {
       setErroFormProntuario('Descreva o procedimento ou evolução clínica realizada.');
@@ -767,7 +787,7 @@ function DetalheAtendimento() {
     try {
       const agendaPrincipal = agendasAtendimento[agendasAtendimento.length - 1];
       const novoProntuario: Prontuario = {
-        voluntarioId: user?.id ?? user?.voluntarioId ?? atendimento.voluntarioId ?? 1,
+        voluntarioId: responsavel,
         atendimentoId: atendimento.id,
         agendaId: agendaPrincipal?.id ?? null,
         paciente: pessoaAtendida,

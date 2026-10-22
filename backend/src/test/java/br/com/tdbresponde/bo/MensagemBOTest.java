@@ -33,6 +33,27 @@ class MensagemBOTest {
         bo.objectMapper = new com.fasterxml.jackson.databind.ObjectMapper().findAndRegisterModules();
     }
 
+    @Test void leituraReutilizaAtendimentoAutorizadoSemBuscarCadastroNovamente() {
+        Atendimento autorizado = new Atendimento(); autorizado.setId(42);
+        bo.listarPorAtendimento(autorizado);
+        assertEquals(0, atendimentoBO.ultimoIdBuscado);
+    }
+
+    @Test void envioReutilizaReferenciaAutorizadaEMantemValidacaoDeStatus() {
+        Atendimento autorizado = new Atendimento(); autorizado.setId(1); autorizado.setStatus("ABERTO");
+        bo.inserir(request(1, "BENEFICIARIO", "Mensagem"), autorizado);
+        assertEquals(0, atendimentoBO.ultimoIdBuscado);
+        autorizado.setStatus("ENCERRADO");
+        assertThrows(BusinessException.class, () -> bo.inserir(request(1, "BENEFICIARIO", "Mensagem"), autorizado));
+        assertEquals(1, mensagemDAO.mensagensInseridas.size());
+    }
+
+    @Test void referenciaDeOutroAtendimentoNaoPodeSerReaproveitadaNoEnvio() {
+        Atendimento autorizado = new Atendimento(); autorizado.setId(2); autorizado.setStatus("ABERTO");
+        assertThrows(BusinessException.class, () -> bo.inserir(request(1, "BENEFICIARIO", "Mensagem"), autorizado));
+        assertTrue(mensagemDAO.mensagensInseridas.isEmpty());
+    }
+
     @Test
     void deveInserirMensagemValidaNormalizandoRemetente() {
         Mensagem mensagem = bo.inserir(request(1, "beneficiario", "Preciso de ajuda"));
@@ -127,7 +148,7 @@ class MensagemBOTest {
         private int ultimoIdBuscado;
 
         @Override
-        public Atendimento buscarPorId(int id) {
+        public Atendimento buscarParaAutorizacao(int id) {
             ultimoIdBuscado = id;
             Atendimento atendimento = new Atendimento();
             atendimento.setId(id);

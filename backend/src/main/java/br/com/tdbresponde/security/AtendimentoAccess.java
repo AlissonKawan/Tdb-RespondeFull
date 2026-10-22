@@ -11,18 +11,23 @@ import br.com.tdbresponde.exception.NotFoundException;
 import br.com.tdbresponde.exception.UnauthorizedException;
 import br.com.tdbresponde.model.Atendimento;
 import br.com.tdbresponde.model.AgendaConsulta;
-import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.SecurityContext;
 import java.util.Objects;
 import java.util.function.Predicate;
+import java.util.HashMap;
+import java.util.Map;
 
 /** Politica compartilhada por REST e emissao de tickets de conversa. */
-@ApplicationScoped
+@RequestScoped
 public class AtendimentoAccess {
     private final AtendimentoBO atendimentos;
     private final ContaUsuarioBO contas;
     private final PessoaAtendidaDAO pessoas;
+    // Reuso somente durante uma requisicao: nenhuma permissao e mantida entre requisicoes.
+    private final Map<Integer, Atendimento> referencias = new HashMap<>();
+    private final Map<Integer, Integer> voluntariosPorConta = new HashMap<>();
 
     @Inject
     public AtendimentoAccess(AtendimentoBO atendimentos, ContaUsuarioBO contas, PessoaAtendidaDAO pessoas) {
@@ -59,7 +64,10 @@ public class AtendimentoAccess {
                     && Objects.equals(conta, atendimento.getPessoaAtendida().getContaId());
         }
         if (identity.isUserInRole("VOLUNTARIO")) {
-            Integer voluntario = contas.buscarVoluntarioIdDaConta(conta);
+            if (atendimento.getVoluntario() != null && atendimento.getVoluntario().getContaId() != null) {
+                return Objects.equals(conta, atendimento.getVoluntario().getContaId());
+            }
+            Integer voluntario = voluntarioDaConta(conta);
             return voluntario != null && atendimento.getVoluntario() != null
                     && voluntario == atendimento.getVoluntario().getId();
         }
@@ -77,7 +85,7 @@ public class AtendimentoAccess {
             return a -> a.getPessoaAtendida() != null && Objects.equals(conta, a.getPessoaAtendida().getContaId());
         }
         if (identity.isUserInRole("VOLUNTARIO")) {
-            Integer voluntario = contas.buscarVoluntarioIdDaConta(conta);
+            Integer voluntario = voluntarioDaConta(conta);
             return a -> filaAberta(a) || (voluntario != null && a.getVoluntario() != null
                     && voluntario == a.getVoluntario().getId());
         }
@@ -91,7 +99,8 @@ public class AtendimentoAccess {
     }
 
     public Atendimento conversar(int id, SecurityContext identity) {
-        Atendimento atendimento = carregar(id);
+        if (id <= 0) throw new BusinessException("ID do atendimento deve ser valido");
+        Atendimento atendimento = referencias.computeIfAbsent(id, atendimentos::buscarParaAutorizacao);
         if (!podeConversar(atendimento, identity)) throw new ForbiddenException();
         return atendimento;
     }
@@ -114,7 +123,7 @@ public class AtendimentoAccess {
     public Integer responsavel(Integer solicitado, SecurityContext identity) {
         if (admin(identity)) return solicitado;
         if (!identity.isUserInRole("VOLUNTARIO")) throw new ForbiddenException();
-        Integer proprio = contas.buscarVoluntarioIdDaConta(contaId(identity));
+        Integer proprio = voluntarioDaConta(contaId(identity));
         if (proprio == null || (solicitado != null && !proprio.equals(solicitado))) throw new ForbiddenException();
         return proprio;
     }
@@ -132,8 +141,8 @@ public class AtendimentoAccess {
     }
 
     public void listarPorConta(int id, SecurityContext identity) {
-        if (identity.isUserInRole("BENEFICIARIO") && contaId(identity) != id) throw new ForbiddenException();
-        contaId(identity);
+        int conta = contaId(identity);
+        if (identity.isUserInRole("BENEFICIARIO") && conta != id) throw new ForbiddenException();
     }
 
     public void listarPorBeneficiario(int id, SecurityContext identity) {
@@ -163,6 +172,13 @@ public class AtendimentoAccess {
             if (identity.isUserInRole(role)) return role;
         }
         throw new ForbiddenException();
+    }
+
+    private Integer voluntarioDaConta(int conta) {
+        if (!voluntariosPorConta.containsKey(conta)) {
+            voluntariosPorConta.put(conta, contas.buscarVoluntarioIdDaConta(conta));
+        }
+        return voluntariosPorConta.get(conta);
     }
 
     private Atendimento carregar(int id) {

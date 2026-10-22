@@ -157,22 +157,32 @@ export default function AgendaConsultas() {
   });
 
   const carregarAgendas = async () => {
-    if (!user?.id) return;
+    if (!user?.voluntarioId) {
+      setConsultas([]);
+      setIsLoading(false);
+      setFeedback({ tone: 'danger', message: 'Sua conta não possui um voluntário vinculado para consultar a agenda.' });
+      return;
+    }
     try {
       setIsLoading(true);
-      const data = await agendaService.buscarPorVoluntario(user.id);
+      const data = await agendaService.buscarPorVoluntario(user.voluntarioId);
       setConsultas(data);
       setFeedback(null);
     } catch (error) {
       console.error("Erro ao carregar agenda", error);
-      setFeedback({ tone: 'danger', message: 'Falha ao conectar com o servidor para buscar sua agenda.' });
+      const message = error instanceof ApiError && error.status === 403
+        ? 'Você não tem permissão para consultar esta agenda.'
+        : error instanceof ApiError && error.status === 401
+          ? 'Sua sessão expirou. Entre novamente para consultar a agenda.'
+          : 'Não foi possível carregar sua agenda. Tente novamente.';
+      setFeedback({ tone: 'danger', message });
     } finally {
       setIsLoading(false);
     }
   };
 
   const carregarAtendimentos = async () => {
-    const volId = user?.voluntarioId ?? user?.id;
+    const volId = user?.voluntarioId;
     if (!volId) {
       setIsLoadingAtendimentos(false);
       return;
@@ -279,7 +289,11 @@ export default function AgendaConsultas() {
   };
 
   const handleSave = async (formData: AgendaFormData) => {
-    if (!user?.id || saveInFlight.current) return;
+    if (saveInFlight.current) return;
+    if (!user?.voluntarioId) {
+      setError('root.server', { message: 'Sua conta precisa estar vinculada a um voluntário para salvar consultas.' });
+      return;
+    }
     saveInFlight.current = true;
 
     try {
@@ -291,7 +305,7 @@ export default function AgendaConsultas() {
       const agendaPayload: AgendaConsulta = {
         ...formData,
         atendimentoId: parsedAtendimentoId,
-        voluntarioId: user.id
+        voluntarioId: user.voluntarioId
       };
 
       if (editingId) {
@@ -365,13 +379,17 @@ export default function AgendaConsultas() {
   };
 
   const handleSaveProntuario = async (prontuarioForm: ProntuarioFormData) => {
-    if (!selectedProntuarioAgenda?.id || !user?.id || saveInFlight.current) return;
+    if (!selectedProntuarioAgenda?.id || saveInFlight.current) return;
+    if (!user?.voluntarioId) {
+      setProntuarioError('root.server', { message: 'Sua conta precisa estar vinculada a um voluntário para registrar evoluções.' });
+      return;
+    }
     saveInFlight.current = true;
 
     try {
       setIsProntuarioLoading(true);
       const novo: Prontuario = {
-        voluntarioId: user.id,
+        voluntarioId: user.voluntarioId,
         agendaId: selectedProntuarioAgenda.id,
         atendimentoId: selectedProntuarioAgenda.atendimentoId ?? null,
         paciente: selectedProntuarioAgenda.paciente,

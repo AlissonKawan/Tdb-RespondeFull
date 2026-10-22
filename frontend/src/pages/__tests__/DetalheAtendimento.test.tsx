@@ -8,6 +8,7 @@ import { atendimentoService } from '../../services/atendimentoService';
 import { mensagensService } from '../../services/mensagensService';
 import { agendaService } from '../../services/agendaService';
 import { prontuarioService } from '../../services/prontuarioService';
+import { ApiError } from '../../services/apiClient';
 import type { AtendimentoApi, Mensagem } from '../../types/AtendimentoApi';
 
 const previsaoIAMock = vi.hoisted(() => vi.fn().mockResolvedValue({}));
@@ -106,7 +107,7 @@ describe('DetalheAtendimento - Deduplicação de Mensagens', () => {
 
     // Default mock implementation for auth
     vi.mocked(useAuth).mockReturnValue({
-      user: { id: 10, voluntarioId: 10, nome: 'Voluntário Teste', tipoUsuario: 'VOLUNTARIO' },
+      user: { id: 1000, voluntarioId: 10, nome: 'Voluntário Teste', tipoUsuario: 'VOLUNTARIO' },
       logout: vi.fn(),
     } as unknown as ReturnType<typeof useAuth>);
     vi.mocked(agendaService.buscarPorAtendimento).mockResolvedValue([]);
@@ -151,13 +152,32 @@ describe('DetalheAtendimento - Deduplicação de Mensagens', () => {
     },
   ];
 
-  it('consulta caso aberto da fila sem carregar conversa ou dados clinicos antes de assumir', async () => {
+  it('inicia a busca das mensagens sem aguardar a resposta do atendimento', async () => {
+    let resolver!: (value: AtendimentoApi) => void;
+    vi.mocked(atendimentoService.buscarPorId).mockReturnValue(new Promise(resolve => { resolver = resolve; }));
+    vi.mocked(mensagensService.getMensagensAtendimento).mockResolvedValue(mockMensagensIniciais);
+    render(<MemoryRouter><DetalheAtendimento /></MemoryRouter>);
+    await waitFor(() => expect(mensagensService.getMensagensAtendimento).toHaveBeenCalledWith(1));
+    await act(async () => { resolver(mockAtendimento); });
+    expect(await screen.findByText('Tenho uma dor de dente muito forte')).toBeInTheDocument();
+  });
+
+  it('nao oculta negacao de conversa em atendimento ja atribuido ao usuario', async () => {
+    vi.mocked(atendimentoService.buscarPorId).mockResolvedValue(mockAtendimento);
+    vi.mocked(mensagensService.getMensagensAtendimento).mockRejectedValueOnce(new ApiError('Conversa indisponível para esta conta', 403));
+    render(<MemoryRouter><DetalheAtendimento /></MemoryRouter>);
+    expect(await screen.findByText('Conversa indisponível para esta conta')).toBeInTheDocument();
+    expect(screen.queryByRole('log')).not.toBeInTheDocument();
+  });
+
+  it('mantem a previa da fila quando o servidor nega acesso a conversa', async () => {
     vi.mocked(atendimentoService.buscarPorId).mockResolvedValue({
       ...mockAtendimento, status: 'ABERTO', voluntarioId: undefined,
     });
+    vi.mocked(mensagensService.getMensagensAtendimento).mockRejectedValueOnce(new ApiError('Acesso negado', 403));
     render(<MemoryRouter><DetalheAtendimento /></MemoryRouter>);
     await screen.findByRole('heading', { name: 'Atendimento de Maria Souza' });
-    expect(mensagensService.getMensagensAtendimento).not.toHaveBeenCalled();
+    expect(mensagensService.getMensagensAtendimento).toHaveBeenCalledWith(1);
     expect(agendaService.buscarPorAtendimento).not.toHaveBeenCalled();
     expect(prontuarioService.buscarPorAtendimento).not.toHaveBeenCalled();
     expect(activeWebSocketInstances).toHaveLength(0);
@@ -375,6 +395,7 @@ describe('DetalheAtendimento - Deduplicação de Mensagens', () => {
       expect(agendaService.criar).toHaveBeenCalledWith(
         expect.objectContaining({
           atendimentoId: 1,
+          voluntarioId: 10,
           paciente: 'Maria Souza',
           tipo: 'Urgência Endodôntica',
         })

@@ -18,7 +18,8 @@ import io.quarkus.test.junit.TestProfile;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -78,6 +79,8 @@ class AuthenticationHttpTest {
         when(dao.buscarPorId(8)).thenReturn(other);
         when(atendimentos.buscarPorId(1)).thenReturn(caseFor(1, 7));
         when(atendimentos.buscarPorId(2)).thenReturn(caseFor(2, 8));
+        when(atendimentos.buscarParaAutorizacao(1)).thenReturn(caseFor(1, 7));
+        when(atendimentos.buscarParaAutorizacao(2)).thenReturn(caseFor(2, 8));
         when(mensagens.listarPorAtendimento(1)).thenReturn(java.util.List.of());
         String first = login();
         when(bo.login(any())).thenReturn(other);
@@ -96,7 +99,9 @@ class AuthenticationHttpTest {
     @Test void messageSenderIsDerivedFromSessionAndForeignWritesAreDenied() {
         when(atendimentos.buscarPorId(1)).thenReturn(caseFor(1, 7));
         when(atendimentos.buscarPorId(2)).thenReturn(caseFor(2, 8));
-        when(mensagens.inserir(any())).thenAnswer(call -> {
+        when(atendimentos.buscarParaAutorizacao(1)).thenReturn(caseFor(1, 7));
+        when(atendimentos.buscarParaAutorizacao(2)).thenReturn(caseFor(2, 8));
+        when(mensagens.inserir(any(), any(Atendimento.class))).thenAnswer(call -> {
             MensagemRequest request = call.getArgument(0);
             Mensagem message = new Mensagem(); message.setId(50); message.setAtendimento(caseFor(1, 7));
             message.setEnviadoPor(request.enviadoPor); return message;
@@ -113,7 +118,7 @@ class AuthenticationHttpTest {
         given().auth().oauth2(token).contentType("application/json").body("{\"idContaBeneficiario\":8}")
                 .post("/atendimentos/relatar").then().statusCode(403);
         verify(atendimentos, never()).relatar(any());
-        verify(mensagens, times(2)).inserir(any());
+        verify(mensagens, times(2)).inserir(any(), any(Atendimento.class));
     }
 
     private Atendimento caseFor(int id, int accountId) {

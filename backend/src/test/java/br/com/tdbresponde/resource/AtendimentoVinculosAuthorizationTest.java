@@ -23,6 +23,7 @@ class AtendimentoVinculosAuthorizationTest {
         ContaUsuarioBO contas = mock(ContaUsuarioBO.class);
         when(contas.buscarVoluntarioIdDaConta(8)).thenReturn(80);
         when(atendimentos.buscarPorId(2)).thenReturn(AtendimentoAuthorizationTest.atendimento(2, 70, 800));
+        when(atendimentos.buscarParaAutorizacao(2)).thenReturn(AtendimentoAuthorizationTest.atendimento(2, 70, 800));
         var access = new AtendimentoAccess(atendimentos, contas, mock(PessoaAtendidaDAO.class));
         var identity = new TestIdentity(8, "VOLUNTARIO");
         agendas = mock(AgendaConsultaBO.class); prontuarios = mock(ProntuarioBO.class);

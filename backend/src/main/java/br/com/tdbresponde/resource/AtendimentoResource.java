@@ -126,8 +126,8 @@ public class AtendimentoResource {
     @GET
     @Path("/{id}/mensagens")
     public Response listarMensagens(@PathParam("id") int id) {
-        access.conversar(id, identity);
-        return Response.ok(mensagemBO.listarPorAtendimento(id).stream()
+        Atendimento autorizado = access.conversar(id, identity);
+        return Response.ok(mensagemBO.listarPorAtendimento(autorizado).stream()
                 .map(MensagemResponse::from)
                 .toList()).build();
     }
@@ -142,12 +142,12 @@ public class AtendimentoResource {
             request = new MensagemRequest();
         }
         request.atendimentoId = id;
-        access.conversar(id, identity);
+        Atendimento autorizado = access.conversar(id, identity);
         request.enviadoPor = access.remetente(identity);
         media.validarVinculo(request.arquivoUrl, id, identity);
 
         // 1. Salva a mensagem no banco (Lógica Original)
-        br.com.tdbresponde.model.Mensagem mensagem = mensagemBO.inserir(request);
+        br.com.tdbresponde.model.Mensagem mensagem = mensagemBO.inserir(request, autorizado);
 
         // 2. Converte para o DTO de resposta
         MensagemResponse response = MensagemResponse.from(mensagem);

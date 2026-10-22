@@ -98,6 +98,12 @@ public class AtendimentoBO {
         return atendimentoDAO.buscarEncerrados();
     }
 
+    public Atendimento buscarParaAutorizacao(int id) {
+        Atendimento atendimento = atendimentoDAO.buscarParaAutorizacao(id);
+        if (atendimento == null) throw new NotFoundException("Atendimento nao encontrado");
+        return atendimento;
+    }
+
     public Atendimento buscarPorId(int id) {
         Atendimento atendimento = atendimentoDAO.buscarPorId(id);
         if (atendimento == null) {

@@ -22,7 +22,7 @@ vi.mock('../../services/atendimentoService', () => ({
 }));
 
 const consulta: AgendaConsulta = {
-  id: 50, voluntarioId: 1, atendimentoId: 777, paciente: 'Eduardo Boni',
+  id: 50, voluntarioId: 10, atendimentoId: 777, paciente: 'Eduardo Boni',
   tipo: 'Avaliação Inicial', dataConsulta: '2099-10-20', horario: '14:30',
   status: 'CONFIRMADO', tipoPessoa: 'CRIANCA_ADOLESCENTE',
 };
@@ -55,6 +55,31 @@ describe('AgendaConsultas', () => {
     vi.mocked(prontuarioService.buscarPorAgenda).mockResolvedValue([]);
   });
   afterEach(() => vi.restoreAllMocks());
+
+  it('busca agenda pelo id do voluntario, distinto do id da conta', async () => {
+    renderAgenda();
+    await waitFor(() => expect(agendaService.buscarPorVoluntario).toHaveBeenCalledWith(10));
+    expect(agendaService.buscarPorVoluntario).not.toHaveBeenCalledWith(1);
+    expect(atendimentoService.listarPorVoluntario).toHaveBeenCalledWith(10);
+  });
+
+  it('nao usa o id da conta quando falta o vinculo de voluntario', async () => {
+    vi.mocked(useAuth).mockReturnValue({ user: {
+      id: 1, nome: 'Dentista', email: 'dentista@teste.org', tipoUsuario: 'VOLUNTARIO', ativo: true,
+    } } as ReturnType<typeof useAuth>);
+    renderAgenda();
+    expect(await screen.findByText('Sua conta não possui um voluntário vinculado para consultar a agenda.')).toBeInTheDocument();
+    expect(agendaService.buscarPorVoluntario).not.toHaveBeenCalled();
+    expect(atendimentoService.listarPorVoluntario).not.toHaveBeenCalled();
+  });
+
+  it('distingue negacao de acesso de falha de conexao na agenda', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.mocked(agendaService.buscarPorVoluntario).mockRejectedValueOnce(new ApiError('Acesso negado', 403));
+    renderAgenda();
+    expect(await screen.findByText('Você não tem permissão para consultar esta agenda.')).toBeInTheDocument();
+    expect(screen.queryByText('Falha ao conectar com o servidor para buscar sua agenda.')).not.toBeInTheDocument();
+  });
 
   it('valida nome, data e horário antes de confirmar ou enviar', async () => {
     renderAgenda();
@@ -100,7 +125,7 @@ describe('AgendaConsultas', () => {
     expect(within(confirmacao).getByText('Eduardo Boni')).toBeInTheDocument();
     await user.click(within(confirmacao).getByRole('button', { name: 'Criar consulta' }));
     await waitFor(() => expect(agendaService.criar).toHaveBeenCalledWith(expect.objectContaining({
-      atendimentoId: 777, paciente: 'Eduardo Boni', voluntarioId: 1,
+      atendimentoId: 777, paciente: 'Eduardo Boni', voluntarioId: 10,
       status: 'AGUARDANDO', tipoPessoa: 'CRIANCA_ADOLESCENTE',
     })));
     expect(await screen.findByText('Atendimento vinculado')).toBeInTheDocument();
@@ -111,7 +136,7 @@ describe('AgendaConsultas', () => {
     expect(prontuarioService.registrarEvolucao).not.toHaveBeenCalled();
     await user.click(within(await screen.findByRole('alertdialog')).getByRole('button', { name: 'Registrar evolução' }));
     await waitFor(() => expect(prontuarioService.registrarEvolucao).toHaveBeenCalledWith({
-      voluntarioId: 1, agendaId: 50, atendimentoId: 777, paciente: 'Eduardo Boni',
+      voluntarioId: 10, agendaId: 50, atendimentoId: 777, paciente: 'Eduardo Boni',
       historicoMedico: 'Hipertenso', tratamentoAtual: 'Profilaxia',
     }));
     expect(await screen.findByText('Profilaxia')).toBeInTheDocument();

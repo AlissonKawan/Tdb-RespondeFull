@@ -33,6 +33,8 @@ class AtendimentoAccessTest {
         proprio = atendimento(1, 7, 80);
         when(bo.buscarPorId(1)).thenReturn(proprio);
         when(bo.buscarPorId(2)).thenReturn(atendimento(2, 70, 800));
+        when(bo.buscarParaAutorizacao(1)).thenReturn(proprio);
+        when(bo.buscarParaAutorizacao(2)).thenReturn(atendimento(2, 70, 800));
         when(contas.buscarVoluntarioIdDaConta(8)).thenReturn(80);
     }
 
@@ -134,6 +136,35 @@ class AtendimentoAccessTest {
         assertTrue(filtro.test(proprio));
         assertFalse(filtro.test(atendimento(2, 70, 800)));
         verify(contas, times(1)).buscarVoluntarioIdDaConta(8);
+    }
+
+    @Test void verificacoesRepetidasNaMesmaRequisicaoNaoRecarregamDados() {
+        access.conversar(1, voluntario);
+        access.conversar(1, voluntario);
+        access.responsavel(null, voluntario);
+        verify(bo, times(1)).buscarParaAutorizacao(1);
+        verify(bo, never()).buscarPorId(anyInt());
+        verify(contas, times(1)).buscarVoluntarioIdDaConta(8);
+    }
+
+    @Test void consultaDeAcessoJaTrazVinculoSemConsultaExtraAoVoluntario() {
+        proprio.getVoluntario().setContaId(8);
+        access.conversar(1, voluntario);
+        access.conversar(1, voluntario);
+        verify(bo, times(1)).buscarParaAutorizacao(1);
+        verify(bo, never()).buscarPorId(anyInt());
+        verifyNoInteractions(contas);
+        proprio.getVoluntario().setContaId(80);
+        assertThrows(ForbiddenException.class, () -> access.conversar(1, voluntario));
+    }
+
+    @Test void outraRequisicaoRevalidaVinculosSemCacheEntreRequisicoes() {
+        access.conversar(1, voluntario);
+        var proximaRequisicao = new AtendimentoAccess(bo, contas, pessoas);
+        when(contas.buscarVoluntarioIdDaConta(8)).thenReturn(800);
+        assertThrows(ForbiddenException.class, () -> proximaRequisicao.conversar(1, voluntario));
+        verify(contas, times(2)).buscarVoluntarioIdDaConta(8);
+        verify(bo, times(2)).buscarParaAutorizacao(1);
     }
 
     static Atendimento atendimento(int id, int conta, int voluntario) {

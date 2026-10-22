@@ -4,6 +4,7 @@ import br.com.tdbresponde.bo.MensagemBO;
 import br.com.tdbresponde.dto.MensagemRequest;
 import br.com.tdbresponde.dto.MensagemResponse;
 import br.com.tdbresponde.model.Mensagem;
+import br.com.tdbresponde.model.Atendimento;
 import br.com.tdbresponde.security.AtendimentoAccess;
 import br.com.tdbresponde.security.ChatMediaAccess;
 import br.com.tdbresponde.exception.BusinessException;
@@ -54,8 +55,8 @@ public class MensagemResource {
     @GET
     @Path("/atendimento/{atendimentoId}")
     public Response listarPorAtendimento(@PathParam("atendimentoId") int atendimentoId) {
-        access.conversar(atendimentoId, identity);
-        return Response.ok(bo.listarPorAtendimento(atendimentoId).stream()
+        Atendimento autorizado = access.conversar(atendimentoId, identity);
+        return Response.ok(bo.listarPorAtendimento(autorizado).stream()
                 .map(MensagemResponse::from)
                 .toList()).build();
     }
@@ -63,10 +64,10 @@ public class MensagemResource {
     @POST
     public Response inserir(MensagemRequest request) {
         if (request == null || request.atendimentoId == null) throw new BusinessException("Informe o atendimento da mensagem");
-        access.conversar(request.atendimentoId, identity);
+        Atendimento autorizado = access.conversar(request.atendimentoId, identity);
         request.enviadoPor = access.remetente(identity);
         media.validarVinculo(request.arquivoUrl, request.atendimentoId, identity);
-        Mensagem mensagem = bo.inserir(request);
+        Mensagem mensagem = bo.inserir(request, autorizado);
 
         MensagemResponse response = MensagemResponse.from(mensagem);
 

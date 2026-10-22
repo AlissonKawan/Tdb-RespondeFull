@@ -28,8 +28,13 @@ public class MensagemBO {
         if (atendimentoId <= 0) {
             throw new BusinessException("ID do atendimento deve ser valido");
         }
-        atendimentoBO.buscarPorId(atendimentoId);
-        return mensagemDAO.buscarPorAtendimento(atendimentoId);
+        return listarPorAtendimento(atendimentoBO.buscarParaAutorizacao(atendimentoId));
+    }
+
+    /** Reutiliza a referencia que o Resource acabou de autorizar nesta requisicao. */
+    public List<Mensagem> listarPorAtendimento(Atendimento atendimento) {
+        if (atendimento == null || atendimento.getId() <= 0) throw new BusinessException("Informe o atendimento");
+        return mensagemDAO.buscarPorAtendimento(atendimento.getId());
     }
 
     public Mensagem buscarPorId(int id) {
@@ -45,7 +50,16 @@ public class MensagemBO {
 
     @Transactional
     public Mensagem inserir(MensagemRequest request) {
-        Mensagem mensagem = toModel(request);
+        return salvar(toModel(request, null));
+    }
+
+    @Transactional
+    public Mensagem inserir(MensagemRequest request, Atendimento atendimentoAutorizado) {
+        if (atendimentoAutorizado == null) throw new BusinessException("Informe o atendimento");
+        return salvar(toModel(request, atendimentoAutorizado));
+    }
+
+    private Mensagem salvar(Mensagem mensagem) {
         validar(mensagem);
         mensagemDAO.inserir(mensagem);
         
@@ -63,11 +77,14 @@ public class MensagemBO {
         return mensagem;
     }
 
-    private Mensagem toModel(MensagemRequest request) {
+    private Mensagem toModel(MensagemRequest request, Atendimento autorizado) {
         Mensagem mensagem = new Mensagem();
         if (request != null) {
             if (request.atendimentoId != null) {
-                Atendimento atendimento = atendimentoBO.buscarPorId(request.atendimentoId);
+                if (autorizado != null && autorizado.getId() != request.atendimentoId) {
+                    throw new BusinessException("O atendimento da mensagem difere do atendimento autorizado");
+                }
+                Atendimento atendimento = autorizado != null ? autorizado : atendimentoBO.buscarParaAutorizacao(request.atendimentoId);
                 mensagem.setAtendimento(atendimento);
             }
             if (request.canalId != null) {

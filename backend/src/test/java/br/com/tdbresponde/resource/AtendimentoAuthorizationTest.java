@@ -29,6 +29,8 @@ class AtendimentoAuthorizationTest {
         resource.identity = new TestIdentity(7, "BENEFICIARIO");
         when(bo.buscarPorId(1)).thenReturn(atendimento(1, 7, 80));
         when(bo.buscarPorId(2)).thenReturn(atendimento(2, 70, 800));
+        when(bo.buscarParaAutorizacao(1)).thenReturn(atendimento(1, 7, 80));
+        when(bo.buscarParaAutorizacao(2)).thenReturn(atendimento(2, 70, 800));
         when(contas.buscarVoluntarioIdDaConta(8)).thenReturn(80);
     }
 
@@ -56,9 +58,10 @@ class AtendimentoAuthorizationTest {
     @Test void envioDeMensagemIgnoraPerfilForjadoNoPayload() {
         var request = new MensagemRequest(); request.enviadoPor = "ADMIN";
         var mensagem = new Mensagem(); mensagem.setAtendimento(atendimento(1, 7, 80));
-        when(mensagens.inserir(any())).thenReturn(mensagem);
+        when(mensagens.inserir(any(), any(Atendimento.class))).thenReturn(mensagem);
         assertEquals(201, resource.inserirMensagem(1, request).getStatus());
-        verify(mensagens).inserir(argThat(r -> r.atendimentoId == 1 && "BENEFICIARIO".equals(r.enviadoPor)));
+        verify(mensagens).inserir(argThat(r -> r.atendimentoId == 1 && "BENEFICIARIO".equals(r.enviadoPor)),
+                argThat(a -> a.getId() == 1));
     }
 
     @Test void voluntarioNaoAlteraCasoDeOutroVoluntarioPorNenhumaRota() {

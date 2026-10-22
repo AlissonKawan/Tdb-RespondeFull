@@ -82,6 +82,41 @@ public class AtendimentoDAO {
         }
     }
 
+    /** Somente os dados usados na autorizacao e no envio de mensagens, sem historico ou detalhes clinicos. */
+    public Atendimento buscarParaAutorizacao(int id) {
+        String sql = "SELECT A.ID, A.STATUS, A.PESSOA_ATENDIDA_ID, A.VOLUNTARIO_ID, P.ID_CONTA, V.ID_CONTA AS CONTA_VOLUNTARIO " +
+                "FROM ATENDIMENTO A LEFT JOIN PESSOA_ATENDIDA P ON P.ID = A.PESSOA_ATENDIDA_ID " +
+                "LEFT JOIN VOLUNTARIO V ON V.ID = A.VOLUNTARIO_ID WHERE A.ID = ?";
+        try (Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (!rs.next()) return null;
+                Atendimento atendimento = new Atendimento();
+                atendimento.setId(rs.getInt("ID"));
+                atendimento.setStatus(rs.getString("STATUS"));
+                int pessoaId = rs.getInt("PESSOA_ATENDIDA_ID");
+                if (!rs.wasNull()) {
+                    var pessoa = new br.com.tdbresponde.model.PessoaAtendidaBase();
+                    pessoa.setId(pessoaId);
+                    int contaId = rs.getInt("ID_CONTA");
+                    pessoa.setContaId(rs.wasNull() ? null : contaId);
+                    atendimento.setPessoaAtendida(pessoa);
+                }
+                int voluntarioId = rs.getInt("VOLUNTARIO_ID");
+                if (!rs.wasNull()) {
+                    Voluntario voluntario = new Voluntario();
+                    voluntario.setId(voluntarioId);
+                    int contaVoluntario = rs.getInt("CONTA_VOLUNTARIO");
+                    voluntario.setContaId(rs.wasNull() ? null : contaVoluntario);
+                    atendimento.setVoluntario(voluntario);
+                }
+                return atendimento;
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException("Erro ao verificar o acesso ao atendimento.", e);
+        }
+    }
+
     // READ por ID
     public Atendimento buscarPorId(int id) {
         String sql = SELECT_BASE + " WHERE A.ID = ?";
