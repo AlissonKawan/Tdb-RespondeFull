@@ -4,6 +4,9 @@ import br.com.tdbresponde.bo.MensagemBO;
 import br.com.tdbresponde.dto.MensagemRequest;
 import br.com.tdbresponde.dto.MensagemResponse;
 import br.com.tdbresponde.model.Mensagem;
+import br.com.tdbresponde.security.AtendimentoAccess;
+import br.com.tdbresponde.security.ChatMediaAccess;
+import br.com.tdbresponde.exception.BusinessException;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -14,6 +17,8 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.SecurityContext;
 import org.jboss.resteasy.reactive.RestForm;
 import org.jboss.resteasy.reactive.multipart.FileUpload;
 
@@ -30,22 +35,26 @@ import java.util.UUID;
 @Consumes(MediaType.APPLICATION_JSON)
 public class MensagemResource {
 
-    private static final java.nio.file.Path UPLOAD_DIR = java.nio.file.Path.of("uploads", "chat")
-            .toAbsolutePath().normalize();
     private static final Set<String> EXTENSOES_PERMITIDAS = Set.of("jpg", "jpeg", "png", "webm", "mp3", "mp4");
 
     @Inject
     MensagemBO bo;
+    @Inject AtendimentoAccess access;
+    @Inject ChatMediaAccess media;
+    @Context SecurityContext identity;
 
     @GET
     @Path("/{id}")
     public Response buscarPorId(@PathParam("id") int id) {
-        return Response.ok(MensagemResponse.from(bo.buscarPorId(id))).build();
+        Mensagem mensagem = bo.buscarPorId(id);
+        access.conversar(mensagem.getAtendimento().getId(), identity);
+        return Response.ok(MensagemResponse.from(mensagem)).build();
     }
 
     @GET
     @Path("/atendimento/{atendimentoId}")
     public Response listarPorAtendimento(@PathParam("atendimentoId") int atendimentoId) {
+        access.conversar(atendimentoId, identity);
         return Response.ok(bo.listarPorAtendimento(atendimentoId).stream()
                 .map(MensagemResponse::from)
                 .toList()).build();
@@ -53,6 +62,10 @@ public class MensagemResource {
 
     @POST
     public Response inserir(MensagemRequest request) {
+        if (request == null || request.atendimentoId == null) throw new BusinessException("Informe o atendimento da mensagem");
+        access.conversar(request.atendimentoId, identity);
+        request.enviadoPor = access.remetente(identity);
+        media.validarVinculo(request.arquivoUrl, request.atendimentoId, identity);
         Mensagem mensagem = bo.inserir(request);
 
         MensagemResponse response = MensagemResponse.from(mensagem);
@@ -65,7 +78,9 @@ public class MensagemResource {
     @POST
     @Path("/upload")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response upload(@RestForm("file") FileUpload arquivo) {
+    public Response upload(@RestForm("file") FileUpload arquivo, @RestForm("atendimentoId") Integer atendimentoId) {
+        if (atendimentoId == null) throw new BusinessException("Informe o atendimento do arquivo");
+        access.conversar(atendimentoId, identity);
         if (arquivo == null || arquivo.fileName() == null || arquivo.fileName().isBlank()) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(Map.of("mensagem", "Selecione uma foto ou um audio para enviar."))
@@ -86,11 +101,11 @@ public class MensagemResource {
                     .build();
         }
 
-        String nomeArquivo = UUID.randomUUID() + "." + extensao;
-        java.nio.file.Path destino = UPLOAD_DIR.resolve(nomeArquivo).normalize();
+        String nomeArquivo = atendimentoId + "-" + UUID.randomUUID() + "." + extensao;
+        java.nio.file.Path destino = media.arquivo(nomeArquivo);
 
         try {
-            Files.createDirectories(UPLOAD_DIR);
+            Files.createDirectories(destino.getParent());
             Files.copy(arquivo.uploadedFile(), destino, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             return Response.serverError()
@@ -109,12 +124,9 @@ public class MensagemResource {
     @Path("/midia/{nomeArquivo}")
     @Produces({"image/jpeg", "image/png", "audio/webm", "audio/mpeg", "audio/mp4"})
     public Response buscarMidia(@PathParam("nomeArquivo") String nomeArquivo) {
-        if (nomeArquivo == null || !nomeArquivo.matches("[0-9a-fA-F-]{36}\\.(jpg|jpeg|png|webm|mp3|mp4)")) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-
-        java.nio.file.Path arquivo = UPLOAD_DIR.resolve(nomeArquivo).normalize();
-        if (!arquivo.startsWith(UPLOAD_DIR) || !Files.isRegularFile(arquivo)) {
+        java.nio.file.Path arquivo = media.arquivo(nomeArquivo);
+        media.autorizarLeitura(nomeArquivo, identity);
+        if (!Files.isRegularFile(arquivo)) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
@@ -123,7 +135,7 @@ public class MensagemResource {
         return Response.ok(stream)
                 .type(mimeTypeSeguro(null, extensao))
                 .header("Content-Disposition", "inline; filename=\"" + nomeArquivo + "\"")
-                .header("Cache-Control", "private, max-age=3600")
+                .header("Cache-Control", "no-store")
                 .header("X-Content-Type-Options", "nosniff")
                 .build();
     }

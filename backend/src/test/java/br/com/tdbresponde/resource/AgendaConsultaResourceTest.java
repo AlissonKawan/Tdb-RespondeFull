@@ -22,6 +22,7 @@ class AgendaConsultaResourceTest {
         bo = mock(AgendaConsultaBO.class);
         resource = new AgendaConsultaResource();
         resource.agendaBO = bo;
+        resource.access = mock(br.com.tdbresponde.security.AtendimentoAccess.class);
     }
 
     @Test

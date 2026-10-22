@@ -10,6 +10,9 @@ import java.util.List;
 import java.sql.Connection;
 import java.sql.Statement;
 import javax.sql.DataSource;
+import br.com.tdbresponde.security.AtendimentoAccess;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.SecurityContext;
 
 @Path("/agendas")
 @Produces(MediaType.APPLICATION_JSON)
@@ -18,6 +21,8 @@ public class AgendaConsultaResource {
 
     @Inject
     AgendaConsultaBO agendaBO;
+    @Inject AtendimentoAccess access;
+    @Context SecurityContext identity;
     
     @Inject
     DataSource dataSource;
@@ -118,6 +123,7 @@ public class AgendaConsultaResource {
     @GET
     @Path("/voluntario/{voluntarioId}")
     public Response buscarPorVoluntario(@PathParam("voluntarioId") int voluntarioId) {
+        access.listarPorVoluntario(voluntarioId, identity);
         List<AgendaConsulta> agendas = agendaBO.buscarPorVoluntario(voluntarioId);
         return Response.ok(agendas).build();
     }
@@ -125,6 +131,7 @@ public class AgendaConsultaResource {
     @GET
     @Path("/atendimento/{atendimentoId}")
     public Response buscarPorAtendimento(@PathParam("atendimentoId") int atendimentoId) {
+        access.alterar(atendimentoId, identity);
         List<AgendaConsulta> agendas = agendaBO.buscarPorAtendimento(atendimentoId);
         return Response.ok(agendas).build();
     }
@@ -133,11 +140,13 @@ public class AgendaConsultaResource {
     @Path("/{id}")
     public Response buscarPorId(@PathParam("id") int id) {
         AgendaConsulta agenda = agendaBO.buscarPorId(id);
+        access.agenda(agenda, identity);
         return Response.ok(agenda).build();
     }
 
     @POST
     public Response criar(AgendaConsulta agenda) {
+        access.agenda(agenda, identity);
         AgendaConsulta criada = agendaBO.cadastrar(agenda);
         return Response.status(Response.Status.CREATED).entity(criada).build();
     }
@@ -145,6 +154,8 @@ public class AgendaConsultaResource {
     @PUT
     @Path("/{id}")
     public Response atualizar(@PathParam("id") int id, AgendaConsulta agenda) {
+        access.agenda(agendaBO.buscarPorId(id), identity);
+        access.agenda(agenda, identity);
         AgendaConsulta atualizada = agendaBO.atualizar(id, agenda);
         return Response.ok(atualizada).build();
     }
@@ -152,6 +163,7 @@ public class AgendaConsultaResource {
     @DELETE
     @Path("/{id}")
     public Response excluir(@PathParam("id") int id) {
+        access.agenda(agendaBO.buscarPorId(id), identity);
         agendaBO.excluir(id);
         return Response.noContent().build();
     }

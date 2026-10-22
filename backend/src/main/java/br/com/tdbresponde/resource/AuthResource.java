@@ -15,7 +15,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.SecurityContext;
 import br.com.tdbresponde.security.SessionService;
 import br.com.tdbresponde.security.WebSocketTickets;
-import br.com.tdbresponde.bo.AtendimentoBO;
+import br.com.tdbresponde.security.AtendimentoAccess;
 import java.util.Map;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -32,7 +32,7 @@ public class AuthResource {
 
     @Inject SessionService sessions;
     @Inject WebSocketTickets tickets;
-    @Inject AtendimentoBO atendimentos;
+    @Inject AtendimentoAccess access;
     @Context SecurityContext identity;
 
     @POST
@@ -128,18 +128,7 @@ public class AuthResource {
         if (request == null || request.atendimentoId() == null || request.atendimentoId() <= 0) {
             return Response.status(400).build();
         }
-        var atendimento = atendimentos.buscarPorId(request.atendimentoId());
-        int accountId = Integer.parseInt(identity.getUserPrincipal().getName());
-        boolean allowed = identity.isUserInRole("ADMIN");
-        if (identity.isUserInRole("BENEFICIARIO")) {
-            allowed = atendimento.getPessoaAtendida() != null
-                    && Integer.valueOf(accountId).equals(atendimento.getPessoaAtendida().getContaId());
-        } else if (identity.isUserInRole("VOLUNTARIO")) {
-            Integer voluntarioId = bo.buscarVoluntarioIdDaConta(accountId);
-            allowed = voluntarioId != null && atendimento.getVoluntario() != null
-                    && voluntarioId == atendimento.getVoluntario().getId();
-        }
-        if (!allowed) return Response.status(403).build();
+        access.conversar(request.atendimentoId(), identity);
         return Response.ok(Map.of("ticket", tickets.issue(SessionService.bearer(authorization),
                 request.atendimentoId().toString()))).header("Cache-Control", "no-store").build();
     }

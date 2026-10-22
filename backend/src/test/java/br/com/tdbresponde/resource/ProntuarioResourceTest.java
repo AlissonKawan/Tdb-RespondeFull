@@ -22,6 +22,8 @@ class ProntuarioResourceTest {
         bo = mock(ProntuarioBO.class);
         resource = new ProntuarioResource();
         resource.prontuarioBO = bo;
+        resource.access = mock(br.com.tdbresponde.security.AtendimentoAccess.class);
+        resource.agendas = mock(br.com.tdbresponde.bo.AgendaConsultaBO.class);
     }
 
     @Test

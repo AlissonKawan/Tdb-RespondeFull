@@ -1,6 +1,14 @@
 package br.com.tdbresponde.security;
 
 import br.com.tdbresponde.bo.ContaUsuarioBO;
+import br.com.tdbresponde.bo.AtendimentoBO;
+import br.com.tdbresponde.bo.MensagemBO;
+import br.com.tdbresponde.dao.PessoaAtendidaDAO;
+import br.com.tdbresponde.dto.MensagemRequest;
+import br.com.tdbresponde.model.Atendimento;
+import br.com.tdbresponde.model.Mensagem;
+import br.com.tdbresponde.model.PessoaAtendidaBase;
+import br.com.tdbresponde.model.Voluntario;
 import br.com.tdbresponde.dao.ContaUsuarioDAO;
 import br.com.tdbresponde.model.ContaUsuario;
 import br.com.tdbresponde.model.TipoUsuario;
@@ -19,6 +27,9 @@ import static org.mockito.Mockito.*;
 class AuthenticationHttpTest {
     @InjectMock ContaUsuarioBO bo;
     @InjectMock ContaUsuarioDAO dao;
+    @InjectMock AtendimentoBO atendimentos;
+    @InjectMock MensagemBO mensagens;
+    @InjectMock PessoaAtendidaDAO pessoas;
     ContaUsuario account;
     @BeforeEach void setup() {
         account = new ContaUsuario(); account.setId(7); account.setNome("Teste");
@@ -59,5 +70,57 @@ class AuthenticationHttpTest {
     @Test void badCredentialsNeverCreateSession() {
         when(bo.login(any())).thenThrow(new br.com.tdbresponde.exception.UnauthorizedException("Email ou senha invalidos."));
         given().contentType("application/json").body("{}").post("/auth/login").then().statusCode(401).body("token", nullValue());
+    }
+
+    @Test void beneficiarySessionsCannotReadEachOthersCasesOrMessages() {
+        ContaUsuario other = new ContaUsuario(); other.setId(8); other.setAtivo(true);
+        other.setTipoUsuario(TipoUsuario.BENEFICIARIO);
+        when(dao.buscarPorId(8)).thenReturn(other);
+        when(atendimentos.buscarPorId(1)).thenReturn(caseFor(1, 7));
+        when(atendimentos.buscarPorId(2)).thenReturn(caseFor(2, 8));
+        when(mensagens.listarPorAtendimento(1)).thenReturn(java.util.List.of());
+        String first = login();
+        when(bo.login(any())).thenReturn(other);
+        String second = given().contentType("application/json").body("{\"email\":\"other@example.test\",\"senha\":\"teste123\"}")
+                .post("/auth/login").then().statusCode(200).extract().path("token");
+        given().auth().oauth2(first).accept("application/json").get("/atendimentos/1").then().statusCode(200);
+        given().auth().oauth2(second).accept("application/json").get("/atendimentos/2").then().statusCode(200);
+        given().auth().oauth2(first).accept("application/json").get("/atendimentos/2").then().statusCode(403);
+        given().auth().oauth2(second).accept("application/json").get("/atendimentos/1").then().statusCode(403);
+        for (String path : new String[]{"/atendimentos/2/mensagens", "/mensagens/atendimento/2", "/atendimentos/beneficiario/conta/8"}) {
+            given().auth().oauth2(first).accept("application/json").get(path).then().statusCode(403);
+        }
+        verify(mensagens, never()).listarPorAtendimento(2);
+    }
+
+    @Test void messageSenderIsDerivedFromSessionAndForeignWritesAreDenied() {
+        when(atendimentos.buscarPorId(1)).thenReturn(caseFor(1, 7));
+        when(atendimentos.buscarPorId(2)).thenReturn(caseFor(2, 8));
+        when(mensagens.inserir(any())).thenAnswer(call -> {
+            MensagemRequest request = call.getArgument(0);
+            Mensagem message = new Mensagem(); message.setId(50); message.setAtendimento(caseFor(1, 7));
+            message.setEnviadoPor(request.enviadoPor); return message;
+        });
+        String token = login();
+        given().auth().oauth2(token).contentType("application/json")
+                .body("{\"conteudo\":\"Teste\",\"enviadoPor\":\"ADMIN\"}")
+                .post("/atendimentos/1/mensagens").then().statusCode(201).body("enviadoPor", is("BENEFICIARIO"));
+        given().auth().oauth2(token).contentType("application/json")
+                .body("{\"atendimentoId\":1,\"conteudo\":\"Teste\",\"enviadoPor\":\"ADMIN\"}")
+                .post("/mensagens").then().statusCode(201).body("enviadoPor", is("BENEFICIARIO"));
+        given().auth().oauth2(token).contentType("application/json").body("{\"conteudo\":\"Teste\"}")
+                .post("/atendimentos/2/mensagens").then().statusCode(403);
+        given().auth().oauth2(token).contentType("application/json").body("{\"idContaBeneficiario\":8}")
+                .post("/atendimentos/relatar").then().statusCode(403);
+        verify(atendimentos, never()).relatar(any());
+        verify(mensagens, times(2)).inserir(any());
+    }
+
+    private Atendimento caseFor(int id, int accountId) {
+        Atendimento atendimento = new Atendimento(); atendimento.setId(id); atendimento.setStatus("EM_ATENDIMENTO");
+        PessoaAtendidaBase pessoa = new PessoaAtendidaBase(); pessoa.setContaId(accountId); pessoa.setId(accountId);
+        atendimento.setPessoaAtendida(pessoa);
+        Voluntario voluntario = new Voluntario(); voluntario.setId(80); atendimento.setVoluntario(voluntario);
+        return atendimento;
     }
 }

@@ -40,10 +40,11 @@ export const mensagensService = {
     apiClient.get<Mensagem[]>(`/atendimentos/${atendimentoId}/mensagens`),
   enviarMensagem: (atendimentoId: number, payload: MensagemRequest) =>
     apiClient.post<Mensagem>(`/atendimentos/${atendimentoId}/mensagens`, payload),
-  uploadMidia: async (file: File | Blob, extensao?: string): Promise<UploadMidiaResponse> => {
+  uploadMidia: async (atendimentoId: number, file: File | Blob, extensao?: string): Promise<UploadMidiaResponse> => {
     const formData = new FormData();
     const nomeArquivo = file instanceof File ? file.name : `audio.${extensao ?? 'webm'}`;
     formData.append('file', file, nomeArquivo);
+    formData.append('atendimentoId', String(atendimentoId));
 
     let response: Response;
     try {

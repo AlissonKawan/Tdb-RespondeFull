@@ -108,6 +108,20 @@ public class MensagemDAO {
         }
     }
 
+    public List<Integer> buscarAtendimentosPorArquivoUrl(String arquivoUrl) {
+        String sql = "SELECT DISTINCT ATENDIMENTO_ID FROM MENSAGEM WHERE ARQUIVO_URL = ?";
+        List<Integer> ids = new ArrayList<>();
+        try (Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, arquivoUrl);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) ids.add(rs.getInt("ATENDIMENTO_ID"));
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException("Erro ao verificar o vinculo da midia.", e);
+        }
+        return ids;
+    }
+
     public Mensagem buscarPorId(int id) {
         String sql = SELECT_BASE + "WHERE M.ID = ?";
 

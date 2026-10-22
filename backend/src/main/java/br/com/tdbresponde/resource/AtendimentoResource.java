@@ -25,6 +25,10 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import br.com.tdbresponde.model.Atendimento;
+import br.com.tdbresponde.security.AtendimentoAccess;
+import br.com.tdbresponde.security.ChatMediaAccess;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.SecurityContext;
 
 @Path("/atendimentos")
 @Produces(MediaType.APPLICATION_JSON)
@@ -37,9 +41,15 @@ public class AtendimentoResource {
     @Inject
     MensagemBO mensagemBO;
 
+    @Inject AtendimentoAccess access;
+    @Inject ChatMediaAccess media;
+    @Context SecurityContext identity;
+
     @GET
     public Response listar() {
+        var permitido = access.consultaPermitida(identity);
         return Response.ok(bo.listar().stream()
+                .filter(permitido)
                 .map(AtendimentoResponse::from)
                 .toList()).build();
     }
@@ -47,7 +57,10 @@ public class AtendimentoResource {
     @GET
     @Path("/solicitados")
     public Response listarSolicitados() {
+        var permitido = access.consultaPermitida(identity);
+        boolean admin = access.admin(identity);
         return Response.ok(bo.listarSolicitados().stream()
+                .filter(a -> admin || (access.filaAberta(a) && permitido.test(a)))
                 .map(AtendimentoResponse::from)
                 .toList()).build();
     }
@@ -55,6 +68,7 @@ public class AtendimentoResource {
     @GET
     @Path("/voluntario/{voluntarioId}")
     public Response listarPorVoluntario(@PathParam("voluntarioId") int voluntarioId) {
+        access.listarPorVoluntario(voluntarioId, identity);
         return Response.ok(bo.listarPorVoluntario(voluntarioId).stream()
                 .map(AtendimentoResponse::from)
                 .toList()).build();
@@ -63,7 +77,10 @@ public class AtendimentoResource {
     @GET
     @Path("/beneficiario/{beneficiarioId}")
     public Response listarPorBeneficiario(@PathParam("beneficiarioId") int beneficiarioId) {
+        access.listarPorBeneficiario(beneficiarioId, identity);
+        var permitido = access.consultaPermitida(identity);
         return Response.ok(bo.listarPorBeneficiario(beneficiarioId).stream()
+                .filter(permitido)
                 .map(AtendimentoResponse::from)
                 .toList()).build();
     }
@@ -71,7 +88,10 @@ public class AtendimentoResource {
     @GET
     @Path("/beneficiario/conta/{contaId}")
     public Response listarPorContaBeneficiario(@PathParam("contaId") int contaId) {
+        access.listarPorConta(contaId, identity);
+        var permitido = access.consultaPermitida(identity);
         return Response.ok(bo.listarPorContaBeneficiario(contaId).stream()
+                .filter(permitido)
                 .map(AtendimentoResponse::from)
                 .toList()).build();
     }
@@ -79,6 +99,7 @@ public class AtendimentoResource {
     @POST
     @Path("/relatar")
     public Response relatar(RelatarSituacaoRequest request) {
+        access.vincularRelato(request, identity);
         return Response.status(Response.Status.CREATED)
                 .entity(bo.relatar(request))
                 .build();
@@ -87,13 +108,14 @@ public class AtendimentoResource {
     @GET
     @Path("/{id}")
     public Response buscarPorId(@PathParam("id") int id) {
-        Atendimento atendimento = bo.buscarPorId(id);
+        Atendimento atendimento = access.consultar(id, identity);
         return Response.ok(AtendimentoResponse.from(atendimento)).build();
     }
 
     @GET
     @Path("/{id}/previsao-ia")
     public Response buscarPrevisaoIA(@PathParam("id") int id) {
+        access.conversar(id, identity);
         CheckinPrevisaoResponse previsao = bo.preverCheckinIA(id);
         if (previsao == null) {
             return Response.status(Response.Status.NO_CONTENT).build();
@@ -104,6 +126,7 @@ public class AtendimentoResource {
     @GET
     @Path("/{id}/mensagens")
     public Response listarMensagens(@PathParam("id") int id) {
+        access.conversar(id, identity);
         return Response.ok(mensagemBO.listarPorAtendimento(id).stream()
                 .map(MensagemResponse::from)
                 .toList()).build();
@@ -119,6 +142,9 @@ public class AtendimentoResource {
             request = new MensagemRequest();
         }
         request.atendimentoId = id;
+        access.conversar(id, identity);
+        request.enviadoPor = access.remetente(identity);
+        media.validarVinculo(request.arquivoUrl, id, identity);
 
         // 1. Salva a mensagem no banco (Lógica Original)
         br.com.tdbresponde.model.Mensagem mensagem = mensagemBO.inserir(request);
@@ -133,6 +159,7 @@ public class AtendimentoResource {
 
     @POST
     public Response inserir(AtendimentoRequest request) {
+        access.exigirAdmin(identity);
         Atendimento atendimento = bo.inserir(request);
         return Response.status(Response.Status.CREATED)
                 .entity(AtendimentoResponse.from(atendimento))
@@ -142,6 +169,8 @@ public class AtendimentoResource {
     @PUT
     @Path("/{id}")
     public Response atualizar(@PathParam("id") int id, AtendimentoRequest request) {
+        Atendimento atual = access.alterar(id, identity);
+        access.validarAtualizacao(atual, request, identity);
         Atendimento atendimento = bo.atualizar(id, request);
         return Response.ok(AtendimentoResponse.from(atendimento)).build();
     }
@@ -149,6 +178,7 @@ public class AtendimentoResource {
     @PUT
     @Path("/{id}/status-prioridade")
     public Response atualizarStatusPrioridade(@PathParam("id") int id, AtendimentoAtualizacaoRequest request) {
+        access.alterar(id, identity);
         Atendimento atendimento = bo.atualizarStatusPrioridade(id, request);
         return Response.ok(AtendimentoResponse.from(atendimento)).build();
     }
@@ -156,9 +186,9 @@ public class AtendimentoResource {
     @PUT
     @Path("/{id}/encerrar")
     public Response encerrar(@PathParam("id") int id, EncerrarAtendimentoRequest request) {
-        int responsavelId = request != null && request.voluntarioResponsavelId != null
-                ? request.voluntarioResponsavelId
-                : 0;
+        access.alterar(id, identity);
+        Integer responsavel = access.responsavel(request != null ? request.voluntarioResponsavelId : null, identity);
+        int responsavelId = responsavel != null ? responsavel : 0;
         Atendimento atendimento = bo.encerrar(id, responsavelId);
         return Response.ok(AtendimentoResponse.from(atendimento)).build();
     }
@@ -166,7 +196,8 @@ public class AtendimentoResource {
     @PUT
     @Path("/{id}/assumir")
     public Response assumir(@PathParam("id") int id, AssumirAtendimentoRequest request) {
-        Integer voluntarioId = request != null ? request.voluntarioId : null;
+        access.consultar(id, identity);
+        Integer voluntarioId = access.responsavel(request != null ? request.voluntarioId : null, identity);
         Atendimento atendimento = bo.assumir(id, voluntarioId);
         return Response.ok(AtendimentoResponse.from(atendimento)).build();
     }
@@ -174,6 +205,7 @@ public class AtendimentoResource {
     @PUT
     @Path("/{id}/checkin")
     public Response atualizarCheckin(@PathParam("id") int id, CheckinRequest request) {
+        access.alterar(id, identity);
         CheckinPrevisaoResponse[] holder = new CheckinPrevisaoResponse[1];
         Atendimento atendimento = bo.atualizarCheckinComPrevisao(id, request, holder);
         CheckinPrevisaoResponse previsao = holder[0];
@@ -186,6 +218,7 @@ public class AtendimentoResource {
     @DELETE
     @Path("/{id}")
     public Response excluir(@PathParam("id") int id) {
+        access.alterar(id, identity);
         bo.excluir(id);
         return Response.noContent().build();
     }

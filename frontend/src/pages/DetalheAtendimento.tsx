@@ -243,6 +243,10 @@ function DetalheAtendimento() {
 
   const voluntarioId = user?.voluntarioId;
   const voluntarioSemVinculo = user?.tipoUsuario === 'VOLUNTARIO' && !voluntarioId;
+  const podeAcessarConversa = Boolean(atendimento && (
+    user?.tipoUsuario === 'ADMIN' || user?.tipoUsuario === 'BENEFICIARIO'
+    || (user?.tipoUsuario === 'VOLUNTARIO' && voluntarioId != null && voluntarioId === atendimento.voluntarioId)
+  ));
 
   const carregarAgendaEProntuario = (idAtend: number) => {
     if (!podeAlterar || !Number.isFinite(idAtend) || idAtend <= 0) return;
@@ -303,17 +307,20 @@ function DetalheAtendimento() {
     setLoading(true);
     setErro('');
     try {
-      const [dadosAtendimento, dadosMensagens] = await Promise.all([
-        atendimentoService.buscarPorId(atendimentoId),
-        mensagensService.getMensagensAtendimento(atendimentoId),
-      ]);
+      const dadosAtendimento = await atendimentoService.buscarPorId(atendimentoId);
+      const podeConversar = user?.tipoUsuario === 'ADMIN'
+        || user?.tipoUsuario === 'BENEFICIARIO'
+        || (user?.tipoUsuario === 'VOLUNTARIO' && user.voluntarioId != null && user.voluntarioId === dadosAtendimento.voluntarioId);
+      const dadosMensagens = podeConversar
+        ? await mensagensService.getMensagensAtendimento(atendimentoId)
+        : [];
       seenIdsRef.current = new Set(dadosMensagens.map(m => m.id));
       setAtendimento(dadosAtendimento);
       setMensagens(dadosMensagens);
       setStatusEdit(dadosAtendimento.status ?? 'ABERTO');
       setPrioridadeEdit(String(dadosAtendimento.prioridade ?? 3));
 
-      carregarAgendaEProntuario(atendimentoId);
+      if (podeConversar) carregarAgendaEProntuario(atendimentoId);
 
     } catch (error) {
       let msgErro = 'Não foi possível carregar os detalhes deste atendimento. Tente novamente mais tarde.';
@@ -341,7 +348,7 @@ function DetalheAtendimento() {
     let reconnectAttempt = 0;
 
     async function connect() {
-      if (cancelled || !atendimentoId) return;
+      if (cancelled || !atendimentoId || !podeAcessarConversa) return;
 
       const clientId = `${remetenteAtual}-${Math.random().toString(36).substring(7)}`;
 
@@ -408,7 +415,7 @@ function DetalheAtendimento() {
       if (reconnectTimeout) clearTimeout(reconnectTimeout);
       socket?.close();
     };
-  }, [atendimentoId, remetenteAtual]);
+  }, [atendimentoId, remetenteAtual, podeAcessarConversa]);
 
   const pessoaAtendida = useMemo(() => (
     atendimento?.pessoaAtendidaNome
@@ -488,7 +495,7 @@ function DetalheAtendimento() {
     setEnviandoMidia(true);
     setFeedback('');
     try {
-      const upload = await mensagensService.uploadMidia(arquivo);
+      const upload = await mensagensService.uploadMidia(atendimentoId, arquivo);
       await enviarPayload({
         conteudo: legenda,
         enviadoPor: remetenteAtual,
@@ -585,7 +592,7 @@ function DetalheAtendimento() {
     try {
       const audio = await pararGravacao();
       const extensao = audio.type.includes('mp4') ? 'mp4' : 'webm';
-      const upload = await mensagensService.uploadMidia(audio, extensao);
+      const upload = await mensagensService.uploadMidia(atendimentoId, audio, extensao);
       await enviarPayload({
         conteudo: '',
         enviadoPor: remetenteAtual,

@@ -22,6 +22,9 @@ class AtendimentoResourceTest {
         bo = mock(AtendimentoBO.class);
         resource = new AtendimentoResource();
         resource.bo = bo;
+        resource.access = new br.com.tdbresponde.security.AtendimentoAccess(bo,
+                mock(br.com.tdbresponde.bo.ContaUsuarioBO.class), mock(br.com.tdbresponde.dao.PessoaAtendidaDAO.class));
+        resource.identity = new br.com.tdbresponde.security.TestIdentity(1, "ADMIN");
     }
 
     @Test

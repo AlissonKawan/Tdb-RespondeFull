@@ -106,7 +106,7 @@ describe('DetalheAtendimento - Deduplicação de Mensagens', () => {
 
     // Default mock implementation for auth
     vi.mocked(useAuth).mockReturnValue({
-      user: { id: 10, nome: 'Voluntário Teste', tipoUsuario: 'VOLUNTARIO' },
+      user: { id: 10, voluntarioId: 10, nome: 'Voluntário Teste', tipoUsuario: 'VOLUNTARIO' },
       logout: vi.fn(),
     } as unknown as ReturnType<typeof useAuth>);
     vi.mocked(agendaService.buscarPorAtendimento).mockResolvedValue([]);
@@ -150,6 +150,18 @@ describe('DetalheAtendimento - Deduplicação de Mensagens', () => {
       enviadoPor: 'BENEFICIARIO',
     },
   ];
+
+  it('consulta caso aberto da fila sem carregar conversa ou dados clinicos antes de assumir', async () => {
+    vi.mocked(atendimentoService.buscarPorId).mockResolvedValue({
+      ...mockAtendimento, status: 'ABERTO', voluntarioId: undefined,
+    });
+    render(<MemoryRouter><DetalheAtendimento /></MemoryRouter>);
+    await screen.findByRole('heading', { name: 'Atendimento de Maria Souza' });
+    expect(mensagensService.getMensagensAtendimento).not.toHaveBeenCalled();
+    expect(agendaService.buscarPorAtendimento).not.toHaveBeenCalled();
+    expect(prontuarioService.buscarPorAtendimento).not.toHaveBeenCalled();
+    expect(activeWebSocketInstances).toHaveLength(0);
+  });
 
   it('deve carregar o atendimento e as mensagens iniciais sem duplicá-las', async () => {
     vi.mocked(atendimentoService.buscarPorId).mockResolvedValue(mockAtendimento);
@@ -579,7 +591,7 @@ describe('DetalheAtendimento - Deduplicação de Mensagens', () => {
     const file = new File(['foto'], 'foto.png', { type: 'image/png' });
     const input = screen.getByLabelText('Selecionar foto', { selector: 'input' });
     await user.upload(input, file);
-    expect(mensagensService.uploadMidia).toHaveBeenCalledWith(file);
+    expect(mensagensService.uploadMidia).toHaveBeenCalledWith(1, file);
     expect(mensagensService.enviarMensagem).toHaveBeenCalledWith(1, { conteudo: 'Orientações', enviadoPor: 'VOLUNTARIO', tipoMensagem: 'IMAGEM', arquivoUrl: '/mensagens/midia/foto.png', mimeType: 'image/png' });
     expect(await screen.findByRole('img', { name: 'Foto enviada' })).toHaveAttribute('src', 'blob:foto-autenticada');
     expect(mensagensService.carregarMidia).toHaveBeenCalledWith('/mensagens/midia/foto.png');
