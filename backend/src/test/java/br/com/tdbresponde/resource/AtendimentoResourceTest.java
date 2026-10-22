@@ -38,6 +38,7 @@ class AtendimentoResourceTest {
         a1.setId(1);
         a1.setVoluntario(voluntario);
         a1.setStatus("EM_ATENDIMENTO");
+        a1.setUltimaMensagemDoBeneficiario(true);
 
         Atendimento a2 = new Atendimento();
         a2.setId(2);
@@ -53,6 +54,7 @@ class AtendimentoResourceTest {
         assertEquals(200, response.getStatus());
         List<?> list = (List<?>) response.getEntity();
         assertEquals(2, list.size());
+        assertEquals(true, ((br.com.tdbresponde.dto.AtendimentoResponse) list.get(0)).ultimaMensagemDoBeneficiario);
         
         verify(bo, times(1)).listarPorVoluntario(voluntarioId);
     }

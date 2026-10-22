@@ -37,6 +37,17 @@ public class MensagemBO {
         return mensagemDAO.buscarPorAtendimento(atendimento.getId());
     }
 
+    public List<Mensagem> listarPagina(Atendimento atendimento, Integer limite, Integer antesId) {
+        if (limite == null) {
+            if (antesId != null) throw new BusinessException("Informe o limite ao buscar mensagens anteriores");
+            return listarPorAtendimento(atendimento);
+        }
+        if (atendimento == null || atendimento.getId() <= 0) throw new BusinessException("Informe o atendimento");
+        if (limite < 1 || limite > 100) throw new BusinessException("O limite deve estar entre 1 e 100 mensagens");
+        if (antesId != null && antesId <= 0) throw new BusinessException("Referencia de mensagem invalida");
+        return mensagemDAO.buscarPaginaPorAtendimento(atendimento.getId(), limite, antesId);
+    }
+
     public Mensagem buscarPorId(int id) {
         Mensagem mensagem = mensagemDAO.buscarPorId(id);
         if (mensagem == null) {

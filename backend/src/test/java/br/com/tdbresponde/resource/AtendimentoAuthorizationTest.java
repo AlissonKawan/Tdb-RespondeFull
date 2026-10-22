@@ -37,6 +37,7 @@ class AtendimentoAuthorizationTest {
     @Test void beneficiarioNaoConsultaCasoMensagensOuPrevisaoDeOutraConta() {
         assertThrows(ForbiddenException.class, () -> resource.buscarPorId(2));
         assertThrows(ForbiddenException.class, () -> resource.listarMensagens(2));
+        assertThrows(ForbiddenException.class, () -> resource.listarMensagens(2, 50, 81));
         assertThrows(ForbiddenException.class, () -> resource.buscarPrevisaoIA(2));
         assertThrows(ForbiddenException.class, () -> resource.inserirMensagem(2, new MensagemRequest()));
         verifyNoInteractions(mensagens);
@@ -96,6 +97,27 @@ class AtendimentoAuthorizationTest {
         resource.identity = new TestIdentity(8, "VOLUNTARIO");
         assertThrows(ForbiddenException.class, () -> resource.listarPorVoluntario(800));
         verify(bo, never()).listarPorVoluntario(anyInt());
+    }
+
+    @Test void listagemGeralDoVoluntarioRestringeSQLSemRetirarVerificacaoPorObjeto() {
+        resource.identity = new TestIdentity(8, "VOLUNTARIO");
+        var proprio = atendimento(1, 7, 80);
+        var alheio = atendimento(2, 70, 800);
+        var fila = atendimento(3, 70, 800); fila.setVoluntario(null); fila.setStatus("ABERTO");
+        when(bo.listarConsultaveisPorVoluntario(80)).thenReturn(List.of(proprio, alheio, fila));
+        List<?> resultado = (List<?>) resource.listar().getEntity();
+        assertEquals(List.of(1, 3), resultado.stream().map(a -> ((AtendimentoResponse) a).id).toList());
+        verify(bo).listarConsultaveisPorVoluntario(80);
+        verify(bo, never()).listar();
+        verify(contas, times(1)).buscarVoluntarioIdDaConta(8);
+    }
+
+    @Test void listagemAdministrativaContinuaCompleta() {
+        resource.identity = new TestIdentity(1, "ADMIN");
+        when(bo.listar()).thenReturn(List.of(atendimento(2, 70, 800)));
+        assertEquals(1, ((List<?>) resource.listar().getEntity()).size());
+        verify(bo).listar();
+        verify(bo, never()).listarConsultaveisPorVoluntario(any());
     }
 
     @Test void erroDePermissaoTemStatus403EMensagemSegura() {

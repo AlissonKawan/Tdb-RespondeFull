@@ -8,6 +8,15 @@ beforeEach(() => {
 });
 afterEach(() => vi.unstubAllGlobals());
 
+it('pagina mensagens na rota existente e preserva a chamada sem parametros', async () => {
+  const fetchMock = vi.fn().mockImplementation(async () => new Response('[]'));
+  vi.stubGlobal('fetch', fetchMock);
+  await mensagensService.getMensagensAtendimento(42, { limite: 50, antesId: 81 });
+  expect(fetchMock.mock.calls[0][0]).toMatch(/\/atendimentos\/42\/mensagens\?limite=50&antesId=81$/);
+  await mensagensService.getMensagensAtendimento(42);
+  expect(fetchMock.mock.calls[1][0]).toMatch(/\/atendimentos\/42\/mensagens$/);
+});
+
 it('envia atendimento e credencial junto ao arquivo', async () => {
   const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ arquivoUrl: '/mensagens/midia/1-foto.png', mimeType: 'image/png' }), { status: 201 }));
   vi.stubGlobal('fetch', fetchMock);

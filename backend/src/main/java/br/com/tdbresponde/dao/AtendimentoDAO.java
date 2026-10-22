@@ -19,17 +19,21 @@ import java.util.List;
 @ApplicationScoped
 public class AtendimentoDAO {
 
-    private static final String SELECT_BASE = 
-            "SELECT A.ID, A.PRIORIDADE, A.STATUS, A.DESCRICAO, A.DATA_ABERTURA, A.DATA_ENCERRAMENTO, " +
+    private static final String COLUNAS_BASE =
+            "A.ID, A.PRIORIDADE, A.STATUS, A.DESCRICAO, A.DATA_ABERTURA, A.DATA_ENCERRAMENTO, " +
             "A.PESSOA_ATENDIDA_ID, A.VOLUNTARIO_ID, A.CANAL_COMUNICACAO_ID, A.STATUS_CHECKIN, A.HORARIO_ENVIO_CHECKIN, " +
             "(SELECT MAX(M.DATA_HORA) FROM MENSAGEM M WHERE M.ATENDIMENTO_ID = A.ID) AS DATA_ATUALIZACAO, " +
             "C.ID AS CANAL_ID, C.NOME AS CANAL_NOME, C.DESCRICAO AS CANAL_DESC, " +
             "V.ID AS VOLUNTARIO_ID_REAL, V.NOME AS VOLUNTARIO_NOME, V.DISPONIVEL AS VOLUNTARIO_DISP, V.ACESSO_SIGILO AS VOLUNTARIO_SIGILO, " +
-            "P.ID AS PESSOA_ID, P.NOME_CODIFICADO AS PESSOA_NOME, P.DATA_CADASTRO AS PESSOA_DATA, P.TELEFONE AS PESSOA_TEL, P.EMAIL AS PESSOA_EMAIL, P.TIPO AS PESSOA_TIPO, P.ID_CONTA AS PESSOA_CONTA " +
+            "P.ID AS PESSOA_ID, P.NOME_CODIFICADO AS PESSOA_NOME, P.DATA_CADASTRO AS PESSOA_DATA, P.TELEFONE AS PESSOA_TEL, P.EMAIL AS PESSOA_EMAIL, P.TIPO AS PESSOA_TIPO, P.ID_CONTA AS PESSOA_CONTA ";
+
+    private static final String FROM_BASE =
             "FROM ATENDIMENTO A " +
             "LEFT JOIN CANAL_COMUNICACAO C ON A.CANAL_COMUNICACAO_ID = C.ID " +
             "LEFT JOIN VOLUNTARIO V ON A.VOLUNTARIO_ID = V.ID " +
             "LEFT JOIN PESSOA_ATENDIDA P ON A.PESSOA_ATENDIDA_ID = P.ID ";
+
+    private static final String SELECT_BASE = "SELECT " + COLUNAS_BASE + FROM_BASE;
 
     @Inject
     DataSource dataSource;
@@ -157,6 +161,23 @@ public class AtendimentoDAO {
         return lista;
     }
 
+    /** Mesma visibilidade da politica de acesso, reduzida antes de materializar resultados. */
+    public List<Atendimento> buscarConsultaveisPorVoluntario(Integer voluntarioId) {
+        String sql = SELECT_BASE + " WHERE (A.VOLUNTARIO_ID IS NULL AND A.STATUS = 'ABERTO') " +
+                "OR A.VOLUNTARIO_ID = ?";
+        List<Atendimento> lista = new ArrayList<>();
+        try (Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            if (voluntarioId == null) stmt.setNull(1, Types.INTEGER);
+            else stmt.setInt(1, voluntarioId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) lista.add(mapearResultSet(rs));
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException("Erro ao listar atendimentos permitidos.", e);
+        }
+        return lista;
+    }
+
     public void relatarSituacao(PessoaAtendida pessoa, String tipo, Atendimento atendimento) {
         Connection conn = null;
 
@@ -199,7 +220,12 @@ public class AtendimentoDAO {
     }
 
     public List<Atendimento> buscarPorVoluntario(int voluntarioId) {
-        String sql = SELECT_BASE + " WHERE A.VOLUNTARIO_ID = ? ORDER BY A.DATA_ABERTURA DESC, A.ID DESC";
+        // O portal precisa apenas do remetente mais recente, nunca do historico inteiro.
+        // O ID desempata mensagens com o mesmo horario de forma deterministica.
+        String sql = "SELECT " + COLUNAS_BASE +
+                ", (SELECT MAX(M.ENVIADO_POR) KEEP (DENSE_RANK LAST ORDER BY M.DATA_HORA, M.ID) " +
+                "FROM MENSAGEM M WHERE M.ATENDIMENTO_ID = A.ID) AS ULTIMA_MENSAGEM_REMETENTE " +
+                FROM_BASE + " WHERE A.VOLUNTARIO_ID = ? ORDER BY A.DATA_ABERTURA DESC, A.ID DESC";
 
         List<Atendimento> lista = new ArrayList<>();
 
@@ -209,7 +235,9 @@ public class AtendimentoDAO {
             stmt.setInt(1, voluntarioId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    lista.add(mapearResultSet(rs));
+                    Atendimento atendimento = mapearResultSet(rs);
+                    atendimento.setUltimaMensagemDoBeneficiario("BENEFICIARIO".equals(rs.getString("ULTIMA_MENSAGEM_REMETENTE")));
+                    lista.add(atendimento);
                 }
             }
 

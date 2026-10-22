@@ -33,6 +33,7 @@ export interface AtendimentoApi {
   dataCriacao?: string;
   dataAbertura?: string;
   dataAtualizacao?: string;
+  ultimaMensagemDoBeneficiario?: boolean;
   dataEncerramento?: string | null;
   solicitanteNome?: string;
   beneficiarioNome?: string;

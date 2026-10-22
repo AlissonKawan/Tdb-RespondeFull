@@ -8,7 +8,6 @@ import { ErrorState, LoadingState } from '../components/ui/FeedbackState';
 import { Input } from '../components/ui/Input';
 import { atendimentoService } from '../services/atendimentoService';
 import { voluntariosService } from '../services/voluntariosService';
-import { mensagensService } from '../services/mensagensService';
 import type { AtendimentoApi } from '../types/AtendimentoApi';
 import { useAuth } from '../context/useAuth';
 import { useConfirm } from '../hooks/useConfirm';
@@ -248,23 +247,10 @@ function PortalVoluntario() {
       setMeusAtendimentos(sorted);
       setLoadingMeus(false); // Desbloqueia a UI imediatamente
 
-      // Fetch mensagens para verificar novidades em background
-      void (async () => {
-        const unreadMap: Record<number, boolean> = {};
-        await Promise.all(sorted.map(async (atendimento) => {
-          try {
-            const msgs = await mensagensService.getMensagensAtendimento(atendimento.id);
-            if (msgs.length > 0) {
-              const ultima = msgs[msgs.length - 1];
-              // Se a última mensagem não foi enviada pelo voluntário ou admin, conta como nova
-              if (ultima.enviadoPor === 'BENEFICIARIO') {
-                unreadMap[atendimento.id] = true;
-              }
-            }
-          } catch { /* ignora se falhar ao buscar msgs */ }
-        }));
-        setNovasMensagens(prev => ({ ...prev, ...unreadMap }));
-      })();
+      // Preserva a regra do badge sem baixar o historico de cada atendimento.
+      setNovasMensagens(Object.fromEntries(sorted.map(atendimento => [
+        atendimento.id, atendimento.ultimaMensagemDoBeneficiario === true,
+      ])));
 
     } catch (error) {
       setErroMeus(error instanceof Error ? error.message : 'Erro ao carregar dados.');
@@ -276,7 +262,7 @@ function PortalVoluntario() {
     async function carregarDadosDoPortal() {
       if (!user) return;
 
-      await carregarSolicitados();
+      const solicitados = carregarSolicitados();
 
       if (user.tipoUsuario !== 'VOLUNTARIO' && user.tipoUsuario !== 'ADMIN') {
         setLoadingMeus(false);
@@ -293,6 +279,7 @@ function PortalVoluntario() {
       }
 
       await Promise.all([
+        solicitados,
         carregarMeus(user.voluntarioId),
         voluntariosService.buscarPorId(user.voluntarioId).then(vol => {
           if (vol.codigoIndicacao) setCodigoIndicacao(vol.codigoIndicacao);

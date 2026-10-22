@@ -139,16 +139,8 @@ describe('PortalVoluntario', () => {
     // Mock Atendimentos (A = Antigo, B = Recente)
     vi.mocked(atendimentoService.listarPorVoluntario).mockResolvedValue([
       { id: 1, beneficiarioNome: 'Paciente Antigo', dataAtualizacao: '2023-01-01T00:00:00Z', status: 'ABERTO' },
-      { id: 2, beneficiarioNome: 'Paciente Recente', dataAtualizacao: '2023-12-31T00:00:00Z', status: 'EM_ATENDIMENTO' },
+      { id: 2, beneficiarioNome: 'Paciente Recente', dataAtualizacao: '2023-12-31T00:00:00Z', status: 'EM_ATENDIMENTO', ultimaMensagemDoBeneficiario: true },
     ]);
-
-    // Mock Mensagens para Atendimento 2 (Recente) ter nova mensagem do BENEFICIARIO
-    vi.mocked(mensagensService.getMensagensAtendimento).mockImplementation(async (id: number) => {
-      if (id === 2) {
-        return [{ id: 100, atendimentoId: 2, conteudo: 'Nova msg', enviadoPor: 'BENEFICIARIO', dataHora: new Date().toISOString() }];
-      }
-      return [];
-    });
 
     render(
       <BrowserRouter>
@@ -173,6 +165,19 @@ describe('PortalVoluntario', () => {
     const posRecente = titles.indexOf('Paciente Recente');
     const posAntigo = titles.indexOf('Paciente Antigo');
     expect(posRecente).toBeLessThan(posAntigo);
+    expect(mensagensService.getMensagensAtendimento).not.toHaveBeenCalled();
+  });
+
+  it('inicia meus atendimentos sem aguardar uma fila lenta e nao baixa historicos', async () => {
+    vi.mocked(useAuth).mockReturnValue(authContext());
+    vi.mocked(voluntariosService.buscarPorId).mockResolvedValue(voluntario());
+    let liberarFila!: (itens: AtendimentoApi[]) => void;
+    vi.mocked(atendimentoService.listarSolicitados).mockReturnValueOnce(new Promise(resolve => { liberarFila = resolve; }));
+    vi.mocked(atendimentoService.listarPorVoluntario).mockResolvedValueOnce([]);
+    render(<BrowserRouter><PortalVoluntario /></BrowserRouter>);
+    await waitFor(() => expect(atendimentoService.listarPorVoluntario).toHaveBeenCalledWith(10));
+    expect(mensagensService.getMensagensAtendimento).not.toHaveBeenCalled();
+    await act(async () => liberarFila([]));
   });
 
   it('deve filtrar a fila por urgentes e casos Apolonia', async () => {

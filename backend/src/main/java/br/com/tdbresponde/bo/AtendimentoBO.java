@@ -65,6 +65,10 @@ public class AtendimentoBO {
         return atendimentoDAO.buscarTodos();
     }
 
+    public List<Atendimento> listarConsultaveisPorVoluntario(Integer voluntarioId) {
+        return atendimentoDAO.buscarConsultaveisPorVoluntario(voluntarioId);
+    }
+
     public List<Atendimento> listarSolicitados() {
         return atendimentoDAO.buscarSolicitados();
     }

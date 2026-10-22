@@ -142,7 +142,7 @@ public class MensagemDAO {
     }
 
     public List<Mensagem> buscarPorAtendimento(int atendimentoId) {
-        String sql = SELECT_BASE + "WHERE M.ATENDIMENTO_ID = ? ORDER BY M.DATA_HORA ASC";
+        String sql = SELECT_BASE + "WHERE M.ATENDIMENTO_ID = ? ORDER BY M.DATA_HORA ASC, M.ID ASC";
         List<Mensagem> mensagens = new ArrayList<>();
 
         try (Connection conn = dataSource.getConnection();
@@ -159,6 +159,36 @@ public class MensagemDAO {
             throw new DatabaseException("Erro ao listar mensagens do atendimento: " + e.getMessage(), e);
         }
         return mensagens;
+    }
+
+    /** Pagina das mensagens mais recentes; o cursor pertence obrigatoriamente a esta conversa. */
+    public List<Mensagem> buscarPaginaPorAtendimento(int atendimentoId, int limite, Integer antesId) {
+        String cursor = antesId == null ? "" :
+                "AND EXISTS (SELECT 1 FROM MENSAGEM CURSOR_M WHERE CURSOR_M.ID = ? " +
+                "AND CURSOR_M.ATENDIMENTO_ID = PAGINA.ATENDIMENTO_ID " +
+                "AND (PAGINA.DATA_HORA < CURSOR_M.DATA_HORA OR " +
+                "(PAGINA.DATA_HORA = CURSOR_M.DATA_HORA AND PAGINA.ID < CURSOR_M.ID))) ";
+        // Limita mensagens antes dos JOINs: varios canais nao podem consumir a pagina.
+        String sql = SELECT_BASE + "WHERE M.ID IN (SELECT ID FROM (SELECT PAGINA.ID FROM MENSAGEM PAGINA " +
+                "WHERE PAGINA.ATENDIMENTO_ID = ? " + cursor +
+                "ORDER BY PAGINA.DATA_HORA DESC, PAGINA.ID DESC) WHERE ROWNUM <= ?) " +
+                "ORDER BY M.DATA_HORA ASC, M.ID ASC, C.ID ASC";
+        var mensagens = new java.util.LinkedHashMap<Integer, Mensagem>();
+        try (Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            int parametro = 1;
+            stmt.setInt(parametro++, atendimentoId);
+            if (antesId != null) stmt.setInt(parametro++, antesId);
+            stmt.setInt(parametro, limite);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Mensagem mensagem = mapearResultSet(rs);
+                    mensagens.putIfAbsent(mensagem.getId(), mensagem);
+                }
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException("Erro ao carregar mensagens do atendimento.", e);
+        }
+        return new ArrayList<>(mensagens.values());
     }
 
     public void atualizar(Mensagem mensagem) {

@@ -36,8 +36,10 @@ async function fetchAutenticado(path: string, options?: RequestInit) {
 }
 
 export const mensagensService = {
-  getMensagensAtendimento: (atendimentoId: number) =>
-    apiClient.get<Mensagem[]>(`/atendimentos/${atendimentoId}/mensagens`),
+  getMensagensAtendimento: (atendimentoId: number, pagina?: { limite: number; antesId?: number }) => {
+    const params = pagina ? `?limite=${pagina.limite}${pagina.antesId == null ? '' : `&antesId=${pagina.antesId}`}` : '';
+    return apiClient.get<Mensagem[]>(`/atendimentos/${atendimentoId}/mensagens${params}`);
+  },
   enviarMensagem: (atendimentoId: number, payload: MensagemRequest) =>
     apiClient.post<Mensagem>(`/atendimentos/${atendimentoId}/mensagens`, payload),
   uploadMidia: async (atendimentoId: number, file: File | Blob, extensao?: string): Promise<UploadMidiaResponse> => {

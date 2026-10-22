@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useRef, type ChangeEvent, type FormEvent, type KeyboardEvent } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useState, useRef, type ChangeEvent, type FormEvent, type KeyboardEvent } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import PageShell from '../components/layout/PageShell';
 import Badge from '../components/ui/Badge';
@@ -22,6 +22,8 @@ import { openChatSocket } from '../services/chatSocket';
 import type { AtendimentoApi, Mensagem, MensagemRequest } from '../types/AtendimentoApi';
 
 const STATUS_OPTIONS = ['ABERTO', 'EM_ATENDIMENTO', 'ENCERRADO', 'CANCELADO'] as const;
+const TAMANHO_PAGINA_MENSAGENS = 50;
+const ERRO_HISTORICO_MENSAGENS = 'Não foi possível carregar mensagens anteriores. Role a conversa novamente para tentar.';
 
 function statusTone(status?: string) {
   if (status === 'ENCERRADO') return 'neutral';
@@ -115,9 +117,27 @@ function MidiaMensagem({ mensagem }: { mensagem: Mensagem }) {
   const [src, setSrc] = useState('');
   const [erro, setErro] = useState(false);
   const [visualizando, setVisualizando] = useState(false);
+  const [visivel, setVisivel] = useState(false);
+  const placeholderRef = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
-    if (!mensagem.arquivoUrl) return;
+    const elemento = placeholderRef.current;
+    if (!elemento || typeof IntersectionObserver === 'undefined') {
+      setVisivel(true);
+      return;
+    }
+    const observer = new IntersectionObserver(entries => {
+      if (entries.some(entry => entry.isIntersecting)) {
+        setVisivel(true);
+        observer.disconnect();
+      }
+    }, { root: elemento.closest('[role="log"]'), rootMargin: '300px' });
+    observer.observe(elemento);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!visivel || !mensagem.arquivoUrl) return;
     let ativo = true;
     let objectUrl = '';
 
@@ -135,13 +155,13 @@ function MidiaMensagem({ mensagem }: { mensagem: Mensagem }) {
       ativo = false;
       if (objectUrl) URL.revokeObjectURL(objectUrl);
     };
-  }, [mensagem.arquivoUrl]);
+  }, [mensagem.arquivoUrl, visivel]);
 
   if (erro) {
     return <p className="mt-2 text-xs font-semibold">Não foi possível carregar esta mídia.</p>;
   }
   if (!src) {
-    return <p className="mt-2 text-xs opacity-75">Carregando mídia...</p>;
+    return <p ref={placeholderRef} className="mt-2 text-xs opacity-75">Carregando mídia...</p>;
   }
   if (mensagem.tipoMensagem === 'IMAGEM') {
     return (
@@ -187,17 +207,29 @@ function DetalheAtendimento() {
   // O ref é atualizado instantaneamente, evitando duplicatas.
   const seenIdsRef = useRef<Set<number>>(new Set());
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const historicoRef = useRef<HTMLDivElement>(null);
+  const paginaAnteriorRef = useRef<{ antesId?: number; temMais: boolean; carregando: boolean }>({ temMais: false, carregando: false });
+  const ancoraHistoricoRef = useRef<{ altura: number; topo: number } | null>(null);
+  const geracaoCargaRef = useRef(0);
   const composerRef = useRef<HTMLTextAreaElement>(null);
   const inputFotoRef = useRef<HTMLInputElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    const ancora = ancoraHistoricoRef.current;
+    if (ancora && historicoRef.current) {
+      historicoRef.current.scrollTop = ancora.topo + historicoRef.current.scrollHeight - ancora.altura;
+      ancoraHistoricoRef.current = null;
+      return;
+    }
     if (typeof messagesEndRef.current?.scrollIntoView === 'function') {
       messagesEndRef.current.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'nearest' });
     }
   }, [mensagens]);
+
+  useEffect(() => () => { geracaoCargaRef.current++; }, [atendimentoId, user?.id]);
 
   useEffect(() => () => {
     if (mediaRecorderRef.current?.state === 'recording') {
@@ -299,6 +331,7 @@ function DetalheAtendimento() {
 
 
   const carregarDados = async () => {
+    const geracao = ++geracaoCargaRef.current;
     if (!Number.isFinite(atendimentoId) || atendimentoId <= 0) {
       setErro('Atendimento inválido.');
       setLoading(false);
@@ -311,11 +344,12 @@ function DetalheAtendimento() {
       // As permissoes sao verificadas no servidor; as duas leituras podem iniciar juntas.
       const [dadosAtendimento, resultadoMensagens] = await Promise.all([
         atendimentoService.buscarPorId(atendimentoId),
-        mensagensService.getMensagensAtendimento(atendimentoId).then(
+        mensagensService.getMensagensAtendimento(atendimentoId, { limite: TAMANHO_PAGINA_MENSAGENS }).then(
           mensagens => ({ mensagens, erro: undefined as unknown }),
           (erro: unknown) => ({ mensagens: [] as Mensagem[], erro }),
         ),
       ]);
+      if (geracao !== geracaoCargaRef.current) return;
       const podeConversar = user?.tipoUsuario === 'ADMIN'
         || user?.tipoUsuario === 'BENEFICIARIO'
         || (user?.tipoUsuario === 'VOLUNTARIO' && user.voluntarioId != null && user.voluntarioId === dadosAtendimento.voluntarioId);
@@ -324,6 +358,11 @@ function DetalheAtendimento() {
         throw resultadoMensagens.erro;
       }
       const dadosMensagens = podeConversar ? resultadoMensagens.mensagens : [];
+      paginaAnteriorRef.current = {
+        antesId: dadosMensagens[0]?.id,
+        temMais: dadosMensagens.length === TAMANHO_PAGINA_MENSAGENS,
+        carregando: false,
+      };
       seenIdsRef.current = new Set(dadosMensagens.map(m => m.id));
       setAtendimento(dadosAtendimento);
       setMensagens(dadosMensagens);
@@ -333,6 +372,7 @@ function DetalheAtendimento() {
       if (podeConversar) carregarAgendaEProntuario(atendimentoId);
 
     } catch (error) {
+      if (geracao !== geracaoCargaRef.current) return;
       let msgErro = 'Não foi possível carregar os detalhes deste atendimento. Tente novamente mais tarde.';
       if (error instanceof Error) {
         if (error.message.includes('Error injecting') || error.message.includes('Internal Server Error') || error.message.includes('500')) {
@@ -343,13 +383,42 @@ function DetalheAtendimento() {
       }
       setErro(msgErro);
     } finally {
-      setLoading(false);
+      if (geracao === geracaoCargaRef.current) setLoading(false);
+    }
+  };
+
+  const carregarMensagensAnteriores = async () => {
+    const pagina = paginaAnteriorRef.current;
+    const historico = historicoRef.current;
+    if (!historico || historico.scrollTop > 80 || !pagina.temMais || pagina.carregando) return;
+    pagina.carregando = true;
+    const geracao = geracaoCargaRef.current;
+    try {
+      const anteriores = await mensagensService.getMensagensAtendimento(atendimentoId, {
+        limite: TAMANHO_PAGINA_MENSAGENS, antesId: pagina.antesId,
+      });
+      if (geracao !== geracaoCargaRef.current || pagina !== paginaAnteriorRef.current) return;
+      setFeedback(atual => atual === ERRO_HISTORICO_MENSAGENS ? '' : atual);
+      pagina.antesId = anteriores[0]?.id ?? pagina.antesId;
+      pagina.temMais = anteriores.length === TAMANHO_PAGINA_MENSAGENS;
+      const novas = anteriores.filter(mensagem => !seenIdsRef.current.has(mensagem.id));
+      novas.forEach(mensagem => seenIdsRef.current.add(mensagem.id));
+      if (novas.length) {
+        ancoraHistoricoRef.current = { altura: historico.scrollHeight, topo: historico.scrollTop };
+        setMensagens(atuais => [...novas, ...atuais]);
+      }
+    } catch {
+      if (geracao === geracaoCargaRef.current) {
+        setFeedback(ERRO_HISTORICO_MENSAGENS);
+      }
+    } finally {
+      pagina.carregando = false;
     }
   };
 
   useEffect(() => {
     void carregarDados();
-  }, [atendimentoId]);
+  }, [atendimentoId, user?.id]);
 
   useEffect(() => {
     let cancelled = false;
@@ -407,10 +476,13 @@ function DetalheAtendimento() {
               .then((msgs) => {
                 if (!cancelled) {
                   seenIdsRef.current = new Set(msgs.map(m => m.id));
+                  paginaAnteriorRef.current = { temMais: false, carregando: false };
                   setMensagens(msgs);
                 }
               })
-              .catch(() => { });
+              .catch(() => {
+                if (!cancelled) setFeedback('Não foi possível atualizar as mensagens. Tentaremos reconectar a conversa.');
+              });
             connect();
           }, delay);
         }
@@ -923,6 +995,9 @@ function DetalheAtendimento() {
               </div>
 
               <div
+                ref={historicoRef}
+                tabIndex={0}
+                onScroll={() => void carregarMensagensAnteriores()}
                 className="atendimento-chat-background min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain p-3 sm:p-5"
                 role="log"
                 aria-live="polite"

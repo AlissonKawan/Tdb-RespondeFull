@@ -13,6 +13,9 @@ import java.util.List;
 @ApplicationScoped
 public class ProntuarioDAO {
 
+    private static final String SELECT_BASE = "SELECT ID, VOLUNTARIO_ID, AGENDA_ID, ATENDIMENTO_ID, PACIENTE, " +
+            "HISTORICO_MEDICO, TRATAMENTO_ATUAL, DATA_REGISTRO FROM PRONTUARIO ";
+
     @Inject
     DataSource dataSource;
 
@@ -60,7 +63,7 @@ public class ProntuarioDAO {
     }
 
     public List<Prontuario> buscarPorAgenda(int agendaId) {
-        String sql = "SELECT * FROM PRONTUARIO " +
+        String sql = SELECT_BASE +
                 "WHERE AGENDA_ID = ? " +
                 "OR (ATENDIMENTO_ID IS NOT NULL AND ATENDIMENTO_ID = (SELECT ATENDIMENTO_ID FROM AGENDA_CONSULTA WHERE ID = ?)) " +
                 "ORDER BY DATA_REGISTRO DESC, ID DESC";
@@ -84,7 +87,7 @@ public class ProntuarioDAO {
     }
 
     public List<Prontuario> buscarPorAtendimento(int atendimentoId) {
-        String sql = "SELECT * FROM PRONTUARIO " +
+        String sql = SELECT_BASE +
                 "WHERE ATENDIMENTO_ID = ? " +
                 "OR AGENDA_ID IN (SELECT ID FROM AGENDA_CONSULTA WHERE ATENDIMENTO_ID = ?) " +
                 "ORDER BY DATA_REGISTRO DESC, ID DESC";

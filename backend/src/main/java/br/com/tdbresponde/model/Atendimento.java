@@ -16,6 +16,15 @@ public class Atendimento {
     private String statusCheckin;
     private LocalDateTime horarioEnvioCheckin;
     private LocalDateTime dataAtualizacao;
+    private Boolean ultimaMensagemDoBeneficiario;
+
+    public Boolean getUltimaMensagemDoBeneficiario() {
+        return ultimaMensagemDoBeneficiario;
+    }
+
+    public void setUltimaMensagemDoBeneficiario(Boolean valor) {
+        this.ultimaMensagemDoBeneficiario = valor;
+    }
 
     public Atendimento() {}
 

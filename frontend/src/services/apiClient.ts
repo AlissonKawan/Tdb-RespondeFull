@@ -2,6 +2,14 @@ import { API_BASE_URL } from '../config/api';
 import type { ApiRequestOptions } from '../types/api';
 import { AUTH_EXPIRED, readSession } from './session';
 
+// Compartilha somente leituras ainda em andamento, sem guardar respostas clinicas.
+const leiturasPendentes = new Map<string, Promise<unknown>>();
+let sessaoDasLeituras: string | undefined;
+
+function limparLeiturasPendentes() {
+  leiturasPendentes.clear();
+}
+
 export class ApiError extends Error {
   status: number;
   details: unknown;
@@ -39,6 +47,8 @@ export async function extractErrorMessage(response: Response, fallback?: string)
 export async function request<T>(path: string, options: ApiRequestOptions = {}): Promise<T> {
   const { body, headers, ...requestOptions } = options;
   const token = readSession()?.token;
+  const escrita = !['GET', 'HEAD'].includes((options.method ?? 'GET').toUpperCase());
+  if (escrita) limparLeiturasPendentes();
 
   let response: Response;
   try {
@@ -54,6 +64,8 @@ export async function request<T>(path: string, options: ApiRequestOptions = {}):
     });
   } catch {
     throw new ApiError('Não foi possível conectar com a API. Verifique se o back-end está rodando.');
+  } finally {
+    if (escrita) limparLeiturasPendentes();
   }
 
   const text = await response.text();
@@ -94,10 +106,24 @@ export const apiRequest = request;
 
 export const apiClient = {
   get: <T>(path: string, options?: ApiRequestOptions) => {
-    // Para evitar cache sem causar erro de CORS, usamos url params ou apenas 'cache: no-store' sem Headers extras.
-    const urlSep = path.includes('?') ? '&' : '?';
-    const noCachePath = `${path}${urlSep}t=${Date.now()}`;
-    return request<T>(noCachePath, { ...options, method: 'GET' });
+    const token = readSession()?.token;
+    if (sessaoDasLeituras !== token) {
+      limparLeiturasPendentes();
+      sessaoDasLeituras = token;
+    }
+    // Sinais e headers personalizados pertencem ao chamador e nao podem ser compartilhados.
+    if (options || leiturasPendentes.size >= 100) {
+      return request<T>(path, { cache: 'no-store', ...options, method: 'GET' });
+    }
+    let leitura = leiturasPendentes.get(path);
+    if (!leitura) {
+      leitura = request<T>(path, { method: 'GET', cache: 'no-store' }).finally(() => {
+        if (leiturasPendentes.get(path) === leitura) leiturasPendentes.delete(path);
+      });
+      leiturasPendentes.set(path, leitura);
+    }
+    // Cada consumidor pode ordenar/mudar sua copia sem afetar outra tela.
+    return leitura.then(dados => structuredClone(dados) as T);
   },
   post: <T>(path: string, body?: unknown, options?: ApiRequestOptions) =>
     request<T>(path, { ...options, method: 'POST', body }),

@@ -26,6 +26,8 @@ public class AtendimentoResponse {
     public LocalDate dataAbertura;
     public LocalDate dataEncerramento;
     public LocalDateTime dataAtualizacao;
+    @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
+    public Boolean ultimaMensagemDoBeneficiario;
     public String statusCheckin;
     public LocalDateTime horarioEnvioCheckin;
     public String previsaoCheckin;
@@ -72,6 +74,7 @@ public class AtendimentoResponse {
         response.dataAbertura = atendimento.getDataAbertura();
         response.dataEncerramento = atendimento.getDataEncerramento();
         response.dataAtualizacao = atendimento.getDataAtualizacao();
+        response.ultimaMensagemDoBeneficiario = atendimento.getUltimaMensagemDoBeneficiario();
         response.statusCheckin = atendimento.getStatusCheckin();
         response.horarioEnvioCheckin = atendimento.getHorarioEnvioCheckin();
         return response;

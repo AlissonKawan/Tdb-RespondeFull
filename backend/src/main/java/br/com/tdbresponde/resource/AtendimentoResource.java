@@ -48,7 +48,7 @@ public class AtendimentoResource {
     @GET
     public Response listar() {
         var permitido = access.consultaPermitida(identity);
-        return Response.ok(bo.listar().stream()
+        return Response.ok(access.listarConsultaveis(identity).stream()
                 .filter(permitido)
                 .map(AtendimentoResponse::from)
                 .toList()).build();
@@ -123,13 +123,22 @@ public class AtendimentoResource {
         return Response.ok(previsao).build();
     }
 
-    @GET
-    @Path("/{id}/mensagens")
     public Response listarMensagens(@PathParam("id") int id) {
         Atendimento autorizado = access.conversar(id, identity);
         return Response.ok(mensagemBO.listarPorAtendimento(autorizado).stream()
                 .map(MensagemResponse::from)
                 .toList()).build();
+    }
+
+    @GET
+    @Path("/{id}/mensagens")
+    public Response listarMensagens(@PathParam("id") int id,
+            @jakarta.ws.rs.QueryParam("limite") Integer limite,
+            @jakarta.ws.rs.QueryParam("antesId") Integer antesId) {
+        if (limite == null && antesId == null) return listarMensagens(id);
+        Atendimento autorizado = access.conversar(id, identity);
+        return Response.ok(mensagemBO.listarPagina(autorizado, limite, antesId).stream()
+                .map(MensagemResponse::from).toList()).build();
     }
 
     /**

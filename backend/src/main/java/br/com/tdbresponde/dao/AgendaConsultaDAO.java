@@ -14,6 +14,9 @@ import java.util.List;
 @ApplicationScoped
 public class AgendaConsultaDAO {
 
+    private static final String SELECT_BASE = "SELECT ID, VOLUNTARIO_ID, ATENDIMENTO_ID, PACIENTE, TIPO, " +
+            "DATA_CONSULTA, HORARIO, STATUS, TIPO_PESSOA FROM AGENDA_CONSULTA ";
+
     @Inject
     DataSource dataSource;
 
@@ -56,7 +59,7 @@ public class AgendaConsultaDAO {
     }
 
     public List<AgendaConsulta> buscarPorVoluntario(int voluntarioId) {
-        String sql = "SELECT * FROM AGENDA_CONSULTA WHERE VOLUNTARIO_ID = ? ORDER BY DATA_CONSULTA ASC, HORARIO ASC";
+        String sql = SELECT_BASE + "WHERE VOLUNTARIO_ID = ? ORDER BY DATA_CONSULTA ASC, HORARIO ASC";
         List<AgendaConsulta> lista = new ArrayList<>();
 
         try (Connection conn = dataSource.getConnection();
@@ -76,7 +79,7 @@ public class AgendaConsultaDAO {
     }
 
     public List<AgendaConsulta> buscarPorAtendimento(int atendimentoId) {
-        String sql = "SELECT * FROM AGENDA_CONSULTA WHERE ATENDIMENTO_ID = ? ORDER BY DATA_CONSULTA ASC, HORARIO ASC";
+        String sql = SELECT_BASE + "WHERE ATENDIMENTO_ID = ? ORDER BY DATA_CONSULTA ASC, HORARIO ASC";
         List<AgendaConsulta> lista = new ArrayList<>();
 
         try (Connection conn = dataSource.getConnection();
@@ -96,7 +99,7 @@ public class AgendaConsultaDAO {
     }
 
     public AgendaConsulta buscarPorId(int id) {
-        String sql = "SELECT * FROM AGENDA_CONSULTA WHERE ID = ?";
+        String sql = SELECT_BASE + "WHERE ID = ?";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

@@ -96,6 +96,21 @@ class AuthenticationHttpTest {
         verify(mensagens, never()).listarPorAtendimento(2);
     }
 
+    @Test void paginatedMessagesKeepArrayContractAndObjectAuthorization() {
+        when(atendimentos.buscarParaAutorizacao(1)).thenReturn(caseFor(1, 7));
+        when(atendimentos.buscarParaAutorizacao(2)).thenReturn(caseFor(2, 8));
+        var message = new Mensagem(); message.setId(80); message.setAtendimento(caseFor(1, 7));
+        message.setConteudo("Historico autorizado");
+        when(mensagens.listarPagina(any(Atendimento.class), eq(50), eq(81))).thenReturn(java.util.List.of(message));
+        String token = login();
+        given().auth().oauth2(token).accept("application/json")
+                .get("/atendimentos/1/mensagens?limite=50&antesId=81").then()
+                .statusCode(200).body("size()", is(1)).body("[0].id", is(80));
+        given().auth().oauth2(token).accept("application/json")
+                .get("/atendimentos/2/mensagens?limite=50&antesId=81").then().statusCode(403);
+        verify(mensagens, times(1)).listarPagina(any(Atendimento.class), eq(50), eq(81));
+    }
+
     @Test void messageSenderIsDerivedFromSessionAndForeignWritesAreDenied() {
         when(atendimentos.buscarPorId(1)).thenReturn(caseFor(1, 7));
         when(atendimentos.buscarPorId(2)).thenReturn(caseFor(2, 8));

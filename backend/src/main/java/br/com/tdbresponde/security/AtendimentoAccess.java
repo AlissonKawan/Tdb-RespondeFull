@@ -78,6 +78,17 @@ public class AtendimentoAccess {
         return consultaPermitida(identity).test(atendimento);
     }
 
+    /** Escolhe uma consulta restrita; o Resource ainda aplica a politica por objeto. */
+    public java.util.List<Atendimento> listarConsultaveis(SecurityContext identity) {
+        int conta = contaId(identity);
+        if (admin(identity)) return atendimentos.listar();
+        if (identity.isUserInRole("BENEFICIARIO")) return atendimentos.listarPorContaBeneficiario(conta);
+        if (identity.isUserInRole("VOLUNTARIO")) {
+            return atendimentos.listarConsultaveisPorVoluntario(voluntarioDaConta(conta));
+        }
+        return java.util.List.of();
+    }
+
     public Predicate<Atendimento> consultaPermitida(SecurityContext identity) {
         int conta = contaId(identity);
         if (admin(identity)) return a -> true;

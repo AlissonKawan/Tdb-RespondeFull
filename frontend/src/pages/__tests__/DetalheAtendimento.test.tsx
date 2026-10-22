@@ -157,7 +157,7 @@ describe('DetalheAtendimento - Deduplicação de Mensagens', () => {
     vi.mocked(atendimentoService.buscarPorId).mockReturnValue(new Promise(resolve => { resolver = resolve; }));
     vi.mocked(mensagensService.getMensagensAtendimento).mockResolvedValue(mockMensagensIniciais);
     render(<MemoryRouter><DetalheAtendimento /></MemoryRouter>);
-    await waitFor(() => expect(mensagensService.getMensagensAtendimento).toHaveBeenCalledWith(1));
+    await waitFor(() => expect(mensagensService.getMensagensAtendimento).toHaveBeenCalledWith(1, { limite: 50 }));
     await act(async () => { resolver(mockAtendimento); });
     expect(await screen.findByText('Tenho uma dor de dente muito forte')).toBeInTheDocument();
   });
@@ -177,7 +177,7 @@ describe('DetalheAtendimento - Deduplicação de Mensagens', () => {
     vi.mocked(mensagensService.getMensagensAtendimento).mockRejectedValueOnce(new ApiError('Acesso negado', 403));
     render(<MemoryRouter><DetalheAtendimento /></MemoryRouter>);
     await screen.findByRole('heading', { name: 'Atendimento de Maria Souza' });
-    expect(mensagensService.getMensagensAtendimento).toHaveBeenCalledWith(1);
+    expect(mensagensService.getMensagensAtendimento).toHaveBeenCalledWith(1, { limite: 50 });
     expect(agendaService.buscarPorAtendimento).not.toHaveBeenCalled();
     expect(prontuarioService.buscarPorAtendimento).not.toHaveBeenCalled();
     expect(activeWebSocketInstances).toHaveLength(0);
@@ -595,6 +595,75 @@ describe('DetalheAtendimento - Deduplicação de Mensagens', () => {
     expect(copy).toHaveBeenCalledWith(expect.stringContaining('Status: Em atendimento'));
     expect(copy.mock.calls[0][0]).not.toMatch(/Informação clínica reservada|Tratamento reservado/);
     expect(await screen.findByText('Dados do atendimento copiados.')).toBeInTheDocument();
+  });
+
+  it('carrega historico ao rolar para cima, preserva a ancora e mensagens recebidas pelo socket', async () => {
+    const recentes: Mensagem[] = Array.from({ length: 50 }, (_, i) => ({
+      id: 101 + i, atendimentoId: 1, conteudo: `Recente ${i}`,
+      dataHora: '2026-10-22T10:00:00', enviadoPor: 'BENEFICIARIO',
+    }));
+    vi.mocked(atendimentoService.buscarPorId).mockResolvedValue(mockAtendimento);
+    let liberar!: (mensagens: Mensagem[]) => void;
+    vi.mocked(mensagensService.getMensagensAtendimento).mockResolvedValueOnce(recentes)
+      .mockReturnValueOnce(new Promise(resolve => { liberar = resolve; }));
+    render(<MemoryRouter><DetalheAtendimento /></MemoryRouter>);
+    const log = await screen.findByRole('log');
+    Object.defineProperty(log, 'scrollHeight', { get: () => log.querySelectorAll('article').length * 100 });
+    log.scrollTop = 20;
+    fireEvent.scroll(log); fireEvent.scroll(log);
+    expect(mensagensService.getMensagensAtendimento).toHaveBeenCalledTimes(2);
+    expect(mensagensService.getMensagensAtendimento).toHaveBeenLastCalledWith(1, { limite: 50, antesId: 101 });
+    const socket = activeWebSocketInstances.at(-1)!;
+    act(() => socket.onmessage?.({ data: JSON.stringify({ ...recentes[0], id: 151, conteudo: 'Chegou durante a paginação' }) }));
+    await act(async () => liberar([{ ...recentes[0], id: 99, conteudo: 'Mensagem anterior' }]));
+    expect(within(log).getByText('Mensagem anterior')).toBeInTheDocument();
+    expect(within(log).getAllByText('Chegou durante a paginação')).toHaveLength(1);
+    expect(log.scrollTop).toBe(120);
+    const textos = [...log.querySelectorAll('article p')].map(p => p.textContent);
+    expect(textos[0]).toBe('Mensagem anterior');
+    fireEvent.scroll(log);
+    expect(mensagensService.getMensagensAtendimento).toHaveBeenCalledTimes(2);
+  });
+
+  it('permite tentar novamente uma pagina que falhou sem apagar a conversa', async () => {
+    const recentes: Mensagem[] = Array.from({ length: 50 }, (_, i) => ({
+      id: 101 + i, atendimentoId: 1, conteudo: `Mensagem preservada ${i}`,
+      dataHora: '2026-10-22T10:00:00', enviadoPor: 'BENEFICIARIO',
+    }));
+    vi.mocked(atendimentoService.buscarPorId).mockResolvedValue(mockAtendimento);
+    vi.mocked(mensagensService.getMensagensAtendimento).mockResolvedValueOnce(recentes)
+      .mockRejectedValueOnce(new Error('rede')).mockResolvedValueOnce([]);
+    render(<MemoryRouter><DetalheAtendimento /></MemoryRouter>);
+    const log = await screen.findByRole('log');
+    fireEvent.scroll(log);
+    expect(await screen.findByText(/Não foi possível carregar mensagens anteriores/)).toBeInTheDocument();
+    expect(within(log).getByText('Mensagem preservada 0')).toBeInTheDocument();
+    fireEvent.scroll(log);
+    await waitFor(() => expect(mensagensService.getMensagensAtendimento).toHaveBeenCalledTimes(3));
+    await waitFor(() => expect(screen.queryByText(/Não foi possível carregar mensagens anteriores/)).not.toBeInTheDocument());
+  });
+
+  it('busca o anexo autenticado apenas quando proximo da area visivel', async () => {
+    let notificar!: IntersectionObserverCallback;
+    const disconnect = vi.fn();
+    vi.stubGlobal('IntersectionObserver', vi.fn(function (callback: IntersectionObserverCallback) {
+      notificar = callback;
+      return { observe: vi.fn(), disconnect };
+    }));
+    const createObjectURL = vi.fn(() => 'blob:midia-visivel');
+    vi.stubGlobal('URL', class extends URL { static createObjectURL = createObjectURL; static revokeObjectURL = vi.fn(); });
+    vi.mocked(atendimentoService.buscarPorId).mockResolvedValue(mockAtendimento);
+    vi.mocked(mensagensService.getMensagensAtendimento).mockResolvedValueOnce([{
+      ...mockMensagensIniciais[0], tipoMensagem: 'IMAGEM', arquivoUrl: '/mensagens/midia/visivel.png',
+    }]);
+    vi.mocked(mensagensService.carregarMidia).mockResolvedValueOnce(new Blob(['imagem']));
+    render(<MemoryRouter><DetalheAtendimento /></MemoryRouter>);
+    await screen.findByText('Carregando mídia...');
+    expect(mensagensService.carregarMidia).not.toHaveBeenCalled();
+    act(() => notificar([{ isIntersecting: true }] as IntersectionObserverEntry[], {} as IntersectionObserver));
+    expect(await screen.findByRole('img', { name: 'Foto enviada' })).toHaveAttribute('src', 'blob:midia-visivel');
+    expect(mensagensService.carregarMidia).toHaveBeenCalledExactlyOnceWith('/mensagens/midia/visivel.png');
+    expect(disconnect).toHaveBeenCalled();
   });
 
   it('envia foto com legenda e carrega a mídia autenticada para exibição', async () => {
