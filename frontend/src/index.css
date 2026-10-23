@@ -47,6 +47,21 @@
 }
 
 /* Compatibilidade com as páginas existentes, sem ocultar conteúdo via JavaScript. */
+.system-shell {
+  --system-bottom-clearance: 0px;
+}
+
+@media (max-width: 767px) {
+  .system-shell {
+    --system-bottom-clearance: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .system-content {
+    padding-bottom: var(--system-bottom-clearance);
+    scroll-padding-bottom: var(--system-bottom-clearance);
+  }
+}
+
 .reveal,
 .reveal.active {
   opacity: 1;

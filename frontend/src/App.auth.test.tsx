@@ -1,5 +1,6 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import userEvent from '@testing-library/user-event';
 import App from './App';
 import { authService } from './services/authService';
 import { saveSession } from './services/session';
@@ -44,6 +45,23 @@ function authenticated(role: 'VOLUNTARIO' | 'ADMIN' | 'BENEFICIARIO') {
     ativo: true,
   });
 }
+
+it.each([
+  ['ADMIN', '/admin', 'Painel administrador'],
+  ['VOLUNTARIO', '/portal-voluntario', 'Painel voluntário'],
+  ['BENEFICIARIO', '/portal-beneficiario', 'Painel beneficiário'],
+] as const)('notificações mantêm o destino do perfil %s', async (role, path, panel) => {
+  const user = userEvent.setup();
+  authenticated(role);
+  go('/portal');
+  expect(await screen.findByText(panel)).toBeInTheDocument();
+  await user.click(screen.getByLabelText('Notificações'));
+  const link = screen.getByRole('link', { name: 'Acessar portal' });
+  expect(link).toHaveAttribute('href', path);
+  await user.click(link);
+  expect(window.location.pathname).toBe(path);
+  expect(screen.getByText(panel)).toBeInTheDocument();
+});
 
 it.each(['/admin', '/portal', '/portal-voluntario', '/atendimentos/1', '/url-inexistente'])(
   'URL %s sem sessão vai ao login sem layout institucional',

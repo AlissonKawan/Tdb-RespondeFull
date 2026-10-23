@@ -20,7 +20,7 @@ function Footer() {
   const team = ['Alisson Kawan', 'Marcos Vinicius', 'Eduardo Boni'];
 
   return (
-    <footer className="border-t border-blue-950/20 bg-foreground text-white">
+    <footer className="border-t border-blue-950/20 bg-foreground pb-16 text-white">
       <Container className="grid gap-8 py-10 md:grid-cols-[1.2fr_0.8fr_0.8fr]">
         <div>
           <div className="w-fit max-w-full rounded-2xl bg-white p-3">

@@ -2,7 +2,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   grid-template-rows: minmax(0, 1fr);
-  height: calc(100dvh - 4rem);
+  height: calc(100dvh - 4rem - var(--system-bottom-clearance, 0px));
   min-height: 28rem;
   gap: 1rem;
   padding: .75rem;

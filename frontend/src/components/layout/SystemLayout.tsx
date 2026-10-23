@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/useAuth';
 import { useConfirm } from '../../hooks/useConfirm';
+import { portalFor } from '../ui/AccountRedirect';
 
 type NavigationGroup = 'GESTÃO & CONTROLE' | 'CLÍNICA & AGENDA' | 'COMUNICAÇÃO';
 type IconName = 'dashboard' | 'inscricoes' | 'voluntario' | 'beneficiario' | 'cronograma' | 'agenda' | 'ranking' | 'mensagens' | 'atendimento';
@@ -165,7 +166,7 @@ export default function SystemLayout() {
   };
 
   return (
-    <div className="flex h-dvh overflow-hidden bg-muted">
+    <div className="system-shell flex h-dvh overflow-hidden bg-muted">
       {isSidebarOpen ? (
         <button
           type="button"
@@ -250,7 +251,7 @@ export default function SystemLayout() {
           })}
         </nav>
 
-        <div className="shrink-0 border-t border-slate-100 p-4">
+        <div className="shrink-0 border-t border-slate-100 py-4 pl-16 pr-4">
           <img src="/img/turmadobem.png" alt="Turma do Bem" width="159" height="90" className="mb-3 ml-3 h-8 w-auto max-w-32 object-contain object-left" />
           <button
             type="button"
@@ -290,12 +291,11 @@ export default function SystemLayout() {
             <details className="group relative" onKeyDown={event => { if (event.key === 'Escape') { event.currentTarget.open = false; event.currentTarget.querySelector('summary')?.focus(); } }} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) event.currentTarget.open = false; }}>
               <summary aria-label="Notificações" className="relative flex h-11 w-11 cursor-pointer list-none items-center justify-center rounded-full border border-slate-200 text-slate-600 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring [&::-webkit-details-marker]:hidden">
                 <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" /></svg>
-                <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-rose-500 ring-2 ring-white" aria-hidden="true" />
               </summary>
               <div className="absolute right-0 top-full z-20 mt-3 w-60 rounded-2xl border border-slate-100 bg-white p-4 shadow-lg">
                 <p className="text-sm font-bold text-slate-900">Mensagens dos atendimentos</p>
                 <p className="mt-2 text-sm leading-6 text-slate-600">Consulte seu portal para acompanhar as mensagens e atualizações dos seus casos.</p>
-                <Link to={isBeneficiario ? '/portal-beneficiario' : '/portal-voluntario'} className="mt-3 inline-flex min-h-11 items-center rounded-lg text-sm font-semibold text-blue-600" onClick={event => { const details = event.currentTarget.closest('details'); if (details) details.open = false; }}>Acessar portal</Link>
+                <Link to={user ? portalFor(user.tipoUsuario) : '/login'} className="mt-3 inline-flex min-h-11 items-center rounded-lg text-sm font-semibold text-blue-600" onClick={event => { const details = event.currentTarget.closest('details'); if (details) details.open = false; }}>Acessar portal</Link>
               </div>
             </details>
             <details className="relative hidden md:block" onKeyDown={event => { if (event.key === 'Escape') { event.currentTarget.open = false; event.currentTarget.querySelector('summary')?.focus(); } }} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) event.currentTarget.open = false; }}>
@@ -312,7 +312,7 @@ export default function SystemLayout() {
           </div>
         </header>
 
-        <div className="min-h-0 flex-1 overflow-auto">
+        <div className="system-content min-h-0 flex-1 overflow-auto">
           <Outlet />
         </div>
       </main>
