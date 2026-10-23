@@ -16,23 +16,21 @@ const pillars = [
 ];
 
 const challenges = [
-  ['Canais desconectados', 'WhatsApp, e-mail e redes sociais sem integração geravam perda de mensagens e respostas duplicadas.'],
   ['Histórico fragmentado', 'Voluntários tinham dificuldade para acompanhar o contexto de cada atendimento.'],
   ['Prioridade pouco clara', 'Casos urgentes precisavam de uma triagem mais visual e objetiva.'],
   ['Captação manual', 'Novos voluntários precisavam de um fluxo simples para demonstrar interesse.'],
 ];
 
 const solutions = [
-  ['Atendimento centralizado', 'Todos os canais aparecem em uma única operação visual.'],
   ['Protocolo de sigilo', 'Casos sensíveis podem ser tratados com mais cuidado e controle.'],
   ['Painel operacional', 'Status, prioridades e responsáveis ficam visíveis para a equipe.'],
   ['Triagem por prioridade', 'Demandas são classificadas para orientar a próxima resposta.'],
-  ['Histórico unificado', 'Mensagens e mudanças de status ficam registradas no fluxo.'],
+  ['Histórico do atendimento', 'Mensagens e mudanças de status ficam registradas na plataforma.'],
   ['Captação de voluntários', 'Formulário público registra candidatos para análise interna.'],
 ];
 
 const flow = [
-  ['1', 'Entrada do beneficiário', 'A demanda chega por canais como WhatsApp, e-mail, redes sociais ou atendimento presencial.'],
+  ['1', 'Entrada do beneficiário', 'A demanda é registrada pelo beneficiário na plataforma.'],
   ['2', 'Triagem inicial', 'A equipe registra dados, classifica prioridade e protege informações sensíveis.'],
   ['3', 'Atribuição', 'O caso é direcionado ao voluntário adequado conforme disponibilidade e especialidade.'],
   ['4', 'Acompanhamento', 'Mensagens, status e histórico permanecem em um fluxo único.'],
@@ -45,7 +43,7 @@ function Sobre() {
       <PageHeader
         eyebrow="Sobre o projeto"
         title="Uma plataforma para organizar atendimento social"
-        description="O TDB Responde é um MVP desenvolvido para centralizar comunicação, priorizar demandas e apoiar voluntários da Turma do Bem com uma experiência digital mais clara."
+        description="O TDB Responde é uma plataforma digital para registrar e acompanhar solicitações, priorizar demandas e apoiar voluntários da Turma do Bem."
       />
 
       <Section tone="white" className="reveal">
@@ -53,7 +51,7 @@ function Sobre() {
           <SectionHeader title="O que é o TDB Responde?" />
           <div className="grid gap-6 text-lg leading-8 text-muted-foreground lg:grid-cols-2">
             <p>
-              O sistema unifica atendimentos da ONG em uma plataforma digital, facilitando a comunicação entre voluntários e beneficiários.
+              O sistema reúne os atendimentos da ONG em uma plataforma digital, facilitando a comunicação entre voluntários e beneficiários.
             </p>
             <p>
               A solução atende crianças, adolescentes e mulheres em situação de vulnerabilidade, preservando contexto, prioridade e sigilo quando necessário.
@@ -68,7 +66,7 @@ function Sobre() {
           title="O problema que orientou o produto"
           description="A proposta nasce da necessidade de reduzir dispersão operacional e dar mais clareza ao atendimento."
         />
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {challenges.map(([title, desc], index) => (
             <Card key={title} className="p-6">
               <span className="mb-4 flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 font-bold text-primary ring-1 ring-primary/20">

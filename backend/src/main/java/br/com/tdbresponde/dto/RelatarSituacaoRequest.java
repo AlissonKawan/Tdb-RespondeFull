@@ -7,7 +7,6 @@ public class RelatarSituacaoRequest {
     public String telefone;
     public String email;
     public String tipo;
-    public Integer canalComunicacaoId;
     public Integer prioridade;
     public String descricao;
 

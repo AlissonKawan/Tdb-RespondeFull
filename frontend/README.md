@@ -88,7 +88,6 @@ O front-end consome a API Java/Quarkus publicada no Render usando `fetch` nativo
 | POST | `/auth/register` | Cadastra beneficiario ou voluntario. |
 | GET | `/especialidades` | Lista especialidades. |
 | GET | `/especialidades/{id}` | Busca especialidade por ID. |
-| GET | `/canais` | Lista canais de comunicacao. |
 | GET | `/atendimentos` | Lista atendimentos. |
 | GET | `/atendimentos/solicitados` | Lista atendimentos solicitados. |
 | GET | `/atendimentos/voluntario/{voluntarioId}` | Lista atendimentos por voluntario. |

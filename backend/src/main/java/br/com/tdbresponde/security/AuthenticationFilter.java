@@ -45,7 +45,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         boolean adminOnly = type == ContaUsuarioResource.class
                 || (type == VoluntarioResource.class && !"GET".equals(request.getMethod()))
                 || (type == VoluntarioResource.class && "listarPendentes".equals(method))
-                || ((type == EspecialidadeResource.class || type == CanalComunicacaoResource.class)
+                || (type == EspecialidadeResource.class
                     && !"GET".equals(request.getMethod()))
                 || (type == AgendaConsultaResource.class && "setupDatabase".equals(method));
         boolean staffOnly = type == AgendaConsultaResource.class || type == ProntuarioResource.class
@@ -70,7 +70,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         return type == SpaFallbackResource.class || type == PingResource.class || type == HealthResource.class
                 || (type == AuthResource.class && ("login".equals(method) || "registrar".equals(method)))
                 || (type == ContatoResource.class && "registrarMensagem".equals(method))
-                || ((type == EspecialidadeResource.class || type == CanalComunicacaoResource.class)
+                || (type == EspecialidadeResource.class
                     && ("listar".equals(method) || "buscarPorId".equals(method)));
     }
 

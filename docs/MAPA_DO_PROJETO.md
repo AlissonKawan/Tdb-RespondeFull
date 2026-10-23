@@ -184,7 +184,6 @@ atendimentoService.ts     # atendimentos
 mensagensService.ts       # mensagens/chat
 voluntariosService.ts     # voluntários
 usuarioService.ts         # usuários/contas
-canaisService.ts          # canais de comunicação
 especialidadesService.ts  # especialidades
 prontuarioService.ts      # prontuário
 agendaService.ts          # agenda/consultas
@@ -362,7 +361,6 @@ ChatWebSocket.java
 AuthResource.java
 VoluntarioResource.java
 ContaUsuarioResource.java
-CanalComunicacaoResource.java
 EspecialidadeResource.java
 ProntuarioResource.java
 AgendaConsultaResource.java
@@ -411,7 +409,6 @@ AtendimentoBO.java
 MensagemBO.java
 ContaUsuarioBO.java
 VoluntarioBO.java
-CanalComunicacaoBO.java
 EspecialidadeBO.java
 ProntuarioBO.java
 AgendaConsultaBO.java
@@ -475,7 +472,6 @@ PessoaAtendidaDAO.java
 CriancaAdolescenteDAO.java
 MulherApoloniaDAO.java
 VoluntarioDAO.java
-CanalComunicacaoDAO.java
 EspecialidadeDAO.java
 ContaUsuarioDAO.java
 ProntuarioDAO.java
@@ -517,7 +513,6 @@ PessoaAtendidaBase
 CriancaAdolescente
 MulherApolonia
 Voluntario
-CanalComunicacao
 Especialidade
 HistoricoStatus
 MensagemContato
@@ -602,11 +597,9 @@ VOLUNTARIO
 PESSOA_ATENDIDA
 CRIANCA_ADOLESCENTE
 MULHER_APOLONIA
-CANAL_COMUNICACAO
 ESPECIALIDADE
 ATENDIMENTO
 MENSAGEM
-MENSAGEM_CANAL
 HISTORICO_STATUS
 VOLUNTARIO_ESPECIALIDADE
 ```
@@ -620,7 +613,7 @@ T_CONTA_USUARIO
           ├── CRIANCA_ADOLESCENTE
           └── MULHER_APOLONIA
 
-PESSOA_ATENDIDA + VOLUNTARIO + CANAL_COMUNICACAO
+PESSOA_ATENDIDA + VOLUNTARIO
    ↓
 ATENDIMENTO
    ├── MENSAGEM

@@ -1,7 +1,6 @@
 package br.com.tdbresponde.dao;
 
 import br.com.tdbresponde.exception.DatabaseException;
-import br.com.tdbresponde.model.CanalComunicacao;
 import br.com.tdbresponde.model.Mensagem;
 import io.agroal.api.AgroalDataSource;
 import jakarta.annotation.PostConstruct;
@@ -67,17 +66,10 @@ public class MensagemDAO {
         }
     }
 
-    @Inject
-    CanalComunicacaoDAO canalDAO;
-
-    private static final String SELECT_BASE = 
+    private static final String SELECT_BASE =
             "SELECT M.ID, M.ATENDIMENTO_ID, M.CONTEUDO, M.DATA_HORA, M.ENVIADO_POR, " +
-            "M.TIPO_MENSAGEM, M.ARQUIVO_URL, M.MIME_TYPE, " +
-            "C.ID AS CANAL_ID, C.NOME AS CANAL_NOME, C.DESCRICAO AS CANAL_DESC " +
-            "FROM MENSAGEM M " +
-            "LEFT JOIN MENSAGEM_CANAL MC ON MC.MENSAGEM_ID = M.ID " +
-            "LEFT JOIN CANAL_COMUNICACAO C ON MC.CANAL_ID = C.ID ";
-            
+            "M.TIPO_MENSAGEM, M.ARQUIVO_URL, M.MIME_TYPE FROM MENSAGEM M ";
+
     public void inserir(Mensagem mensagem) {
         String sql = "INSERT INTO MENSAGEM (ATENDIMENTO_ID, CONTEUDO, DATA_HORA, ENVIADO_POR, " +
                 "TIPO_MENSAGEM, ARQUIVO_URL, MIME_TYPE) VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -102,7 +94,6 @@ public class MensagemDAO {
                 }
             }
 
-            inserirCanal(conn, mensagem);
         } catch (SQLException e) {
             throw new DatabaseException("Erro ao inserir mensagem: " + e.getMessage(), e);
         }
@@ -168,11 +159,10 @@ public class MensagemDAO {
                 "AND CURSOR_M.ATENDIMENTO_ID = PAGINA.ATENDIMENTO_ID " +
                 "AND (PAGINA.DATA_HORA < CURSOR_M.DATA_HORA OR " +
                 "(PAGINA.DATA_HORA = CURSOR_M.DATA_HORA AND PAGINA.ID < CURSOR_M.ID))) ";
-        // Limita mensagens antes dos JOINs: varios canais nao podem consumir a pagina.
         String sql = SELECT_BASE + "WHERE M.ID IN (SELECT ID FROM (SELECT PAGINA.ID FROM MENSAGEM PAGINA " +
                 "WHERE PAGINA.ATENDIMENTO_ID = ? " + cursor +
                 "ORDER BY PAGINA.DATA_HORA DESC, PAGINA.ID DESC) WHERE ROWNUM <= ?) " +
-                "ORDER BY M.DATA_HORA ASC, M.ID ASC, C.ID ASC";
+                "ORDER BY M.DATA_HORA ASC, M.ID ASC";
         var mensagens = new java.util.LinkedHashMap<Integer, Mensagem>();
         try (Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             int parametro = 1;
@@ -203,8 +193,6 @@ public class MensagemDAO {
                 stmt.executeUpdate();
             }
 
-            excluirCanais(conn, mensagem.getId());
-            inserirCanal(conn, mensagem);
         } catch (SQLException e) {
             throw new DatabaseException("Erro ao atualizar mensagem: " + e.getMessage(), e);
         }
@@ -214,7 +202,6 @@ public class MensagemDAO {
         String sql = "DELETE FROM MENSAGEM WHERE ID = ?";
 
         try (Connection conn = dataSource.getConnection()) {
-            excluirCanais(conn, id);
 
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setInt(1, id);
@@ -243,56 +230,7 @@ public class MensagemDAO {
             mensagem.setAtendimento(atendimento);
         }
 
-        // Carrega canal pelo JOIN
-        int canalId = rs.getInt("CANAL_ID");
-        if (!rs.wasNull() && canalId > 0) {
-            CanalComunicacao canal = new CanalComunicacao();
-            canal.setId(canalId);
-            try {
-                canal.setNome(rs.getString("CANAL_NOME"));
-                canal.setDescricao(rs.getString("CANAL_DESC"));
-                mensagem.setCanal(canal);
-            } catch (SQLException e) {}
-        }
-        
         return mensagem;
-    }
-
-    private void carregarCanal(Mensagem mensagem) throws SQLException {
-        String sql = "SELECT CANAL_ID FROM MENSAGEM_CANAL WHERE MENSAGEM_ID = ?";
-
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, mensagem.getId());
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    CanalComunicacao canal = canalDAO.buscarPorId(rs.getInt("CANAL_ID"));
-                    mensagem.setCanal(canal);
-                }
-            }
-        }
-    }
-
-    private void inserirCanal(Connection conn, Mensagem mensagem) throws SQLException {
-        if (mensagem.getCanal() == null || mensagem.getCanal().getId() <= 0) {
-            return;
-        }
-
-        String sql = "INSERT INTO MENSAGEM_CANAL (MENSAGEM_ID, CANAL_ID) VALUES (?, ?)";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, mensagem.getId());
-            stmt.setInt(2, mensagem.getCanal().getId());
-            stmt.executeUpdate();
-        }
-    }
-
-    private void excluirCanais(Connection conn, int mensagemId) throws SQLException {
-        String sql = "DELETE FROM MENSAGEM_CANAL WHERE MENSAGEM_ID = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, mensagemId);
-            stmt.executeUpdate();
-        }
     }
 
 }

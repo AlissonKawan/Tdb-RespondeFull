@@ -73,7 +73,6 @@ async function run() {
       telefone: "11999999999",
       email: "ana.beneficiaria@tdb.com",
       tipo: "MULHER_APOLONIA",
-      canalComunicacaoId: 1,
       prioridade: 3,
       descricao: "Preciso de ajuda urgente com dores intensas.",
       nivelRisco: 2,

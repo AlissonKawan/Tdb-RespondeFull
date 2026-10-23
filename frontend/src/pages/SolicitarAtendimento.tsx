@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Section from '../components/layout/Section';
 import PageShell from '../components/layout/PageShell';
@@ -10,7 +10,6 @@ import PageHeader from '../components/ui/PageHeader';
 import { programImages } from '../config/programImages';
 import { useAuth } from '../context/useAuth';
 import { useConfirm } from '../hooks/useConfirm';
-import { listarCanais } from '../services/canaisService';
 import { relatarAtendimento } from '../services/relatoAtendimentoService';
 import type { RelatarAtendimentoRequest, TipoPessoaRelato } from '../types/AtendimentoApi';
 
@@ -19,7 +18,6 @@ type FormState = {
   telefone: string;
   email: string;
   tipoPessoaAtendida: TipoPessoaRelato;
-  canalComunicacaoId: string;
   prioridade: string;
   descricao: string;
   idade: string;
@@ -37,7 +35,6 @@ const initialForm: FormState = {
   telefone: '',
   email: '',
   tipoPessoaAtendida: 'CRIANCA_ADOLESCENTE',
-  canalComunicacaoId: '',
   prioridade: '3',
   descricao: '',
   idade: '',
@@ -74,7 +71,6 @@ function montarPayload(form: FormState, idContaBeneficiario?: number): RelatarAt
     telefone: form.telefone.trim(),
     email: form.email.trim(),
     tipo: form.tipoPessoaAtendida,
-    canalComunicacaoId: Number(form.canalComunicacaoId),
     prioridade: Number(form.prioridade),
     descricao: form.descricao.trim(),
   };
@@ -102,7 +98,6 @@ function validar(form: FormState) {
   }
   if (!form.telefone.trim()) return 'Informe um telefone para contato.';
   if (!form.email.trim()) return 'Informe um email para contato.';
-  if (!form.canalComunicacaoId) return 'Erro ao carregar canal de comunicação.';
   if (!form.descricao.trim() || form.descricao.trim().length < 15) {
     return 'Descreva a situacao com pelo menos 15 caracteres.';
   }
@@ -129,31 +124,9 @@ export default function SolicitarAtendimento() {
     nomeCodificado: user?.nome ?? '',
     email: user?.email ?? '',
   }));
-  const [carregandoCanais, setCarregandoCanais] = useState(true);
   const [enviando, setEnviando] = useState(false);
   const [sucesso, setSucesso] = useState('');
   const [erro, setErro] = useState('');
-
-  useEffect(() => {
-    async function carregarCanais() {
-      setCarregandoCanais(true);
-      const canaisDisponiveis = await listarCanais();
-      
-      const canalWeb = canaisDisponiveis.find(c => 
-        c.nome.toLowerCase().includes('form') || 
-        c.nome.toLowerCase().includes('web') || 
-        c.nome.toLowerCase().includes('sistema')
-      );
-
-      setForm((current) => ({
-        ...current,
-        canalComunicacaoId: current.canalComunicacaoId || String(canalWeb?.id ?? canaisDisponiveis[0]?.id ?? ''),
-      }));
-      setCarregandoCanais(false);
-    }
-
-    void carregarCanais();
-  }, []);
 
   const tipoSelecionado = form.tipoPessoaAtendida === 'MULHER_APOLONIA'
     ? 'Programa Apolônia'
@@ -204,7 +177,6 @@ export default function SolicitarAtendimento() {
             nomeCodificado: user?.nome ?? current.nomeCodificado,
             telefone: current.telefone,
             email: current.email,
-            canalComunicacaoId: current.canalComunicacaoId,
           }));
         } catch (error) {
           setErro(error instanceof Error ? error.message : 'Não foi possível enviar o relato.');
@@ -461,7 +433,7 @@ export default function SolicitarAtendimento() {
 
             <div className="flex flex-col-reverse gap-3 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-sm text-muted-foreground">Campos de risco usam escala de 1 a 5.</p>
-              <Button type="submit" size="large" disabled={enviando || carregandoCanais}>
+              <Button type="submit" size="large" disabled={enviando}>
                 {enviando ? 'Enviando...' : 'Enviar relato'}
               </Button>
             </div>

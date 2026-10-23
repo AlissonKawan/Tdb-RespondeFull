@@ -127,7 +127,6 @@ describe('DetalheAtendimento - Deduplicação de Mensagens', () => {
     descricao: 'Preciso de atendimento odontológico urgente',
     status: 'EM_ATENDIMENTO',
     prioridade: 3,
-    canal: 'WhatsApp',
     pessoaAtendidaNome: 'Maria Souza',
     pessoaAtendidaEmail: 'maria@example.com',
     pessoaAtendidaTelefone: '5511999999999',
@@ -338,7 +337,7 @@ describe('DetalheAtendimento - Deduplicação de Mensagens', () => {
     }));
   });
 
-  it('remove a previsão de IA e preserva a confirmação operacional do WhatsApp', async () => {
+  it('remove o envio por WhatsApp e preserva o acompanhamento da consulta', async () => {
     vi.mocked(atendimentoService.buscarPorId).mockResolvedValue(mockAtendimento);
     vi.mocked(mensagensService.getMensagensAtendimento).mockResolvedValue(mockMensagensIniciais);
 
@@ -348,7 +347,8 @@ describe('DetalheAtendimento - Deduplicação de Mensagens', () => {
       </MemoryRouter>
     );
 
-    expect(await screen.findByRole('button', { name: 'Abrir WhatsApp' })).toBeInTheDocument();
+    expect(await screen.findByText('Acompanhamento da consulta')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /WhatsApp/i })).not.toBeInTheDocument();
     expect(screen.queryByText(/Previsão da Inteligência Artificial|de confiança/i)).not.toBeInTheDocument();
     expect(previsaoIAMock).not.toHaveBeenCalled();
   });

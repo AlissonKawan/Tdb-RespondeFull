@@ -9,15 +9,13 @@ public class Mensagem {
     private String conteudo; //texto da mensagem
     private LocalDateTime dataHora; //guardar data e hora
     private String enviadoPor; //Voluntario ou Pessoa atendida
-    private CanalComunicacao canal; //por onde foi enviada a mensagem
     private String tipoMensagem;
     private String arquivoUrl;
     private String mimeType;
 
     public Mensagem() {}
 
-    public Mensagem(CanalComunicacao canal, Atendimento atendimento, String conteudo, LocalDateTime dataHora, String enviadoPor, int id) {
-        this.canal = canal;
+    public Mensagem(Atendimento atendimento, String conteudo, LocalDateTime dataHora, String enviadoPor, int id) {
         this.atendimento = atendimento;
         this.conteudo = conteudo;
         this.dataHora = dataHora;
@@ -31,14 +29,6 @@ public class Mensagem {
 
     public void setAtendimento(Atendimento atendimento) {
         this.atendimento = atendimento;
-    }
-
-    public CanalComunicacao getCanal() {
-        return canal;
-    }
-
-    public void setCanal(CanalComunicacao canal) {
-        this.canal = canal;
     }
 
     public String getConteudo() {

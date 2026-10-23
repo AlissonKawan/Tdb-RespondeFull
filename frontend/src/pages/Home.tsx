@@ -24,12 +24,6 @@ const featureIcons = {
       <path d="M12 21s-7-4.4-9.3-9A5.5 5.5 0 0 1 12 6.2 5.5 5.5 0 0 1 21.3 12C19 16.6 12 21 12 21Z" strokeLinecap="round" strokeLinejoin="round" />
     </Icon>
   ),
-  connected: (
-    <Icon>
-      <path d="M8 12h8M7 7h.01M17 17h.01" strokeLinecap="round" />
-      <path d="M7 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM17 20a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM17 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
-    </Icon>
-  ),
   organized: (
     <Icon>
       <path d="M4 19V5M8 19V9M12 19V7M16 19v-5M20 19V4" strokeLinecap="round" />
@@ -41,7 +35,7 @@ const features = [
   {
     icon: featureIcons.agile,
     title: 'Mais ágil',
-    description: 'Atendimentos reunidos em um fluxo único para reduzir espera e perda de contexto.',
+    description: 'Pedidos organizados por prioridade para reduzir a espera e orientar a equipe.',
     tone: 'blue' as const,
   },
   {
@@ -49,12 +43,6 @@ const features = [
     title: 'Mais acolhedor',
     description: 'Histórico e mensagens organizadas para que cada pessoa seja atendida com cuidado.',
     tone: 'sky' as const,
-  },
-  {
-    icon: featureIcons.connected,
-    title: 'Canais integrados',
-    description: 'WhatsApp, e-mail e redes sociais aparecem como uma operação centralizada.',
-    tone: 'orange' as const,
   },
   {
     icon: featureIcons.organized,

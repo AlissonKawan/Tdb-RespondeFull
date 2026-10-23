@@ -1,7 +1,6 @@
 package br.com.tdbresponde.dao;
 
 import br.com.tdbresponde.model.Atendimento;
-import br.com.tdbresponde.model.CanalComunicacao;
 import br.com.tdbresponde.model.CriancaAdolescente;
 import br.com.tdbresponde.model.MulherApolonia;
 import br.com.tdbresponde.model.PessoaAtendida;
@@ -21,15 +20,13 @@ public class AtendimentoDAO {
 
     private static final String COLUNAS_BASE =
             "A.ID, A.PRIORIDADE, A.STATUS, A.DESCRICAO, A.DATA_ABERTURA, A.DATA_ENCERRAMENTO, " +
-            "A.PESSOA_ATENDIDA_ID, A.VOLUNTARIO_ID, A.CANAL_COMUNICACAO_ID, A.STATUS_CHECKIN, A.HORARIO_ENVIO_CHECKIN, " +
+            "A.PESSOA_ATENDIDA_ID, A.VOLUNTARIO_ID, A.STATUS_CHECKIN, A.HORARIO_ENVIO_CHECKIN, " +
             "(SELECT MAX(M.DATA_HORA) FROM MENSAGEM M WHERE M.ATENDIMENTO_ID = A.ID) AS DATA_ATUALIZACAO, " +
-            "C.ID AS CANAL_ID, C.NOME AS CANAL_NOME, C.DESCRICAO AS CANAL_DESC, " +
             "V.ID AS VOLUNTARIO_ID_REAL, V.NOME AS VOLUNTARIO_NOME, V.DISPONIVEL AS VOLUNTARIO_DISP, V.ACESSO_SIGILO AS VOLUNTARIO_SIGILO, " +
             "P.ID AS PESSOA_ID, P.NOME_CODIFICADO AS PESSOA_NOME, P.DATA_CADASTRO AS PESSOA_DATA, P.TELEFONE AS PESSOA_TEL, P.EMAIL AS PESSOA_EMAIL, P.TIPO AS PESSOA_TIPO, P.ID_CONTA AS PESSOA_CONTA ";
 
     private static final String FROM_BASE =
             "FROM ATENDIMENTO A " +
-            "LEFT JOIN CANAL_COMUNICACAO C ON A.CANAL_COMUNICACAO_ID = C.ID " +
             "LEFT JOIN VOLUNTARIO V ON A.VOLUNTARIO_ID = V.ID " +
             "LEFT JOIN PESSOA_ATENDIDA P ON A.PESSOA_ATENDIDA_ID = P.ID ";
 
@@ -37,9 +34,6 @@ public class AtendimentoDAO {
 
     @Inject
     DataSource dataSource;
-
-    @Inject
-    CanalComunicacaoDAO canalDAO;
 
     @Inject
     VoluntarioDAO voluntarioDAO;
@@ -51,8 +45,8 @@ public class AtendimentoDAO {
     public void inserir(Atendimento atendimento) {
         String sql = "INSERT INTO ATENDIMENTO " +
                 "(PRIORIDADE, STATUS, DESCRICAO, DATA_ABERTURA, DATA_ENCERRAMENTO, " +
-                "PESSOA_ATENDIDA_ID, VOLUNTARIO_ID, CANAL_COMUNICACAO_ID) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                "PESSOA_ATENDIDA_ID, VOLUNTARIO_ID) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, new String[]{"ID"})) {
@@ -68,8 +62,6 @@ public class AtendimentoDAO {
             } else {
                 stmt.setNull(7, Types.INTEGER);
             }
-            stmt.setInt(8, atendimento.getCanalOrigem().getId());
-
             stmt.executeUpdate();
 
             // Captura o ID gerado pelo Oracle
@@ -301,7 +293,7 @@ public class AtendimentoDAO {
     public void atualizar(Atendimento atendimento) {
         String sql = "UPDATE ATENDIMENTO SET " +
                 "PRIORIDADE = ?, STATUS = ?, DESCRICAO = ?, DATA_ABERTURA = ?, DATA_ENCERRAMENTO = ?, " +
-                "PESSOA_ATENDIDA_ID = ?, VOLUNTARIO_ID = ?, CANAL_COMUNICACAO_ID = ? " +
+                "PESSOA_ATENDIDA_ID = ?, VOLUNTARIO_ID = ? " +
                 "WHERE ID = ?";
 
         try (Connection conn = dataSource.getConnection();
@@ -318,8 +310,7 @@ public class AtendimentoDAO {
             } else {
                 stmt.setNull(7, Types.INTEGER);
             }
-            stmt.setInt(8, atendimento.getCanalOrigem().getId());
-            stmt.setInt(9, atendimento.getId());
+            stmt.setInt(8, atendimento.getId());
 
             stmt.executeUpdate();
 
@@ -375,18 +366,6 @@ public class AtendimentoDAO {
             a.setDataAtualizacao(rs.getObject("DATA_ATUALIZACAO", LocalDateTime.class));
         } catch (SQLException ignore) {
             // Coluna pode ainda nao existir se for a primeira execucao
-        }
-
-        // Carrega canal pelo JOIN
-        int canalId = rs.getInt("CANAL_COMUNICACAO_ID");
-        if (!rs.wasNull()) {
-            CanalComunicacao canal = new CanalComunicacao();
-            canal.setId(canalId);
-            try {
-                canal.setNome(rs.getString("CANAL_NOME"));
-                canal.setDescricao(rs.getString("CANAL_DESC"));
-                a.setCanalOrigem(canal);
-            } catch (SQLException e) {}
         }
 
         // Carrega voluntario pelo JOIN
@@ -613,14 +592,13 @@ public class AtendimentoDAO {
 
     private void inserirAtendimento(Connection conn, Atendimento atendimento) throws SQLException {
         String sql = "INSERT INTO ATENDIMENTO " +
-                "(PESSOA_ATENDIDA_ID, VOLUNTARIO_ID, CANAL_COMUNICACAO_ID, PRIORIDADE, STATUS, DATA_ABERTURA, DESCRICAO) " +
-                "VALUES (?, NULL, ?, ?, 'ABERTO', SYSDATE, ?)";
+                "(PESSOA_ATENDIDA_ID, VOLUNTARIO_ID, PRIORIDADE, STATUS, DATA_ABERTURA, DESCRICAO) " +
+                "VALUES (?, NULL, ?, 'ABERTO', SYSDATE, ?)";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql, new String[]{"ID"})) {
             stmt.setInt(1, atendimento.getPessoaAtendida().getId());
-            stmt.setInt(2, atendimento.getCanalOrigem().getId());
-            stmt.setInt(3, atendimento.getPrioridade());
-            stmt.setString(4, atendimento.getDescricao());
+            stmt.setInt(2, atendimento.getPrioridade());
+            stmt.setString(3, atendimento.getDescricao());
             stmt.executeUpdate();
 
             try (ResultSet rs = stmt.getGeneratedKeys()) {

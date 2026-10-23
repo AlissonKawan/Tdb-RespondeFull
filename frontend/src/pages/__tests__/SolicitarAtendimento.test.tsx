@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import SolicitarAtendimento from '../SolicitarAtendimento';
 import { useAuth } from '../../context/useAuth';
-import { listarCanais } from '../../services/canaisService';
 import { relatarAtendimento } from '../../services/relatoAtendimentoService';
 import { BrowserRouter } from 'react-router-dom';
 
@@ -10,20 +9,11 @@ vi.mock('../../context/useAuth', () => ({
   useAuth: vi.fn(),
 }));
 
-vi.mock('../../services/canaisService', () => ({
-  listarCanais: vi.fn(),
-}));
-
 vi.mock('../../services/relatoAtendimentoService', () => ({
   relatarAtendimento: vi.fn(),
 }));
 
 describe('SolicitarAtendimento', () => {
-  const mockCanais = [
-    { id: 1, nome: 'WhatsApp', descricao: 'WhatsApp link' },
-    { id: 5, nome: 'Formulario Web', descricao: 'Web Form' },
-  ];
-
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(useAuth).mockReturnValue({
@@ -38,24 +28,18 @@ describe('SolicitarAtendimento', () => {
       login: vi.fn(),
       register: vi.fn(),
     });
-    vi.mocked(listarCanais).mockResolvedValue(mockCanais);
   });
 
-  it('deve ocultar campos tecnicos (prioridade, gravidade bucal, canal de comunicacao) na renderizacao inicial', async () => {
+  it('exibe o formulario de solicitacao sem campos tecnicos', async () => {
     render(
       <BrowserRouter>
         <SolicitarAtendimento />
       </BrowserRouter>
     );
 
-    // Aguarda carregar os canais em segundo plano
-    await waitFor(() => {
-      expect(listarCanais).toHaveBeenCalled();
-    });
-
     // Validar que os campos ocultados não estão visíveis
     expect(screen.queryByLabelText(/Prioridade/i)).not.toBeInTheDocument();
-    expect(screen.queryByLabelText(/Canal de comunicacao/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/Canal/i)).not.toBeInTheDocument();
     expect(screen.queryByLabelText(/Gravidade bucal/i)).not.toBeInTheDocument();
 
     // Validar que o campo geral de Nome está visível por padrão (como Criança ou Adolescente está selecionado inicialmente)
@@ -69,9 +53,6 @@ describe('SolicitarAtendimento', () => {
       </BrowserRouter>
     );
 
-    await waitFor(() => {
-      expect(listarCanais).toHaveBeenCalled();
-    });
 
     fireEvent.click(screen.getByRole('radio', { name: /Mulher em Vulnerabilidade/i }));
 
@@ -96,9 +77,6 @@ describe('SolicitarAtendimento', () => {
       </BrowserRouter>
     );
 
-    await waitFor(() => {
-      expect(listarCanais).toHaveBeenCalled();
-    });
 
     fireEvent.click(screen.getByRole('radio', { name: /Mulher em Vulnerabilidade/i }));
 
@@ -120,11 +98,10 @@ describe('SolicitarAtendimento', () => {
     });
 
     // O payload enviado deve conter nomeCodificado = 'Aurora Segura' (mapeado de codinome),
-    // e o canalComunicacaoId deve ser 5 (Formulario Web detectado automaticamente)
     const payload = vi.mocked(relatarAtendimento).mock.calls[0][0];
     expect(payload.nomeCodificado).toBe('Aurora Segura');
     expect(JSON.stringify(payload)).not.toContain('Maria Silva');
-    expect(payload.canalComunicacaoId).toBe(5); // Detectado Formulario Web na busca automatica do mock
+    expect(payload).not.toHaveProperty('canalComunicacaoId');
     expect(payload.prioridade).toBe(3); // Default inicial
   });
 
@@ -135,9 +112,6 @@ describe('SolicitarAtendimento', () => {
       </BrowserRouter>
     );
 
-    await waitFor(() => {
-      expect(listarCanais).toHaveBeenCalled();
-    });
 
     fireEvent.click(screen.getByRole('radio', { name: /Mulher em Vulnerabilidade/i }));
 
@@ -162,7 +136,6 @@ describe('SolicitarAtendimento', () => {
       </BrowserRouter>
     );
 
-    await waitFor(() => expect(listarCanais).toHaveBeenCalled());
     const telefone = screen.getByLabelText(/Telefone/i) as HTMLInputElement;
 
     fireEvent.change(telefone, { target: { value: '11988887777' } });

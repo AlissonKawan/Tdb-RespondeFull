@@ -172,7 +172,6 @@ function AtendimentoCard({ atendimento, onAssumir, assumindo, assumirBloqueado, 
             </div>
             <div className="mt-2 space-y-1 text-xs leading-5 text-slate-500">
               <p><strong className="text-foreground">Contexto:</strong> <span className="line-clamp-1">{getAtendimentoDescricaoContexto(atendimento)}</span></p>
-              {atendimento.canal && <p><strong className="text-foreground">Canal:</strong> {atendimento.canal?.toLowerCase().includes('sistema web') ? 'TDB - Responde' : atendimento.canal}</p>}
               {(atendimento.dataAtualizacao || atendimento.dataCriacao || atendimento.dataAbertura) && (
                 <p><strong className="text-foreground">Última Atividade:</strong> {formatDate(atendimento.dataAtualizacao ?? atendimento.dataCriacao ?? atendimento.dataAbertura)}</p>
               )}

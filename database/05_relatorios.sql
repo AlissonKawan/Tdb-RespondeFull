@@ -59,13 +59,12 @@ WHERE A.PRIORIDADE < (
 ORDER BY A.PRIORIDADE ASC, P.NOME_CODIFICADO;
 
 -- 5) Relatorio usando juncao de tabelas.
--- Visao operacional com pessoa, voluntario, canal e mensagem.
+-- Visao operacional com pessoa, voluntario e mensagens da plataforma.
 SELECT
     A.ID AS ATENDIMENTO_ID,
     P.NOME_CODIFICADO,
     P.TIPO,
     NVL(V.NOME, 'Aguardando voluntario') AS VOLUNTARIO,
-    C.NOME AS CANAL,
     A.STATUS,
     A.PRIORIDADE,
     COUNT(M.ID) AS TOTAL_MENSAGENS
@@ -74,8 +73,6 @@ JOIN PESSOA_ATENDIDA P
     ON P.ID = A.PESSOA_ATENDIDA_ID
 LEFT JOIN VOLUNTARIO V
     ON V.ID = A.VOLUNTARIO_ID
-JOIN CANAL_COMUNICACAO C
-    ON C.ID = A.CANAL_COMUNICACAO_ID
 LEFT JOIN MENSAGEM M
     ON M.ATENDIMENTO_ID = A.ID
 GROUP BY
@@ -83,7 +80,6 @@ GROUP BY
     P.NOME_CODIFICADO,
     P.TIPO,
     V.NOME,
-    C.NOME,
     A.STATUS,
     A.PRIORIDADE
 ORDER BY A.ID;

@@ -30,9 +30,7 @@ Execute os arquivos nesta ordem:
 - `ESPECIALIDADE`
 - `VOLUNTARIO_ESPECIALIDADE`
 - `ATENDIMENTO`
-- `CANAL_COMUNICACAO`
 - `MENSAGEM`
-- `MENSAGEM_CANAL`
 - `HISTORICO_STATUS`
 - `CRIANCA_ADOLESCENTE`
 - `MULHER_APOLONIA`
@@ -42,4 +40,5 @@ Execute os arquivos nesta ordem:
 - Os nomes de tabelas e colunas foram mantidos alinhados ao backend Java.
 - Os dados usam e-mails e hashes demonstrativos, sem credenciais reais.
 - Os scripts usam sintaxe Oracle, incluindo blocos PL/SQL para `DROP TABLE` seguro.
+- Em bancos existentes, revise e aplique manualmente `06_remover_canais.sql` durante a implantacao coordenada do backend. Ele remove historico de canal e exige backup; nao e executado pela aplicacao.
 - O arquivo de updates/deletes nao quebra as FKs porque cria registros temporarios para os testes de exclusao e desfaz as alteracoes ao final.

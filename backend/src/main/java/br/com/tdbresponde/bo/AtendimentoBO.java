@@ -1,7 +1,6 @@
 package br.com.tdbresponde.bo;
 
 import br.com.tdbresponde.dao.AtendimentoDAO;
-import br.com.tdbresponde.dao.CanalComunicacaoDAO;
 import br.com.tdbresponde.dao.CriancaAdolescenteDAO;
 import br.com.tdbresponde.dao.HistoricoStatusDAO;
 import br.com.tdbresponde.dao.MulherApoloniaDAO;
@@ -20,7 +19,6 @@ import br.com.tdbresponde.exception.NotFoundException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import br.com.tdbresponde.model.Atendimento;
-import br.com.tdbresponde.model.CanalComunicacao;
 import br.com.tdbresponde.model.CriancaAdolescente;
 import br.com.tdbresponde.model.HistoricoStatus;
 import br.com.tdbresponde.model.MulherApolonia;
@@ -45,9 +43,6 @@ public class AtendimentoBO {
 
     @Inject
     PessoaAtendidaDAO pessoaAtendidaDAO;
-
-    @Inject
-    CanalComunicacaoDAO canalDAO;
 
     @Inject
     CriancaAdolescenteDAO criancaDAO;
@@ -151,10 +146,6 @@ public class AtendimentoBO {
         atendimento.setDataEncerramento(null);
         atendimento.setVoluntario(null);
 
-        CanalComunicacao canal = new CanalComunicacao();
-        canal.setId(request.canalComunicacaoId);
-        atendimento.setCanalOrigem(canal);
-
         atendimentoDAO.inserir(atendimento);
         return atendimento;
     }
@@ -163,7 +154,6 @@ public class AtendimentoBO {
         validarRelato(request);
 
         String tipo = normalizarTipoRelato(request.tipo);
-        validarCanalComunicacao(request.canalComunicacaoId);
         PessoaAtendida pessoa = criarPessoaRelato(request, tipo);
 
         Atendimento atendimento = new Atendimento();
@@ -173,10 +163,6 @@ public class AtendimentoBO {
         atendimento.setStatus("ABERTO");
         atendimento.setDescricao(request.descricao.trim());
         atendimento.setDataAbertura(LocalDate.now());
-
-        CanalComunicacao canal = new CanalComunicacao();
-        canal.setId(request.canalComunicacaoId);
-        atendimento.setCanalOrigem(canal);
 
         atendimentoDAO.relatarSituacao(pessoa, tipo, atendimento);
 
@@ -434,11 +420,6 @@ public class AtendimentoBO {
                 voluntario.setId(request.voluntarioId);
                 atendimento.setVoluntario(voluntario);
             }
-            if (request.canalComunicacaoId != null) {
-                CanalComunicacao canal = new CanalComunicacao();
-                canal.setId(request.canalComunicacaoId);
-                atendimento.setCanalOrigem(canal);
-            }
             if (atendimento.getPrioridade() <= 0 && atendimento.getPessoaAtendida() != null) {
                 atendimento.setPrioridade(calcularPrioridade(atendimento.getPessoaAtendida()));
             }
@@ -452,9 +433,6 @@ public class AtendimentoBO {
         }
         if (atendimento.getPessoaAtendida() == null || atendimento.getPessoaAtendida().getId() <= 0) {
             throw new BusinessException("ID da pessoa atendida e obrigatorio");
-        }
-        if (atendimento.getCanalOrigem() == null || atendimento.getCanalOrigem().getId() <= 0) {
-            throw new BusinessException("ID do canal de comunicacao e obrigatorio");
         }
         if (atendimento.getVoluntario() != null && atendimento.getVoluntario().getId() <= 0) {
             throw new BusinessException("ID do voluntario deve ser valido");
@@ -501,9 +479,6 @@ public class AtendimentoBO {
         if (request.beneficiarioId == null || request.beneficiarioId <= 0) {
             throw new BusinessException("ID do beneficiario e obrigatorio");
         }
-        if (request.canalComunicacaoId == null || request.canalComunicacaoId <= 0) {
-            throw new BusinessException("ID do canal de comunicacao e obrigatorio");
-        }
         if (request.prioridade < 0 || request.prioridade > 4) {
             throw new BusinessException("Prioridade deve estar entre 1 e 4, ou 0 para calcular automaticamente");
         }
@@ -519,9 +494,6 @@ public class AtendimentoBO {
         String tipo = normalizarTipoRelato(request.tipo);
         if (isBlank(request.nomeCodificado)) {
             throw new BusinessException("Nome codificado e obrigatorio");
-        }
-        if (request.canalComunicacaoId == null || request.canalComunicacaoId <= 0) {
-            throw new BusinessException("ID do canal de comunicacao e obrigatorio");
         }
         if (request.prioridade == null || request.prioridade < 1 || request.prioridade > 5) {
             throw new BusinessException("Prioridade deve estar entre 1 e 5");
@@ -553,12 +525,6 @@ public class AtendimentoBO {
             if (request.nivelRisco < 1 || request.nivelRisco > 5) {
                 throw new BusinessException("Nivel de risco deve estar entre 1 e 5");
             }
-        }
-    }
-
-    private void validarCanalComunicacao(int canalComunicacaoId) {
-        if (canalDAO.buscarPorId(canalComunicacaoId) == null) {
-            throw new NotFoundException("Canal de comunicacao nao encontrado");
         }
     }
 

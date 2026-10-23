@@ -18,7 +18,7 @@ const faqs: FAQItem[] = [
   {
     category: 'Plataforma',
     question: 'O que é o TDB Responde?',
-    answer: 'É uma plataforma de atendimento centralizado para a Turma do Bem, reunindo canais, histórico e prioridades em um único fluxo.',
+    answer: 'É a plataforma digital da Turma do Bem para registrar solicitações, acompanhar mensagens e organizar prioridades.',
   },
   {
     category: 'Plataforma',

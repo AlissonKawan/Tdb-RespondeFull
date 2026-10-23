@@ -25,7 +25,7 @@ class MensagemPaginationDAOTest {
         dao = new MensagemDAO(); dao.dataSource = source;
     }
 
-    @Test void limitaMensagensAntesDosCanaisEDevolveUmaOcorrenciaPorId() throws Exception {
+    @Test void limitaMensagensSemCanaisEDevolveUmaOcorrenciaPorId() throws Exception {
         when(rs.next()).thenReturn(true, true, true, false);
         when(rs.getInt("ID")).thenReturn(30, 30, 31);
         var result = dao.buscarPaginaPorAtendimento(42, 50, null);
@@ -34,7 +34,8 @@ class MensagemPaginationDAOTest {
         verify(conn).prepareStatement(sql.capture());
         assertTrue(sql.getValue().contains("WHERE M.ID IN (SELECT ID FROM (SELECT PAGINA.ID"));
         assertTrue(sql.getValue().contains("ORDER BY PAGINA.DATA_HORA DESC, PAGINA.ID DESC) WHERE ROWNUM <= ?"));
-        assertTrue(sql.getValue().endsWith("ORDER BY M.DATA_HORA ASC, M.ID ASC, C.ID ASC"));
+        assertTrue(sql.getValue().endsWith("ORDER BY M.DATA_HORA ASC, M.ID ASC"));
+        assertFalse(sql.getValue().contains("CANAL"));
         verify(stmt).setInt(1, 42); verify(stmt).setInt(2, 50);
         verify(rs).close(); verify(stmt).close(); verify(conn).close();
     }

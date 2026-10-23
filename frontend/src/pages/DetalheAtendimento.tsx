@@ -91,15 +91,6 @@ function InfoItem({ label, value }: { label: string; value?: string | number | n
   );
 }
 
-function normalizarTelefone(tel?: string) {
-  if (!tel) return '';
-  let limpo = tel.replace(/\D/g, '');
-  if (limpo.length > 0 && !limpo.startsWith('55')) {
-    limpo = '55' + limpo;
-  }
-  return limpo;
-}
-
 function labelStatusCheckin(status?: string) {
   const labels: Record<string, string> = {
     NAO_ENVIADO: 'Não enviado',
@@ -745,7 +736,7 @@ function DetalheAtendimento() {
     });
   };
 
-  const handleAlterarCheckin = async (status: string, abrirWhats = false) => {
+  const handleAlterarCheckin = async (status: string) => {
     if (!atendimento) return;
     setSalvandoCheckin(true);
     setFeedback('');
@@ -753,12 +744,6 @@ function DetalheAtendimento() {
       const atualizado = await atendimentoService.atualizarCheckin(atendimento.id, status);
       setAtendimento((prev) => prev ? { ...prev, statusCheckin: atualizado.statusCheckin, horarioEnvioCheckin: atualizado.horarioEnvioCheckin } : prev);
 
-      if (abrirWhats && atualizado.pessoaAtendidaTelefone) {
-        const telefone = normalizarTelefone(atualizado.pessoaAtendidaTelefone);
-        const nome = atualizado.pessoaAtendidaNome || 'paciente';
-        const msg = encodeURIComponent(`Olá, ${nome}! Tudo bem? Passando para confirmar sua consulta...`);
-        window.open(`https://wa.me/${telefone}?text=${msg}`, '_blank');
-      }
     } catch (error) {
       setFeedback(error instanceof Error ? error.message : 'Não foi possível atualizar o check-in.');
     } finally {
@@ -891,8 +876,6 @@ function DetalheAtendimento() {
   });
   const proximaAgenda = agendasOrdenadas.find(consultaFutura);
   const responsavel = atendimento?.nomeVoluntario ?? atendimento?.voluntario?.nome ?? 'Aguardando voluntário';
-  const canalOriginal = atendimento?.canalOrigem?.nome ?? atendimento?.canal;
-  const canal = canalOriginal?.toLowerCase().includes('sistema web') ? 'TDB - Responde' : canalOriginal;
   const statusClass = (status: string) => status === 'EM_ATENDIMENTO' ? 'bg-success/10 text-success' : status === 'CANCELADO' ? 'bg-danger/10 text-danger' : status === 'ENCERRADO' ? 'bg-muted text-muted-foreground' : 'bg-primary/10 text-primary';
   const fecharPainel = () => {
     setPainelAberto(false);
@@ -906,7 +889,7 @@ function DetalheAtendimento() {
         `E-mail: ${atendimento.pessoaAtendidaEmail || 'Não informado'}`,
         `Telefone: ${atendimento.pessoaAtendidaTelefone || 'Não informado'}`,
         `Status: ${labelStatus(atendimento.status)}`, `Prioridade: ${labelPrioridade(atendimento.prioridade)}`,
-        `Canal: ${canal || 'Não informado'}`, `Responsável: ${responsavel}`,
+        `Responsável: ${responsavel}`,
         `Abertura: ${formatDate(atendimento.dataAbertura ?? atendimento.dataCriacao)}`,
       ].join('\n'));
       setFeedback('Dados do atendimento copiados.');
@@ -952,19 +935,12 @@ function DetalheAtendimento() {
               <button ref={painelButtonRef} type="button" onClick={() => painelAberto ? fecharPainel() : setPainelAberto(true)} aria-expanded={painelAberto} aria-controls="detalhes-atendimento" aria-label={painelAberto ? 'Ocultar detalhes do atendimento' : 'Abrir detalhes do atendimento'} className="atendimento-icon-button"><AtendimentoIcon name="panel" /></button>
             </header>
 
-            <div className="grid shrink-0 grid-cols-2 gap-x-4 gap-y-2 rounded-xl border border-border bg-surface px-4 py-3 text-xs sm:grid-cols-3 2xl:grid-cols-4">
+            <div className="grid shrink-0 grid-cols-2 gap-x-4 gap-y-2 rounded-xl border border-border bg-surface px-4 py-3 text-xs sm:grid-cols-3 2xl:grid-cols-3">
               <div className="flex min-w-0 items-center gap-2.5">
                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-warning/10 text-warning"><AtendimentoIcon name="priority" className="h-4 w-4" /></span>
                 <div>
                   <p className="text-muted-foreground">Prioridade</p>
                   <p className="font-semibold">{labelPrioridade(atendimento.prioridade)}</p>
-                </div>
-              </div>
-              <div className="flex min-w-0 items-center gap-2.5">
-                <span className="hidden h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary sm:flex"><AtendimentoIcon name="chat" className="h-4 w-4" /></span>
-                <div>
-                  <p className="text-muted-foreground">Canal</p>
-                  <p className="break-words font-semibold">{canal || 'Não informado'}</p>
                 </div>
               </div>
               <div className="col-span-2 flex min-w-0 items-center gap-2.5 sm:col-span-1">
@@ -1172,7 +1148,6 @@ function DetalheAtendimento() {
                 <InfoItem label="Nome" value={pessoaAtendida} />
                 <InfoItem label="E-mail" value={atendimento.pessoaAtendidaEmail} />
                 <InfoItem label="Telefone" value={atendimento.pessoaAtendidaTelefone} />
-                <InfoItem label="Canal" value={canal} />
                 <InfoItem label="Prioridade" value={labelPrioridade(atendimento.prioridade)} />
                 <InfoItem label="Responsável" value={responsavel} />
                 <InfoItem label="Aberto em" value={formatDate(atendimento.dataAbertura ?? atendimento.dataCriacao)} />
@@ -1238,19 +1213,14 @@ function DetalheAtendimento() {
             <section className="atendimento-section space-y-3 p-3" aria-labelledby="acoes-atendimento">
               <h3 id="acoes-atendimento" className="text-sm font-bold">Ações rápidas</h3>
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                {podeAlterar && <Button variant="secondary" size="sm" disabled={salvandoCheckin || !atendimento.pessoaAtendidaTelefone} onClick={() => void handleAlterarCheckin('AGUARDANDO_RESPOSTA', true)} className="!border-success/20 !bg-success/10 !text-success">
-                  <AtendimentoIcon name="phone" className="h-4 w-4" />
-                  {salvandoCheckin ? 'Processando...' : 'Abrir WhatsApp'}
-                </Button>}
                 <Button variant="secondary" size="sm" onClick={() => void copiarDados()}><AtendimentoIcon name="copy" className="h-4 w-4" />Copiar dados</Button>
                 {podeAlterar && <Button variant="secondary" size="sm" disabled={salvando || atendimento.status === 'ENCERRADO'} onClick={confirmarEncerramento} className="!border-danger/20 !bg-danger/10 !text-danger sm:col-span-2"><AtendimentoIcon name="end" className="h-4 w-4" />Encerrar atendimento</Button>}
               </div>
-              {podeAlterar && !atendimento.pessoaAtendidaTelefone && <p className="text-xs text-muted-foreground">Cadastre um telefone para abrir o WhatsApp.</p>}
             </section>
 
-            {podeAlterar && <PainelSecao title="Confirmação via WhatsApp" icon="phone" defaultOpen={false}>
+            {podeAlterar && <PainelSecao title="Acompanhamento da consulta" icon="calendar" defaultOpen={false}>
               <p className="text-xs text-muted-foreground">Status atual: <strong className="text-foreground">{labelStatusCheckin(atendimento.statusCheckin)}</strong></p>
-              {atendimento.horarioEnvioCheckin && <p className="text-xs text-muted-foreground">Enviado em: {formatDate(atendimento.horarioEnvioCheckin)}</p>}
+              {atendimento.horarioEnvioCheckin && <p className="text-xs text-muted-foreground">Atualizado em: {formatDate(atendimento.horarioEnvioCheckin)}</p>}
               <div className="grid grid-cols-2 gap-2">
                 {[['CONFIRMADO', 'Confirmou'], ['NAO_COMPARECERA', 'Não vai'], ['REAGENDAMENTO_SOLICITADO', 'Solicitar reagendamento'], ['SEM_RESPOSTA', 'Sem resposta']].map(([value, label]) => <Button key={value} variant="secondary" size="sm" disabled={salvandoCheckin} onClick={() => void handleAlterarCheckin(value)}>{label}</Button>)}
               </div>

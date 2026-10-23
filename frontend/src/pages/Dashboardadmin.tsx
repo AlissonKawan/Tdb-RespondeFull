@@ -91,7 +91,7 @@ export default function DashboardAdmin() {
 
   const atendimentosFiltrados = atendimentos.filter((a) => {
     const passaStatus = filtroStatus === 'todos' || a.status === filtroStatus;
-    const texto = `${a.pessoaAtendidaNome || a.beneficiarioNome || ''} ${a.canal || ''}`.toLowerCase();
+    const texto = `${a.pessoaAtendidaNome || a.beneficiarioNome || ''}`.toLowerCase();
     return passaStatus && texto.includes(busca.toLowerCase());
   });
 
@@ -239,7 +239,7 @@ export default function DashboardAdmin() {
           <div className="space-y-5">
             <SectionTitle title="Atendimentos" description="Acompanhe os protocolos reais." />
             <Card className="grid gap-3 p-4 md:grid-cols-2">
-              <Input value={busca} onChange={(e) => setBusca(e.target.value)} placeholder="Buscar por nome ou canal" />
+              <Input value={busca} onChange={(e) => setBusca(e.target.value)} placeholder="Buscar por nome" />
               <Select value={filtroStatus} onChange={(e) => setFiltroStatus(e.target.value)}>
                 <option value="todos">Todos os status</option>
                 <option value="ABERTO">{formatStatusLabel('ABERTO')}</option>
@@ -257,7 +257,7 @@ export default function DashboardAdmin() {
                           <h3 className="font-bold text-slate-900">{item.pessoaAtendidaNome || item.beneficiarioNome || 'Paciente não informado'}</h3>
                           <Badge tone={item.status === 'ENCERRADO' ? 'success' : item.status === 'ABERTO' ? 'info' : 'warning'}>{formatStatusLabel(item.status)}</Badge>
                         </div>
-                        <p className="mt-1 text-sm text-slate-500">Canal: {(item.canal === 'Sistema Web' || item.canal === 'sistemas web' || item.canal === 'sistema web' || item.canal === 'Sistemas Web') ? 'TDB - Responde' : (item.canal || 'Padrão')} | Criado em {formatDate(item.dataCriacao)}</p>
+                        <p className="mt-1 text-sm text-slate-500">Criado em {formatDate(item.dataCriacao)}</p>
                         <p className="mt-1 text-sm text-slate-600">Responsável: {item.nomeVoluntario || 'Não atribuído'}</p>
                       </div>
                       <Select aria-label={`Status do atendimento de ${item.pessoaAtendidaNome || item.beneficiarioNome || 'paciente não informado'}`} disabled={isChangingStatus || Boolean(confirmDialog)} value={item.status || 'ABERTO'} onChange={(e) => {

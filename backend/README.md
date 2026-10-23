@@ -43,7 +43,6 @@ https://tdb-respondefull.onrender.com
 - Registro e acompanhamento de atendimentos
 - Envio e consulta de mensagens
 - Consulta de especialidades
-- Consulta de canais de comunicacao
 
 ## Endpoints principais
 
@@ -70,11 +69,6 @@ https://tdb-respondefull.onrender.com
 | POST | `/especialidades` | Cadastra especialidade. |
 | PUT | `/especialidades/{id}` | Atualiza especialidade. |
 | DELETE | `/especialidades/{id}` | Exclui especialidade. |
-| GET | `/canais` | Lista canais de comunicacao. |
-| GET | `/canais/{id}` | Busca canal de comunicacao por ID. |
-| POST | `/canais` | Cadastra canal de comunicacao. |
-| PUT | `/canais/{id}` | Atualiza canal de comunicacao. |
-| DELETE | `/canais/{id}` | Exclui canal de comunicacao. |
 | GET | `/atendimentos` | Lista atendimentos. |
 | GET | `/atendimentos/solicitados` | Lista atendimentos solicitados ou em aberto. |
 | GET | `/atendimentos/voluntario/{voluntarioId}` | Lista atendimentos por voluntario. |

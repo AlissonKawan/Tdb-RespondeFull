@@ -5,7 +5,6 @@ import br.com.tdbresponde.dto.MensagemRequest;
 import br.com.tdbresponde.exception.BusinessException;
 import br.com.tdbresponde.exception.NotFoundException;
 import br.com.tdbresponde.model.Atendimento;
-import br.com.tdbresponde.model.CanalComunicacao;
 import br.com.tdbresponde.model.Mensagem;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -97,11 +96,6 @@ public class MensagemBO {
                 }
                 Atendimento atendimento = autorizado != null ? autorizado : atendimentoBO.buscarParaAutorizacao(request.atendimentoId);
                 mensagem.setAtendimento(atendimento);
-            }
-            if (request.canalId != null) {
-                CanalComunicacao canal = new CanalComunicacao();
-                canal.setId(request.canalId);
-                mensagem.setCanal(canal);
             }
             mensagem.setConteudo(request.conteudo);
             mensagem.setEnviadoPor(normalizarEnviadoPor(request.enviadoPor));

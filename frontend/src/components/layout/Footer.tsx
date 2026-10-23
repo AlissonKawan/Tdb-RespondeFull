@@ -26,7 +26,7 @@ function Footer() {
           <div className="w-fit max-w-full rounded-2xl bg-white p-3">
             <img
               src="/img/logo-completa.png"
-              alt="TDB Responde — Unificando atendimentos que fazem o bem."
+              alt="TDB Responde — Plataforma de atendimento da Turma do Bem."
               width="840"
               height="672"
               loading="lazy"
@@ -34,7 +34,7 @@ function Footer() {
             />
           </div>
           <p className="mt-4 max-w-md text-sm leading-6 text-slate-300">
-            Plataforma criada para centralizar canais, organizar históricos e apoiar voluntários com uma operação mais clara.
+            Plataforma criada para organizar históricos e apoiar voluntários com uma operação mais clara.
           </p>
           <p className="mt-3 text-sm font-semibold text-blue-200">
             Em colaboração com a Turma do Bem.

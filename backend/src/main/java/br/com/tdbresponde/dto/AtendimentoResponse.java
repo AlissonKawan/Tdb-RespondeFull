@@ -22,7 +22,6 @@ public class AtendimentoResponse {
     public int prioridade;
     public String status;
     public String descricao;
-    public CanalComunicacaoResponse canalOrigem;
     public LocalDate dataAbertura;
     public LocalDate dataEncerramento;
     public LocalDateTime dataAtualizacao;
@@ -68,9 +67,6 @@ public class AtendimentoResponse {
         response.prioridade = atendimento.getPrioridade();
         response.status = atendimento.getStatus();
         response.descricao = atendimento.getDescricao();
-        if (atendimento.getCanalOrigem() != null) {
-            response.canalOrigem = CanalComunicacaoResponse.from(atendimento.getCanalOrigem());
-        }
         response.dataAbertura = atendimento.getDataAbertura();
         response.dataEncerramento = atendimento.getDataEncerramento();
         response.dataAtualizacao = atendimento.getDataAtualizacao();

@@ -116,7 +116,7 @@ function Login() {
             </ul>
           </div>
 
-          <p className="hidden text-sm text-muted-foreground lg:block">Unificando atendimentos que fazem o bem.</p>
+          <p className="hidden text-sm text-muted-foreground lg:block">Acompanhamento de atendimentos pela plataforma.</p>
         </section>
 
         <section className="order-1 flex items-center border-b border-border/70 bg-white/80 px-6 py-8 backdrop-blur-sm sm:px-10 lg:order-2 lg:border-b-0 lg:border-l lg:px-16 lg:py-10">

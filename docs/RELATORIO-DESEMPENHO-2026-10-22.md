@@ -55,10 +55,8 @@ A tela solicita 50 mensagens recentes e carrega as anteriores ao rolar para o
 início, mantendo a posição de leitura. A ordenação é cronológica, com desempate
 por ID. A referência de cursor é resolvida dentro do mesmo atendimento.
 
-O limite é aplicado aos IDs das mensagens antes dos JOINs de canais; assim,
-vários canais não consomem posições da página. Na resposta paginada há uma
-ocorrência por mensagem e, se houver vários canais legados, é escolhido o de
-menor ID. O modelo e o DTO continuam expondo um único canal.
+O limite é aplicado aos IDs das mensagens antes de montar a resposta paginada,
+mantendo uma ocorrência por mensagem e a ordem determinística por data e ID.
 
 `IntersectionObserver` adia downloads até 300px da área visível do histórico.
 Navegadores sem essa API mantêm o download imediato como compatibilidade.
@@ -185,7 +183,7 @@ Em homologação isolada, com dados sintéticos de volume e distribuição equiv
    com aquecimento documentado e as mesmas condições de rede/concorrência.
 3. Medir tempo de SQL, linhas lidas e espera/aquisição de conexões Agroal.
 4. Executar as consultas novas no Oracle real da homologação, verificar planos,
-   nulos legados, canais múltiplos, horários iguais e cursor de outro atendimento.
+   nulos legados, horários iguais e cursor de outro atendimento.
 5. Comparar antes/depois com o mesmo conjunto de dados e carga.
 
 O pool, a hospedagem, cold starts e distância entre API e banco podem continuar

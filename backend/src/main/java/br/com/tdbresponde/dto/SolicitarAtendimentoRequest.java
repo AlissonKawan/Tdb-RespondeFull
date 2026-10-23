@@ -4,6 +4,5 @@ public class SolicitarAtendimentoRequest {
 
     public Integer beneficiarioId;
     public int prioridade;
-    public Integer canalComunicacaoId;
     public String descricao;
 }

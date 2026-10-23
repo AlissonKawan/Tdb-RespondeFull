@@ -10,7 +10,6 @@ public class Atendimento {
     private int prioridade; //1=crítico, 2=alto, 3=médio, 4=baixo
     private String status; //"Aberto", "Em andamento", "Encerrado"
     private String descricao;
-    private CanalComunicacao canalOrigem;
     private LocalDate dataAbertura;
     private LocalDate dataEncerramento; // pode ser null se não encerrou
     private String statusCheckin;
@@ -28,8 +27,7 @@ public class Atendimento {
 
     public Atendimento() {}
 
-    public Atendimento(CanalComunicacao canalOrigem, LocalDate dataEncerramento, LocalDate dataAbertura, int id, PessoaAtendida pessoaAtendida, int prioridade, String status, Voluntario voluntario) {
-        this.canalOrigem = canalOrigem;
+    public Atendimento(LocalDate dataEncerramento, LocalDate dataAbertura, int id, PessoaAtendida pessoaAtendida, int prioridade, String status, Voluntario voluntario) {
         this.dataEncerramento = dataEncerramento;
         this.dataAbertura = dataAbertura;
         this.id = id;
@@ -37,14 +35,6 @@ public class Atendimento {
         this.prioridade = prioridade;
         this.status = status;
         this.voluntario = voluntario;
-    }
-
-    public CanalComunicacao getCanalOrigem() {
-        return canalOrigem;
-    }
-
-    public void setCanalOrigem(CanalComunicacao canalOrigem) {
-        this.canalOrigem = canalOrigem;
     }
 
     public LocalDate getDataAbertura() {

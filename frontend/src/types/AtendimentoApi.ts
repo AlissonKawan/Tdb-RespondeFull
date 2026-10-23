@@ -25,11 +25,6 @@ export interface AtendimentoApi {
   observacao?: string;
   status?: AtendimentoStatus;
   prioridade?: AtendimentoPrioridade;
-  canal?: string;
-  canalOrigem?: {
-    id: number;
-    nome: string;
-  };
   dataCriacao?: string;
   dataAbertura?: string;
   dataAtualizacao?: string;
@@ -61,17 +56,10 @@ export interface AtendimentoApi {
 export interface SolicitarAtendimentoRequest {
   beneficiarioId: number;
   prioridade: number;
-  canalComunicacaoId: number;
   descricao: string;
 }
 
 export type TipoPessoaRelato = 'CRIANCA_ADOLESCENTE' | 'MULHER_APOLONIA' | 'OUTRO';
-
-export interface CanalComunicacaoApi {
-  id: number;
-  nome: string;
-  descricao?: string;
-}
 
 export interface RelatarCriancaAdolescentePayload {
   idade: number;
@@ -93,7 +81,6 @@ export interface RelatarAtendimentoRequest {
   telefone: string;
   email: string;
   tipo: TipoPessoaRelato;
-  canalComunicacaoId: number;
   prioridade: number;
   descricao: string;
   idade?: number;

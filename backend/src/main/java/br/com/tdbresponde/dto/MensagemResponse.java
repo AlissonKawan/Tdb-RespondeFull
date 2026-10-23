@@ -12,7 +12,6 @@ public class MensagemResponse {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     public LocalDateTime dataHora;
     public String enviadoPor;
-    public CanalComunicacaoResponse canal;
     public String tipoMensagem;
     public String arquivoUrl;
     public String mimeType;
@@ -29,9 +28,6 @@ public class MensagemResponse {
         response.tipoMensagem = mensagem.getTipoMensagem() == null ? "TEXTO" : mensagem.getTipoMensagem();
         response.arquivoUrl = mensagem.getArquivoUrl();
         response.mimeType = mensagem.getMimeType();
-        if (mensagem.getCanal() != null) {
-            response.canal = CanalComunicacaoResponse.from(mensagem.getCanal());
-        }
         return response;
     }
 

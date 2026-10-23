@@ -52,7 +52,6 @@ export interface Atendimento {
   id: number;
   tipo: TipoPessoa;
   pessoa: CriancaAdolescente | MulherApolonia;
-  canal: string;
   prioridade: Prioridade;
   status: StatusAtendimento;
   voluntarioId: number | null;

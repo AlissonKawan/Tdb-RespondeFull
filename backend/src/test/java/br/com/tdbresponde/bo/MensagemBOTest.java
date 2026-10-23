@@ -68,6 +68,22 @@ class MensagemBOTest {
     }
 
     @Test
+    void respostaDoChatPreservaMidiaSemExporCanal() throws Exception {
+        MensagemRequest request = request(1, "beneficiario", "Imagem");
+        request.tipoMensagem = "IMAGEM";
+        request.arquivoUrl = "/midias/imagem.png";
+        request.mimeType = "image/png";
+        var response = br.com.tdbresponde.dto.MensagemResponse.from(bo.inserir(request));
+        var json = bo.objectMapper.valueToTree(response);
+        assertEquals(1, json.get("atendimentoId").asInt());
+        assertEquals("IMAGEM", json.get("tipoMensagem").asText());
+        assertEquals("/midias/imagem.png", json.get("arquivoUrl").asText());
+        assertEquals("image/png", json.get("mimeType").asText());
+        org.junit.jupiter.api.Assertions.assertFalse(json.has("canal"));
+        org.junit.jupiter.api.Assertions.assertFalse(json.has("canalId"));
+    }
+
+    @Test
     void deveAceitarRemetentesPermitidos() {
         assertAll(
                 () -> assertEquals("BENEFICIARIO", bo.inserir(request(1, "beneficiario", "a")).getEnviadoPor()),
@@ -115,7 +131,6 @@ class MensagemBOTest {
     private MensagemRequest request(Integer atendimentoId, String enviadoPor, String conteudo) {
         MensagemRequest request = new MensagemRequest();
         request.atendimentoId = atendimentoId;
-        request.canalId = 2;
         request.enviadoPor = enviadoPor;
         request.conteudo = conteudo;
         return request;
