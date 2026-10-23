@@ -118,7 +118,7 @@ function NavBar() {
                 <Link to="/faq" {...linkProps('/faq')}>FAQ</Link>
                 <Link to="/contato" {...linkProps('/contato')}>Contato</Link>
                 <Link to="/integrantes" {...linkProps('/integrantes')}>Integrantes</Link>
-                <Link to="/roadmap" {...linkProps('/roadmap')}>Solução</Link>
+                <Link to="/solucao" {...linkProps('/solucao')}>Solução</Link>
                 <Link to="/quero-ser-voluntario" {...linkProps('/quero-ser-voluntario')}>Seja voluntário</Link>
               </>
             )}
@@ -154,7 +154,7 @@ function NavBar() {
                 <Link to="/faq" onClick={() => setIsOpen(false)} {...linkProps('/faq')}>FAQ</Link>
                 <Link to="/contato" onClick={() => setIsOpen(false)} {...linkProps('/contato')}>Contato</Link>
                 <Link to="/integrantes" onClick={() => setIsOpen(false)} {...linkProps('/integrantes')}>Integrantes</Link>
-                <Link to="/roadmap" onClick={() => setIsOpen(false)} {...linkProps('/roadmap')}>Solução</Link>
+                <Link to="/solucao" onClick={() => setIsOpen(false)} {...linkProps('/solucao')}>Solução</Link>
                 <Link to="/quero-ser-voluntario" onClick={() => setIsOpen(false)} {...linkProps('/quero-ser-voluntario')}>Seja voluntário</Link>
               </>
             )}

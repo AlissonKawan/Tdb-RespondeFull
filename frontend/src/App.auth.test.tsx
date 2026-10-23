@@ -25,6 +25,15 @@ function go(path: string) {
   render(<App />);
 }
 
+it.each(['/roadmap', '/solucao'])('abre a solução pela URL %s e mantém os links canônicos', async (path) => {
+  go(path);
+  expect(await screen.findByRole('heading', { name: 'Todo pedido de ajuda merece acolhimento.' })).toBeInTheDocument();
+  expect(window.location.pathname).toBe('/solucao');
+  for (const link of screen.getAllByRole('link', { name: 'Solução' })) {
+    expect(link).toHaveAttribute('href', '/solucao');
+  }
+});
+
 function authenticated(role: 'VOLUNTARIO' | 'ADMIN' | 'BENEFICIARIO') {
   saveSession({ token: 'x'.repeat(43), expiresAt: new Date(Date.now() + 3_600_000).toISOString() });
   vi.mocked(authService.me).mockResolvedValue({

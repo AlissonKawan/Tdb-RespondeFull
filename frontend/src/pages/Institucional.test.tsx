@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import Contato from './Contato';
 import FAQ from './FAQ';
 import Integrantes from './Integrantes';
-import Roadmap from './Roadmap';
+import Solucao from './Solucao';
 import Sobre from './Sobre';
 import { contatoService } from '../services/contatoService';
 
@@ -70,14 +70,19 @@ describe('páginas institucionais', () => {
     expect(linkedin.querySelector('svg')).toBeInTheDocument();
   });
 
-  it('estrutura o roadmap nas três fases de entrega', () => {
-    renderPage(<Roadmap />);
-
-    const timeline = screen.getByRole('list', { name: 'Fases de entrega do TDB Responde' });
-    expect(screen.getByRole('heading', { name: 'MVP' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Inteligência Operacional' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Expansão de Rede' })).toBeInTheDocument();
-    expect(within(timeline).getAllByRole('listitem').length).toBeGreaterThanOrEqual(3);
+  it('apresenta os públicos e conecta o pedido ao trabalho voluntário', () => {
+    renderPage(<Solucao />);
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Todo pedido de ajuda merece acolhimento.');
+    expect(screen.getByRole('heading', { name: 'Um sorriso pode abrir novos caminhos.' })).toBeInTheDocument();
+    const journey = screen.getByRole('list', { name: 'Caminho de um pedido' });
+    expect(within(journey).getAllByRole('listitem')).toHaveLength(3);
+    expect(screen.getByRole('link', { name: 'Quero fazer parte dessa rede' })).toHaveAttribute('href', '/cadastro-voluntario');
+    expect(screen.queryByText('MVP')).not.toBeInTheDocument();
+    expect(screen.getByText(/Imagens ilustrativas geradas por IA/)).toBeInTheDocument();
+    for (const link of screen.getAllByRole('link')) {
+      const href = link.getAttribute('href');
+      if (href?.startsWith('#')) expect(document.getElementById(href.slice(1))).toBeInTheDocument();
+    }
   });
 
   it('exibe a redação institucional com acentuação revisada', () => {

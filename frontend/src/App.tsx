@@ -3,7 +3,7 @@
 
 
 import React, { Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import Layout from './components/layout/Layout';
 import SystemLayout from './components/layout/SystemLayout';
@@ -18,7 +18,7 @@ const Sobre = React.lazy(() => import('./pages/Sobre'));
 const FAQ = React.lazy(() => import('./pages/FAQ'));
 const Contato = React.lazy(() => import('./pages/Contato'));
 const Integrantes = React.lazy(() => import('./pages/Integrantes'));
-const Roadmap = React.lazy(() => import('./pages/Roadmap'));
+const Solucao = React.lazy(() => import('./pages/Solucao'));
 
 // Páginas novas (Lazy Loaded)
 const Login = React.lazy(() => import('./pages/Login'));
@@ -55,8 +55,8 @@ function App() {
               <Route path="faq" element={<FAQ />} />
               <Route path="contato" element={<Contato />} />
               <Route path="integrantes" element={<Integrantes />} />
-              <Route path="roadmap" element={<Roadmap />} />
-              <Route path="solucao" element={<Roadmap />} />
+              <Route path="roadmap" element={<Navigate to="/solucao" replace />} />
+              <Route path="solucao" element={<Solucao />} />
               <Route path="cadastro" element={<CadastroVoluntario />} />
               <Route path="cadastro-voluntario" element={<CadastroVoluntario />} />
               <Route path="cadastro-beneficiario" element={<CadastroBeneficiario />} />

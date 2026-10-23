@@ -1,0 +1,13 @@
+.solucao-page section[id] { scroll-margin-top: 6rem; }
+.solucao-hero { min-height: max(640px, calc(100svh - 210px)); }
+.solucao-youth { min-height: 680px; }
+.solucao-shade { background: linear-gradient(90deg, rgb(15 23 42 / 92%) 0%, rgb(15 23 42 / 75%) 36%, rgb(15 23 42 / 12%) 70%); }
+.solucao-youth-shade { background: linear-gradient(90deg, rgb(248 250 252 / 98%) 0%, rgb(248 250 252 / 92%) 33%, rgb(248 250 252 / 0%) 65%); }
+@media (max-width: 767px) {
+  .solucao-hero { min-height: 800px; align-items: end; }
+  .solucao-hero .solucao-photo { object-position: 72% top; }
+  .solucao-shade { background: linear-gradient(0deg, rgb(15 23 42 / 98%) 0%, rgb(15 23 42 / 90%) 47%, rgb(15 23 42 / 15%) 100%); }
+  .solucao-youth { padding-top: 260px; min-height: auto; }
+  .solucao-youth .solucao-photo { height: 400px; object-position: 75% top; }
+  .solucao-youth-shade { background: linear-gradient(0deg, rgb(239 246 255) 0%, rgb(239 246 255) 48%, rgb(239 246 255 / 0%) 85%); }
+}
