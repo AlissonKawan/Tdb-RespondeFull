@@ -261,7 +261,8 @@ function DetalheAtendimento() {
   const [erroFormProntuario, setErroFormProntuario] = useState('');
   const [salvandoProntuario, setSalvandoProntuario] = useState(false);
 
-  const podeAlterar = user?.tipoUsuario === 'VOLUNTARIO' || user?.tipoUsuario === 'ADMIN';
+  const ehAdmin = user?.tipoUsuario === 'ADMIN';
+  const podeAlterar = user?.tipoUsuario === 'VOLUNTARIO' || ehAdmin;
   const remetenteAtual = getSender(user?.tipoUsuario);
   const chatBloqueado = atendimento?.status === 'ENCERRADO' || atendimento?.status === 'CANCELADO';
 
@@ -494,8 +495,8 @@ function DetalheAtendimento() {
     atendimento?.pessoaAtendidaNome
     ?? atendimento?.beneficiarioNome
     ?? atendimento?.pacienteNome
-    ?? (atendimento?.pessoaAtendidaId ? `Pessoa #${atendimento.pessoaAtendidaId}` : 'Não informada')
-  ), [atendimento]);
+    ?? (ehAdmin && atendimento?.pessoaAtendidaId ? `Pessoa #${atendimento.pessoaAtendidaId}` : 'Não informada')
+  ), [atendimento, ehAdmin]);
 
   const semAlteracoes = Boolean(
     atendimento
@@ -885,7 +886,7 @@ function DetalheAtendimento() {
     if (!atendimento) return;
     try {
       await navigator.clipboard.writeText([
-        `Atendimento #${atendimento.id}`, `Beneficiário: ${pessoaAtendida}`,
+        ...(ehAdmin ? [`Atendimento #${atendimento.id}`] : []), `Beneficiário: ${pessoaAtendida}`,
         `E-mail: ${atendimento.pessoaAtendidaEmail || 'Não informado'}`,
         `Telefone: ${atendimento.pessoaAtendidaTelefone || 'Não informado'}`,
         `Status: ${labelStatus(atendimento.status)}`, `Prioridade: ${labelPrioridade(atendimento.prioridade)}`,
@@ -925,7 +926,7 @@ function DetalheAtendimento() {
             <header className="flex shrink-0 items-start gap-3">
               <button type="button" onClick={() => navigate(-1)} className="atendimento-icon-button" aria-label="Voltar"><AtendimentoIcon name="back" /></button>
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-semibold text-primary">Atendimento #{atendimento.id}</p>
+                {ehAdmin && <p className="text-xs font-semibold text-primary">Atendimento #{atendimento.id}</p>}
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                   <h1 className="break-words text-xl font-bold leading-tight tracking-tight text-foreground lg:text-2xl">Atendimento de {pessoaAtendida}</h1>
                   <Badge tone={statusTone(atendimento.status)}>{labelStatus(atendimento.status)}</Badge>
@@ -1183,7 +1184,7 @@ function DetalheAtendimento() {
                     </div>
                     <dl>
                       <InfoItem label="Data e horário" value={`${ag.dataConsulta.split('-').reverse().join('/')} às ${ag.horario}`} />
-                      <InfoItem label="Profissional" value={ag.voluntarioId === atendimento.voluntarioId ? responsavel : `Profissional #${ag.voluntarioId}`} />
+                      <InfoItem label="Profissional" value={ag.voluntarioId === atendimento.voluntarioId ? responsavel : ehAdmin ? `Profissional #${ag.voluntarioId}` : 'Outro voluntário da rede'} />
                     </dl>
                     <Button variant="secondary" size="sm" fullWidth className="mt-2" onClick={() => abrirModalEditarAgenda(ag)}>Visualizar / reagendar</Button>
                   </article>)}
@@ -1244,7 +1245,7 @@ function DetalheAtendimento() {
               <p className="text-xs leading-5 text-muted-foreground">O histórico detalhado de alterações de status e responsável ainda não está disponível.</p>
             </PainelSecao>
 
-            {modalAgendaAberto && <Dialog title={editandoAgendaId ? 'Editar Consulta do Atendimento' : 'Agendar Consulta para Atendimento'} description={`Paciente: ${pessoaAtendida} · Atendimento #${atendimento.id}`} onClose={() => { if (!salvandoAgenda) setModalAgendaAberto(false); }}>
+            {modalAgendaAberto && <Dialog title={editandoAgendaId ? 'Editar Consulta do Atendimento' : 'Agendar Consulta para Atendimento'} description={ehAdmin ? `Paciente: ${pessoaAtendida} · Atendimento #${atendimento.id}` : `Paciente: ${pessoaAtendida}`} onClose={() => { if (!salvandoAgenda) setModalAgendaAberto(false); }}>
               <form onSubmit={salvarAgendaDoAtendimento} noValidate className="space-y-4">
                 <Field label="Tipo de Consulta">
                   <Input
@@ -1311,7 +1312,7 @@ function DetalheAtendimento() {
                 {prontuarios.map((item, index) => <article key={item.id ?? index} className="space-y-2 rounded-xl border border-border bg-muted/30 p-4">
                   <p className="text-xs font-semibold text-muted-foreground">
                     {formatDate(item.dataRegistro)}
-                    {item.agendaId ? ` · Consulta #${item.agendaId}` : ''}
+                    {ehAdmin && item.agendaId ? ` · Consulta #${item.agendaId}` : ''}
                   </p>
                   <p className="whitespace-pre-wrap break-words text-sm">
                     <strong>Histórico / anamnese: </strong>

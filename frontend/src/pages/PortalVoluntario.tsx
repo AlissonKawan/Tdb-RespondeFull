@@ -137,12 +137,13 @@ function OperationalEmptyState({ title, description }: { title: string; descript
 }
 
 
-function AtendimentoCard({ atendimento, onAssumir, assumindo, assumirBloqueado, hasNovaMensagem }: {
+function AtendimentoCard({ atendimento, onAssumir, assumindo, assumirBloqueado, hasNovaMensagem, showProtocol }: {
   atendimento: AtendimentoApi;
   onAssumir?: (atendimento: AtendimentoApi) => void;
   assumindo?: boolean;
   assumirBloqueado?: boolean;
   hasNovaMensagem?: boolean;
+  showProtocol?: boolean;
 }) {
   const navigate = useNavigate();
   const aguardandoAcolhimento = ['ABERTO', 'Aberto'].includes(atendimento.status ?? 'ABERTO');
@@ -179,7 +180,7 @@ function AtendimentoCard({ atendimento, onAssumir, assumindo, assumirBloqueado, 
           </div>
         </div>
         <div className="shrink-0 xl:max-w-xs xl:text-right">
-          <p className="text-sm font-bold text-slate-500">#TDB-{atendimento.id.toString().padStart(3, '0')}</p>
+          {showProtocol && <p className="text-sm font-bold text-slate-500">#TDB-{atendimento.id.toString().padStart(3, '0')}</p>}
           {(atendimento.dataCriacao || atendimento.dataAbertura) && <p className="mt-0.5 text-xs text-slate-500">Recebido em {formatDate(atendimento.dataCriacao ?? atendimento.dataAbertura)}</p>}
           <div className="mt-4 flex flex-wrap gap-2 xl:justify-end">
             <Button onClick={() => navigate(`/atendimentos/${atendimento.id}`)} className="rounded-xl"><PortalIcon name="eye" />Abrir atendimento</Button>
@@ -515,6 +516,7 @@ function PortalVoluntario() {
                   onAssumir={assumirComConfirmacao}
                   assumirBloqueado={voluntarioSemVinculo}
                   assumindo={assumindoId === atendimento.id}
+                  showProtocol={user?.tipoUsuario === 'ADMIN'}
                 />
               ))}
             </div>
@@ -537,7 +539,12 @@ function PortalVoluntario() {
             )}
             <div className="grid gap-4">
               {!loadingMeus && !erroMeus && atendimentosFiltrados.map((atendimento) => (
-                <AtendimentoCard key={atendimento.id} atendimento={atendimento} hasNovaMensagem={novasMensagens[atendimento.id]} />
+                <AtendimentoCard
+                  key={atendimento.id}
+                  atendimento={atendimento}
+                  hasNovaMensagem={novasMensagens[atendimento.id]}
+                  showProtocol={user?.tipoUsuario === 'ADMIN'}
+                />
               ))}
             </div>
           </div>

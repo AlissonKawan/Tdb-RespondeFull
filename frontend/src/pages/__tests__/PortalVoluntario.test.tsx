@@ -268,4 +268,27 @@ describe('PortalVoluntario', () => {
     act(() => vi.advanceTimersByTime(1));
     expect(screen.getByRole('button', { name: /Copiar link/i })).toBeInTheDocument();
   });
+
+  it('oculta o código #TDB para voluntário e exibe apenas para administrador', async () => {
+    vi.mocked(useAuth).mockReturnValue(authContext());
+    vi.mocked(voluntariosService.buscarPorId).mockResolvedValue(voluntario());
+    vi.mocked(atendimentoService.listarSolicitados).mockResolvedValue([
+      { id: 163, beneficiarioNome: 'Eduardo Boni', prioridade: 1, status: 'ABERTO' },
+    ]);
+
+    const { unmount } = render(<BrowserRouter><PortalVoluntario /></BrowserRouter>);
+    expect(await screen.findByText('Eduardo Boni')).toBeInTheDocument();
+    expect(screen.queryByText('#TDB-163')).not.toBeInTheDocument();
+    unmount();
+
+    const adminAuth = authContext('Admin');
+    adminAuth.user!.tipoUsuario = 'ADMIN';
+    adminAuth.isAdmin = true;
+    adminAuth.isVoluntario = false;
+    vi.mocked(useAuth).mockReturnValue(adminAuth);
+
+    render(<BrowserRouter><PortalVoluntario /></BrowserRouter>);
+    expect(await screen.findByText('Eduardo Boni')).toBeInTheDocument();
+    expect(screen.getByText('#TDB-163')).toBeInTheDocument();
+  });
 });
