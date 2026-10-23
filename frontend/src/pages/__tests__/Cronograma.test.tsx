@@ -18,6 +18,9 @@ vi.mock('../../services/cronogramaService', () => ({
   },
 }));
 
+type AuthReturn = ReturnType<typeof useAuth>;
+type ListarTarefasReturn = Awaited<ReturnType<typeof cronogramaService.listarTarefas>>;
+
 describe('Cronograma', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -28,8 +31,8 @@ describe('Cronograma', () => {
     vi.mocked(useAuth).mockReturnValue({
       user: { id: 1, nome: 'Voluntario', tipoUsuario: 'VOLUNTARIO', voluntarioId: 10 },
       logout: vi.fn(),
-    } as any);
-    vi.mocked(cronogramaService.listarTarefas).mockResolvedValue({ tarefas: [] } as any);
+    } as unknown as AuthReturn);
+    vi.mocked(cronogramaService.listarTarefas).mockResolvedValue({ tarefas: [] } as unknown as ListarTarefasReturn);
     const { container } = render(<Cronograma />);
     await user.click(screen.getByRole('button', { name: '+ Nova Tarefa' }));
     await user.type(screen.getByPlaceholderText('Ex: Reunião com equipe'), 'Reunião da equipe');
@@ -54,10 +57,10 @@ describe('Cronograma', () => {
     vi.mocked(useAuth).mockReturnValue({
       user: { id: 1, nome: 'Voluntario', tipoUsuario: 'VOLUNTARIO', voluntarioId: 10 },
       logout: vi.fn(),
-    } as any);
+    } as unknown as AuthReturn);
     vi.mocked(cronogramaService.listarTarefas).mockResolvedValue({
       tarefas: [{ id_tarefa: 42, titulo: 'Tarefa', dia_semana: 'Segunda-feira', prioridade: 'Alta', status: 'Pendente', tipo: 'Outros' }],
-    } as any);
+    } as unknown as ListarTarefasReturn);
     render(<Cronograma />);
     await user.click(await screen.findByTitle('Excluir tarefa'));
     expect(cronogramaService.excluirTarefa).not.toHaveBeenCalled();
@@ -70,7 +73,7 @@ describe('Cronograma', () => {
     vi.mocked(useAuth).mockReturnValue({
       user: { id: 1, nome: 'Voluntario', tipoUsuario: 'VOLUNTARIO', voluntarioId: 10 },
       logout: vi.fn(),
-    } as any);
+    } as unknown as AuthReturn);
 
     vi.mocked(cronogramaService.listarTarefas).mockResolvedValue({
       tarefas: [
@@ -83,7 +86,7 @@ describe('Cronograma', () => {
           tipo: 'Outros'
         }
       ]
-    } as any);
+    } as unknown as ListarTarefasReturn);
 
     render(<Cronograma />);
 
@@ -114,7 +117,7 @@ describe('Cronograma', () => {
     vi.mocked(useAuth).mockReturnValue({
       user: { id: 1, nome: 'Voluntario', tipoUsuario: 'VOLUNTARIO', voluntarioId: 10 },
       logout: vi.fn(),
-    } as any);
+    } as unknown as AuthReturn);
 
     vi.mocked(cronogramaService.listarTarefas).mockResolvedValue({
       tarefas: [
@@ -127,7 +130,7 @@ describe('Cronograma', () => {
           tipo: 'Outros'
         }
       ]
-    } as any);
+    } as unknown as ListarTarefasReturn);
 
     render(<Cronograma />);
 
@@ -148,7 +151,7 @@ describe('Cronograma', () => {
     vi.mocked(useAuth).mockReturnValue({
       user: { id: 1, nome: 'Voluntario', tipoUsuario: 'VOLUNTARIO', voluntarioId: 10 },
       logout: vi.fn(),
-    } as any);
+    } as unknown as AuthReturn);
 
     vi.mocked(cronogramaService.listarTarefas).mockResolvedValue({
       tarefas: [
@@ -161,7 +164,7 @@ describe('Cronograma', () => {
           tipo: 'Reunião'
         }
       ]
-    } as any);
+    } as unknown as ListarTarefasReturn);
 
     const apiError = new Error('Erro de validação');
     vi.mocked(cronogramaService.atualizarTarefa).mockRejectedValue(apiError);

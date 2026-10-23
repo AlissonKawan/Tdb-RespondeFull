@@ -165,7 +165,7 @@ export default function SystemLayout() {
   };
 
   return (
-    <div className="flex min-h-dvh overflow-hidden bg-muted">
+    <div className="flex h-dvh overflow-hidden bg-muted">
       {isSidebarOpen ? (
         <button
           type="button"
@@ -180,11 +180,11 @@ export default function SystemLayout() {
         ref={sidebarRef}
         id="menu-sistema"
         aria-label="Navegação do sistema"
-        className={`fixed inset-y-0 left-0 z-50 flex w-64 max-w-[88vw] shrink-0 transform flex-col border-r border-blue-100 bg-white shadow-2xl transition-transform duration-normal ease-out motion-reduce:transition-none md:relative md:translate-x-0 md:transform-none md:shadow-none ${
+        className={`fixed inset-y-0 left-0 z-50 flex h-dvh min-h-0 w-64 max-w-[88vw] shrink-0 transform flex-col overflow-hidden border-r border-blue-100 bg-white shadow-2xl transition-transform duration-normal ease-out motion-reduce:transition-none md:relative md:translate-x-0 md:transform-none md:shadow-none ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="p-5 pb-2">
+        <div className="shrink-0 p-5 pb-2">
           <div className="flex items-center justify-between gap-3">
             <Link to="/" className="flex min-h-11 items-center gap-2.5 rounded-lg text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" aria-label="TDB Responde — página inicial">
               <img src="/img/logo-simbolo.png" alt="" width="512" height="492" className="h-12 w-12 shrink-0 object-contain" />
@@ -216,7 +216,7 @@ export default function SystemLayout() {
           </div>
         </div>
 
-        <nav className="flex-1 overflow-y-auto overscroll-contain px-3 py-5">
+        <nav className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-5">
           {GROUPS.map((group, groupIndex) => {
             const items = navigation.filter((item) => item.group === group);
             if (items.length === 0) return null;
@@ -250,7 +250,7 @@ export default function SystemLayout() {
           })}
         </nav>
 
-        <div className="border-t border-slate-100 p-4">
+        <div className="shrink-0 border-t border-slate-100 p-4">
           <img src="/img/turmadobem.png" alt="Turma do Bem" width="159" height="90" className="mb-3 ml-3 h-8 w-auto max-w-32 object-contain object-left" />
           <button
             type="button"
@@ -265,7 +265,7 @@ export default function SystemLayout() {
         </div>
       </aside>
 
-      <main id="conteudo-principal" className="flex min-w-0 flex-1 flex-col bg-background">
+      <main id="conteudo-principal" className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-background">
         <header className="z-10 flex h-16 shrink-0 items-center border-b border-border bg-white/95 px-4 backdrop-blur md:h-20 md:px-6 lg:px-8">
           <button
             ref={menuButtonRef}

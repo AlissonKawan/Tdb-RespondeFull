@@ -39,19 +39,19 @@ describe('ChartCard', () => {
     // Mockando respostas para 3 atendimentos, 2 mensagens no primeiro, 1 voluntário e 2 usuários (1 beneficiário)
     vi.mocked(atendimentoService.listarTodos).mockResolvedValue([
       { id: 1 }, { id: 2 }, { id: 3 }
-    ] as any);
+    ] as unknown as Awaited<ReturnType<typeof atendimentoService.listarTodos>>);
     
     vi.mocked(voluntariosService.listar).mockResolvedValue([
       { id: 10, nome: 'V1' }
-    ] as any);
+    ] as unknown as Awaited<ReturnType<typeof voluntariosService.listar>>);
 
     vi.mocked(usuarioService.listar).mockResolvedValue([
       { id: 100, tipoUsuario: 'BENEFICIARIO' },
       { id: 101, tipoUsuario: 'VOLUNTARIO' }
-    ] as any);
+    ] as unknown as Awaited<ReturnType<typeof usuarioService.listar>>);
 
     vi.mocked(mensagensService.getMensagensAtendimento).mockImplementation((id: number) => {
-      if (id === 1) return Promise.resolve([{ id: 1 }, { id: 2 }] as any);
+      if (id === 1) return Promise.resolve([{ id: 1 }, { id: 2 }] as unknown as Awaited<ReturnType<typeof mensagensService.getMensagensAtendimento>>);
       return Promise.resolve([]);
     });
 

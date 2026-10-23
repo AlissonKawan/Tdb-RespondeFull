@@ -113,6 +113,7 @@ public class AuthResource {
 
     @POST
     @Path("/logout")
+    @Consumes(MediaType.WILDCARD)
     public Response logout(@HeaderParam("Authorization") String authorization) {
         String token = SessionService.bearer(authorization);
         sessions.revoke(token);

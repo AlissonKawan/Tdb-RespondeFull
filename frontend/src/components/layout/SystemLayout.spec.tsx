@@ -1,5 +1,5 @@
-import { render, screen, within } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { fireEvent, render, screen, within } from '@testing-library/react';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { describe, it, expect, vi } from 'vitest';
 import SystemLayout from './SystemLayout';
 import * as useAuthHook from '../../context/useAuth';
@@ -9,6 +9,37 @@ vi.mock('../../context/useAuth', () => ({
 }));
 
 describe('SystemLayout', () => {
+  it('mantém a saída disponível com conteúdo longo e só encerra a sessão após confirmar', () => {
+    const logout = vi.fn();
+    vi.mocked(useAuthHook.useAuth).mockReturnValue({
+      user: { id: 1, nome: 'Voluntário', email: 'local@example.test', tipoUsuario: 'VOLUNTARIO', ativo: true },
+      isVoluntario: true, isBeneficiario: false, isAdmin: false,
+      isAuthenticated: true, isLoading: false, authError: '',
+      logout, login: vi.fn(), register: vi.fn(),
+    });
+    render(<MemoryRouter initialEntries={['/portal-voluntario']}>
+      <Routes>
+        <Route element={<SystemLayout />}>
+          <Route path="/portal-voluntario" element={<section>{Array.from({ length: 60 }, (_, i) => <article key={i}>Atendimento {i + 1}</article>)}</section>} />
+        </Route>
+        <Route path="/login" element={<h1>Entrar na plataforma</h1>} />
+      </Routes>
+    </MemoryRouter>);
+
+    const sidebar = screen.getByLabelText('Navegação do sistema');
+    const exit = within(sidebar).getByRole('button', { name: 'Sair da conta' });
+    expect(within(sidebar.querySelector('nav')!).queryByRole('button', { name: 'Sair da conta' })).not.toBeInTheDocument();
+    expect(screen.getAllByRole('article')).toHaveLength(60);
+    fireEvent.click(exit);
+    expect(logout).not.toHaveBeenCalled();
+    fireEvent.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Cancelar' }));
+    expect(logout).not.toHaveBeenCalled();
+    fireEvent.click(exit);
+    fireEvent.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: /^Sair$/ }));
+    expect(logout).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole('heading', { name: 'Entrar na plataforma' })).toBeInTheDocument();
+  });
+
   it('renderiza a sidebar com o nome do usuário e botão sair para voluntário', () => {
     vi.mocked(useAuthHook.useAuth).mockReturnValue({
       user: {
