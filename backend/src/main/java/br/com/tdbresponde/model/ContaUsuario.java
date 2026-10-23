@@ -6,6 +6,9 @@ public class ContaUsuario {
 
     private int id;
     private String nome;
+    private String usuario;
+    private String tipoBeneficiario;
+    private String modoIdentificacao;
     private String email;
     private String senhaHash;
     private TipoUsuario tipoUsuario;
@@ -14,6 +17,13 @@ public class ContaUsuario {
 
     public ContaUsuario() {
     }
+
+    public String getUsuario() { return usuario; }
+    public void setUsuario(String usuario) { this.usuario = usuario; }
+    public String getTipoBeneficiario() { return tipoBeneficiario; }
+    public void setTipoBeneficiario(String tipoBeneficiario) { this.tipoBeneficiario = tipoBeneficiario; }
+    public String getModoIdentificacao() { return modoIdentificacao; }
+    public void setModoIdentificacao(String modoIdentificacao) { this.modoIdentificacao = modoIdentificacao; }
 
     public int getId() {
         return id;

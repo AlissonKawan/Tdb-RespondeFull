@@ -5,7 +5,7 @@ import java.time.LocalDate;
 public class MulherApolonia extends PessoaAtendida {
     private String codinome;
     private  int nivelRisco; //1 a 5, onde 5 é risco de vida
-    private boolean temBoletimOcorrencia;
+    private Boolean temBoletimOcorrencia;
     private boolean necessitaSigiloAbsoluto = true; //sempre true para Apolonias
 
     public MulherApolonia() {}
@@ -43,10 +43,14 @@ public class MulherApolonia extends PessoaAtendida {
     }
 
     public boolean isTemBoletimOcorrencia() {
+        return Boolean.TRUE.equals(temBoletimOcorrencia);
+    }
+
+    public Boolean getTemBoletimOcorrencia() {
         return temBoletimOcorrencia;
     }
 
-    public void setTemBoletimOcorrencia(boolean temBoletimOcorrencia) {
+    public void setTemBoletimOcorrencia(Boolean temBoletimOcorrencia) {
         this.temBoletimOcorrencia = temBoletimOcorrencia;
     }
 

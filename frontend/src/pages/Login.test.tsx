@@ -36,7 +36,7 @@ function renderLogin() {
 
 async function preencherEEntrar() {
   const user = userEvent.setup();
-  await user.type(screen.getByLabelText('E-mail'), 'pessoa@teste.com');
+  await user.type(screen.getByLabelText(/ou e-mail/i), 'pessoa@teste.com');
   await user.type(screen.getByLabelText('Senha'), 'senha123');
   await user.click(screen.getByRole('button', { name: 'Entrar' }));
 }

@@ -6,6 +6,8 @@ export interface RegisterPayload {
   email: string;
   senha: string;
   tipoUsuario: TipoUsuario;
+  usuario?: string;
+  modoIdentificacao?: 'NOME' | 'CODINOME' | 'GERADO';
   especialidadeId?: number;
   motivoVoluntariado?: string;
   tipoPessoaAtendida?: TipoPessoaAtendida;
@@ -25,7 +27,10 @@ export interface LoginRequest {
 export interface AuthUser {
   id: number;
   nome: string;
-  email: string;
+  email: string | null;
+  usuario?: string;
+  tipoBeneficiario?: TipoPessoaAtendida;
+  modoIdentificacao?: 'NOME' | 'CODINOME' | 'GERADO';
   tipoUsuario: TipoUsuario;
   ativo: boolean;
   dataCriacao?: string;

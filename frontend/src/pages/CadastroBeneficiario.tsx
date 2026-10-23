@@ -3,7 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import PageShell from '../components/layout/PageShell';
 import Button from '../components/ui/Button';
-import { Field, Input } from '../components/ui/Input';
+import { Field, Input, Select } from '../components/ui/Input';
+import { useConfirm } from '../hooks/useConfirm';
+import type { RegisterRequest } from '../types/auth';
 import { useAuth } from '../context/useAuth';
 import { ApiError } from '../services/apiClient';
 
@@ -12,6 +14,7 @@ interface FormData {
   email: string;
   senha: string;
   confirmarSenha: string;
+  usuario: string;
 }
 
 const BENEFITS = [
@@ -50,12 +53,15 @@ function CadastroBeneficiario() {
   const [loading, setLoading] = useState(false);
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [mostrarConfirmacao, setMostrarConfirmacao] = useState(false);
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<FormData>();
+  const [apolonia, setApolonia] = useState(false);
+  const [identificacao, setIdentificacao] = useState('');
+  const { confirm, confirmDialog } = useConfirm();
+  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormData>({ shouldUnregister: true });
   const senha = watch('senha');
 
   const errorMessage = (error: unknown) => {
     if (error instanceof ApiError) {
-      if (error.status === 409) return 'Este e-mail já está cadastrado.';
+      if (error.status === 409) return apolonia ? 'Este usuário ou e-mail já está cadastrado.' : 'Este e-mail já está cadastrado.';
       if (error.status === 400) return error.message || 'Confira os dados do cadastro.';
       if (error.status === 0) return 'Não foi possível conectar ao servidor.';
       return error.message;
@@ -63,24 +69,51 @@ function CadastroBeneficiario() {
     return 'Não foi possível criar o cadastro.';
   };
 
-  const onSubmit = async (data: FormData) => {
+  const salvar = async (payload: RegisterRequest) => {
     setErro('');
     setSucesso('');
     setLoading(true);
     try {
-      await registerAccount({
-        nome: data.nome,
-        email: data.email,
-        senha: data.senha,
-        tipoUsuario: 'BENEFICIARIO',
-      });
-      setSucesso('Cadastro criado com sucesso. Agora você pode entrar e acompanhar seus atendimentos.');
-      window.setTimeout(() => navigate('/login'), 2200);
+      const conta = await registerAccount(payload);
+      setSucesso(apolonia
+        ? `Conta criada. Seu usuário é ${payload.usuario}. Você será apresentada como ${conta.nome}. Guarde seu usuário e sua senha em um local seguro.`
+        : 'Cadastro criado com sucesso. Agora você pode entrar e acompanhar seus atendimentos.');
     } catch (error) {
       setErro(errorMessage(error));
     } finally {
       setLoading(false);
     }
+  };
+
+  const onSubmit = (data: FormData) => {
+    if (loading || confirmDialog) return;
+    if (apolonia && !identificacao) {
+      setErro('Escolha como deseja se apresentar.');
+      return;
+    }
+    const payload: RegisterRequest = {
+      nome: apolonia && identificacao === 'GERADO' ? '' : data.nome.trim(),
+      email: data.email?.trim() || '',
+      senha: data.senha,
+      tipoUsuario: 'BENEFICIARIO',
+      ...(apolonia ? {
+        tipoBeneficiario: 'MULHER_APOLONIA' as const,
+        usuario: data.usuario.trim().toLowerCase(),
+        modoIdentificacao: identificacao as RegisterRequest['modoIdentificacao'],
+      } : {}),
+    };
+    confirm({
+      title: 'Criar sua conta',
+      message: 'Confirma a criação da conta com estas escolhas?',
+      confirmText: 'Confirmar cadastro',
+      details: [
+        { label: 'Programa', value: apolonia ? 'Apolônias do Bem' : 'Atendimento geral' },
+        { label: 'Como você será apresentada', value: identificacao === 'GERADO' && apolonia ? 'Nome gerado pelo sistema' : payload.nome },
+        { label: 'Acesso', value: apolonia ? payload.usuario! : payload.email },
+        { label: 'E-mail informado', value: payload.email || 'Nenhum. Acompanhe pela aplicação.' },
+      ],
+      onConfirm: () => { void salvar(payload); },
+    });
   };
 
   return (
@@ -115,16 +148,45 @@ function CadastroBeneficiario() {
               )}
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+                <Field label="Programa de atendimento">
+                  <Select value={apolonia ? 'apolonia' : 'geral'} onChange={event => {
+                    setApolonia(event.target.value === 'apolonia'); setIdentificacao(''); setErro('');
+                    setValue('nome', ''); setValue('email', '');
+                  }}>
+                    <option value="geral">Atendimento geral</option>
+                    <option value="apolonia">Apolônias do Bem</option>
+                  </Select>
+                </Field>
+                {apolonia && (
+                  <div className="space-y-4 rounded-ui border border-border bg-muted p-4">
+                    <p className="text-sm text-foreground">Você escolhe como se apresentar. O nome escolhido será usado no portal e poderá ser visto pela equipe de voluntários na fila de atendimento. Informe apenas o que for seguro compartilhar.</p>
+                    <Field label="Como deseja se apresentar?">
+                      <Select value={identificacao} onChange={event => { setIdentificacao(event.target.value); setValue('nome', ''); }}>
+                        <option value="">Escolha uma opção</option>
+                        <option value="NOME">Quero usar meu nome</option>
+                        <option value="CODINOME">Quero escolher um codinome</option>
+                        <option value="GERADO">Prefiro um nome gerado pelo sistema</option>
+                      </Select>
+                    </Field>
+                    <Field label="Nome de usuário" hint="Use de 3 a 40 letras, números, pontos, traços ou sublinhados. Não precisa ser seu nome real." error={errors.usuario?.message}>
+                      <Input autoComplete="username" autoCapitalize="none" maxLength={40} {...register('usuario', {
+                        required: apolonia ? 'Escolha um nome de usuário' : false,
+                        pattern: { value: /^[A-Za-z0-9._-]{3,40}$/, message: 'Use de 3 a 40 caracteres: letras, números, ponto, traço ou sublinhado.' },
+                      })} />
+                    </Field>
+                    <p className="text-sm text-muted-foreground">Telefone não é necessário. O e-mail é opcional e não autoriza contato externo. Sem e-mail, entre com seu usuário para acompanhar as respostas. A recuperação de senha ainda não está disponível; guarde suas credenciais com cuidado.</p>
+                  </div>
+                )}
                 <div className="grid gap-5 sm:grid-cols-2">
-                  <Field label="Nome completo" error={errors.nome?.message}>
-                    <Input autoComplete="name" {...register('nome', { required: 'Informe seu nome completo' })} placeholder="Maria Silva" />
-                  </Field>
-                  <Field label="E-mail" error={errors.email?.message}>
+                  {(!apolonia || (identificacao && identificacao !== 'GERADO')) && <Field label={apolonia && identificacao === 'CODINOME' ? 'Codinome' : 'Nome completo'} error={errors.nome?.message}>
+                    <Input maxLength={apolonia ? 50 : 120} autoComplete={apolonia ? 'off' : 'name'} {...register('nome', { required: !apolonia || identificacao !== 'GERADO' ? 'Informe o nome ou codinome escolhido' : false })} />
+                  </Field>}
+                  <Field label={apolonia ? 'E-mail (opcional)' : 'E-mail'} error={errors.email?.message}>
                     <Input
                       type="email"
                       autoComplete="email"
                       {...register('email', {
-                        required: 'Informe seu e-mail',
+                        required: apolonia ? false : 'Informe seu e-mail',
                         pattern: { value: /^\S+@\S+$/i, message: 'Informe um e-mail válido' },
                       })}
                       placeholder="maria@email.com"
@@ -133,9 +195,13 @@ function CadastroBeneficiario() {
                 </div>
 
                 <div className="grid gap-5 sm:grid-cols-2">
-                  <Field label="Senha" error={errors.senha?.message}>
+                  <div>
+                    <label htmlFor="cadastro-senha" className="mb-1.5 block text-sm font-semibold text-foreground">Senha</label>
                     <div className="relative">
                       <Input
+                        id="cadastro-senha"
+                        aria-invalid={Boolean(errors.senha)}
+                        aria-describedby={errors.senha ? 'cadastro-senha-erro' : undefined}
                         type={mostrarSenha ? 'text' : 'password'}
                         autoComplete="new-password"
                         className="pr-12"
@@ -155,10 +221,15 @@ function CadastroBeneficiario() {
                         <EyeIcon hidden={mostrarSenha} />
                       </button>
                     </div>
-                  </Field>
-                  <Field label="Confirmar senha" error={errors.confirmarSenha?.message}>
+                    {errors.senha && <p id="cadastro-senha-erro" role="alert" className="mt-1.5 text-sm text-danger">{errors.senha.message}</p>}
+                  </div>
+                  <div>
+                    <label htmlFor="cadastro-confirmar-senha" className="mb-1.5 block text-sm font-semibold text-foreground">Confirmar senha</label>
                     <div className="relative">
                       <Input
+                        id="cadastro-confirmar-senha"
+                        aria-invalid={Boolean(errors.confirmarSenha)}
+                        aria-describedby={errors.confirmarSenha ? 'cadastro-confirmar-senha-erro' : undefined}
                         type={mostrarConfirmacao ? 'text' : 'password'}
                         autoComplete="new-password"
                         className="pr-12"
@@ -178,12 +249,14 @@ function CadastroBeneficiario() {
                         <EyeIcon hidden={mostrarConfirmacao} />
                       </button>
                     </div>
-                  </Field>
+                    {errors.confirmarSenha && <p id="cadastro-confirmar-senha-erro" role="alert" className="mt-1.5 text-sm text-danger">{errors.confirmarSenha.message}</p>}
+                  </div>
                 </div>
 
-                <Button type="submit" disabled={loading} isLoading={loading} loadingText="Criando cadastro..." size="large" fullWidth>
+                <Button type="submit" disabled={loading || Boolean(confirmDialog) || Boolean(sucesso)} isLoading={loading} loadingText="Criando cadastro..." size="large" fullWidth>
                   Criar conta de beneficiário
                 </Button>
+                {sucesso && <Button type="button" onClick={() => navigate('/login')} fullWidth>Entrar na minha conta</Button>}
               </form>
             </div>
           </section>
@@ -219,6 +292,7 @@ function CadastroBeneficiario() {
           </aside>
         </div>
       </main>
+      {confirmDialog}
     </PageShell>
   );
 }

@@ -198,6 +198,8 @@ describe('Skill project-e2e-navigator — Navegação Completa e Ciclo de Vida E
 
     // Submete o cadastro
     await user.click(screen.getByRole('button', { name: /Criar conta de beneficiário/i }));
+    expect(registerMock).not.toHaveBeenCalled();
+    await user.click(await screen.findByRole('button', { name: 'Confirmar cadastro' }));
 
     await waitFor(() => {
       expect(registerMock).toHaveBeenCalledWith({

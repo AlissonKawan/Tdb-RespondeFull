@@ -3,6 +3,7 @@ import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/useAuth';
 import { useConfirm } from '../../hooks/useConfirm';
 import { portalFor } from '../ui/AccountRedirect';
+import QuickExitButton from '../ui/QuickExitButton';
 
 type NavigationGroup = 'GESTÃO & CONTROLE' | 'CLÍNICA & AGENDA' | 'COMUNICAÇÃO';
 type IconName = 'dashboard' | 'inscricoes' | 'voluntario' | 'beneficiario' | 'cronograma' | 'agenda' | 'ranking' | 'mensagens' | 'atendimento';
@@ -225,6 +226,7 @@ export default function SystemLayout() {
             </button>
           </div>
 
+          <div className="mt-3 flex justify-end md:hidden"><QuickExitButton /></div>
           <div className="mt-7 flex items-center gap-3 rounded-2xl border border-blue-100 bg-slate-50/40 p-3">
             <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-black text-white ring-4 ring-blue-50" aria-hidden="true">
               {getInitials(user?.nome)}
@@ -309,6 +311,7 @@ export default function SystemLayout() {
             <p className="truncate text-base font-bold text-slate-900 md:text-lg">{currentRouteLabel}</p>
           </div>
 
+          <QuickExitButton />
           <div ref={headerMenusRef} className="ml-3 flex shrink-0 items-center gap-3 md:gap-5">
             <details className="group relative" onKeyDown={event => { if (event.key === 'Escape') { event.currentTarget.open = false; event.currentTarget.querySelector('summary')?.focus(); } }}>
               <summary aria-label="Notificações" className="relative flex h-11 w-11 cursor-pointer list-none items-center justify-center rounded-full border border-slate-200 text-slate-600 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring [&::-webkit-details-marker]:hidden">

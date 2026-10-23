@@ -1,6 +1,7 @@
 package br.com.tdbresponde.dao;
 
 import br.com.tdbresponde.exception.DatabaseException;
+import br.com.tdbresponde.exception.ConflictException;
 import br.com.tdbresponde.model.ContaUsuario;
 import br.com.tdbresponde.model.TipoUsuario;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -25,14 +26,17 @@ public class ContaUsuarioDAO {
         try (Connection conn = dataSource.getConnection()) {
             cadastrarConta(conn, conta);
         } catch (SQLException e) {
+            if (e.getErrorCode() == 1) {
+                throw new ConflictException("Nome de usuário ou e-mail já cadastrado.");
+            }
             throw new DatabaseException("Erro ao cadastrar conta: " + e.getMessage(), e);
         }
     }
 
     public void cadastrarConta(Connection conn, ContaUsuario conta) throws SQLException {
         String sql = "INSERT INTO T_CONTA_USUARIO " +
-                "(NOME, EMAIL, SENHA_HASH, TIPO_USUARIO, ATIVO) " +
-                "VALUES (?, ?, ?, ?, ?)";
+                "(NOME, EMAIL, SENHA_HASH, TIPO_USUARIO, ATIVO, USUARIO, TIPO_BENEFICIARIO, MODO_IDENTIFICACAO) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql, new String[] {"ID_CONTA"})) {
 
@@ -41,6 +45,9 @@ public class ContaUsuarioDAO {
             stmt.setString(3, conta.getSenhaHash());
             stmt.setString(4, conta.getTipoUsuario().name());
             stmt.setInt(5, conta.isAtivo() ? 1 : 0);
+            stmt.setString(6, conta.getUsuario());
+            stmt.setString(7, conta.getTipoBeneficiario());
+            stmt.setString(8, conta.getModoIdentificacao());
             stmt.executeUpdate();
 
             try (ResultSet rs = stmt.getGeneratedKeys()) {
@@ -54,7 +61,7 @@ public class ContaUsuarioDAO {
     }
 
     public ContaUsuario buscarPorEmail(String email) {
-        String sql = "SELECT ID_CONTA, NOME, EMAIL, SENHA_HASH, TIPO_USUARIO, ATIVO, DATA_CRIACAO " +
+        String sql = "SELECT ID_CONTA, NOME, EMAIL, SENHA_HASH, TIPO_USUARIO, ATIVO, DATA_CRIACAO, USUARIO, TIPO_BENEFICIARIO, MODO_IDENTIFICACAO " +
                 "FROM T_CONTA_USUARIO WHERE LOWER(EMAIL) = LOWER(?)";
 
         try (Connection conn = dataSource.getConnection();
@@ -74,8 +81,29 @@ public class ContaUsuarioDAO {
         return null;
     }
 
+    public ContaUsuario buscarPorUsuario(String usuario) {
+        String sql = "SELECT ID_CONTA, NOME, EMAIL, SENHA_HASH, TIPO_USUARIO, ATIVO, DATA_CRIACAO, USUARIO, TIPO_BENEFICIARIO, MODO_IDENTIFICACAO " +
+                "FROM T_CONTA_USUARIO WHERE LOWER(USUARIO) = LOWER(?)";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, usuario);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapearConta(rs);
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new DatabaseException("Erro ao buscar conta por usuario: " + e.getMessage(), e);
+        }
+
+        return null;
+    }
+
     public ContaUsuario buscarPorId(int id) {
-        String sql = "SELECT ID_CONTA, NOME, EMAIL, SENHA_HASH, TIPO_USUARIO, ATIVO, DATA_CRIACAO " +
+        String sql = "SELECT ID_CONTA, NOME, EMAIL, SENHA_HASH, TIPO_USUARIO, ATIVO, DATA_CRIACAO, USUARIO, TIPO_BENEFICIARIO, MODO_IDENTIFICACAO " +
                 "FROM T_CONTA_USUARIO WHERE ID_CONTA = ?";
 
         try (Connection conn = dataSource.getConnection();
@@ -96,7 +124,7 @@ public class ContaUsuarioDAO {
     }
 
     public List<ContaUsuario> listar() {
-        String sql = "SELECT ID_CONTA, NOME, EMAIL, SENHA_HASH, TIPO_USUARIO, ATIVO, DATA_CRIACAO " +
+        String sql = "SELECT ID_CONTA, NOME, EMAIL, SENHA_HASH, TIPO_USUARIO, ATIVO, DATA_CRIACAO, USUARIO, TIPO_BENEFICIARIO, MODO_IDENTIFICACAO " +
                 "FROM T_CONTA_USUARIO ORDER BY ID_CONTA";
         List<ContaUsuario> contas = new ArrayList<>();
 
@@ -182,6 +210,9 @@ public class ContaUsuarioDAO {
         ContaUsuario conta = new ContaUsuario();
         conta.setId(rs.getInt("ID_CONTA"));
         conta.setNome(rs.getString("NOME"));
+        conta.setUsuario(rs.getString("USUARIO"));
+        conta.setTipoBeneficiario(rs.getString("TIPO_BENEFICIARIO"));
+        conta.setModoIdentificacao(rs.getString("MODO_IDENTIFICACAO"));
         conta.setEmail(rs.getString("EMAIL"));
         conta.setSenhaHash(rs.getString("SENHA_HASH"));
         conta.setTipoUsuario(TipoUsuario.valueOf(rs.getString("TIPO_USUARIO")));

@@ -3,6 +3,8 @@ package br.com.tdbresponde.dto;
 public class RegisterRequest {
 
     public String nome;
+    public String usuario;
+    public String modoIdentificacao;
     public String email;
     public String senha;
     public String tipoUsuario;

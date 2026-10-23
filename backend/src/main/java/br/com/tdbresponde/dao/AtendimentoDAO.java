@@ -538,7 +538,7 @@ public class AtendimentoDAO {
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, mulher.getCodinome());
             stmt.setInt(2, mulher.getNivelRisco());
-            stmt.setInt(3, mulher.isTemBoletimOcorrencia() ? 1 : 0);
+            stmt.setObject(3, mulher.getTemBoletimOcorrencia() == null ? null : (mulher.getTemBoletimOcorrencia() ? 1 : 0), Types.NUMERIC);
             stmt.setInt(4, mulher.isNecessitaSigiloAbsoluto() ? 1 : 0);
             stmt.setInt(5, pessoaId);
             stmt.executeUpdate();
@@ -584,7 +584,7 @@ public class AtendimentoDAO {
             stmt.setInt(1, pessoaId);
             stmt.setString(2, mulher.getCodinome());
             stmt.setInt(3, mulher.getNivelRisco());
-            stmt.setInt(4, mulher.isTemBoletimOcorrencia() ? 1 : 0);
+            stmt.setObject(4, mulher.getTemBoletimOcorrencia() == null ? null : (mulher.getTemBoletimOcorrencia() ? 1 : 0), Types.NUMERIC);
             stmt.setInt(5, mulher.isNecessitaSigiloAbsoluto() ? 1 : 0);
             stmt.executeUpdate();
         }

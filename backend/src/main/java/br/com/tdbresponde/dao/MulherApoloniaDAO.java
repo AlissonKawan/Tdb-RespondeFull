@@ -61,7 +61,7 @@ public class MulherApoloniaDAO {
                 stmt.setInt(1, pessoaId);
                 stmt.setString(2, mulher.getCodinome());
                 stmt.setInt(3, mulher.getNivelRisco());
-                stmt.setBoolean(4, mulher.isTemBoletimOcorrencia());
+                stmt.setObject(4, mulher.getTemBoletimOcorrencia() == null ? null : (mulher.getTemBoletimOcorrencia() ? 1 : 0), Types.NUMERIC);
                 stmt.setBoolean(5, mulher.isNecessitaSigiloAbsoluto());
                 stmt.executeUpdate();
             }
@@ -185,7 +185,7 @@ public class MulherApoloniaDAO {
             try (PreparedStatement stmt = conn.prepareStatement(sqlMulher)) {
                 stmt.setString(1, mulher.getCodinome());
                 stmt.setInt(2, mulher.getNivelRisco());
-                stmt.setBoolean(3, mulher.isTemBoletimOcorrencia());
+                stmt.setObject(3, mulher.getTemBoletimOcorrencia() == null ? null : (mulher.getTemBoletimOcorrencia() ? 1 : 0), Types.NUMERIC);
                 stmt.setBoolean(4, mulher.isNecessitaSigiloAbsoluto());
                 stmt.setInt(5, mulher.getId());
                 stmt.executeUpdate();
@@ -252,7 +252,8 @@ public class MulherApoloniaDAO {
         m.setId(rs.getInt("pessoa_id"));
         m.setCodinome(rs.getString("codinome"));
         m.setNivelRisco(rs.getInt("nivel_risco"));
-        m.setTemBoletimOcorrencia(rs.getBoolean("tem_boletim_ocorrencia"));
+        boolean boletim = rs.getBoolean("tem_boletim_ocorrencia");
+        m.setTemBoletimOcorrencia(rs.wasNull() ? null : boletim);
         m.setNecessitaSigiloAbsoluto(rs.getBoolean("necessita_sigilo_absoluto"));
         int contaId = rs.getInt("id_conta");
         if (!rs.wasNull()) {

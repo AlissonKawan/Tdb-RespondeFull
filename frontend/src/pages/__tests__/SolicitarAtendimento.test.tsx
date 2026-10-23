@@ -55,6 +55,7 @@ describe('SolicitarAtendimento', () => {
 
 
     fireEvent.click(screen.getByRole('radio', { name: /Mulher em Vulnerabilidade/i }));
+    fireEvent.change(screen.getByLabelText(/Como deseja se apresentar/i), { target: { value: 'CODINOME' } });
 
     // O campo geral de nome deve desaparecer
     expect(screen.queryByLabelText(/Nome da pessoa atendida/i)).not.toBeInTheDocument();
@@ -79,7 +80,9 @@ describe('SolicitarAtendimento', () => {
 
 
     fireEvent.click(screen.getByRole('radio', { name: /Mulher em Vulnerabilidade/i }));
+    fireEvent.change(screen.getByLabelText(/Como deseja se apresentar/i), { target: { value: 'CODINOME' } });
 
+    fireEvent.change(screen.getByLabelText(/Como podemos entrar em contato/i), { target: { value: 'INFORMADO' } });
     // Preenche telefone, email, codinome e descricao
     fireEvent.change(screen.getByLabelText(/Telefone/i), { target: { value: '(11) 98888-8888' } });
     fireEvent.change(screen.getByLabelText(/Email/i), { target: { value: 'test@example.com' } });
@@ -114,6 +117,7 @@ describe('SolicitarAtendimento', () => {
 
 
     fireEvent.click(screen.getByRole('radio', { name: /Mulher em Vulnerabilidade/i }));
+    fireEvent.change(screen.getByLabelText(/Como deseja se apresentar/i), { target: { value: 'CODINOME' } });
 
     // Encontra o select de nível de risco
     const selectRisco = screen.getByLabelText(/Nivel de risco/i) as HTMLSelectElement;
@@ -141,5 +145,40 @@ describe('SolicitarAtendimento', () => {
     fireEvent.change(telefone, { target: { value: '11988887777' } });
 
     expect(telefone.value).toBe('(11) 98888-7777');
+  });
+
+  it('envia sem contato externo e sem responder ao boletim após confirmação', async () => {
+    render(<BrowserRouter><SolicitarAtendimento /></BrowserRouter>);
+    fireEvent.click(screen.getByRole('radio', { name: /Mulher em Vulnerabilidade/i }));
+    expect(screen.queryByLabelText(/Telefone/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/^Email$/i)).not.toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText(/Como deseja se apresentar/i), { target: { value: 'GERADO' } });
+    fireEvent.change(screen.getByLabelText(/Descricao da situacao/i), { target: { value: 'Preciso conversar com a equipe de acolhimento.' } });
+    fireEvent.click(screen.getByRole('button', { name: /Enviar relato/i }));
+    expect(relatarAtendimento).not.toHaveBeenCalled();
+    const confirm = await screen.findByRole('button', { name: /^Enviar$/i });
+    expect(screen.getByRole('alertdialog')).toHaveTextContent('Somente pela aplicação');
+    expect(screen.getByRole('alertdialog')).toHaveTextContent('Prefiro não responder');
+    fireEvent.click(confirm);
+    await waitFor(() => expect(relatarAtendimento).toHaveBeenCalledOnce());
+    const payload = vi.mocked(relatarAtendimento).mock.calls[0][0];
+    expect(payload.email).toBe('');
+    expect(payload.telefone).toBe('');
+    expect(payload.temBoletimOcorrencia).toBeUndefined();
+    expect(payload.nomeCodificado).toMatch(/^Pessoa /);
+    expect(payload.idContaBeneficiario).toBe(10);
+    expect(JSON.stringify(payload)).not.toContain('maria@example.com');
+  });
+
+  it('usa o nome real somente quando escolhido explicitamente', async () => {
+    render(<BrowserRouter><SolicitarAtendimento /></BrowserRouter>);
+    fireEvent.click(screen.getByRole('radio', { name: /Mulher em Vulnerabilidade/i }));
+    fireEvent.change(screen.getByLabelText(/Como deseja se apresentar/i), { target: { value: 'NOME' } });
+    fireEvent.change(screen.getByLabelText('Nome que deseja compartilhar'), { target: { value: 'Nome autorizado' } });
+    fireEvent.change(screen.getByLabelText(/Descricao da situacao/i), { target: { value: 'Preciso conversar com a equipe de acolhimento.' } });
+    fireEvent.click(screen.getByRole('button', { name: /Enviar relato/i }));
+    fireEvent.click(await screen.findByRole('button', { name: /^Enviar$/i }));
+    await waitFor(() => expect(relatarAtendimento).toHaveBeenCalledOnce());
+    expect(vi.mocked(relatarAtendimento).mock.calls[0][0].nomeCodificado).toBe('Nome autorizado');
   });
 });

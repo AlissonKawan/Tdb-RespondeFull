@@ -8,6 +8,9 @@ public class AuthUserResponse {
 
     public int id;
     public String nome;
+    public String usuario;
+    public String tipoBeneficiario;
+    public String modoIdentificacao;
     public String email;
     public String tipoUsuario;
     public Boolean ativo;
@@ -22,6 +25,9 @@ public class AuthUserResponse {
 
         response.id = conta.getId();
         response.nome = conta.getNome();
+        response.usuario = conta.getUsuario();
+        response.tipoBeneficiario = conta.getTipoBeneficiario();
+        response.modoIdentificacao = conta.getModoIdentificacao();
         response.email = conta.getEmail();
         response.tipoUsuario = conta.getTipoUsuario() != null ? conta.getTipoUsuario().name() : null;
         response.ativo = conta.isAtivo();

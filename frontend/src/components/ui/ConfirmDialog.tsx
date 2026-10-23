@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, type ReactNode, type RefObject } from 'react';
 import Button from './Button';
+import QuickExitButton from './QuickExitButton';
 
 export interface ConfirmConfig {
   title: string;
@@ -147,6 +148,7 @@ export function Dialog({
           </button>
         </div>
 
+        <div className="flex shrink-0 justify-end px-6 py-2"><QuickExitButton /></div>
         <div className={`min-h-0 overflow-y-auto px-6 ${variant === 'form' ? 'pb-4 sm:px-8' : 'py-5'}`}>{children}</div>
         {footer ? (
           <div className={`flex shrink-0 flex-col-reverse gap-3 border-t border-border px-6 py-4 sm:flex-row sm:justify-end ${variant === 'form' ? 'bg-white sm:px-8' : 'bg-muted/30'}`}>

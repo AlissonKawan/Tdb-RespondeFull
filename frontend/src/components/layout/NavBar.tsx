@@ -4,6 +4,7 @@ import { useAuth } from '../../context/useAuth';
 import { useConfirm } from '../../hooks/useConfirm';
 import Button from '../ui/Button';
 import Container from '../ui/Container';
+import QuickExitButton from '../ui/QuickExitButton';
 
 function NavBar() {
   const location = useLocation();
@@ -68,9 +69,9 @@ function NavBar() {
   return (
     <nav aria-label="Navegação principal" className="sticky top-0 z-40 border-b border-border/80 bg-background/95 backdrop-blur-xl">
       <Container className="py-3">
-        <div className="flex items-center justify-between md:justify-center">
+        <div className="flex items-center justify-between gap-2 md:justify-center">
           {/* Logo or Platform Name on Mobile */}
-          <div className="flex items-center gap-2 md:hidden">
+          <div className="hidden items-center gap-2 sm:flex md:hidden">
             <span className="font-bold text-slate-800 text-sm">TDB Responde</span>
           </div>
 
@@ -142,6 +143,7 @@ function NavBar() {
               </Button>
             )}
           </div>
+          <QuickExitButton />
         </div>
 
         {/* Mobile Navigation Dropdown Menu */}

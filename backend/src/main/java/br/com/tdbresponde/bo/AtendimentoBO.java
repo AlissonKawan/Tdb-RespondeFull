@@ -542,7 +542,7 @@ public class AtendimentoBO {
             MulherApolonia mulher = new MulherApolonia();
             mulher.setCodinome(isBlank(request.codinome) ? request.nomeCodificado.trim() : request.codinome.trim());
             mulher.setNivelRisco(request.nivelRisco);
-            mulher.setTemBoletimOcorrencia(Boolean.TRUE.equals(request.temBoletimOcorrencia));
+            mulher.setTemBoletimOcorrencia(request.temBoletimOcorrencia);
             mulher.setNecessitaSigiloAbsoluto(request.necessitaSigiloAbsoluto == null || request.necessitaSigiloAbsoluto);
             pessoa = mulher;
         } else {

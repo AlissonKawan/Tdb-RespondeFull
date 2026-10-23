@@ -507,7 +507,7 @@ export default function DashboardAdmin() {
               <Input ref={primeiroInputBeneficiarioRef} value={editingBeneficiario.nome} onChange={e => setEditingBeneficiario({...editingBeneficiario, nome: e.target.value})} />
             </Field>
             <Field label="E-mail">
-              <Input type="email" value={editingBeneficiario.email} onChange={e => setEditingBeneficiario({...editingBeneficiario, email: e.target.value})} />
+              <Input type="email" value={editingBeneficiario.email ?? ''} onChange={e => setEditingBeneficiario({...editingBeneficiario, email: e.target.value})} />
             </Field>
             <Field label="Status (Ativo)">
               <Select value={editingBeneficiario.ativo ? 'true' : 'false'} onChange={e => setEditingBeneficiario({...editingBeneficiario, ativo: e.target.value === 'true'})}>

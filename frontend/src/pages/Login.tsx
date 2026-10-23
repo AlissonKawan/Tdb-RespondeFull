@@ -7,6 +7,7 @@ import { Field, Input } from '../components/ui/Input';
 import { ApiError } from '../services/apiClient';
 import type { LoginRequest, TipoUsuario } from '../types/auth';
 import { useAuth } from '../context/useAuth';
+import QuickExitButton from '../components/ui/QuickExitButton';
 
 const portalPorTipo: Record<TipoUsuario, string> = {
   ADMIN: '/admin',
@@ -42,7 +43,7 @@ function Login() {
         return 'Sua solicitação ainda está em análise. Aguarde a aprovação para acessar o portal.';
       }
       if (error.status === 404) return 'Conta não encontrada.';
-      if (error.status === 401) return 'E-mail ou senha inválidos.';
+      if (error.status === 401) return 'Usuário, e-mail ou senha inválidos.';
       if (error.status === 403) return 'Sua solicitação ainda está em análise. Aguarde a aprovação para acessar o portal.';
       if (error.status === 0) return 'Não foi possível conectar ao servidor.';
       return error.message;
@@ -71,7 +72,8 @@ function Login() {
   };
 
   return (
-    <PageShell className="relative min-h-dvh overflow-hidden bg-slate-50">
+    <PageShell className="relative min-h-dvh bg-slate-50">
+      <div className="sticky top-0 z-40 flex justify-end bg-white/95 px-4 py-2"><QuickExitButton /></div>
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">
         <div className="absolute -left-36 top-1/4 h-80 w-80 rounded-full bg-blue-200/45 blur-3xl" />
         <div className="absolute -right-32 bottom-0 h-96 w-96 rounded-full bg-cyan-100/70 blur-3xl" />
@@ -161,15 +163,14 @@ function Login() {
               )}
 
               <form onSubmit={handleSubmit(onSubmit)} className="mt-7 space-y-5" noValidate>
-                <Field label="E-mail" error={errors.email?.message}>
+                <Field label="Usuário ou e-mail" error={errors.email?.message}>
                   <Input
-                    type="email"
+                    type="text"
                     {...register('email', {
-                      required: 'Digite seu e-mail',
-                      pattern: { value: /^\S+@\S+$/i, message: 'E-mail inválido' },
+                      required: 'Digite seu usuário ou e-mail',
                     })}
-                    placeholder="voce@email.com"
-                    autoComplete="email"
+                    placeholder="Seu usuário ou e-mail"
+                    autoComplete="username"
                     autoCapitalize="none"
                     spellCheck={false}
                   />

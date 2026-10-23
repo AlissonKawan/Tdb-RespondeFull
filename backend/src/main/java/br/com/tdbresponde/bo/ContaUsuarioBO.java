@@ -56,8 +56,8 @@ public class ContaUsuarioBO {
     public ContaUsuario registrar(RegisterRequest request) {
         validarCadastro(request);
 
-        String email = normalizarEmail(request.email);
-        if (dao.emailExiste(email)) {
+        String email = isBlank(request.email) ? null : normalizarEmail(request.email);
+        if (email != null && dao.emailExiste(email)) {
             throw new ConflictException("Este e-mail já está cadastrado.");
         }
 
@@ -68,7 +68,19 @@ public class ContaUsuarioBO {
         String senhaHash = SenhaHasher.gerarHash(request.senha);
 
         ContaUsuario conta = new ContaUsuario();
-        conta.setNome(request.nome.trim());
+        boolean apolonia = cadastroApolonia(request);
+        conta.setNome(apolonia && "GERADO".equals(request.modoIdentificacao)
+                ? "Pessoa " + java.util.UUID.randomUUID().toString().substring(0, 8)
+                : request.nome.trim());
+        if (apolonia) {
+            String usuario = request.usuario.trim().toLowerCase(java.util.Locale.ROOT);
+            if (dao.buscarPorUsuario(usuario) != null) {
+                throw new ConflictException("Este nome de usuário já está em uso.");
+            }
+            conta.setUsuario(usuario);
+            conta.setTipoBeneficiario("MULHER_APOLONIA");
+            conta.setModoIdentificacao(request.modoIdentificacao);
+        }
         conta.setEmail(email);
         conta.setSenhaHash(senhaHash);
         conta.setTipoUsuario(tipo);
@@ -90,9 +102,11 @@ public class ContaUsuarioBO {
     public ContaUsuario login(LoginRequest request) {
         validarLogin(request);
 
-        ContaUsuario conta = dao.buscarPorEmail(normalizarEmail(request.email));
+        String identificador = request.email.trim().toLowerCase(java.util.Locale.ROOT);
+        ContaUsuario conta = identificador.contains("@")
+                ? dao.buscarPorEmail(identificador) : dao.buscarPorUsuario(identificador);
         if (conta == null || !SenhaHasher.validarSenha(request.senha, conta.getSenhaHash())) {
-            throw new UnauthorizedException("Email ou senha invalidos.");
+            throw new UnauthorizedException("Usuário, e-mail ou senha inválidos.");
         }
         if (!conta.isAtivo()) {
             throw new UnauthorizedException("Conta inativa.");
@@ -133,10 +147,10 @@ public class ContaUsuarioBO {
 
     public ContaUsuario atualizar(int id, ContaUsuarioRequest request) {
         ContaUsuario atual = buscarPorId(id);
-        validarAtualizacao(request);
+        validarAtualizacao(request, atual);
 
-        String email = normalizarEmail(request.email);
-        ContaUsuario contaDoEmail = dao.buscarPorEmail(email);
+        String email = isBlank(request.email) ? null : normalizarEmail(request.email);
+        ContaUsuario contaDoEmail = email == null ? null : dao.buscarPorEmail(email);
         if (contaDoEmail != null && contaDoEmail.getId() != id) {
             throw new ConflictException("Este e-mail já está cadastrado.");
         }
@@ -221,19 +235,39 @@ public class ContaUsuarioBO {
         mulher.setEmail(conta.getEmail());
         mulher.setCodinome(isBlank(request.codinome) ? conta.getNome() : request.codinome.trim());
         mulher.setNivelRisco(request.nivelRisco != null ? request.nivelRisco : 1);
-        mulher.setTemBoletimOcorrencia(request.temBoletimOcorrencia != null && request.temBoletimOcorrencia);
+        mulher.setTemBoletimOcorrencia(request.temBoletimOcorrencia);
         mulher.setNecessitaSigiloAbsoluto(true);
         mulherDAO.inserir(mulher);
+    }
+
+    private boolean cadastroApolonia(RegisterRequest request) {
+        return "BENEFICIARIO".equalsIgnoreCase(request.tipoUsuario)
+                && "MULHER_APOLONIA".equals(request.tipoBeneficiario);
     }
 
     private void validarCadastro(RegisterRequest request) {
         if (request == null) {
             throw new BusinessException("Dados de cadastro sao obrigatorios.");
         }
-        if (isBlank(request.nome)) {
-            throw new BusinessException("Nome e obrigatorio.");
+        boolean apolonia = cadastroApolonia(request);
+        if (apolonia) {
+            if (!java.util.Set.of("NOME", "CODINOME", "GERADO").contains(
+                    request.modoIdentificacao == null ? "" : request.modoIdentificacao)) {
+                throw new BusinessException("Escolha como deseja se apresentar.");
+            }
+            if (isBlank(request.usuario) || !request.usuario.trim().matches("[A-Za-z0-9._-]{3,40}")) {
+                throw new BusinessException("Use um usuário de 3 a 40 letras, números, pontos, traços ou sublinhados.");
+            }
+            if (!isBlank(request.email)) validarEmail(request.email);
+        } else {
+            validarEmail(request.email);
         }
-        validarEmail(request.email);
+        if ((!apolonia || !"GERADO".equals(request.modoIdentificacao)) && isBlank(request.nome)) {
+            throw new BusinessException("Informe o nome ou codinome escolhido.");
+        }
+        if (apolonia && !isBlank(request.nome) && request.nome.trim().length() > 50) {
+            throw new BusinessException("Use até 50 caracteres para o nome ou codinome.");
+        }
         if (isBlank(request.senha)) {
             throw new BusinessException("Senha e obrigatoria.");
         }
@@ -302,20 +336,26 @@ public class ContaUsuarioBO {
         if (request == null) {
             throw new BusinessException("Dados de login sao obrigatorios.");
         }
-        validarEmail(request.email);
+        if (isBlank(request.email)) throw new BusinessException("Informe seu usuário ou e-mail.");
+        if (request.email.contains("@")) validarEmail(request.email);
+        else if (!request.email.trim().matches("[A-Za-z0-9._-]{3,40}")) {
+            throw new BusinessException("Informe um usuário válido.");
+        }
         if (isBlank(request.senha)) {
             throw new BusinessException("Senha e obrigatoria.");
         }
     }
 
-    private void validarAtualizacao(ContaUsuarioRequest request) {
+    private void validarAtualizacao(ContaUsuarioRequest request, ContaUsuario atual) {
         if (request == null) {
             throw new BusinessException("Dados da conta sao obrigatorios.");
         }
         if (isBlank(request.nome)) {
             throw new BusinessException("Nome e obrigatorio.");
         }
-        validarEmail(request.email);
+        boolean permiteSemEmail = "MULHER_APOLONIA".equals(atual.getTipoBeneficiario())
+                && !isBlank(atual.getUsuario()) && "BENEFICIARIO".equals(request.tipoUsuario);
+        if (!permiteSemEmail || !isBlank(request.email)) validarEmail(request.email);
         parseTipo(request.tipoUsuario);
     }
 

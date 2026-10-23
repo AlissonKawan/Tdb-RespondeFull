@@ -28,6 +28,8 @@ type FormState = {
   nivelRisco: string;
   temBoletimOcorrencia: string;
   necessitaSigiloAbsoluto: string;
+  identificacao: string;
+  contatoSeguro: string;
 };
 
 const initialForm: FormState = {
@@ -43,8 +45,10 @@ const initialForm: FormState = {
   gravidadeBucal: '3',
   codinome: '',
   nivelRisco: '3',
-  temBoletimOcorrencia: 'false',
-  necessitaSigiloAbsoluto: 'false',
+  temBoletimOcorrencia: '',
+  necessitaSigiloAbsoluto: 'true',
+  identificacao: '',
+  contatoSeguro: 'APLICACAO',
 };
 
 function toBoolean(value: string) {
@@ -68,8 +72,8 @@ function montarPayload(form: FormState, idContaBeneficiario?: number): RelatarAt
   const payload: RelatarAtendimentoRequest = {
     idContaBeneficiario,
     nomeCodificado: form.tipoPessoaAtendida === 'MULHER_APOLONIA' ? form.codinome.trim() : form.nomeCodificado.trim(),
-    telefone: form.telefone.trim(),
-    email: form.email.trim(),
+    telefone: form.tipoPessoaAtendida === 'MULHER_APOLONIA' && form.contatoSeguro === 'APLICACAO' ? '' : form.telefone.trim(),
+    email: form.tipoPessoaAtendida === 'MULHER_APOLONIA' && form.contatoSeguro === 'APLICACAO' ? '' : form.email.trim(),
     tipo: form.tipoPessoaAtendida,
     prioridade: Number(form.prioridade),
     descricao: form.descricao.trim(),
@@ -85,7 +89,7 @@ function montarPayload(form: FormState, idContaBeneficiario?: number): RelatarAt
   if (form.tipoPessoaAtendida === 'MULHER_APOLONIA') {
     payload.codinome = form.codinome.trim();
     payload.nivelRisco = Number(form.nivelRisco);
-    payload.temBoletimOcorrencia = toBoolean(form.temBoletimOcorrencia);
+    payload.temBoletimOcorrencia = form.temBoletimOcorrencia === '' ? undefined : toBoolean(form.temBoletimOcorrencia);
     payload.necessitaSigiloAbsoluto = toBoolean(form.necessitaSigiloAbsoluto);
   }
 
@@ -96,8 +100,13 @@ function validar(form: FormState) {
   if (form.tipoPessoaAtendida !== 'MULHER_APOLONIA' && !form.nomeCodificado.trim()) {
     return 'Informe o nome da pessoa atendida.';
   }
-  if (!form.telefone.trim()) return 'Informe um telefone para contato.';
-  if (!form.email.trim()) return 'Informe um email para contato.';
+  if (form.tipoPessoaAtendida !== 'MULHER_APOLONIA') {
+    if (!form.telefone.trim()) return 'Informe um telefone para contato.';
+    if (!form.email.trim()) return 'Informe um email para contato.';
+  }
+  if (form.tipoPessoaAtendida === 'MULHER_APOLONIA' && !form.identificacao) {
+    return 'Escolha como deseja se apresentar.';
+  }
   if (!form.descricao.trim() || form.descricao.trim().length < 15) {
     return 'Descreva a situacao com pelo menos 15 caracteres.';
   }
@@ -122,7 +131,10 @@ export default function SolicitarAtendimento() {
   const [form, setForm] = useState<FormState>(() => ({
     ...initialForm,
     nomeCodificado: user?.nome ?? '',
-    email: user?.email ?? '',
+    email: user?.tipoBeneficiario === 'MULHER_APOLONIA' ? '' : user?.email ?? '',
+    tipoPessoaAtendida: user?.tipoBeneficiario ?? initialForm.tipoPessoaAtendida,
+    identificacao: user?.modoIdentificacao ?? '',
+    codinome: user?.tipoBeneficiario === 'MULHER_APOLONIA' ? user.nome : '',
   }));
   const [enviando, setEnviando] = useState(false);
   const [sucesso, setSucesso] = useState('');
@@ -145,6 +157,11 @@ export default function SolicitarAtendimento() {
       nomeCodificado: tipo === 'MULHER_APOLONIA'
         ? ''
         : current.nomeCodificado || user?.nome || '',
+      telefone: '',
+      email: tipo === 'MULHER_APOLONIA' ? '' : user?.email ?? '',
+      identificacao: '',
+      codinome: '',
+      contatoSeguro: 'APLICACAO',
     }));
     setErro('');
     setSucesso('');
@@ -152,6 +169,7 @@ export default function SolicitarAtendimento() {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (enviando || confirmDialog) return;
     const validationError = validar(form);
 
     if (validationError) {
@@ -164,6 +182,12 @@ export default function SolicitarAtendimento() {
       message: 'Confirma o envio desta solicitação de atendimento?',
       confirmText: 'Enviar',
       tone: 'primary',
+      details: [
+        { label: 'Programa', value: tipoSelecionado },
+        { label: 'Identificação compartilhada', value: form.tipoPessoaAtendida === 'MULHER_APOLONIA' ? form.codinome : form.nomeCodificado },
+        { label: 'Contato', value: form.tipoPessoaAtendida === 'MULHER_APOLONIA' && form.contatoSeguro === 'APLICACAO' ? 'Somente pela aplicação' : [form.telefone, form.email].filter(Boolean).join(' / ') || 'Somente pela aplicação' },
+        ...(form.tipoPessoaAtendida === 'MULHER_APOLONIA' ? [{ label: 'Boletim de ocorrência', value: form.temBoletimOcorrencia === '' ? 'Prefiro não responder' : form.temBoletimOcorrencia === 'true' ? 'Sim' : 'Não' }] : []),
+      ],
       onConfirm: async () => {
         setEnviando(true);
         setErro('');
@@ -173,10 +197,8 @@ export default function SolicitarAtendimento() {
           await relatarAtendimento(montarPayload(form, user?.id));
           setSucesso('Relato enviado com sucesso. Aguarde um voluntário assumir o atendimento.');
           setForm((current) => ({
-            ...initialForm,
-            nomeCodificado: user?.nome ?? current.nomeCodificado,
-            telefone: current.telefone,
-            email: current.email,
+            ...current,
+            descricao: '',
           }));
         } catch (error) {
           setErro(error instanceof Error ? error.message : 'Não foi possível enviar o relato.');
@@ -291,7 +313,7 @@ export default function SolicitarAtendimento() {
                     <span className="mt-4 text-base font-bold text-foreground">Mulher em Vulnerabilidade</span>
                     <span className="text-sm font-semibold text-rose-700">Programa Apolônia</span>
                     <span className="mt-1 text-sm leading-6 text-muted-foreground">
-                      Seu nome real não será solicitado. O atendimento usa codinome e informações protegidas por sigilo.
+                      Você escolhe como se apresentar e quais dados é seguro compartilhar.
                     </span>
                     <span className="mt-auto pt-3 text-xs font-bold uppercase tracking-wide text-rose-700">
                       {form.tipoPessoaAtendida === 'MULHER_APOLONIA' ? 'Selecionado com sigilo' : 'Selecionar atendimento sigiloso'}
@@ -301,6 +323,12 @@ export default function SolicitarAtendimento() {
               </div>
             </fieldset>
 
+            {form.tipoPessoaAtendida === 'MULHER_APOLONIA' && <Field label="Como podemos entrar em contato?" hint="Você pode acompanhar as respostas somente pela aplicação. Se informar contatos, eles poderão ser vistos pela equipe de voluntários que consulta a fila de atendimento.">
+              <Select value={form.contatoSeguro} onChange={event => updateField('contatoSeguro', event.target.value)}>
+                <option value="APLICACAO">Somente pela aplicação</option>
+                <option value="INFORMADO">Quero informar um contato seguro</option>
+              </Select>
+            </Field>}
             <div className="grid gap-5 md:grid-cols-2">
               {form.tipoPessoaAtendida !== 'MULHER_APOLONIA' && (
                 <Field label="Nome da pessoa atendida">
@@ -312,7 +340,7 @@ export default function SolicitarAtendimento() {
                 </Field>
               )}
 
-              <Field label="Telefone">
+              {(form.tipoPessoaAtendida !== 'MULHER_APOLONIA' || form.contatoSeguro === 'INFORMADO') && <><Field label="Telefone">
                 <Input
                   type="tel"
                   inputMode="tel"
@@ -332,6 +360,7 @@ export default function SolicitarAtendimento() {
                   placeholder="voce@email.com"
                 />
               </Field>
+              </>}
 
             </div>
 
@@ -373,18 +402,31 @@ export default function SolicitarAtendimento() {
               <div className="rounded-ui-lg border border-rose-200 bg-rose-50/70 p-5">
                 <div className="mb-4 flex flex-wrap items-center gap-2">
                   <Badge tone="danger">Sigilo sensivel</Badge>
-                  <p className="text-sm text-rose-900">Não informe o nome real. Use apenas um codinome que seja seguro para você.</p>
+                  <p className="text-sm text-rose-900">Compartilhe apenas o que for seguro. Sua escolha de nome identifica este atendimento; evite dados pessoais no relato e nos anexos se não quiser se identificar.</p>
                 </div>
                 <div className="grid gap-5 md:grid-cols-2">
-                  <Field label="Codinome" hint="Este será o único nome usado para identificar a solicitante neste relato.">
+                  <Field label="Como deseja se apresentar?">
+                    <Select value={form.identificacao} onChange={event => {
+                      const modo = event.target.value;
+                      setForm(current => ({ ...current, identificacao: modo, codinome: modo === 'GERADO' ? `Pessoa ${crypto.randomUUID().slice(0, 8)}` : '' }));
+                    }}>
+                      <option value="">Escolha uma opção</option>
+                      <option value="NOME">Quero usar meu nome</option>
+                      <option value="CODINOME">Quero escolher um codinome</option>
+                      <option value="GERADO">Prefiro um nome gerado pelo sistema</option>
+                    </Select>
+                  </Field>
+                  {form.identificacao && <Field label={form.identificacao === 'NOME' ? 'Nome que deseja compartilhar' : 'Codinome'} hint="Este nome será exibido à equipe, inclusive na fila de atendimento.">
                     <Input
                       required
                       autoComplete="off"
+                      maxLength={50}
+                      readOnly={form.identificacao === 'GERADO'}
                       value={form.codinome}
                       onChange={(event) => updateField('codinome', event.target.value)}
                       placeholder="Ex.: Aurora"
                     />
-                  </Field>
+                  </Field>}
                   <Field label="Nivel de risco">
                     <Select value={form.nivelRisco} onChange={(event) => updateField('nivelRisco', event.target.value)}>
                       <option value="1">1 - Baixo</option>
@@ -396,6 +438,7 @@ export default function SolicitarAtendimento() {
                   </Field>
                   <Field label="Tem boletim de ocorrencia?">
                     <Select value={form.temBoletimOcorrencia} onChange={(event) => updateField('temBoletimOcorrencia', event.target.value)}>
+                      <option value="">Prefiro não responder</option>
                       <option value="false">Nao</option>
                       <option value="true">Sim</option>
                     </Select>
@@ -433,7 +476,7 @@ export default function SolicitarAtendimento() {
 
             <div className="flex flex-col-reverse gap-3 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-sm text-muted-foreground">Campos de risco usam escala de 1 a 5.</p>
-              <Button type="submit" size="large" disabled={enviando}>
+              <Button type="submit" size="large" disabled={enviando || Boolean(confirmDialog)}>
                 {enviando ? 'Enviando...' : 'Enviar relato'}
               </Button>
             </div>
