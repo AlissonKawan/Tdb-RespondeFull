@@ -147,4 +147,44 @@ describe('SystemLayout', () => {
     expect(screen.getByText('Portal Voluntário')).toBeInTheDocument();
     expect(screen.getByText('Portal Beneficiário')).toBeInTheDocument();
   });
+
+  it('mantém o popover de notificações aberto ao clicar no texto interno e fecha ao clicar fora', () => {
+    vi.mocked(useAuthHook.useAuth).mockReturnValue({
+      user: {
+        id: 1,
+        nome: 'Alisson Voluntário',
+        email: 'alisson@example.com',
+        tipoUsuario: 'VOLUNTARIO',
+        ativo: true,
+      },
+      isVoluntario: true,
+      isBeneficiario: false,
+      isAdmin: false,
+      isAuthenticated: true,
+      isLoading: false,
+      authError: '',
+      logout: vi.fn(),
+      login: vi.fn(),
+      register: vi.fn(),
+    });
+
+    render(
+      <MemoryRouter initialEntries={['/portal-voluntario']}>
+        <SystemLayout />
+      </MemoryRouter>
+    );
+
+    const summary = screen.getByLabelText('Notificações');
+    const details = summary.closest('details')!;
+    summary.focus();
+    details.open = true;
+
+    const messageText = screen.getByText(/Consulte seu portal para acompanhar as mensagens/i);
+    fireEvent.blur(summary, { relatedTarget: null });
+    fireEvent.click(messageText);
+    expect(details.open).toBe(true);
+
+    fireEvent.click(screen.getByText('Área restrita'));
+    expect(details.open).toBe(false);
+  });
 });

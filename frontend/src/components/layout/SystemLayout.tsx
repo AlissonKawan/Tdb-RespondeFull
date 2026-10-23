@@ -93,6 +93,7 @@ export default function SystemLayout() {
   const { confirm, confirmDialog } = useConfirm();
   const sidebarRef = useRef<HTMLElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const headerMenusRef = useRef<HTMLDivElement>(null);
 
   const navigation: NavigationItem[] = [
     ...(isAdmin ? [
@@ -148,6 +149,27 @@ export default function SystemLayout() {
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [isSidebarOpen]);
+
+  useEffect(() => {
+    const closeOutsideMenus = (event: MouseEvent | FocusEvent) => {
+      const container = headerMenusRef.current;
+      if (!container) return;
+      const target = event.target;
+      if (!(target instanceof Node)) return;
+      container.querySelectorAll<HTMLDetailsElement>('details[open]').forEach((details) => {
+        if (!details.contains(target)) {
+          details.open = false;
+        }
+      });
+    };
+
+    document.addEventListener('click', closeOutsideMenus);
+    document.addEventListener('focusin', closeOutsideMenus);
+    return () => {
+      document.removeEventListener('click', closeOutsideMenus);
+      document.removeEventListener('focusin', closeOutsideMenus);
+    };
+  }, []);
 
   const closeSidebar = () => setIsSidebarOpen(false);
   const currentRouteLabel = getRouteLabel(location.pathname);
@@ -287,8 +309,8 @@ export default function SystemLayout() {
             <p className="truncate text-base font-bold text-slate-900 md:text-lg">{currentRouteLabel}</p>
           </div>
 
-          <div className="ml-3 flex shrink-0 items-center gap-3 md:gap-5">
-            <details className="group relative" onKeyDown={event => { if (event.key === 'Escape') { event.currentTarget.open = false; event.currentTarget.querySelector('summary')?.focus(); } }} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) event.currentTarget.open = false; }}>
+          <div ref={headerMenusRef} className="ml-3 flex shrink-0 items-center gap-3 md:gap-5">
+            <details className="group relative" onKeyDown={event => { if (event.key === 'Escape') { event.currentTarget.open = false; event.currentTarget.querySelector('summary')?.focus(); } }}>
               <summary aria-label="Notificações" className="relative flex h-11 w-11 cursor-pointer list-none items-center justify-center rounded-full border border-slate-200 text-slate-600 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring [&::-webkit-details-marker]:hidden">
                 <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" /></svg>
               </summary>
@@ -298,7 +320,7 @@ export default function SystemLayout() {
                 <Link to={user ? portalFor(user.tipoUsuario) : '/login'} className="mt-3 inline-flex min-h-11 items-center rounded-lg text-sm font-semibold text-blue-600" onClick={event => { const details = event.currentTarget.closest('details'); if (details) details.open = false; }}>Acessar portal</Link>
               </div>
             </details>
-            <details className="relative hidden md:block" onKeyDown={event => { if (event.key === 'Escape') { event.currentTarget.open = false; event.currentTarget.querySelector('summary')?.focus(); } }} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) event.currentTarget.open = false; }}>
+            <details className="relative hidden md:block" onKeyDown={event => { if (event.key === 'Escape') { event.currentTarget.open = false; event.currentTarget.querySelector('summary')?.focus(); } }}>
               <summary className="flex min-h-11 cursor-pointer list-none items-center gap-3 rounded-full border border-slate-200 bg-white py-1.5 pl-1.5 pr-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring [&::-webkit-details-marker]:hidden" aria-label="Perfil do usuário">
                 <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-sm font-bold text-white" aria-hidden="true">{getInitials(user?.nome)}</span>
                 <span className="max-w-32 truncate text-sm font-semibold text-slate-700">{user?.nome?.trim().split(/\s+/)[0] || 'Usuário'}</span>
