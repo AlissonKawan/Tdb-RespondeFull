@@ -23,7 +23,7 @@ O sistema funciona com uma arquitetura separada (Client-Server), onde o front-en
 
 1. **Front-end (SPA)**: Aplicação web construída em **React** e **Vite**, que fornece portais exclusivos para Beneficiários, Voluntários e Administradores. O gerenciamento de estado e chamadas à API são realizados com as ferramentas nativas (`fetch`) e TypeScript. Entre os grandes destaques da interface, temos: **Prontuário Médico Digital**, **Módulo de Expirados Inteligente** e **Painel Admin com Edição Avançada**.
 2. **Back-end (API REST)**: Construído com **Java 21** e **Quarkus**, garante alta performance. A conexão com o banco de dados **Oracle** é feita de forma manual via JDBC, mantendo controle direto sobre as consultas, com suporte completo ao histórico de evolução clínica dos atendimentos.
-3. **Cronograma**: CRUD de tarefas, filtros e resumo semanal implementados no backend Java, com JDBC e Oracle. A previsão de check-in utiliza um cliente Java para o Gemini.
+3. **Cronograma**: CRUD de tarefas, filtros e resumo semanal implementados no backend Java, com JDBC e Oracle. O check-in é atualizado manualmente pela equipe, sem previsão por IA.
 
 ---
 

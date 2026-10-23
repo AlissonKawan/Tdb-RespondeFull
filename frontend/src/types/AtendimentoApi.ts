@@ -46,9 +46,6 @@ export interface AtendimentoApi {
   usuario?: AtendimentoUsuarioResumo | null;
   statusCheckin?: StatusCheckin;
   horarioEnvioCheckin?: string;
-  previsaoCheckin?: StatusCheckin | string;
-  confiancaCheckin?: number;
-  justificativaCheckin?: string;
   tipoPessoa?: TipoPessoaRelato;
   gravidade?: number;
 }

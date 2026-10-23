@@ -100,24 +100,27 @@ class AtendimentoResourceTest {
     }
 
     @Test
-    void deveBuscarPrevisaoIAComSucesso() {
-        // Arrange
-        int atendimentoId = 49;
-        br.com.tdbresponde.dto.CheckinPrevisaoResponse previsaoMock = new br.com.tdbresponde.dto.CheckinPrevisaoResponse();
-        previsaoMock.previsaoCheckin = "CONFIRMADO";
-        previsaoMock.confiancaCheckin = 0.95;
-
-        when(bo.preverCheckinIA(atendimentoId)).thenReturn(previsaoMock);
-
-        // Act
-        Response response = resource.buscarPrevisaoIA(atendimentoId);
-
-        // Assert
+    void checkinManualRetornaStatusSemCamposDePrevisao() {
+        var atendimento = new Atendimento(); atendimento.setId(49);
+        atendimento.setStatusCheckin("CONFIRMADO");
+        var request = new br.com.tdbresponde.dto.CheckinRequest(); request.statusCheckin = "CONFIRMADO";
+        when(bo.atualizarCheckin(49, request)).thenReturn(atendimento);
+        var response = resource.atualizarCheckin(49, request);
         assertEquals(200, response.getStatus());
-        br.com.tdbresponde.dto.CheckinPrevisaoResponse responseDto = (br.com.tdbresponde.dto.CheckinPrevisaoResponse) response.getEntity();
-        assertEquals("CONFIRMADO", responseDto.previsaoCheckin);
-        assertEquals(0.95, responseDto.confiancaCheckin);
+        var dto = (br.com.tdbresponde.dto.AtendimentoResponse) response.getEntity();
+        assertEquals("CONFIRMADO", dto.statusCheckin);
+        var json = new com.fasterxml.jackson.databind.ObjectMapper().valueToTree(dto);
+        org.junit.jupiter.api.Assertions.assertFalse(json.has("previsaoCheckin"));
+        org.junit.jupiter.api.Assertions.assertFalse(json.has("confiancaCheckin"));
+        org.junit.jupiter.api.Assertions.assertFalse(json.has("justificativaCheckin"));
+        verify(bo).atualizarCheckin(49, request);
+    }
 
-        verify(bo, times(1)).preverCheckinIA(atendimentoId);
+    @Test
+    void rotaDePrevisaoNaoEstaMaisPublicada() {
+        for (var method : AtendimentoResource.class.getDeclaredMethods()) {
+            var path = method.getAnnotation(jakarta.ws.rs.Path.class);
+            if (path != null) org.junit.jupiter.api.Assertions.assertFalse(path.value().contains("previsao-ia"));
+        }
     }
 }

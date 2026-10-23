@@ -34,14 +34,12 @@ class AtendimentoAuthorizationTest {
         when(contas.buscarVoluntarioIdDaConta(8)).thenReturn(80);
     }
 
-    @Test void beneficiarioNaoConsultaCasoMensagensOuPrevisaoDeOutraConta() {
+    @Test void beneficiarioNaoConsultaCasoOuMensagensDeOutraConta() {
         assertThrows(ForbiddenException.class, () -> resource.buscarPorId(2));
         assertThrows(ForbiddenException.class, () -> resource.listarMensagens(2));
         assertThrows(ForbiddenException.class, () -> resource.listarMensagens(2, 50, 81));
-        assertThrows(ForbiddenException.class, () -> resource.buscarPrevisaoIA(2));
         assertThrows(ForbiddenException.class, () -> resource.inserirMensagem(2, new MensagemRequest()));
         verifyNoInteractions(mensagens);
-        verify(bo, never()).preverCheckinIA(anyInt());
     }
 
     @Test void relatoDeOutraContaERejeitadoAntesDePersistir() {
@@ -75,7 +73,7 @@ class AtendimentoAuthorizationTest {
         assertThrows(ForbiddenException.class, () -> resource.excluir(2));
         verify(bo, never()).atualizar(anyInt(), any());
         verify(bo, never()).atualizarStatusPrioridade(anyInt(), any());
-        verify(bo, never()).atualizarCheckinComPrevisao(anyInt(), any(), any());
+        verify(bo, never()).atualizarCheckin(anyInt(), any());
         verify(bo, never()).encerrar(anyInt(), anyInt());
         verify(bo, never()).assumir(anyInt(), any());
         verify(bo, never()).excluir(anyInt());
@@ -142,8 +140,6 @@ class AtendimentoAuthorizationTest {
             var json = new com.fasterxml.jackson.databind.ObjectMapper().valueToTree(dto);
             assertFalse(json.has("prioridade")); assertFalse(json.has("gravidade"));
         }
-        assertThrows(ForbiddenException.class, () -> resource.buscarPrevisaoIA(1));
-        verify(bo, never()).preverCheckinIA(anyInt());
     }
 
     @Test void filaEDetalheNaoRevelamRelatoIdentidadeOuContatoAntesDaAtribuicao() {

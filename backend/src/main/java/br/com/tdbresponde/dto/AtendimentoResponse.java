@@ -30,9 +30,6 @@ public class AtendimentoResponse {
     public Boolean ultimaMensagemDoBeneficiario;
     public String statusCheckin;
     public LocalDateTime horarioEnvioCheckin;
-    public String previsaoCheckin;
-    public Double confiancaCheckin;
-    public String justificativaCheckin;
     public String tipoPessoa;
     @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
     public Integer gravidade;
@@ -107,15 +104,4 @@ public class AtendimentoResponse {
         return response;
     }
 
-    /**
-     * Versao enriquecida com previsao da IA.
-     * Usa o factory padrao e depois injeta os campos extras calculados pelo BO.
-     */
-    public static AtendimentoResponse from(Atendimento atendimento, String previsaoCheckin, Double confiancaCheckin, String justificativaCheckin) {
-        AtendimentoResponse response = from(atendimento);
-        response.previsaoCheckin = previsaoCheckin;
-        response.confiancaCheckin = confiancaCheckin;
-        response.justificativaCheckin = justificativaCheckin;
-        return response;
-    }
 }

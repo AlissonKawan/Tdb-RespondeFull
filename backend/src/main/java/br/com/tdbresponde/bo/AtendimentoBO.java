@@ -6,10 +6,8 @@ import br.com.tdbresponde.dao.HistoricoStatusDAO;
 import br.com.tdbresponde.dao.MulherApoloniaDAO;
 import br.com.tdbresponde.dao.PessoaAtendidaDAO;
 import br.com.tdbresponde.dao.VoluntarioDAO;
-import br.com.tdbresponde.config.IaClient;
 import br.com.tdbresponde.dto.AtendimentoRequest;
 import br.com.tdbresponde.dto.AtendimentoAtualizacaoRequest;
-import br.com.tdbresponde.dto.CheckinPrevisaoResponse;
 import br.com.tdbresponde.dto.CheckinRequest;
 import br.com.tdbresponde.dto.RelatarSituacaoRequest;
 import br.com.tdbresponde.dto.RelatarSituacaoResponse;
@@ -52,9 +50,6 @@ public class AtendimentoBO {
 
     @Inject
     VoluntarioDAO voluntarioDAO;
-
-    @Inject
-    IaClient iaClient;
 
     public List<Atendimento> listar() {
         return atendimentoDAO.buscarTodos();
@@ -112,14 +107,6 @@ public class AtendimentoBO {
             atendimento.setPessoaAtendida(buscarPessoaCompleta(atendimento.getPessoaAtendida().getId()));
         }
         return atendimento;
-    }
-
-    /**
-     * Retorna a previsao da IA isoladamente, para carregamento assincrono no front.
-     */
-    public CheckinPrevisaoResponse preverCheckinIA(int id) {
-        Atendimento atendimento = buscarPorId(id);
-        return iaClient.preverCheckin(atendimento);
     }
 
     public Atendimento inserir(AtendimentoRequest request) {
@@ -273,18 +260,6 @@ public class AtendimentoBO {
         atendimentoDAO.atualizarCheckin(id, novoStatus, horarioEnvio);
 
         return buscarPorId(id);
-    }
-
-    /**
-     * Atualiza o checkin e retorna o atendimento ja enriquecido com a previsao da IA.
-     */
-    public Atendimento atualizarCheckinComPrevisao(int id, CheckinRequest request, CheckinPrevisaoResponse[] holder) {
-        Atendimento atendimento = atualizarCheckin(id, request);
-        CheckinPrevisaoResponse previsao = iaClient.preverCheckin(atendimento);
-        if (holder != null && holder.length > 0) {
-            holder[0] = previsao;
-        }
-        return atendimento;
     }
 
     // Metodo: Calcular prioridade automaticamente

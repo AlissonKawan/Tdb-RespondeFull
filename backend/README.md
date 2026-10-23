@@ -102,8 +102,10 @@ Em ambiente novo, criar a tabela com `src/main/resources/sql/cronograma.sql`.
 Não executar esse script em uma tabela já existente. Datas de atividade e horários
 mantêm o contrato textual anterior. Nenhum script é executado automaticamente.
 
-A classificação de mensagens foi removida. A previsão de check-in pelo Gemini
-continua no cliente Java `IaClient`.
+A classificação de mensagens e a previsão de check-in por IA foram removidas.
+O check-in é atualizado manualmente, sem envio de mensagens a terceiros. O CRO
+permanece informado no cadastro e sujeito à conferência manual pelo administrador;
+não há consulta automática nem aprovação automática baseada em CRO.
 
 ### Validacao opcional no Oracle
 

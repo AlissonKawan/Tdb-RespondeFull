@@ -11,7 +11,6 @@ import { prontuarioService } from '../../services/prontuarioService';
 import { ApiError } from '../../services/apiClient';
 import type { AtendimentoApi, Mensagem } from '../../types/AtendimentoApi';
 
-const previsaoIAMock = vi.hoisted(() => vi.fn().mockResolvedValue({}));
 
 // Mock routing params so that useParams returns { id: '1' }
 vi.mock('react-router-dom', async (importOriginal) => {
@@ -36,7 +35,6 @@ vi.mock('../../services/atendimentoService', () => ({
     buscarPorId: vi.fn(),
     atualizarStatusPrioridade: vi.fn(),
     atualizarCheckin: vi.fn(),
-    preverCheckinIA: previsaoIAMock,
   },
 }));
 
@@ -350,7 +348,7 @@ describe('DetalheAtendimento - Deduplicação de Mensagens', () => {
     expect(await screen.findByText('Acompanhamento da consulta')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /WhatsApp/i })).not.toBeInTheDocument();
     expect(screen.queryByText(/Previsão da Inteligência Artificial|de confiança/i)).not.toBeInTheDocument();
-    expect(previsaoIAMock).not.toHaveBeenCalled();
+    expect('preverCheckinIA' in atendimentoService).toBe(false);
   });
 
   it('permite agendar consulta vinculada diretamente pelo atendimento com validação de campos', async () => {

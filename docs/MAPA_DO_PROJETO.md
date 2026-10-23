@@ -326,7 +326,7 @@ backend/Dockerfile
 Responsabilidade:
 
 - `pom.xml`: dependências Java/Quarkus, Oracle JDBC, REST, WebSocket, testes e build;
-- `application.properties`: porta, Oracle, CORS, validação CRO e Gemini;
+- `application.properties`: porta, Oracle e CORS;
 - `Dockerfile`: empacotamento/deploy.
 
 Tecnologias centrais:
@@ -545,7 +545,6 @@ AtendimentoResponse
 AtendimentoAtualizacaoRequest
 AssumirAtendimentoRequest
 CheckinRequest
-CheckinPrevisaoResponse
 EncerrarAtendimentoRequest
 MensagemRequest
 MensagemResponse
@@ -673,11 +672,10 @@ Perguntas para guiar debug:
 
 ## 6. IA e integrações externas
 
-### 6.1 Previsão de check-in em Java
+### 6.1 Check-in manual
 
-O cliente Java `backend/src/main/java/br/com/tdbresponde/config/IaClient.java`
-consulta o Gemini. Configuração: `gemini.api.key` / `GEMINI_API_KEY`.
-A classificação automática de mensagens foi removida.
+A previsão de check-in e o cliente de IA foram removidos. A rota de previsão não
+existe mais; a atualização de check-in permanece manual, sem transmitir chat a terceiros.
 
 ### 6.2 Cronograma em Java
 
@@ -695,22 +693,11 @@ O script não deve recriar a tabela que já contém tarefas.
 
 ---
 
-### 6.3 Validação de CRO
+### 6.3 Conferência manual de CRO
 
-Locais principais:
-
-```txt
-backend/src/main/java/br/com/tdbresponde/client/GovCroVerificationService.java
-backend/src/main/resources/application.properties
-```
-
-Configurações:
-
-```txt
-tdbresponde.cro.verification.mode
-tdbresponde.cro.verification.url
-tdbresponde.cro.verification.strict
-```
+O cadastro mantém número/UF do CRO e validações locais. A consulta externa foi
+removida. Novos cadastros permanecem pendentes de análise administrativa; a aprovação
+continua no fluxo administrativo existente. Não há validação profissional automática.
 
 ---
 

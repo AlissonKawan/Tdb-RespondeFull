@@ -1,206 +1,181 @@
 package br.com.tdbresponde.bo;
 
-import br.com.tdbresponde.dao.*;
+import br.com.tdbresponde.dao.ContaUsuarioDAO;
+import br.com.tdbresponde.dao.EspecialidadeDAO;
+import br.com.tdbresponde.dao.VoluntarioDAO;
 import br.com.tdbresponde.dto.RegisterRequest;
+import br.com.tdbresponde.dto.LoginRequest;
 import br.com.tdbresponde.exception.BusinessException;
+import br.com.tdbresponde.exception.UnauthorizedException;
 import br.com.tdbresponde.model.ContaUsuario;
 import br.com.tdbresponde.model.Especialidade;
 import br.com.tdbresponde.model.Voluntario;
-import br.com.tdbresponde.client.CroVerificationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
+
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-public class VoluntarioCroTest {
-
+class VoluntarioCroTest {
     private ContaUsuarioBO bo;
+    private ContaUsuarioDAO contaDAO;
     private VoluntarioDAO voluntarioDAO;
-    private ContaUsuarioDAO contaUsuarioDAO;
     private EspecialidadeDAO especialidadeDAO;
-    private CriancaAdolescenteDAO criancaDAO;
-    private MulherApoloniaDAO mulherDAO;
-    private CroVerificationService croService;
 
     @BeforeEach
     void setUp() {
         bo = new ContaUsuarioBO();
-        voluntarioDAO = mock(VoluntarioDAO.class);
-        contaUsuarioDAO = mock(ContaUsuarioDAO.class);
-        especialidadeDAO = mock(EspecialidadeDAO.class);
-        criancaDAO = mock(CriancaAdolescenteDAO.class);
-        mulherDAO = mock(MulherApoloniaDAO.class);
-        croService = mock(CroVerificationService.class);
-
-        bo.voluntarioDAO = voluntarioDAO;
-        bo.dao = contaUsuarioDAO;
-        bo.especialidadeDAO = especialidadeDAO;
-        bo.criancaDAO = criancaDAO;
-        bo.mulherDAO = mulherDAO;
-        bo.croService = croService;
-
-        // Mock default specialty "Odontologia"
-        Especialidade esp = new Especialidade(1, "Desc", "Odontologia");
-        when(especialidadeDAO.buscarPorId(1)).thenReturn(esp);
+        bo.dao = contaDAO = mock(ContaUsuarioDAO.class);
+        bo.voluntarioDAO = voluntarioDAO = mock(VoluntarioDAO.class);
+        bo.especialidadeDAO = especialidadeDAO = mock(EspecialidadeDAO.class);
+        when(especialidadeDAO.buscarPorId(1))
+                .thenReturn(new Especialidade(1, "Fixture sintética", "Odontologia"));
     }
 
     @Test
-    void deveRegistrarVoluntarioComCroValido() {
-        // Arrange
-        RegisterRequest req = new RegisterRequest();
-        req.nome = "Dr. Valido";
-        req.email = "valido@teste.com";
-        req.senha = "123456";
-        req.tipoUsuario = "VOLUNTARIO";
-        req.motivoVoluntariado = "Quero muito ajudar pessoas necessitadas.";
-        req.especialidadeId = 1;
-        req.cro = "12345";
-        req.ufCro = "SP";
+    void deveGuardarCroManualEManterCadastroPendenteSemAutoAprovacao() {
+        RegisterRequest request = cadastro();
+        request.cro = " 12345 ";
+        request.ufCro = " sp ";
+        ContaUsuario conta = registrar(request);
 
-        when(contaUsuarioDAO.emailExiste("valido@teste.com")).thenReturn(false);
-        when(croService.verificar("12345", "SP")).thenReturn(true);
-        when(croService.obterStatusUltimaVerificacao()).thenReturn("VALIDADO");
+        ArgumentCaptor<Voluntario> captor = ArgumentCaptor.forClass(Voluntario.class);
+        verify(voluntarioDAO).inserir(captor.capture());
+        Voluntario salvo = captor.getValue();
+        assertEquals("12345", salvo.getCro());
+        assertEquals("SP", salvo.getUfCro());
+        assertEquals("PENDENTE", salvo.getStatusAprovacao());
+        assertNull(salvo.getStatusCro(), "Não deve declarar validação externa ou falha de integração");
+        assertFalse(conta.isAtivo(), "Somente a revisão administrativa deve liberar a conta");
+        assertFalse(salvo.isAcessoSigilo());
+        assertEquals(conta.getId(), salvo.getContaId());
 
+        when(contaDAO.buscarPorEmail(request.email)).thenReturn(conta);
+        LoginRequest login = new LoginRequest();
+        login.email = request.email;
+        login.senha = request.senha;
+        assertThrows(UnauthorizedException.class, () -> bo.login(login));
+        verify(contaDAO, never()).atualizar(any());
+    }
+
+    @Test
+    void deveCadastrarSemDependenciaDeClienteOuConsultaATerceiros() {
+        // Apenas DAOs locais são injetados: nenhum cliente externo é necessário para cadastrar.
+        assertTrue(Arrays.stream(ContaUsuarioBO.class.getDeclaredFields())
+                .noneMatch(field -> field.getType().getPackageName().equals("br.com.tdbresponde.client")));
+        ContaUsuario conta = registrar(cadastro());
+        assertFalse(conta.isAtivo());
+        verify(voluntarioDAO).inserir(any(Voluntario.class));
+    }
+
+    @Test
+    void deveAceitarNumeroSemConferirRegistroNoConselho() {
+        RegisterRequest request = cadastro();
+        // O número não é declarado válido/inválido pelo sistema; a conferência é humana.
+        request.cro = "000000";
+        registrar(request);
+        ArgumentCaptor<Voluntario> captor = ArgumentCaptor.forClass(Voluntario.class);
+        verify(voluntarioDAO).inserir(captor.capture());
+        assertEquals("000000", captor.getValue().getCro());
+        assertEquals("PENDENTE", captor.getValue().getStatusAprovacao());
+        assertNull(captor.getValue().getStatusCro());
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"   "})
+    void deveExigirCroParaOdontologia(String cro) {
+        RegisterRequest request = cadastro();
+        request.cro = cro;
+        assertEquals("CRO e obrigatorio para cadastro de voluntario.",
+                assertThrows(BusinessException.class, () -> bo.registrar(request)).getMessage());
+        verifyNoInteractions(contaDAO, voluntarioDAO);
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"   "})
+    void deveExigirUfParaOdontologia(String uf) {
+        RegisterRequest request = cadastro();
+        request.ufCro = uf;
+        assertEquals("UF do CRO e obrigatoria para cadastro de voluntario.",
+                assertThrows(BusinessException.class, () -> bo.registrar(request)).getMessage());
+        verifyNoInteractions(contaDAO, voluntarioDAO);
+    }
+
+    @Test
+    void deveRecusarCroSemDigitosEFormatoDeUfIncompletoLocalmente() {
+        RegisterRequest request = cadastro();
+        request.cro = "INVALIDO";
+        assertThrows(BusinessException.class, () -> bo.registrar(request));
+        request.cro = "12345";
+        request.ufCro = "S";
+        assertThrows(BusinessException.class, () -> bo.registrar(request));
+        verifyNoInteractions(contaDAO, voluntarioDAO);
+    }
+
+    @Test
+    void deveExigirCroTambemComEspecialidadePorNomeOuLista() {
+        RegisterRequest request = cadastro();
+        request.especialidadeId = null;
+        request.especialidade = "Odontologia";
+        request.cro = null;
+        assertThrows(BusinessException.class, () -> bo.registrar(request));
+        request.especialidade = null;
+        request.especialidadeIds = List.of(1);
+        assertThrows(BusinessException.class, () -> bo.registrar(request));
+        verifyNoInteractions(contaDAO, voluntarioDAO);
+    }
+
+    @Test
+    void deveManterCadastroNaoOdontologicoPendenteSemExigirCro() {
+        when(especialidadeDAO.buscarPorId(2))
+                .thenReturn(new Especialidade(2, "Fixture sintética", "Psicologia"));
+        RegisterRequest request = cadastro();
+        request.especialidadeId = 2;
+        request.cro = null;
+        request.ufCro = null;
+        assertFalse(registrar(request).isAtivo());
+        ArgumentCaptor<Voluntario> captor = ArgumentCaptor.forClass(Voluntario.class);
+        verify(voluntarioDAO).inserir(captor.capture());
+        assertEquals("PENDENTE", captor.getValue().getStatusAprovacao());
+        assertNull(captor.getValue().getCro());
+        assertNull(captor.getValue().getStatusCro());
+    }
+
+    private ContaUsuario registrar(RegisterRequest request) {
         doAnswer(invocation -> {
             ContaUsuario conta = invocation.getArgument(0);
             conta.setId(10);
+            when(contaDAO.buscarPorId(10)).thenReturn(conta);
             return null;
-        }).when(contaUsuarioDAO).cadastrarConta(any(ContaUsuario.class));
-        
-        when(contaUsuarioDAO.buscarPorId(10)).thenReturn(new ContaUsuario());
-
+        }).when(contaDAO).cadastrarConta(any(ContaUsuario.class));
         doAnswer(invocation -> {
-            Voluntario vol = invocation.getArgument(0);
-            vol.setId(20);
+            Voluntario voluntario = invocation.getArgument(0);
+            voluntario.setId(20);
             return null;
         }).when(voluntarioDAO).inserir(any(Voluntario.class));
-
-        // Act
-        bo.registrar(req);
-
-        // Assert
-        ArgumentCaptor<Voluntario> voluntarioCaptor = ArgumentCaptor.forClass(Voluntario.class);
-        verify(voluntarioDAO).inserir(voluntarioCaptor.capture());
-
-        Voluntario voluntarioSalvo = voluntarioCaptor.getValue();
-        assertEquals("12345", voluntarioSalvo.getCro());
-        assertEquals("SP", voluntarioSalvo.getUfCro());
-        assertEquals("VALIDADO", voluntarioSalvo.getStatusCro());
+        return bo.registrar(request);
     }
 
-    @Test
-    void deveRegistrarVoluntarioComStatusFalhaIntegracaoQuandoServicoFalhar() {
-        // Arrange
-        RegisterRequest req = new RegisterRequest();
-        req.nome = "Dr. Falha Conexao";
-        req.email = "falha@teste.com";
-        req.senha = "123456";
-        req.tipoUsuario = "VOLUNTARIO";
-        req.motivoVoluntariado = "Quero muito ajudar pessoas necessitadas.";
-        req.especialidadeId = 1;
-        req.cro = "12345";
-        req.ufCro = "SP";
-
-        when(contaUsuarioDAO.emailExiste("falha@teste.com")).thenReturn(false);
-        when(croService.verificar("12345", "SP")).thenReturn(true);
-        when(croService.obterStatusUltimaVerificacao()).thenReturn("FALHA_INTEGRACAO");
-
-        doAnswer(invocation -> {
-            ContaUsuario conta = invocation.getArgument(0);
-            conta.setId(11);
-            return null;
-        }).when(contaUsuarioDAO).cadastrarConta(any(ContaUsuario.class));
-        
-        when(contaUsuarioDAO.buscarPorId(11)).thenReturn(new ContaUsuario());
-
-        doAnswer(invocation -> {
-            Voluntario vol = invocation.getArgument(0);
-            vol.setId(21);
-            return null;
-        }).when(voluntarioDAO).inserir(any(Voluntario.class));
-
-        // Act
-        bo.registrar(req);
-
-        // Assert
-        ArgumentCaptor<Voluntario> voluntarioCaptor = ArgumentCaptor.forClass(Voluntario.class);
-        verify(voluntarioDAO, atLeastOnce()).inserir(voluntarioCaptor.capture());
-
-        Voluntario voluntarioSalvo = voluntarioCaptor.getAllValues().stream()
-                .filter(v -> "Dr. Falha Conexao".equals(v.getNome()))
-                .findFirst().orElseThrow();
-
-        assertEquals("12345", voluntarioSalvo.getCro());
-        assertEquals("SP", voluntarioSalvo.getUfCro());
-        assertEquals("FALHA_INTEGRACAO", voluntarioSalvo.getStatusCro());
-    }
-
-    @Test
-    void deveLancarExcecaoQuandoCroForNulo() {
-        // Arrange
-        RegisterRequest req = new RegisterRequest();
-        req.nome = "Dr. Sem Cro";
-        req.email = "semcro@teste.com";
-        req.senha = "123456";
-        req.tipoUsuario = "VOLUNTARIO";
-        req.motivoVoluntariado = "Quero muito ajudar pessoas necessitadas.";
-        req.especialidadeId = 1;
-        req.cro = null;
-        req.ufCro = "SP";
-
-        // Act & Assert
-        BusinessException exception = assertThrows(BusinessException.class, () -> {
-            bo.registrar(req);
-        });
-
-        assertEquals("CRO e obrigatorio para cadastro de voluntario.", exception.getMessage());
-    }
-
-    @Test
-    void deveLancarExcecaoQuandoUfCroForNulo() {
-        // Arrange
-        RegisterRequest req = new RegisterRequest();
-        req.nome = "Dr. Sem UF";
-        req.email = "semuf@teste.com";
-        req.senha = "123456";
-        req.tipoUsuario = "VOLUNTARIO";
-        req.motivoVoluntariado = "Quero muito ajudar pessoas necessitadas.";
-        req.especialidadeId = 1;
-        req.cro = "12345";
-        req.ufCro = null;
-
-        // Act & Assert
-        BusinessException exception = assertThrows(BusinessException.class, () -> {
-            bo.registrar(req);
-        });
-
-        assertEquals("UF do CRO e obrigatoria para cadastro de voluntario.", exception.getMessage());
-    }
-
-    @Test
-    void deveLancarExcecaoQuandoCroForInvalido() {
-        // Arrange
-        RegisterRequest req = new RegisterRequest();
-        req.nome = "Dr. Invalido";
-        req.email = "invalido@teste.com";
-        req.senha = "123456";
-        req.tipoUsuario = "VOLUNTARIO";
-        req.motivoVoluntariado = "Quero muito ajudar pessoas necessitadas.";
-        req.especialidadeId = 1;
-        req.cro = "INVALIDO";
-        req.ufCro = "RJ";
-
-        when(contaUsuarioDAO.emailExiste("invalido@teste.com")).thenReturn(false);
-        when(croService.verificar("INVALIDO", "RJ")).thenReturn(false);
-
-        // Act & Assert
-        BusinessException exception = assertThrows(BusinessException.class, () -> {
-            bo.registrar(req);
-        });
-
-        assertEquals("CRO informado nao foi validado pelo conselho regional.", exception.getMessage());
+    private RegisterRequest cadastro() {
+        RegisterRequest request = new RegisterRequest();
+        request.nome = "Voluntário sintético";
+        request.email = "voluntario@example.test";
+        request.senha = "senha-fixture";
+        request.tipoUsuario = "VOLUNTARIO";
+        request.motivoVoluntariado = "Quero colaborar com o atendimento voluntário.";
+        request.especialidadeId = 1;
+        request.cro = "12345";
+        request.ufCro = "SP";
+        return request;
     }
 }

@@ -12,7 +12,6 @@ import org.mockito.ArgumentCaptor;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import br.com.tdbresponde.client.CroVerificationService;
 import static org.mockito.Mockito.*;
 
 public class VoluntarioIndicacaoTest {
@@ -23,7 +22,6 @@ public class VoluntarioIndicacaoTest {
     private EspecialidadeDAO especialidadeDAO;
     private CriancaAdolescenteDAO criancaDAO;
     private MulherApoloniaDAO mulherDAO;
-    private CroVerificationService croService;
 
     @BeforeEach
     void setUp() {
@@ -33,14 +31,12 @@ public class VoluntarioIndicacaoTest {
         especialidadeDAO = mock(EspecialidadeDAO.class);
         criancaDAO = mock(CriancaAdolescenteDAO.class);
         mulherDAO = mock(MulherApoloniaDAO.class);
-        croService = mock(CroVerificationService.class);
 
         bo.voluntarioDAO = voluntarioDAO;
         bo.dao = contaUsuarioDAO;
         bo.especialidadeDAO = especialidadeDAO;
         bo.criancaDAO = criancaDAO;
         bo.mulherDAO = mulherDAO;
-        bo.croService = croService;
     }
 
     @Test
@@ -59,7 +55,6 @@ public class VoluntarioIndicacaoTest {
 
         when(contaUsuarioDAO.emailExiste("novo@teste.com")).thenReturn(false);
         when(especialidadeDAO.buscarPorId(1)).thenReturn(new Especialidade());
-        when(croService.verificar("12345", "SP")).thenReturn(true);
 
         Voluntario indicador = new Voluntario();
         indicador.setId(99);
@@ -90,6 +85,11 @@ public class VoluntarioIndicacaoTest {
 
         Voluntario voluntarioSalvo = voluntarioCaptor.getValue();
         
+        assertEquals("PENDENTE", voluntarioSalvo.getStatusAprovacao());
+        assertNull(voluntarioSalvo.getStatusCro());
+        ArgumentCaptor<ContaUsuario> contaCaptor = ArgumentCaptor.forClass(ContaUsuario.class);
+        verify(contaUsuarioDAO).cadastrarConta(contaCaptor.capture());
+        assertFalse(contaCaptor.getValue().isAtivo(), "Indicação não deve ativar a conta automaticamente");
         assertNotNull(voluntarioSalvo.getCodigoIndicacao(), "O codigo de indicacao deve ser gerado");
         assertEquals(8, voluntarioSalvo.getCodigoIndicacao().length(), "O codigo deve ter 8 caracteres");
         assertEquals(99, voluntarioSalvo.getIdVoluntarioIndicador(), "O ID do voluntario indicador deve ser vinculado");
@@ -111,7 +111,6 @@ public class VoluntarioIndicacaoTest {
 
         when(contaUsuarioDAO.emailExiste("novo@teste.com")).thenReturn(false);
         when(especialidadeDAO.buscarPorId(1)).thenReturn(new Especialidade());
-        when(croService.verificar("12345", "SP")).thenReturn(true);
         when(voluntarioDAO.buscarPorCodigoIndicacao("INVALIDO")).thenReturn(null);
 
         // Act & Assert
