@@ -50,6 +50,16 @@ class AuthenticationHttpTest {
         given().auth().oauth2(token).post("/auth/logout").then().statusCode(204);
         given().auth().oauth2(token).get("/auth/me").then().statusCode(401);
     }
+    @Test void usernameUnavailableReturns503AndEmailLoginRemainsAvailable() {
+        when(bo.login(any())).thenThrow(new br.com.tdbresponde.exception.PrivacidadeIndisponivelException());
+        given().contentType("application/json").body("{\"email\":\"aurora\",\"senha\":\"teste123\"}")
+                .post("/auth/login").then().statusCode(503).header("Cache-Control", "no-store")
+                .body("erro", is("RECURSO_INDISPONIVEL"))
+                .body("mensagem", is(new br.com.tdbresponde.exception.PrivacidadeIndisponivelException().getMessage()))
+                .body("token", nullValue());
+        doReturn(account).when(bo).login(any());
+        login();
+    }
     @Test void blocksAllPrivateResourcesWithoutSession() {
         for (String path : new String[]{"/auth/me", "/usuarios", "/atendimentos", "/voluntarios",
                 "/agendas/setup", "/prontuarios/agenda/1", "/api/cronograma/tarefas/1", "/contato"}) {

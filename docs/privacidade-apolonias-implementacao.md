@@ -11,13 +11,15 @@
 - O botão de saída rápida fica na navegação institucional, no login, no cabeçalho do sistema, no menu móvel e nos diálogos compartilhados para continuar acessível com o modal aberto. Não confirma nem salva formulários. Remove a credencial local, emite o evento de expiração e tenta revogar a sessão com `keepalive`, sem esperar a rede, antes de `location.replace('https://www.youtube.com/')`.
 - A página informa que a saída não apaga o histórico. A política `no-referrer` evita enviar a URL da aplicação como referência na navegação externa.
 
-## Banco: revisão e autorização ainda necessárias
+## Banco: execução manual autorizada, conexão pendente
 
-O arquivo `database/23_proposta_privacidade_apolonias.sql` é uma proposta manual. Não foi executado nem incluído no startup. Não foi consultado ou modificado o schema real.
+O arquivo `database/23_proposta_privacidade_apolonias.sql` é uma migração manual, autorizada em conversa em 23/10/2026. Não foi executado nem incluído no startup. A tentativa de conexão com a configuração local do backend foi recusada pelo Oracle com ORA-01017, antes de qualquer consulta de metadados ou DDL. Não foi consultado ou modificado o schema real. As credenciais não foram exibidas nem gravadas no script.
 
 O script acrescenta `USUARIO`, `TIPO_BENEFICIARIO` e `MODO_IDENTIFICACAO` em `T_CONTA_USUARIO`, cria índice único do usuário sem diferença entre maiúsculas/minúsculas e permite e-mail nulo com uma constraint que exige acesso por usuário para a conta Apolônias sem e-mail. Não utiliza e-mail fictício. Em `MULHER_APOLONIA`, permite boletim nulo, preservando os valores históricos existentes.
 
-As novas consultas de conta usam essas colunas. **Não publicar nem reiniciar o backend com esta versão contra o schema antigo.** Até a aplicação manual autorizada do script, o novo cadastro não está operacional no Oracle. O script tem DDL com commit implícito, pode bloquear objetos durante sua aplicação e não é idempotente. O responsável deve conferir o schema de destino, os dados, os nomes das constraints e o backup antes de executar. O retorno ao código anterior não exige apagar as novas colunas; qualquer reversão de dados ou schema exige planejamento próprio.
+Após a correção de compatibilidade, login por e-mail, revalidação de sessão, listagem e cadastro anteriores não dependem dessas colunas. As consultas mantêm projeções explícitas. Se o Oracle retornar ORA-00904 nomeando uma das três colunas opcionais, somente as leituras anteriores repetem a consulta com a projeção antiga. No schema antigo isso acrescenta uma tentativa; no migrado não há segunda consulta. Não há cache da versão do schema nem alteração no banco. O mapeamento só lê os campos opcionais presentes nos metadados do resultado. O cadastro anterior insere somente as colunas anteriores. Não existe fallback que descarte os dados de privacidade de um cadastro novo.
+
+Até a aplicação do script, o novo cadastro e acesso por usuário não estão operacionais no Oracle: retornam HTTP 503 com mensagem amigável se as colunas necessárias estiverem ausentes, inclusive em preparação parcial. Erros de conexão continuam sendo tratados como falha de banco. O script tem DDL com commit implícito e pode bloquear objetos durante sua aplicação. Foi preparado para reaplicação, verificando as colunas, o índice e as constraints já existentes e interrompendo em definições incompatíveis. Uma falha ainda pode deixar DDL parcial confirmado; o script não exclui objetos nem corrige dados automaticamente. Essa reaplicação não foi validada no Oracle devido à autenticação recusada. O responsável deve conferir o schema de destino, os dados e o backup antes de executar. O retorno ao código anterior não exige apagar as novas colunas; qualquer reversão de dados ou schema exige planejamento próprio.
 
 Sequência de liberação: revisar e autorizar o SQL; executar de forma controlada no ambiente definido; conferir os metadados; publicar o código compatível; validar cadastro, login por usuário, login anterior por e-mail e relato em ambiente autorizado. Não executar os scripts gerais de drop/recriação para aplicar esta alteração.
 
@@ -39,3 +41,11 @@ Resultado final em 23/10/2026: 177 testes do frontend e 199 testes do backend pa
 Na rodada com Maven, build e Vitest simultâneos, um teste longo de chat excedeu o timeout de cinco segundos. A suíte completa foi repetida sozinha e passou, sem aumentar timeouts nem alterar o fluxo de chat. O teste de navegação do cadastro foi atualizado para realizar a nova confirmação obrigatória.
 
 As alterações que já existiam em `DetalheAtendimento.tsx`, `PortalVoluntario.tsx` e seu teste foram preservadas.
+
+## Correção do incidente ORA-00904
+
+O log publicado apontou que a consulta de login por e-mail exigia `MODO_IDENTIFICACAO` em um schema que não reconhecia a coluna. A mesma dependência existia na busca por ID, listagem e cadastro anteriores. Quatro testes reproduziram essas falhas antes da correção.
+
+`ContaUsuarioDAO` agora recupera essas leituras com a projeção anterior apenas para ORA-00904 que identifique uma das três colunas novas. O cadastro anterior não inclui essas colunas. O novo acesso por usuário continua exigindo o recurso completo e usa `PrivacidadeIndisponivelException` e seu mapper HTTP 503. Não há alteração ou inicialização automática de banco.
+
+Foram adicionados dez testes JDBC simulando schemas antigo, migrado e parcial, cadastro anterior e novo, resposta HTTP e preservação de falhas de conexão. `AuthenticationHttpTest` ganhou um cenário HTTP de indisponibilidade do acesso por usuário seguido de login por e-mail. A suíte final do backend passou com 210 testes, sem falhas ou testes pulados na seleção; `CronogramaOracleIntegrationTest` foi explicitamente excluído. Não houve conexão com Oracle real, execução do SQL ou deploy. Para o ambiente do log receber a correção é necessário republicar o backend corrigido.
