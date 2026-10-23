@@ -246,6 +246,10 @@ public class AtendimentoBO {
             throw new BusinessException("Atendimento ja possui voluntario responsavel");
         }
 
+        if (!voluntarioPodeAtender(voluntario, atendimento)) {
+            throw new br.com.tdbresponde.exception.ForbiddenException();
+        }
+
         atendimento.setVoluntario(voluntario);
         atendimento.setStatus("EM_ATENDIMENTO");
         atendimentoDAO.atualizar(atendimento);
@@ -353,7 +357,6 @@ public class AtendimentoBO {
 
         // Regra 1: voluntário precisa estar disponível
         if (!voluntario.isDisponivel()) {
-            System.out.println("Voluntário " + voluntario.getNome() + " não está disponível.");
             return false;
         }
 
@@ -363,13 +366,10 @@ public class AtendimentoBO {
             MulherApolonia mulher = (MulherApolonia) atendimento.getPessoaAtendida();
             if (mulher.isNecessitaSigiloAbsoluto() &&
                     (voluntario.getAcessoSigilo() == null || !voluntario.getAcessoSigilo())) {
-                System.out.println("Voluntário " + voluntario.getNome() +
-                        " não tem acesso a sigilo para atender este caso.");
                 return false;
             }
         }
 
-        System.out.println("Voluntário " + voluntario.getNome() + " PODE atender.");
         return true;
     }
 

@@ -127,6 +127,55 @@ class AtendimentoAuthorizationTest {
         assertEquals("no-store", response.getHeaderString("Cache-Control"));
     }
 
+    @Test void beneficiarioRecebeAcompanhamentoSemTriagemInterna() throws Exception {
+        var a = atendimento(1, 7, 80);
+        var pessoa = new MulherApolonia(); pessoa.setId(10); pessoa.setContaId(7);
+        pessoa.setNivelRisco(5); a.setPessoaAtendida(pessoa);
+        a.setPrioridade(1); a.setDescricao("Relato sintetico");
+        when(bo.buscarPorId(1)).thenReturn(a);
+        when(bo.listarPorContaBeneficiario(7)).thenReturn(List.of(a));
+        var detalhe = (AtendimentoResponse) resource.buscarPorId(1).getEntity();
+        var lista = (List<?>) resource.listarPorContaBeneficiario(7).getEntity();
+        for (var dto : List.of(detalhe, (AtendimentoResponse) lista.get(0))) {
+            assertNull(dto.prioridade); assertNull(dto.gravidade); assertNull(dto.voluntario);
+            assertEquals("Relato sintetico", dto.descricao);
+            var json = new com.fasterxml.jackson.databind.ObjectMapper().valueToTree(dto);
+            assertFalse(json.has("prioridade")); assertFalse(json.has("gravidade"));
+        }
+        assertThrows(ForbiddenException.class, () -> resource.buscarPrevisaoIA(1));
+        verify(bo, never()).preverCheckinIA(anyInt());
+    }
+
+    @Test void filaEDetalheNaoRevelamRelatoIdentidadeOuContatoAntesDaAtribuicao() {
+        resource.identity = new TestIdentity(8, "VOLUNTARIO");
+        var a = atendimento(3, 70, 800); a.setVoluntario(null); a.setStatus("ABERTO");
+        a.setDescricao("Relato sintetico reservado"); a.setPrioridade(2);
+        a.getPessoaAtendida().setNomeCodificado("Pessoa sintetica");
+        a.getPessoaAtendida().setTelefone("contato sintetico");
+        a.getPessoaAtendida().setEmail("fixture@example.invalid");
+        when(bo.listarSolicitados()).thenReturn(List.of(a));
+        when(bo.listarConsultaveisPorVoluntario(80)).thenReturn(List.of(a));
+        when(bo.buscarPorId(3)).thenReturn(a);
+        var fila = (List<?>) resource.listarSolicitados().getEntity();
+        var geral = (List<?>) resource.listar().getEntity();
+        var detalhe = (AtendimentoResponse) resource.buscarPorId(3).getEntity();
+        for (var dto : List.of((AtendimentoResponse) fila.get(0), (AtendimentoResponse) geral.get(0), detalhe)) {
+            assertEquals(3, dto.id); assertEquals(2, dto.prioridade);
+            assertNull(dto.descricao); assertNull(dto.pessoaAtendidaNome);
+            assertNull(dto.pessoaAtendidaTelefone); assertNull(dto.pessoaAtendidaEmail);
+            assertNull(dto.pessoaAtendidaId); assertNull(dto.beneficiarioId);
+        }
+    }
+
+    @Test void voluntarioAtribuidoEAdminMantemDetalhesNecessarios() {
+        var a = atendimento(1, 7, 80); a.setDescricao("Relato sintetico reservado");
+        a.setPrioridade(1); when(bo.buscarPorId(1)).thenReturn(a);
+        resource.identity = new TestIdentity(8, "VOLUNTARIO");
+        assertEquals(a.getDescricao(), ((AtendimentoResponse) resource.buscarPorId(1).getEntity()).descricao);
+        resource.identity = new TestIdentity(1, "ADMIN");
+        assertEquals(1, ((AtendimentoResponse) resource.buscarPorId(1).getEntity()).prioridade);
+    }
+
     static Atendimento atendimento(int id, int conta, int voluntario) {
         var a = new Atendimento(); a.setId(id); a.setStatus("EM_ATENDIMENTO");
         var p = new PessoaAtendidaBase(); p.setId(10); p.setContaId(conta); a.setPessoaAtendida(p);
