@@ -127,7 +127,11 @@ export default function DashboardAdmin() {
     setIsChangingStatus(true);
     try {
       await atendimentoService.atualizarStatusPrioridade(id, { status: novoStatus });
-      setAtendimentos(atendimentos.map(a => a.id === id ? { ...a, status: novoStatus } : a));
+      setAtendimentos(atendimentos.map(a => a.id === id ? {
+        ...a,
+        status: novoStatus,
+        ...(novoStatus === 'ABERTO' ? { nomeVoluntario: undefined, voluntarioId: undefined, voluntario: undefined } : {}),
+      } : a));
     } catch {
       setFeedback({ message: 'Não foi possível atualizar o status.', tone: 'danger' });
     } finally {

@@ -128,6 +128,28 @@ class AtendimentoBOTest {
         assertNull(historicoDAO.historicoInserido);
     }
 
+    @Test
+    void deveLimparVoluntarioQuandoStatusMudarParaAberto() {
+        Atendimento atendimento = new Atendimento();
+        atendimento.setId(10);
+        atendimento.setStatus("EM_ATENDIMENTO");
+        Voluntario voluntario = voluntario(true, true);
+        voluntario.setId(20);
+        atendimento.setVoluntario(voluntario);
+
+        atendimentoDAO.atendimentoBuscado = atendimento;
+
+        br.com.tdbresponde.dto.AtendimentoAtualizacaoRequest request = new br.com.tdbresponde.dto.AtendimentoAtualizacaoRequest();
+        request.status = "ABERTO";
+
+        Atendimento resultado = bo.atualizarStatusPrioridade(10, request);
+
+        assertNotNull(resultado);
+        assertEquals("ABERTO", resultado.getStatus());
+        assertNull(resultado.getVoluntario());
+        assertNull(atendimentoDAO.atendimentoAtualizado.getVoluntario());
+    }
+
     private MulherApolonia mulherComRisco(int nivelRisco) {
         MulherApolonia mulher = new MulherApolonia();
         mulher.setCodinome("Caso " + nivelRisco);
@@ -164,6 +186,12 @@ class AtendimentoBOTest {
 
     private static class FakeAtendimentoDAO extends AtendimentoDAO {
         private Atendimento atendimentoAtualizado;
+        private Atendimento atendimentoBuscado;
+
+        @Override
+        public Atendimento buscarPorId(int id) {
+            return atendimentoAtualizado != null ? atendimentoAtualizado : atendimentoBuscado;
+        }
 
         @Override
         public void atualizar(Atendimento atendimento) {

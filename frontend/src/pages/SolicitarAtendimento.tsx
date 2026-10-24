@@ -127,16 +127,17 @@ function validar(form: FormState) {
 export default function SolicitarAtendimento() {
   const { user } = useAuth();
   const beneficiarioAutenticado = user?.tipoUsuario === 'BENEFICIARIO';
+  const ehAdmin = user?.tipoUsuario === 'ADMIN';
   const apoloniaPropria = beneficiarioAutenticado && user?.tipoBeneficiario === 'MULHER_APOLONIA';
   const navigate = useNavigate();
   const { confirm, confirmDialog } = useConfirm();
   const [form, setForm] = useState<FormState>(() => ({
     ...initialForm,
-    nomeCodificado: user?.nome ?? '',
-    email: user?.tipoBeneficiario === 'MULHER_APOLONIA' ? '' : user?.email ?? '',
-    tipoPessoaAtendida: user?.tipoBeneficiario ?? initialForm.tipoPessoaAtendida,
-    identificacao: user?.modoIdentificacao ?? '',
-    codinome: user?.tipoBeneficiario === 'MULHER_APOLONIA' ? user.nome : '',
+    nomeCodificado: beneficiarioAutenticado ? (user?.nome ?? '') : '',
+    email: beneficiarioAutenticado && user?.tipoBeneficiario !== 'MULHER_APOLONIA' ? (user?.email ?? '') : '',
+    tipoPessoaAtendida: (beneficiarioAutenticado && user?.tipoBeneficiario) ? user.tipoBeneficiario : initialForm.tipoPessoaAtendida,
+    identificacao: beneficiarioAutenticado ? (user?.modoIdentificacao ?? '') : '',
+    codinome: apoloniaPropria ? (user?.nome ?? '') : '',
   }));
   const [enviando, setEnviando] = useState(false);
   const [sucesso, setSucesso] = useState('');
@@ -158,9 +159,9 @@ export default function SolicitarAtendimento() {
       tipoPessoaAtendida: tipo,
       nomeCodificado: tipo === 'MULHER_APOLONIA'
         ? ''
-        : current.nomeCodificado || user?.nome || '',
+        : current.nomeCodificado || (beneficiarioAutenticado ? (user?.nome || '') : ''),
       telefone: '',
-      email: tipo === 'MULHER_APOLONIA' ? '' : user?.email ?? '',
+      email: tipo === 'MULHER_APOLONIA' ? '' : (beneficiarioAutenticado ? (user?.email ?? '') : ''),
       identificacao: '',
       codinome: '',
       contatoSeguro: 'APLICACAO',
@@ -205,7 +206,8 @@ export default function SolicitarAtendimento() {
         setSucesso('');
 
         try {
-          await relatarAtendimento(beneficiarioAutenticado ? { descricao: form.descricao.trim() } : montarPayload(form, user?.id));
+          const idContaRelato = beneficiarioAutenticado || ehAdmin ? user?.id : undefined;
+          await relatarAtendimento(beneficiarioAutenticado ? { descricao: form.descricao.trim() } : montarPayload(form, idContaRelato));
           setSucesso('Relato enviado com sucesso. Aguarde um voluntário assumir o atendimento.');
           setForm((current) => ({
             ...current,

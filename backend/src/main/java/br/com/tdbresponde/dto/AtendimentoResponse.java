@@ -111,6 +111,8 @@ public class AtendimentoResponse {
         response.status = atendimento.getStatus();
         response.prioridade = atendimento.getPrioridade();
         response.dataAbertura = atendimento.getDataAbertura();
+        response.dataAtualizacao = atendimento.getDataAtualizacao();
+
         if (atendimento.getPessoaAtendida() instanceof MulherApolonia) {
             response.tipoPessoa = "MULHER_APOLONIA";
         } else if (atendimento.getPessoaAtendida() instanceof CriancaAdolescente) {
@@ -118,9 +120,20 @@ public class AtendimentoResponse {
         } else if (atendimento.getPessoaAtendida() != null) {
             response.tipoPessoa = atendimento.getPessoaAtendida().getTipo();
         }
+
         if ("MULHER_APOLONIA".equals(response.tipoPessoa)) {
             preencherIdentificacaoApolonia(response, atendimento);
             response.descricao = atendimento.getDescricao();
+        } else if ("CRIANCA_ADOLESCENTE".equals(response.tipoPessoa)) {
+            response.descricao = atendimento.getDescricao();
+            if (atendimento.getPessoaAtendida() != null) {
+                response.pessoaAtendidaId = atendimento.getPessoaAtendida().getId();
+                response.beneficiarioId = atendimento.getPessoaAtendida().getId();
+                response.pessoaAtendidaNome = atendimento.getPessoaAtendida().getNomeCodificado();
+                if (atendimento.getPessoaAtendida() instanceof CriancaAdolescente crianca) {
+                    response.gravidade = crianca.getGravidadeBucal();
+                }
+            }
         }
         return response;
     }

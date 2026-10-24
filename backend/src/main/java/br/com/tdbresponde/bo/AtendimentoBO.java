@@ -293,6 +293,9 @@ public class AtendimentoBO {
             if (!"ENCERRADO".equals(status)) {
                 atendimento.setDataEncerramento(null);
             }
+            if ("ABERTO".equals(status)) {
+                atendimento.setVoluntario(null);
+            }
         }
 
         atendimentoDAO.atualizar(atendimento);
