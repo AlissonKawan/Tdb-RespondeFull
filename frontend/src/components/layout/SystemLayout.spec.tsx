@@ -187,4 +187,79 @@ describe('SystemLayout', () => {
     fireEvent.click(screen.getByText('Área restrita'));
     expect(details.open).toBe(false);
   });
+
+  it('destrava o scroll do body ao abrir sidebar mobile, clicar em sair da conta e confirmar', () => {
+    const logout = vi.fn();
+    vi.mocked(useAuthHook.useAuth).mockReturnValue({
+      user: { id: 1, nome: 'Voluntário', email: 'local@example.test', tipoUsuario: 'VOLUNTARIO', ativo: true },
+      isVoluntario: true, isBeneficiario: false, isAdmin: false,
+      isAuthenticated: true, isLoading: false, authError: '',
+      logout, login: vi.fn(), register: vi.fn(),
+    });
+
+    render(
+      <MemoryRouter initialEntries={['/portal-voluntario']}>
+        <Routes>
+          <Route element={<SystemLayout />}>
+            <Route path="/portal-voluntario" element={<h1>Portal Voluntário</h1>} />
+          </Route>
+          <Route path="/login" element={<h1>Entrar na plataforma</h1>} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    expect(document.body.style.overflow).toBe('');
+
+    // Abre a sidebar no mobile
+    const openBtn = screen.getByLabelText('Abrir menu do sistema');
+    fireEvent.click(openBtn);
+    expect(document.body.style.overflow).toBe('hidden');
+
+    // Clica em sair da conta na sidebar
+    const sidebar = screen.getByLabelText('Navegação do sistema');
+    const exitBtn = within(sidebar).getByRole('button', { name: 'Sair da conta' });
+    fireEvent.click(exitBtn);
+
+    // Confirma a saída no modal
+    const dialog = screen.getByRole('alertdialog');
+    const confirmBtn = within(dialog).getByRole('button', { name: /^Sair$/ });
+    fireEvent.click(confirmBtn);
+
+    expect(logout).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole('heading', { name: 'Entrar na plataforma' })).toBeInTheDocument();
+    // O scroll do body deve estar destravado!
+    expect(document.body.style.overflow).toBe('');
+  });
+
+  it('destrava o scroll do body ao clicar no link da logo na sidebar mobile aberta', () => {
+    vi.mocked(useAuthHook.useAuth).mockReturnValue({
+      user: { id: 1, nome: 'Voluntário', email: 'local@example.test', tipoUsuario: 'VOLUNTARIO', ativo: true },
+      isVoluntario: true, isBeneficiario: false, isAdmin: false,
+      isAuthenticated: true, isLoading: false, authError: '',
+      logout: vi.fn(), login: vi.fn(), register: vi.fn(),
+    });
+
+    render(
+      <MemoryRouter initialEntries={['/portal-voluntario']}>
+        <Routes>
+          <Route element={<SystemLayout />}>
+            <Route path="/portal-voluntario" element={<h1>Portal Voluntário</h1>} />
+          </Route>
+          <Route path="/" element={<h1>Página Inicial Pública</h1>} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    // Abre a sidebar no mobile
+    const openBtn = screen.getByLabelText('Abrir menu do sistema');
+    fireEvent.click(openBtn);
+    expect(document.body.style.overflow).toBe('hidden');
+
+    // Clica no link da logo que leva para a home pública
+    const brandLink = screen.getByRole('link', { name: 'TDB Responde — página inicial' });
+    fireEvent.click(brandLink);
+
+    expect(screen.getByRole('heading', { name: 'Página Inicial Pública' })).toBeInTheDocument();
+    expect(document.body.style.overflow).toBe('');
+  });
 });

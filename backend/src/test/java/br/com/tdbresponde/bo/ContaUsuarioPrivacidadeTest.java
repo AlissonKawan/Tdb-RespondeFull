@@ -1,6 +1,7 @@
 package br.com.tdbresponde.bo;
 
 import br.com.tdbresponde.dao.ContaUsuarioDAO;
+import br.com.tdbresponde.dao.CriancaAdolescenteDAO;
 import br.com.tdbresponde.dto.LoginRequest;
 import br.com.tdbresponde.dto.RegisterRequest;
 import br.com.tdbresponde.dto.ContaUsuarioRequest;
@@ -8,6 +9,7 @@ import br.com.tdbresponde.exception.BusinessException;
 import br.com.tdbresponde.exception.ConflictException;
 import br.com.tdbresponde.exception.UnauthorizedException;
 import br.com.tdbresponde.model.ContaUsuario;
+import br.com.tdbresponde.model.CriancaAdolescente;
 import br.com.tdbresponde.model.TipoUsuario;
 import br.com.tdbresponde.security.SenhaHasher;
 import org.junit.jupiter.api.BeforeEach;
@@ -112,5 +114,48 @@ class ContaUsuarioPrivacidadeTest {
         verify(bo.dao).atualizar(conta);
         assertNull(conta.getEmail());
         assertEquals("aurora.segura", conta.getUsuario());
+    }
+
+    @Test void cadastroCriancaAdolescentePersistePerfilVinculadoAConta() {
+        bo.criancaDAO = mock(CriancaAdolescenteDAO.class);
+        var request = new RegisterRequest();
+        request.nome = "Pedro Santos";
+        request.email = "pedro@exemplo.com";
+        request.senha = "segredo123";
+        request.tipoUsuario = "BENEFICIARIO";
+        request.tipoBeneficiario = "CRIANCA_ADOLESCENTE";
+        request.telefone = "11999998888";
+        request.idade = 12;
+        request.nomeResponsavel = "Carla Santos";
+        request.escola = "E.E. Dom Pedro";
+
+        var conta = bo.registrar(request);
+        assertEquals("CRIANCA_ADOLESCENTE", conta.getTipoBeneficiario());
+
+        var criancaCaptor = ArgumentCaptor.forClass(CriancaAdolescente.class);
+        verify(bo.criancaDAO).inserir(criancaCaptor.capture());
+        var crianca = criancaCaptor.getValue();
+        assertEquals(15, crianca.getContaId());
+        assertEquals("Pedro Santos", crianca.getNomeCodificado());
+        assertEquals("11999998888", crianca.getTelefone());
+        assertEquals(12, crianca.getIdade());
+        assertEquals("Carla Santos", crianca.getNomeResponsavel());
+        assertEquals("E.E. Dom Pedro", crianca.getEscola());
+    }
+
+    @Test void cadastroCriancaAdolescenteExigeDadosDoPerfil() {
+        var request = new RegisterRequest();
+        request.nome = "Pedro Santos";
+        request.email = "pedro@exemplo.com";
+        request.senha = "segredo123";
+        request.tipoUsuario = "BENEFICIARIO";
+        request.tipoBeneficiario = "CRIANCA_ADOLESCENTE";
+        request.telefone = "11999998888";
+        request.idade = 12;
+        request.nomeResponsavel = "Carla Santos";
+        request.escola = "   ";
+
+        assertThrows(BusinessException.class, () -> bo.registrar(request));
+        verify(bo.dao, never()).cadastrarConta(any());
     }
 }

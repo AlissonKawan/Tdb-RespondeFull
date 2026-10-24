@@ -189,6 +189,10 @@ describe('Skill project-e2e-navigator — Navegação Completa e Ciclo de Vida E
 
     await user.type(screen.getByLabelText(/Nome completo/i), 'Ana Beneficiária E2E');
     await user.type(screen.getByLabelText(/E-mail/i), 'ana.e2e@tdb.test');
+    await user.type(screen.getByLabelText(/Telefone/i), '11988887777');
+    await user.type(screen.getByLabelText(/^Idade$/i), '11');
+    await user.type(screen.getByLabelText(/Nome do responsável/i), 'Maria E2E');
+    await user.type(screen.getByLabelText(/^Escola$/i), 'Escola Municipal E2E');
     await user.type(screen.getByPlaceholderText(/Mínimo de 6 caracteres/i), 'Senha@123');
     await user.type(screen.getByPlaceholderText(/Repita sua senha/i), 'Senha@123');
 
@@ -205,8 +209,13 @@ describe('Skill project-e2e-navigator — Navegação Completa e Ciclo de Vida E
       expect(registerMock).toHaveBeenCalledWith({
         nome: 'Ana Beneficiária E2E',
         email: 'ana.e2e@tdb.test',
+        telefone: '(11) 98888-7777',
+        idade: 11,
+        nomeResponsavel: 'Maria E2E',
+        escola: 'Escola Municipal E2E',
         senha: 'Senha@123',
         tipoUsuario: 'BENEFICIARIO',
+        tipoBeneficiario: 'CRIANCA_ADOLESCENTE',
       });
     });
 
@@ -306,12 +315,6 @@ describe('Skill project-e2e-navigator — Navegação Completa e Ciclo de Vida E
       </MemoryRouter>,
     );
 
-    fireEvent.change(screen.getByLabelText(/Nome da pessoa atendida/i), { target: { value: 'Lucas Silva E2E' } });
-    fireEvent.change(screen.getByLabelText(/Telefone/i), { target: { value: '11988887777' } });
-    fireEvent.change(screen.getByLabelText(/Email/i), { target: { value: 'ana.e2e@tdb.test' } });
-    fireEvent.change(screen.getByLabelText(/^Idade$/i), { target: { value: '11' } });
-    fireEvent.change(screen.getByLabelText(/Nome do responsável/i), { target: { value: 'Ana Beneficiária E2E' } });
-    fireEvent.change(screen.getByLabelText(/^Escola$/i), { target: { value: 'Escola Municipal E2E' } });
     fireEvent.change(screen.getByLabelText(/Descricao da situacao/i), {
       target: { value: 'Criança com dor aguda no molar inferior precisando de avaliação urgente.' },
     });
@@ -323,13 +326,9 @@ describe('Skill project-e2e-navigator — Navegação Completa e Ciclo de Vida E
     await user.click(confirmBtn);
 
     await waitFor(() => {
-      expect(relatarAtendimento).toHaveBeenCalledWith(
-        expect.objectContaining({
-          idContaBeneficiario: 201,
-          nomeCodificado: 'Lucas Silva E2E',
-          tipo: 'CRIANCA_ADOLESCENTE',
-        }),
-      );
+      expect(relatarAtendimento).toHaveBeenCalledWith({
+        descricao: 'Criança com dor aguda no molar inferior precisando de avaliação urgente.',
+      });
     });
   });
 

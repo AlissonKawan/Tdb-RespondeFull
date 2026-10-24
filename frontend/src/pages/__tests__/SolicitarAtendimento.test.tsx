@@ -13,14 +13,14 @@ vi.mock('../../services/relatoAtendimentoService', () => ({
   relatarAtendimento: vi.fn(),
 }));
 
-describe('SolicitarAtendimento', () => {
+describe('SolicitarAtendimento (Admin / Triagem Manual)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(useAuth).mockReturnValue({
-      user: { id: 10, nome: 'Maria Silva', email: 'maria@example.com', tipoUsuario: 'BENEFICIARIO', ativo: true },
+      user: { id: 10, nome: 'Admin TDB', email: 'admin@example.com', tipoUsuario: 'ADMIN', ativo: true },
       isVoluntario: false,
-      isBeneficiario: true,
-      isAdmin: false,
+      isBeneficiario: false,
+      isAdmin: true,
       isAuthenticated: true,
       isLoading: false,
       authError: '',
@@ -203,4 +203,49 @@ describe('SolicitarAtendimento', () => {
    vi.mocked(relatarAtendimento).mockReset();preparar();fireEvent.click(screen.getByRole('button',{name:'Enviar relato'}));
    expect(screen.getByText('Descreva a situação com 15 a 4000 caracteres.')).toBeInTheDocument();expect(relatarAtendimento).not.toHaveBeenCalled();
  });
+});
+
+describe('Criança/Adolescente autenticado', () => {
+  function preparar() {
+    vi.mocked(useAuth).mockReturnValue({
+      user: {
+        id: 9,
+        nome: 'Pedro Santos',
+        email: 'pedro@exemplo.com',
+        tipoUsuario: 'BENEFICIARIO',
+        tipoBeneficiario: 'CRIANCA_ADOLESCENTE',
+        idade: 12,
+        nomeResponsavel: 'Carla Santos',
+        escola: 'E.E. Dom Pedro',
+        telefone: '11999998888',
+        ativo: true,
+      },
+    } as ReturnType<typeof useAuth>);
+    render(<BrowserRouter><SolicitarAtendimento /></BrowserRouter>);
+  }
+
+  it('exibe resumo do perfil salvo e pede somente a descrição da situação', async () => {
+    vi.mocked(relatarAtendimento).mockReset();
+    preparar();
+
+    expect(screen.queryByRole('radio')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/Nome do responsavel|Escola|Idade|Telefone/i)).not.toBeInTheDocument();
+    expect(screen.getByText('Criança ou adolescente')).toBeInTheDocument();
+    expect(screen.getByText(/Perfil vinculado: Pedro Santos \(12 anos\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/Responsável: Carla Santos • Escola: E\.E\. Dom Pedro/i)).toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText('Descricao da situacao'), {
+      target: { value: 'Dor de dente constante há uma semana na escola.' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Enviar relato' }));
+
+    expect(relatarAtendimento).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: /^Enviar$/ }));
+
+    await waitFor(() =>
+      expect(relatarAtendimento).toHaveBeenCalledWith({
+        descricao: 'Dor de dente constante há uma semana na escola.',
+      })
+    );
+  });
 });

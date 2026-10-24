@@ -126,7 +126,8 @@ function validar(form: FormState) {
 
 export default function SolicitarAtendimento() {
   const { user } = useAuth();
-  const apoloniaPropria = user?.tipoUsuario === 'BENEFICIARIO' && user?.tipoBeneficiario === 'MULHER_APOLONIA';
+  const beneficiarioAutenticado = user?.tipoUsuario === 'BENEFICIARIO';
+  const apoloniaPropria = beneficiarioAutenticado && user?.tipoBeneficiario === 'MULHER_APOLONIA';
   const navigate = useNavigate();
   const { confirm, confirmDialog } = useConfirm();
   const [form, setForm] = useState<FormState>(() => ({
@@ -141,7 +142,7 @@ export default function SolicitarAtendimento() {
   const [sucesso, setSucesso] = useState('');
   const [erro, setErro] = useState('');
 
-  const tipoSelecionado = form.tipoPessoaAtendida === 'MULHER_APOLONIA'
+  const tipoSelecionado = (apoloniaPropria || (!beneficiarioAutenticado && form.tipoPessoaAtendida === 'MULHER_APOLONIA'))
     ? 'Programa Apolônia'
     : 'Criança ou adolescente';
 
@@ -171,7 +172,7 @@ export default function SolicitarAtendimento() {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (enviando || confirmDialog) return;
-    const validationError = apoloniaPropria
+    const validationError = beneficiarioAutenticado
       ? (form.descricao.trim().length < 15 || form.descricao.trim().length > 4000 ? 'Descreva a situação com 15 a 4000 caracteres.' : '')
       : validar(form);
 
@@ -185,8 +186,11 @@ export default function SolicitarAtendimento() {
       message: 'Confirma o envio desta solicitação de atendimento?',
       confirmText: 'Enviar',
       tone: 'primary',
-      details: apoloniaPropria ? [
-        { label: 'Programa', value: 'Programa Apolônia' },
+      details: beneficiarioAutenticado ? [
+        { label: 'Programa', value: apoloniaPropria ? 'Programa Apolônia' : 'Criança e Adolescente (Dentista do Bem)' },
+        { label: apoloniaPropria ? 'Como você é apresentada' : 'Pessoa atendida', value: user?.nome ?? 'Perfil da conta' },
+        ...(!apoloniaPropria && user?.nomeResponsavel ? [{ label: 'Responsável', value: user.nomeResponsavel }] : []),
+        ...(!apoloniaPropria && user?.escola ? [{ label: 'Escola', value: user.escola }] : []),
         { label: 'Descrição', value: form.descricao.trim() },
         { label: 'Conta', value: 'Será usada sua conta autenticada. Acompanhe pela aplicação.' },
       ] : [
@@ -201,7 +205,7 @@ export default function SolicitarAtendimento() {
         setSucesso('');
 
         try {
-          await relatarAtendimento(apoloniaPropria ? { descricao: form.descricao.trim() } : montarPayload(form, user?.id));
+          await relatarAtendimento(beneficiarioAutenticado ? { descricao: form.descricao.trim() } : montarPayload(form, user?.id));
           setSucesso('Relato enviado com sucesso. Aguarde um voluntário assumir o atendimento.');
           setForm((current) => ({
             ...current,
@@ -220,9 +224,15 @@ export default function SolicitarAtendimento() {
     <PageShell>
       <PageHeader
         variant="compact"
-        eyebrow="Atendimento"
+        eyebrow={apoloniaPropria ? 'Atendimento Sigiloso' : 'Atendimento'}
         title="Relatar uma situação"
-        description={apoloniaPropria ? "Conte qual apoio precisa. Você poderá acompanhar sua solicitação pela aplicação." : "Preencha as informações com cuidado. A equipe usa esses dados para priorizar e encaminhar o atendimento."}
+        description={
+          apoloniaPropria
+            ? 'Conte qual apoio precisa. Suas preferências de privacidade já estão salvas na sua conta e você acompanhará tudo pela aplicação.'
+            : beneficiarioAutenticado
+              ? 'Os dados do perfil da criança ou adolescente já estão vinculados à sua conta. Relate abaixo a necessidade odontológica.'
+              : 'Preencha as informações com cuidado. A equipe usa esses dados para priorizar e encaminhar o atendimento.'
+        }
         actions={
           <Button variant="secondary" onClick={() => navigate('/portal-beneficiario')}>
             Voltar para o portal
@@ -232,18 +242,22 @@ export default function SolicitarAtendimento() {
 
       <Section tone="white">
         <Card className="mx-auto max-w-4xl overflow-hidden">
-          <div className="border-b border-border bg-slate-50 px-6 py-5 sm:px-8">
+          <div className={`border-b px-6 py-5 sm:px-8 ${apoloniaPropria ? 'border-rose-200 bg-rose-50/60' : 'border-border bg-slate-50'}`}>
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h2 className="text-xl font-bold text-foreground">Dados do relato</h2>
-                <p className="mt-1 text-sm text-muted-foreground">{apoloniaPropria ? 'Descreva sua necessidade de atendimento.' : 'Identificacao protegida e triagem inicial.'}</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {beneficiarioAutenticado
+                    ? 'Descreva sua necessidade de atendimento. As configurações do seu perfil já estão salvas.'
+                    : 'Identificacao protegida e triagem inicial.'}
+                </p>
               </div>
-              <Badge tone="info">{tipoSelecionado}</Badge>
+              <Badge tone={apoloniaPropria ? 'danger' : 'info'}>{tipoSelecionado}</Badge>
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-8 p-6 sm:p-8">
-            {!apoloniaPropria && <>
+            {!beneficiarioAutenticado && <>
             <fieldset aria-describedby="care-path-description">
               <legend className="text-base font-bold text-foreground">Quem precisa de atendimento?</legend>
               <p id="care-path-description" className="mt-1 text-sm leading-6 text-muted-foreground">
@@ -348,7 +362,7 @@ export default function SolicitarAtendimento() {
                 </Field>
               )}
 
-              {(form.tipoPessoaAtendida !== 'MULHER_APOLONIA' || form.contatoSeguro === 'INFORMADO') && <><Field label="Telefone">
+              {(form.tipoPessoaAtendida !== 'MULHER_APOLONIA' || form.contatoSeguro === 'INFORMADO') && <><Field label={form.tipoPessoaAtendida === 'CRIANCA_ADOLESCENTE' ? 'Telefone do responsável' : 'Telefone'} hint={form.tipoPessoaAtendida === 'CRIANCA_ADOLESCENTE' ? 'Telefone de contato do pai, mãe ou responsável legal' : undefined}>
                 <Input
                   type="tel"
                   inputMode="tel"
@@ -462,11 +476,29 @@ export default function SolicitarAtendimento() {
             )}
 
             </>}
-            {apoloniaPropria && <p className="text-sm text-muted-foreground">Sua solicitação será vinculada à sua conta. Conte apenas o que for seguro compartilhar e acompanhe as respostas pela aplicação.</p>}
+            {beneficiarioAutenticado && (
+              <div className={`rounded-xl border p-4 text-sm ${apoloniaPropria ? 'border-rose-200 bg-rose-50/70 text-rose-950' : 'border-blue-100 bg-blue-50/60 text-slate-800'}`}>
+                <p className="font-bold">
+                  {apoloniaPropria
+                    ? `Identificação configurada no perfil: ${user?.nome}`
+                    : `Perfil vinculado: ${user?.nome}${user?.idade != null ? ` (${user.idade} anos)` : ''}`}
+                </p>
+                {!apoloniaPropria && (user?.nomeResponsavel || user?.escola) && (
+                  <p className="mt-1 text-muted-foreground">
+                    {[user?.nomeResponsavel ? `Responsável: ${user.nomeResponsavel}` : '', user?.escola ? `Escola: ${user.escola}` : ''].filter(Boolean).join(' • ')}
+                  </p>
+                )}
+                <p className="mt-1 text-muted-foreground">
+                  {apoloniaPropria
+                    ? 'Sua solicitação será vinculada à sua conta com sigilo protegido. Conte apenas o que for seguro compartilhar e acompanhe as respostas pela aplicação.'
+                    : 'As configurações do seu perfil já estão salvas. Descreva abaixo apenas o que está acontecendo e qual atendimento odontológico precisa.'}
+                </p>
+              </div>
+            )}
             <Field label="Descricao da situacao">
               <Textarea
                 rows={6}
-                maxLength={apoloniaPropria ? 4000 : undefined}
+                maxLength={beneficiarioAutenticado ? 4000 : undefined}
                 value={form.descricao}
                 onChange={(event) => updateField('descricao', event.target.value)}
                 placeholder="Conte o que está acontecendo, quando começou e qual apoio precisa agora."
@@ -486,7 +518,7 @@ export default function SolicitarAtendimento() {
             )}
 
             <div className="flex flex-col-reverse gap-3 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-sm text-muted-foreground">{apoloniaPropria ? 'Revise a descrição antes de enviar.' : 'Campos de risco usam escala de 1 a 5.'}</p>
+              <p className="text-sm text-muted-foreground">{beneficiarioAutenticado ? 'Revise a descrição antes de enviar.' : 'Campos de risco usam escala de 1 a 5.'}</p>
               <Button type="submit" size="large" disabled={enviando || Boolean(confirmDialog)}>
                 {enviando ? 'Enviando...' : 'Enviar relato'}
               </Button>

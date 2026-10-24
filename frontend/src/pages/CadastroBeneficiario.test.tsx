@@ -89,3 +89,49 @@ it('informa conflito de usuário sem atribuí-lo obrigatoriamente ao e-mail', as
   fireEvent.click(await screen.findByRole('button', { name: 'Confirmar cadastro' }));
   expect(await screen.findByRole('alert')).toHaveTextContent('Este usuário ou e-mail já está cadastrado');
 });
+
+it('cadastra perfil de Criança e Adolescente já salvando idade, responsável, escola e telefone', async () => {
+  render(<MemoryRouter><CadastroBeneficiario /></MemoryRouter>);
+  fireEvent.change(screen.getByLabelText('Nome completo'), { target: { value: 'Lucas Silva' } });
+  fireEvent.change(screen.getByLabelText('E-mail'), { target: { value: 'lucas@familia.test' } });
+  fireEvent.change(screen.getByLabelText(/Telefone/i), { target: { value: '11988887777' } });
+  fireEvent.change(screen.getByLabelText('Idade'), { target: { value: '12' } });
+  fireEvent.change(screen.getByLabelText('Nome do responsável'), { target: { value: 'Maria Silva' } });
+  fireEvent.change(screen.getByLabelText('Escola'), { target: { value: 'Escola Municipal Esperança' } });
+  fireEvent.change(screen.getByLabelText('Senha'), { target: { value: 'segredo123' } });
+  fireEvent.change(screen.getByLabelText('Confirmar senha'), { target: { value: 'segredo123' } });
+
+  fireEvent.click(screen.getByRole('button', { name: 'Criar conta de beneficiário' }));
+  const confirm = await screen.findByRole('button', { name: 'Confirmar cadastro' });
+  expect(registerAccount).not.toHaveBeenCalled();
+  fireEvent.click(confirm);
+
+  await waitFor(() => expect(registerAccount).toHaveBeenCalledExactlyOnceWith({
+    nome: 'Lucas Silva',
+    email: 'lucas@familia.test',
+    telefone: '(11) 98888-7777',
+    idade: 12,
+    nomeResponsavel: 'Maria Silva',
+    escola: 'Escola Municipal Esperança',
+    senha: 'segredo123',
+    tipoUsuario: 'BENEFICIARIO',
+    tipoBeneficiario: 'CRIANCA_ADOLESCENTE',
+  }));
+});
+
+it('permite que Mulher Apolônia informe telefone opcionalmente e exibe aviso de preenchimento não obrigatório', async () => {
+  start();
+  expect(screen.getByText(/O preenchimento do telefone não é obrigatório/i)).toBeInTheDocument();
+  const telefone = screen.getByLabelText(/Telefone \(opcional\)/i);
+  expect(telefone).toBeInTheDocument();
+  fireEvent.change(telefone, { target: { value: '11977776666' } });
+  fireEvent.change(screen.getByLabelText('Codinome'), { target: { value: 'Aurora Segura' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Criar conta de beneficiário' }));
+  const confirm = await screen.findByRole('button', { name: 'Confirmar cadastro' });
+  fireEvent.click(confirm);
+  await waitFor(() => expect(registerAccount).toHaveBeenCalledWith(expect.objectContaining({
+    tipoBeneficiario: 'MULHER_APOLONIA',
+    telefone: '(11) 97777-6666',
+    nome: 'Aurora Segura',
+  })));
+});

@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import AtendimentoIcon from '../atendimento/AtendimentoIcon';
+import { lockBodyScroll } from '../../utils/scrollLock';
 
 interface ImagemAmpliadaProps {
   src: string;
@@ -20,8 +21,8 @@ export default function ImagemAmpliada({ src, legenda, onClose }: ImagemAmpliada
     const dialog = dialogRef.current;
     if (!dialog) return;
     const anterior = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    const overflowAnterior = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    const unlock = lockBodyScroll();
+    
     dialog.showModal();
     // O painel do atendimento troca de modo neste breakpoint e pode abrir
     // outro dialog. A imagem deve continuar à frente durante essa transição.
@@ -34,7 +35,7 @@ export default function ImagemAmpliada({ src, legenda, onClose }: ImagemAmpliada
     return () => {
       viewport.removeEventListener('change', manterImagemVisivel);
       dialog.close();
-      document.body.style.overflow = overflowAnterior;
+      unlock();
       if (anterior?.isConnected) anterior.focus({ preventScroll: true });
     };
   }, []);

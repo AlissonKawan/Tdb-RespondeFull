@@ -13,6 +13,7 @@ interface FormData {
   nome: string;
   email: string;
   telefone: string;
+  telefoneOpcional: string;
   idade: string;
   nomeResponsavel: string;
   escola: string;
@@ -73,7 +74,7 @@ function CadastroBeneficiario() {
   const [apolonia, setApolonia] = useState(false);
   const [identificacao, setIdentificacao] = useState('');
   const { confirm, confirmDialog } = useConfirm();
-  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormData>({ shouldUnregister: true });
+  const { register, handleSubmit, watch, setValue, unregister, clearErrors, formState: { errors } } = useForm<FormData>({ shouldUnregister: true });
   const senha = watch('senha');
 
   const errorMessage = (error: unknown) => {
@@ -113,13 +114,14 @@ function CadastroBeneficiario() {
       email: data.email?.trim() || '',
       senha: data.senha,
       tipoUsuario: 'BENEFICIARIO',
-      ...(apolonia ? {
+  ...(apolonia ? {
         tipoBeneficiario: 'MULHER_APOLONIA' as const,
         usuario: data.usuario.trim().toLowerCase(),
         modoIdentificacao: identificacao as RegisterRequest['modoIdentificacao'],
+        ...(data.telefoneOpcional?.trim() ? { telefone: formatPhone(data.telefoneOpcional.trim()) } : {}),
       } : {
         tipoBeneficiario: 'CRIANCA_ADOLESCENTE' as const,
-        telefone: data.telefone.trim(),
+        telefone: formatPhone(data.telefone.trim()),
         idade: Number(data.idade),
         nomeResponsavel: data.nomeResponsavel.trim(),
         escola: data.escola.trim(),
@@ -133,6 +135,7 @@ function CadastroBeneficiario() {
         { label: 'Programa', value: 'Apolônias do Bem' },
         { label: 'Como você será apresentada', value: identificacao === 'GERADO' ? 'Nome gerado pelo sistema' : payload.nome },
         { label: 'Acesso', value: payload.usuario! },
+        { label: 'Telefone informado', value: payload.telefone || 'Não informado (opcional)' },
         { label: 'E-mail informado', value: payload.email || 'Nenhum. Acompanhe pela aplicação.' },
       ] : [
         { label: 'Programa', value: 'Criança e Adolescente (Dentista do Bem)' },
@@ -179,10 +182,14 @@ function CadastroBeneficiario() {
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                 <Field label="Programa de atendimento">
                   <Select value={apolonia ? 'apolonia' : 'geral'} onChange={event => {
-                    setApolonia(event.target.value === 'apolonia'); setIdentificacao(''); setErro('');
+                    const isApolonia = event.target.value === 'apolonia';
+                    setApolonia(isApolonia); setIdentificacao(''); setErro('');
                     setValue('nome', ''); setValue('email', '');
                     setValue('telefone', ''); setValue('idade', '');
                     setValue('nomeResponsavel', ''); setValue('escola', '');
+                    unregister('telefone'); unregister('idade');
+                    unregister('nomeResponsavel'); unregister('escola');
+                    clearErrors();
                   }}>
                     <option value="geral">Criança e Adolescente (Dentista do Bem)</option>
                     <option value="apolonia">Apolônias do Bem</option>
@@ -205,13 +212,30 @@ function CadastroBeneficiario() {
                         pattern: { value: /^[A-Za-z0-9._-]{3,40}$/, message: 'Use de 3 a 40 caracteres: letras, números, ponto, traço ou sublinhado.' },
                       })} />
                     </Field>
-                    <p className="text-sm text-muted-foreground">Telefone não é necessário. O e-mail é opcional e não autoriza contato externo. Sem e-mail, entre com seu usuário para acompanhar as respostas. A recuperação de senha ainda não está disponível; guarde suas credenciais com cuidado.</p>
+                    <p className="text-sm text-muted-foreground">O preenchimento do telefone não é obrigatório. O e-mail também é opcional e não autoriza contato externo. Sem e-mail, entre com seu usuário para acompanhar as respostas. A recuperação de senha ainda não está disponível; guarde suas credenciais com cuidado.</p>
                   </div>
                 )}
                 <div className="grid gap-5 sm:grid-cols-2">
                   {(!apolonia || (identificacao && identificacao !== 'GERADO')) && <Field label={apolonia && identificacao === 'CODINOME' ? 'Codinome' : 'Nome completo'} error={errors.nome?.message}>
                     <Input maxLength={apolonia ? 50 : 120} autoComplete={apolonia ? 'off' : 'name'} {...register('nome', { required: !apolonia || identificacao !== 'GERADO' ? 'Informe o nome ou codinome escolhido' : false })} />
                   </Field>}
+                  {apolonia && (
+                    <Field label="Telefone (opcional)" hint="Não é obrigatório preencher">
+                      <Input
+                        type="tel"
+                        inputMode="tel"
+                        autoComplete="tel"
+                        maxLength={15}
+                        placeholder="(11) 99999-9999"
+                        {...register('telefoneOpcional', {
+                          required: false,
+                          onChange: (event) => {
+                            event.target.value = formatPhone(event.target.value);
+                          },
+                        })}
+                      />
+                    </Field>
+                  )}
                   <Field label={apolonia ? 'E-mail (opcional)' : 'E-mail'} error={errors.email?.message}>
                     <Input
                       type="email"
@@ -231,7 +255,7 @@ function CadastroBeneficiario() {
                       Configure já os dados da criança ou adolescente. Assim, ao precisar de atendimento, você só precisará relatar o que está acontecendo.
                     </p>
                     <div className="grid gap-4 sm:grid-cols-2">
-                      <Field label="Telefone" error={errors.telefone?.message}>
+                      <Field label="Telefone do responsável" hint="Telefone de contato do pai, mãe ou responsável legal" error={errors.telefone?.message}>
                         <Input
                           type="tel"
                           inputMode="tel"
@@ -239,7 +263,7 @@ function CadastroBeneficiario() {
                           maxLength={15}
                           placeholder="(11) 99999-9999"
                           {...register('telefone', {
-                            required: 'Informe um telefone para contato',
+                            required: !apolonia ? 'Informe o telefone do responsável para contato' : false,
                             onChange: (event) => {
                               event.target.value = formatPhone(event.target.value);
                             },
@@ -253,8 +277,9 @@ function CadastroBeneficiario() {
                           max={17}
                           placeholder="Ex.: 12"
                           {...register('idade', {
-                            required: 'Informe a idade da criança ou adolescente',
+                            required: !apolonia ? 'Informe a idade da criança ou adolescente' : false,
                             validate: (value) => {
+                              if (apolonia) return true;
                               const num = Number(value);
                               if (Number.isNaN(num) || num < 0 || num > 17) return 'A idade deve estar entre 0 e 17 anos';
                               return true;
@@ -266,7 +291,7 @@ function CadastroBeneficiario() {
                         <Input
                           placeholder="Nome de quem acompanha"
                           {...register('nomeResponsavel', {
-                            required: 'Informe o nome do responsável',
+                            required: !apolonia ? 'Informe o nome do responsável' : false,
                           })}
                         />
                       </Field>
@@ -274,7 +299,7 @@ function CadastroBeneficiario() {
                         <Input
                           placeholder="Nome da escola"
                           {...register('escola', {
-                            required: 'Informe a escola',
+                            required: !apolonia ? 'Informe a escola' : false,
                           })}
                         />
                       </Field>

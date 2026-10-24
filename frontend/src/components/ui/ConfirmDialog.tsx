@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, type ReactNode, type RefObject } from 'react'
 import Button from './Button';
 import QuickExitButton from './QuickExitButton';
 import { useQuickExitVisibility } from './useQuickExitVisibility';
+import { lockBodyScroll } from '../../utils/scrollLock';
 
 export interface ConfirmConfig {
   title: string;
@@ -74,8 +75,8 @@ export function Dialog({
     const previouslyFocused = document.activeElement instanceof HTMLElement
       ? document.activeElement
       : null;
-    const previousBodyOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    const unlock = lockBodyScroll();
+    
 
     const requestedFocus = initialFocusRef?.current;
     const focusTarget = requestedFocus && !requestedFocus.matches(':disabled')
@@ -113,7 +114,7 @@ export function Dialog({
     dialog.addEventListener('keydown', handleKeyDown);
     return () => {
       dialog.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = previousBodyOverflow;
+      unlock();
       requestAnimationFrame(() => previouslyFocused?.focus());
     };
   }, [initialFocusRef]);

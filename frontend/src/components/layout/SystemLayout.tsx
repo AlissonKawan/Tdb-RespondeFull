@@ -4,6 +4,7 @@ import { useAuth } from '../../context/useAuth';
 import { useConfirm } from '../../hooks/useConfirm';
 import { portalFor } from '../ui/AccountRedirect';
 import QuickExitButton from '../ui/QuickExitButton';
+import { lockBodyScroll } from '../../utils/scrollLock';
 
 type NavigationGroup = 'GESTÃO & CONTROLE' | 'CLÍNICA & AGENDA' | 'COMUNICAÇÃO';
 type IconName = 'dashboard' | 'inscricoes' | 'voluntario' | 'beneficiario' | 'cronograma' | 'agenda' | 'ranking' | 'mensagens' | 'atendimento';
@@ -95,6 +96,14 @@ export default function SystemLayout() {
   const sidebarRef = useRef<HTMLElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const headerMenusRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setIsSidebarOpen(false);
+    if (contentRef.current) {
+      contentRef.current.scrollTop = 0;
+    }
+  }, [location.pathname]);
 
   const navigation: NavigationItem[] = [
     ...(isAdmin ? [
@@ -119,8 +128,8 @@ export default function SystemLayout() {
     const sidebar = sidebarRef.current;
     if (!sidebar) return;
 
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    const unlock = lockBodyScroll();
+    
     sidebar.querySelector<HTMLElement>('button, a')?.focus();
 
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -146,7 +155,7 @@ export default function SystemLayout() {
 
     document.addEventListener('keydown', handleKeyDown);
     return () => {
-      document.body.style.overflow = previousOverflow;
+      unlock();
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [isSidebarOpen]);
@@ -183,6 +192,7 @@ export default function SystemLayout() {
       confirmText: 'Sair',
       tone: 'danger',
       onConfirm: () => {
+        setIsSidebarOpen(false);
         logout();
         navigate('/login');
       },
@@ -211,7 +221,7 @@ export default function SystemLayout() {
       >
         <div className="shrink-0 p-5 pb-2">
           <div className="flex items-center justify-between gap-3">
-            <Link to="/" className="flex min-h-11 items-center gap-2.5 rounded-lg text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" aria-label="TDB Responde — página inicial">
+            <Link to="/" onClick={closeSidebar} className="flex min-h-11 items-center gap-2.5 rounded-lg text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" aria-label="TDB Responde — página inicial">
               <img src="/img/logo-simbolo.png" alt="" width="512" height="492" className="h-12 w-12 shrink-0 object-contain" />
               <span className="text-lg font-extrabold leading-5 tracking-tight">TDB<br />Responde</span>
             </Link>
@@ -338,7 +348,7 @@ export default function SystemLayout() {
           </div>
         </header>
 
-        <div className="system-content min-h-0 flex-1 overflow-auto">
+        <div ref={contentRef} className="system-content min-h-0 flex-1 overflow-auto">
           <Outlet />
         </div>
       </main>

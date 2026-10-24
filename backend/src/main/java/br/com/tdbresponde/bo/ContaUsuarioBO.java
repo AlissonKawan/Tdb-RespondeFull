@@ -97,7 +97,10 @@ public class ContaUsuarioBO {
         }
 
         ContaUsuario contaSalva = dao.buscarPorId(conta.getId());
-        if (contaSalva != null && contaSalva.getTipoBeneficiario() == null
+        if (contaSalva == null) {
+            contaSalva = conta;
+        }
+        if (contaSalva.getTipoBeneficiario() == null
                 && "CRIANCA_ADOLESCENTE".equalsIgnoreCase(request.tipoBeneficiario)) {
             contaSalva.setTipoBeneficiario("CRIANCA_ADOLESCENTE");
         }

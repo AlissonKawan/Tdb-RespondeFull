@@ -1,5 +1,6 @@
 package br.com.tdbresponde.bo;
 import br.com.tdbresponde.dao.AtendimentoDAO;
+import br.com.tdbresponde.dao.CriancaAdolescenteDAO;
 import br.com.tdbresponde.dto.*;
 import br.com.tdbresponde.exception.BusinessException;
 import br.com.tdbresponde.model.*;
@@ -16,4 +17,31 @@ class ApoloniaAberturaTest {
  @Test void riscoAusenteNaoCalculaPrioridade(){assertNull(bo.calcularPrioridade(new MulherApolonia()));}
  @Test void beneficiariaNaoRecebeTriagem(){var a=new Atendimento();a.setPrioridade(1);var p=new MulherApolonia();p.setNivelRisco(5);a.setPessoaAtendida(p);assertNull(AtendimentoResponse.paraBeneficiario(a).prioridade);assertNull(AtendimentoResponse.paraBeneficiario(a).gravidade);}
  @Test void projecaoNaoInventaGravidade(){var a=new Atendimento();a.setPessoaAtendida(new PessoaAtendidaBase());assertNull(AtendimentoResponse.from(a).gravidade);assertNull(AtendimentoResponse.from(a).prioridade);}
+ @Test void criancaAutenticadaRelataApenasComDescricaoUsandoPerfilSalvo(){
+  bo.criancaDAO = mock(CriancaAdolescenteDAO.class);
+  var crianca = new CriancaAdolescente();
+  crianca.setId(33);
+  crianca.setNomeCodificado("Pedro Santos");
+  crianca.setIdade(12);
+  crianca.setNomeResponsavel("Carla Santos");
+  crianca.setEscola("E.E. Dom Pedro");
+  crianca.setGravidadeBucal(2);
+  when(bo.criancaDAO.buscarPorContaId(9)).thenReturn(crianca);
+
+  var req = new RelatarSituacaoRequest();
+  req.idContaBeneficiario = 9;
+  req.descricao = "  Dor de dente intensa na escola.  ";
+
+  var resp = bo.relatar(req);
+  assertEquals(33, resp.pessoaAtendidaId);
+  assertEquals("ABERTO", resp.status);
+
+  var captor = org.mockito.ArgumentCaptor.forClass(Atendimento.class);
+  verify(dao).inserir(captor.capture());
+  var atendimento = captor.getValue();
+  assertSame(crianca, atendimento.getPessoaAtendida());
+  assertEquals("Dor de dente intensa na escola.", atendimento.getDescricao());
+  assertEquals("ABERTO", atendimento.getStatus());
+  assertEquals(Integer.valueOf(4), atendimento.getPrioridade());
+ }
 }

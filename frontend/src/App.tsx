@@ -7,6 +7,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './context/AuthContext';
 import Layout from './components/layout/Layout';
 import SystemLayout from './components/layout/SystemLayout';
+import RouteScrollManager from './components/layout/RouteScrollManager';
 import ProtectedRoute from './components/ui/ProtectedRoute';
 import SessionGate from './components/ui/SessionGate';
 import { AccountRedirect, GuestOnly } from './components/ui/AccountRedirect';
@@ -40,6 +41,7 @@ function App() {
     // AuthProvider envolve tudo — contexto disponível em qualquer componente
     <AuthProvider>
       <Router>
+        <RouteScrollManager />
         <SessionGate>
         <Suspense fallback={<div className="min-h-dvh bg-background p-6 md:p-10"><LoadingState title="Carregando página..." count={3} /></div>}>
           <Routes>

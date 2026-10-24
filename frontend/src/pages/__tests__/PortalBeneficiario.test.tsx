@@ -107,4 +107,72 @@ describe('PortalBeneficiario', () => {
     expect(screen.getByLabelText('Progresso do atendimento: Concluído')).toBeInTheDocument();
     expect(screen.getByLabelText('Progresso do atendimento: Atendimento cancelado')).toBeInTheDocument();
   });
+
+  it('adapta o portal para Criança e Adolescente (Dentista do Bem) exibindo dados do perfil cadastrado', async () => {
+    vi.mocked(useAuth).mockReturnValue({
+      user: {
+        id: 2,
+        nome: 'Lucas Silva',
+        email: 'maria@example.com',
+        telefone: '(11) 98888-7777',
+        idade: 12,
+        nomeResponsavel: 'Maria Silva',
+        escola: 'Escola Municipal Sol',
+        tipoUsuario: 'BENEFICIARIO',
+        tipoBeneficiario: 'CRIANCA_ADOLESCENTE',
+        ativo: true,
+      },
+      isVoluntario: false,
+      isBeneficiario: true,
+      isAdmin: false,
+      isAuthenticated: true,
+      isLoading: false,
+      authError: '',
+      logout: vi.fn(),
+      login: vi.fn(),
+      register: vi.fn(),
+    });
+    vi.mocked(atendimentoService.listarPorContaBeneficiario).mockResolvedValue([]);
+
+    render(<BrowserRouter><PortalBeneficiario /></BrowserRouter>);
+
+    expect(await screen.findByText('Portal Dentista do Bem')).toBeInTheDocument();
+    expect(screen.getByText('Programa Dentista do Bem — Criança e Adolescente')).toBeInTheDocument();
+    expect(screen.getByText('Lucas Silva (12 anos)')).toBeInTheDocument();
+    expect(screen.getByText('Maria Silva • Escola Municipal Sol')).toBeInTheDocument();
+  });
+
+  it('adapta o portal para Mulher Beneficiária (Apolônias do Bem) com identidade de acolhimento sigiloso', async () => {
+    vi.mocked(useAuth).mockReturnValue({
+      user: {
+        id: 3,
+        nome: 'Aurora',
+        usuario: 'aurora.segura',
+        email: null,
+        tipoUsuario: 'BENEFICIARIO',
+        tipoBeneficiario: 'MULHER_APOLONIA',
+        modoIdentificacao: 'CODINOME',
+        ativo: true,
+      },
+      isVoluntario: false,
+      isBeneficiario: true,
+      isAdmin: false,
+      isAuthenticated: true,
+      isLoading: false,
+      authError: '',
+      logout: vi.fn(),
+      login: vi.fn(),
+      register: vi.fn(),
+    });
+    vi.mocked(atendimentoService.listarPorContaBeneficiario).mockResolvedValue([]);
+
+    render(<BrowserRouter><PortalBeneficiario /></BrowserRouter>);
+
+    expect(await screen.findByText('Portal Apolônias do Bem')).toBeInTheDocument();
+    expect(screen.getByText('Programa Apolônias do Bem')).toBeInTheDocument();
+    expect(screen.getByText('Sigilo protegido')).toBeInTheDocument();
+    expect(screen.getByText('Acolhimento e solicitações sigilosas')).toBeInTheDocument();
+    expect(screen.getByText('aurora.segura')).toBeInTheDocument();
+    expect(screen.getByText('Seu espaço seguro de acolhimento começa aqui')).toBeInTheDocument();
+  });
 });

@@ -169,7 +169,7 @@ function PortalBeneficiario() {
   const [erro, setErro] = useState('');
 
   const isApolonia = user?.tipoBeneficiario === 'MULHER_APOLONIA'
-    || atendimentos.some((a) => a.tipoBeneficiario === 'MULHER_APOLONIA' || a.beneficiario?.tipo === 'MULHER_APOLONIA');
+    || atendimentos.some((a) => a.tipoPessoa === 'MULHER_APOLONIA');
 
   useEffect(() => {
     async function carregarAtendimentos() {
