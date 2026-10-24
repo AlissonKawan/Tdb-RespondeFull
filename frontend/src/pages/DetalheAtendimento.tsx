@@ -889,7 +889,8 @@ function DetalheAtendimento() {
         ...(ehAdmin ? [`Atendimento #${atendimento.id}`] : []), `Beneficiário: ${pessoaAtendida}`,
         `E-mail: ${atendimento.pessoaAtendidaEmail || 'Não informado'}`,
         `Telefone: ${atendimento.pessoaAtendidaTelefone || 'Não informado'}`,
-        `Status: ${labelStatus(atendimento.status)}`, `Prioridade: ${labelPrioridade(atendimento.prioridade)}`,
+        `Status: ${labelStatus(atendimento.status)}`,
+        ...(podeAlterar ? [`Prioridade: ${labelPrioridade(atendimento.prioridade)}`] : []),
         `Responsável: ${responsavel}`,
         `Abertura: ${formatDate(atendimento.dataAbertura ?? atendimento.dataCriacao)}`,
       ].join('\n'));
@@ -937,13 +938,13 @@ function DetalheAtendimento() {
             </header>
 
             <div className="grid shrink-0 grid-cols-2 gap-x-4 gap-y-2 rounded-xl border border-border bg-surface px-4 py-3 text-xs sm:grid-cols-3 2xl:grid-cols-3">
-              <div className="flex min-w-0 items-center gap-2.5">
+              {podeAlterar && <div className="flex min-w-0 items-center gap-2.5">
                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-warning/10 text-warning"><AtendimentoIcon name="priority" className="h-4 w-4" /></span>
                 <div>
                   <p className="text-muted-foreground">Prioridade</p>
                   <p className="font-semibold">{labelPrioridade(atendimento.prioridade)}</p>
                 </div>
-              </div>
+              </div>}
               <div className="col-span-2 flex min-w-0 items-center gap-2.5 sm:col-span-1">
                 <span className="hidden h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary sm:flex"><AtendimentoIcon name="user" className="h-4 w-4" /></span>
                 <div>
@@ -1140,7 +1141,7 @@ function DetalheAtendimento() {
               <p className="mt-2">
                 <Badge tone={statusTone(atendimento.status)}>{labelStatus(atendimento.status)}</Badge>
               </p>
-              <p className="mt-2 text-xs leading-5 text-muted-foreground">Status e prioridade são gerenciados pela equipe responsável.</p>
+              <p className="mt-2 text-xs leading-5 text-muted-foreground">Acompanhe por aqui o andamento do seu atendimento.</p>
             </div>}
 
             <section className="atendimento-section p-3" aria-labelledby="informacoes-atendimento">
@@ -1149,7 +1150,7 @@ function DetalheAtendimento() {
                 <InfoItem label="Nome" value={pessoaAtendida} />
                 <InfoItem label="E-mail" value={atendimento.pessoaAtendidaEmail} />
                 <InfoItem label="Telefone" value={atendimento.pessoaAtendidaTelefone} />
-                <InfoItem label="Prioridade" value={labelPrioridade(atendimento.prioridade)} />
+                {podeAlterar && <InfoItem label="Prioridade" value={labelPrioridade(atendimento.prioridade)} />}
                 <InfoItem label="Responsável" value={responsavel} />
                 <InfoItem label="Aberto em" value={formatDate(atendimento.dataAbertura ?? atendimento.dataCriacao)} />
                 {atendimento.dataEncerramento && <InfoItem label="Encerrado em" value={formatDate(atendimento.dataEncerramento)} />}
@@ -1242,7 +1243,7 @@ function DetalheAtendimento() {
                   <time className="text-muted-foreground">{formatDate(atendimento.dataEncerramento)}</time>
                 </li>}
               </ol>
-              <p className="text-xs leading-5 text-muted-foreground">O histórico detalhado de alterações de status e responsável ainda não está disponível.</p>
+              {podeAlterar && <p className="text-xs leading-5 text-muted-foreground">O histórico detalhado de alterações de status e responsável ainda não está disponível.</p>}
             </PainelSecao>
 
             {modalAgendaAberto && <Dialog title={editandoAgendaId ? 'Editar Consulta do Atendimento' : 'Agendar Consulta para Atendimento'} description={ehAdmin ? `Paciente: ${pessoaAtendida} · Atendimento #${atendimento.id}` : `Paciente: ${pessoaAtendida}`} onClose={() => { if (!salvandoAgenda) setModalAgendaAberto(false); }}>

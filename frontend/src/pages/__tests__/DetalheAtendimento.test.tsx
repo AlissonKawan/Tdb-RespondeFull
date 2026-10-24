@@ -550,6 +550,27 @@ describe('DetalheAtendimento - Deduplicação de Mensagens', () => {
     expect(screen.queryByLabelText('Status do atendimento')).not.toBeInTheDocument();
   });
 
+  it.each([undefined, 1] as const)('oculta prioridade %s e textos internos do beneficiário na tela e na cópia', async prioridade => {
+    const user = userEvent.setup();
+    const copy = vi.spyOn(navigator.clipboard, 'writeText');
+    vi.mocked(useAuth).mockReturnValue({ user: { id: 20, nome: 'Pessoa sintética', tipoUsuario: 'BENEFICIARIO' }, isBeneficiario: true } as ReturnType<typeof useAuth>);
+    vi.mocked(atendimentoService.buscarPorId).mockResolvedValue({ ...mockAtendimento, prioridade, dataAbertura: '2026-10-22T21:00:00' });
+    vi.mocked(mensagensService.getMensagensAtendimento).mockResolvedValue([]);
+    render(<MemoryRouter><DetalheAtendimento /></MemoryRouter>);
+
+    await screen.findByRole('heading', { name: 'Atendimento de Maria Souza' });
+    expect(screen.getByRole('button', { name: 'Fechar detalhes do atendimento' })).toBeInTheDocument();
+    expect(screen.getByText('Informações do atendimento')).toBeInTheDocument();
+    expect(screen.getByText('Acompanhe por aqui o andamento do seu atendimento.')).toBeInTheDocument();
+    expect(document.body.textContent).not.toMatch(/prioridade|Não avaliada|histórico detalhado de alterações|gerenciados pela equipe/i);
+    expect(screen.getByText('Atendimento aberto')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Copiar dados' }));
+    expect(copy).toHaveBeenCalledWith(expect.stringContaining('Status: Em atendimento'));
+    expect(copy.mock.calls.at(-1)?.[0]).not.toMatch(/prioridade|gravidade|risco/i);
+    expect(agendaService.buscarPorAtendimento).not.toHaveBeenCalled();
+    expect(prontuarioService.buscarPorAtendimento).not.toHaveBeenCalled();
+  });
+
   it('salva status e prioridade somente após confirmação e bloqueia o chat encerrado', async () => {
     const user = userEvent.setup();
     vi.mocked(atendimentoService.buscarPorId).mockResolvedValue(mockAtendimento);
@@ -591,6 +612,7 @@ describe('DetalheAtendimento - Deduplicação de Mensagens', () => {
     await user.click(await screen.findByRole('button', { name: 'Copiar dados' }));
     expect(copy).toHaveBeenCalledWith(expect.stringContaining('Beneficiário: Maria Souza'));
     expect(copy).toHaveBeenCalledWith(expect.stringContaining('Status: Em atendimento'));
+    expect(copy).toHaveBeenCalledWith(expect.stringContaining('Prioridade:'));
     expect(copy.mock.calls[0][0]).not.toMatch(/Informação clínica reservada|Tratamento reservado/);
     expect(await screen.findByText('Dados do atendimento copiados.')).toBeInTheDocument();
   });

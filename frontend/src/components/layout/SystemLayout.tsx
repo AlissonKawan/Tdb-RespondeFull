@@ -178,6 +178,7 @@ export default function SystemLayout() {
   const handleLogout = () => {
     confirm({
       title: 'Sair da conta',
+      compact: true,
       message: 'Você realmente quer sair da conta?',
       confirmText: 'Sair',
       tone: 'danger',
