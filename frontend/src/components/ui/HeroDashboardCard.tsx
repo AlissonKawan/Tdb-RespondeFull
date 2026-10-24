@@ -35,6 +35,7 @@ const programSlides = [
 function HeroDashboardCard() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isManuallyPaused, setIsManuallyPaused] = useState(false);
+  const [timerResetKey, setTimerResetKey] = useState(0);
 
   useEffect(() => {
     if (isManuallyPaused) return;
@@ -44,14 +45,21 @@ function HeroDashboardCard() {
     }, 7000);
 
     return () => window.clearInterval(intervalId);
-  }, [isManuallyPaused]);
+  }, [currentSlide, isManuallyPaused, timerResetKey]);
+
+  const selectSlide = (index: number) => {
+    setCurrentSlide(index);
+    setTimerResetKey((key) => key + 1);
+  };
 
   const showPreviousSlide = () => {
     setCurrentSlide((current) => (current - 1 + programSlides.length) % programSlides.length);
+    setTimerResetKey((key) => key + 1);
   };
 
   const showNextSlide = () => {
     setCurrentSlide((current) => (current + 1) % programSlides.length);
+    setTimerResetKey((key) => key + 1);
   };
 
   return (
@@ -143,7 +151,7 @@ function HeroDashboardCard() {
               <button
                 key={slide.title}
                 type="button"
-                onClick={() => setCurrentSlide(index)}
+                onClick={() => selectSlide(index)}
                 className={`h-3 rounded-full transition-[width,background-color] duration-fast focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                   index === currentSlide ? 'w-8 bg-primary' : 'w-3 bg-slate-300 hover:bg-slate-400'
                 }`}
