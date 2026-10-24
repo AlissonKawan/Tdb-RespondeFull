@@ -126,6 +126,7 @@ function validar(form: FormState) {
 
 export default function SolicitarAtendimento() {
   const { user } = useAuth();
+  const apoloniaPropria = user?.tipoUsuario === 'BENEFICIARIO' && user?.tipoBeneficiario === 'MULHER_APOLONIA';
   const navigate = useNavigate();
   const { confirm, confirmDialog } = useConfirm();
   const [form, setForm] = useState<FormState>(() => ({
@@ -170,7 +171,9 @@ export default function SolicitarAtendimento() {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (enviando || confirmDialog) return;
-    const validationError = validar(form);
+    const validationError = apoloniaPropria
+      ? (form.descricao.trim().length < 15 || form.descricao.trim().length > 4000 ? 'Descreva a situação com 15 a 4000 caracteres.' : '')
+      : validar(form);
 
     if (validationError) {
       setErro(validationError);
@@ -182,7 +185,11 @@ export default function SolicitarAtendimento() {
       message: 'Confirma o envio desta solicitação de atendimento?',
       confirmText: 'Enviar',
       tone: 'primary',
-      details: [
+      details: apoloniaPropria ? [
+        { label: 'Programa', value: 'Programa Apolônia' },
+        { label: 'Descrição', value: form.descricao.trim() },
+        { label: 'Conta', value: 'Será usada sua conta autenticada. Acompanhe pela aplicação.' },
+      ] : [
         { label: 'Programa', value: tipoSelecionado },
         { label: 'Identificação compartilhada', value: form.tipoPessoaAtendida === 'MULHER_APOLONIA' ? form.codinome : form.nomeCodificado },
         { label: 'Contato', value: form.tipoPessoaAtendida === 'MULHER_APOLONIA' && form.contatoSeguro === 'APLICACAO' ? 'Somente pela aplicação' : [form.telefone, form.email].filter(Boolean).join(' / ') || 'Somente pela aplicação' },
@@ -194,7 +201,7 @@ export default function SolicitarAtendimento() {
         setSucesso('');
 
         try {
-          await relatarAtendimento(montarPayload(form, user?.id));
+          await relatarAtendimento(apoloniaPropria ? { descricao: form.descricao.trim() } : montarPayload(form, user?.id));
           setSucesso('Relato enviado com sucesso. Aguarde um voluntário assumir o atendimento.');
           setForm((current) => ({
             ...current,
@@ -215,7 +222,7 @@ export default function SolicitarAtendimento() {
         variant="compact"
         eyebrow="Atendimento"
         title="Relatar uma situação"
-        description="Preencha as informações com cuidado. A equipe usa esses dados para priorizar e encaminhar o atendimento."
+        description={apoloniaPropria ? "Conte qual apoio precisa. Você poderá acompanhar sua solicitação pela aplicação." : "Preencha as informações com cuidado. A equipe usa esses dados para priorizar e encaminhar o atendimento."}
         actions={
           <Button variant="secondary" onClick={() => navigate('/portal-beneficiario')}>
             Voltar para o portal
@@ -229,13 +236,14 @@ export default function SolicitarAtendimento() {
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h2 className="text-xl font-bold text-foreground">Dados do relato</h2>
-                <p className="mt-1 text-sm text-muted-foreground">Identificacao protegida e triagem inicial.</p>
+                <p className="mt-1 text-sm text-muted-foreground">{apoloniaPropria ? 'Descreva sua necessidade de atendimento.' : 'Identificacao protegida e triagem inicial.'}</p>
               </div>
               <Badge tone="info">{tipoSelecionado}</Badge>
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-8 p-6 sm:p-8">
+            {!apoloniaPropria && <>
             <fieldset aria-describedby="care-path-description">
               <legend className="text-base font-bold text-foreground">Quem precisa de atendimento?</legend>
               <p id="care-path-description" className="mt-1 text-sm leading-6 text-muted-foreground">
@@ -453,9 +461,12 @@ export default function SolicitarAtendimento() {
               </div>
             )}
 
+            </>}
+            {apoloniaPropria && <p className="text-sm text-muted-foreground">Sua solicitação será vinculada à sua conta. Conte apenas o que for seguro compartilhar e acompanhe as respostas pela aplicação.</p>}
             <Field label="Descricao da situacao">
               <Textarea
                 rows={6}
+                maxLength={apoloniaPropria ? 4000 : undefined}
                 value={form.descricao}
                 onChange={(event) => updateField('descricao', event.target.value)}
                 placeholder="Conte o que está acontecendo, quando começou e qual apoio precisa agora."
@@ -475,7 +486,7 @@ export default function SolicitarAtendimento() {
             )}
 
             <div className="flex flex-col-reverse gap-3 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-sm text-muted-foreground">Campos de risco usam escala de 1 a 5.</p>
+              <p className="text-sm text-muted-foreground">{apoloniaPropria ? 'Revise a descrição antes de enviar.' : 'Campos de risco usam escala de 1 a 5.'}</p>
               <Button type="submit" size="large" disabled={enviando || Boolean(confirmDialog)}>
                 {enviando ? 'Enviando...' : 'Enviar relato'}
               </Button>

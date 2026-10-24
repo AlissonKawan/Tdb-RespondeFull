@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 public class MulherApolonia extends PessoaAtendida {
     private String codinome;
-    private  int nivelRisco; //1 a 5, onde 5 é risco de vida
+    private Integer nivelRisco; //1 a 5, onde 5 é risco de vida
     private Boolean temBoletimOcorrencia;
     private boolean necessitaSigiloAbsoluto = true; //sempre true para Apolonias
 
@@ -26,11 +26,11 @@ public class MulherApolonia extends PessoaAtendida {
         this.codinome = codinome;
     }
 
-    public int getNivelRisco() {
+    public Integer getNivelRisco() {
         return nivelRisco;
     }
 
-    public void setNivelRisco(int nivelRisco) {
+    public void setNivelRisco(Integer nivelRisco) {
         this.nivelRisco = nivelRisco;
     }
 

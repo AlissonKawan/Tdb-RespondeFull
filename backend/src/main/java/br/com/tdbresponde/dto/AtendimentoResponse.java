@@ -55,7 +55,7 @@ public class AtendimentoResponse {
                 if (response.tipoPessoa == null) {
                     response.tipoPessoa = "OUTRO";
                 }
-                response.gravidade = 3;
+                response.gravidade = null;
             }
         }
         if (atendimento.getVoluntario() != null) {

@@ -64,7 +64,7 @@ function labelPrioridade(prioridade?: string | number) {
     '4': '4 - Baixa',
     '5': '5 - Acompanhamento',
   };
-  return prioridade === undefined ? 'Não informada' : labels[String(prioridade)] ?? String(prioridade);
+  return prioridade === undefined || prioridade === '' ? 'Não avaliada' : labels[String(prioridade)] ?? String(prioridade);
 }
 
 function getSender(tipoUsuario?: string): MensagemRequest['enviadoPor'] {
@@ -239,7 +239,7 @@ function DetalheAtendimento() {
   const [salvando, setSalvando] = useState(false);
   const [salvandoCheckin, setSalvandoCheckin] = useState(false);
   const [statusEdit, setStatusEdit] = useState('ABERTO');
-  const [prioridadeEdit, setPrioridadeEdit] = useState('3');
+  const [prioridadeEdit, setPrioridadeEdit] = useState('');
 
   // --- Estados de Agenda e Prontuário no Atendimento ---
   const [agendasAtendimento, setAgendasAtendimento] = useState<AgendaConsulta[]>([]);
@@ -359,7 +359,7 @@ function DetalheAtendimento() {
       setAtendimento(dadosAtendimento);
       setMensagens(dadosMensagens);
       setStatusEdit(dadosAtendimento.status ?? 'ABERTO');
-      setPrioridadeEdit(String(dadosAtendimento.prioridade ?? 3));
+      setPrioridadeEdit(String(dadosAtendimento.prioridade ?? ''));
 
       if (podeConversar) carregarAgendaEProntuario(atendimentoId);
 
@@ -501,7 +501,7 @@ function DetalheAtendimento() {
   const semAlteracoes = Boolean(
     atendimento
     && statusEdit === (atendimento.status ?? 'ABERTO')
-    && prioridadeEdit === String(atendimento.prioridade ?? 3),
+    && prioridadeEdit === String(atendimento.prioridade ?? ''),
   );
 
   const confirmarAssumirAtendimento = () => {
@@ -702,7 +702,7 @@ function DetalheAtendimento() {
     try {
       const atualizado = await atendimentoService.atualizarStatusPrioridade(atendimento.id, {
         status: novoStatus,
-        prioridade: Number(prioridadeEdit),
+        prioridade: prioridadeEdit ? Number(prioridadeEdit) : undefined,
       });
       setAtendimento(atualizado);
       setStatusEdit(atualizado.status ?? novoStatus);
@@ -1129,7 +1129,7 @@ function DetalheAtendimento() {
                     </div>
                   </div>
                   <Field label="Prioridade">
-                    <Select value={prioridadeEdit} disabled={salvando} onChange={event => setPrioridadeEdit(event.target.value)} className="!py-2 !text-sm">{[1, 2, 3, 4, 5].map(value => <option key={value} value={value}>{labelPrioridade(value)}</option>)}</Select>
+                    <Select value={prioridadeEdit} disabled={salvando} onChange={event => setPrioridadeEdit(event.target.value)} className="!py-2 !text-sm"><option value="" disabled={Boolean(atendimento.prioridade)}>Não avaliada</option>{[1, 2, 3, 4, 5].map(value => <option key={value} value={value}>{labelPrioridade(value)}</option>)}</Select>
                   </Field>
                 </div>
                 {!semAlteracoes && <p className="text-xs text-muted-foreground">Alterações pendentes. Salve para aplicar.</p>}

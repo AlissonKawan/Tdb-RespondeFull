@@ -182,3 +182,25 @@ describe('SolicitarAtendimento', () => {
     expect(vi.mocked(relatarAtendimento).mock.calls[0][0].nomeCodificado).toBe('Nome autorizado');
   });
 });
+
+ describe('Apolônia autenticada', () => {
+ function preparar() {
+   vi.mocked(useAuth).mockReturnValue({user:{id:7,nome:'Aurora sintética',email:null,tipoUsuario:'BENEFICIARIO',tipoBeneficiario:'MULHER_APOLONIA',ativo:true}} as ReturnType<typeof useAuth>);
+   render(<BrowserRouter><SolicitarAtendimento /></BrowserRouter>);
+ }
+ it('pede somente descrição e envia após confirmação', async () => {
+   vi.mocked(relatarAtendimento).mockReset(); preparar();
+   expect(screen.queryByRole('radio')).not.toBeInTheDocument();
+   expect(screen.queryByLabelText(/Codinome|Nivel de risco|boletim|Telefone|Email/i)).not.toBeInTheDocument();
+   fireEvent.change(screen.getByLabelText('Descricao da situacao'),{target:{value:'Preciso de apoio odontológico.'}});
+   fireEvent.click(screen.getByRole('button',{name:'Enviar relato'}));
+   expect(relatarAtendimento).not.toHaveBeenCalled();
+   expect(screen.getAllByText('Preciso de apoio odontológico.').length).toBeGreaterThan(0);
+   fireEvent.click(screen.getByRole('button',{name:/^Enviar$/}));
+   await waitFor(()=>expect(relatarAtendimento).toHaveBeenCalledWith({descricao:'Preciso de apoio odontológico.'}));
+ });
+ it('valida descrição antes de abrir confirmação', () => {
+   vi.mocked(relatarAtendimento).mockReset();preparar();fireEvent.click(screen.getByRole('button',{name:'Enviar relato'}));
+   expect(screen.getByText('Descreva a situação com 15 a 4000 caracteres.')).toBeInTheDocument();expect(relatarAtendimento).not.toHaveBeenCalled();
+ });
+});

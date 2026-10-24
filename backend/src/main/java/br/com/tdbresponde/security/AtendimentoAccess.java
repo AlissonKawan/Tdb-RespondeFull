@@ -165,6 +165,13 @@ public class AtendimentoAccess {
         }
     }
 
+    public boolean contaApolonia(SecurityContext identity) {
+        int id = contaId(identity);
+        if (!identity.isUserInRole("BENEFICIARIO") || admin(identity)) return false;
+        var conta = contas.buscarPorId(id);
+        return conta != null && "MULHER_APOLONIA".equals(conta.getTipoBeneficiario());
+    }
+
     public void vincularRelato(RelatarSituacaoRequest request, SecurityContext identity) {
         int conta = contaId(identity);
         if (request == null) throw new BusinessException("Dados do relato sao obrigatorios");
@@ -173,6 +180,8 @@ public class AtendimentoAccess {
                     || (request.idContaBeneficiario != null && request.idContaBeneficiario != conta)) {
                 throw new ForbiddenException();
             }
+            // Defesa em profundidade: Apolônia nunca chega ao upsert legado de perfil.
+            if (contaApolonia(identity)) throw new ForbiddenException();
             request.idContaBeneficiario = conta;
         }
     }

@@ -60,7 +60,7 @@ public class MulherApoloniaDAO {
             try (PreparedStatement stmt = conn.prepareStatement(sqlMulher)) {
                 stmt.setInt(1, pessoaId);
                 stmt.setString(2, mulher.getCodinome());
-                stmt.setInt(3, mulher.getNivelRisco());
+                setInteger(stmt, 3, mulher.getNivelRisco());
                 stmt.setObject(4, mulher.getTemBoletimOcorrencia() == null ? null : (mulher.getTemBoletimOcorrencia() ? 1 : 0), Types.NUMERIC);
                 stmt.setBoolean(5, mulher.isNecessitaSigiloAbsoluto());
                 stmt.executeUpdate();
@@ -184,7 +184,7 @@ public class MulherApoloniaDAO {
                     "WHERE pessoa_id = ?";
             try (PreparedStatement stmt = conn.prepareStatement(sqlMulher)) {
                 stmt.setString(1, mulher.getCodinome());
-                stmt.setInt(2, mulher.getNivelRisco());
+                setInteger(stmt, 2, mulher.getNivelRisco());
                 stmt.setObject(3, mulher.getTemBoletimOcorrencia() == null ? null : (mulher.getTemBoletimOcorrencia() ? 1 : 0), Types.NUMERIC);
                 stmt.setBoolean(4, mulher.isNecessitaSigiloAbsoluto());
                 stmt.setInt(5, mulher.getId());
@@ -251,7 +251,8 @@ public class MulherApoloniaDAO {
         MulherApolonia m = new MulherApolonia();
         m.setId(rs.getInt("pessoa_id"));
         m.setCodinome(rs.getString("codinome"));
-        m.setNivelRisco(rs.getInt("nivel_risco"));
+        int risco = rs.getInt("nivel_risco");
+        m.setNivelRisco(rs.wasNull() ? null : risco);
         boolean boletim = rs.getBoolean("tem_boletim_ocorrencia");
         m.setTemBoletimOcorrencia(rs.wasNull() ? null : boletim);
         m.setNecessitaSigiloAbsoluto(rs.getBoolean("necessita_sigilo_absoluto"));
@@ -264,5 +265,9 @@ public class MulherApoloniaDAO {
         m.setTelefone(rs.getString("telefone"));
         m.setEmail(rs.getString("email"));
         return m;
+    }
+    private static void setInteger(PreparedStatement stmt, int index, Integer value) throws SQLException {
+        if (value == null) stmt.setNull(index, java.sql.Types.INTEGER);
+        else stmt.setInt(index, value);
     }
 }

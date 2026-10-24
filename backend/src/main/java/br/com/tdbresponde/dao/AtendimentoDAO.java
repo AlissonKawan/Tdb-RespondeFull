@@ -51,7 +51,7 @@ public class AtendimentoDAO {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, new String[]{"ID"})) {
 
-            stmt.setInt(1, atendimento.getPrioridade());
+            setInteger(stmt, 1, atendimento.getPrioridade());
             stmt.setString(2, atendimento.getStatus());
             stmt.setString(3, atendimento.getDescricao());
             stmt.setObject(4, atendimento.getDataAbertura());
@@ -170,6 +170,66 @@ public class AtendimentoDAO {
         return lista;
     }
 
+    /** Serializa por conta; não sobrescreve perfil nem detalhes históricos. */
+    public void abrirApolonia(int contaId, Atendimento atendimento) {
+        try (Connection conn = dataSource.getConnection()) {
+            boolean autoCommit = conn.getAutoCommit();
+            conn.setAutoCommit(false);
+            try {
+                String nome;
+                try (PreparedStatement stmt = conn.prepareStatement(
+                        "SELECT NOME, TIPO_USUARIO, TIPO_BENEFICIARIO, ATIVO FROM T_CONTA_USUARIO WHERE ID_CONTA = ? FOR UPDATE")) {
+                    stmt.setInt(1, contaId);
+                    try (ResultSet rs = stmt.executeQuery()) {
+                        if (!rs.next() || !"BENEFICIARIO".equals(rs.getString("TIPO_USUARIO"))
+                                || !"MULHER_APOLONIA".equals(rs.getString("TIPO_BENEFICIARIO"))
+                                || !rs.getBoolean("ATIVO")) throw new br.com.tdbresponde.exception.ForbiddenException();
+                        nome = rs.getString("NOME");
+                    }
+                }
+                if (nome == null || nome.isBlank()) throw new br.com.tdbresponde.exception.BusinessException(
+                        "Não foi possível usar a identificação da conta. Procure o suporte.");
+                MulherApolonia pessoa = new MulherApolonia();
+                pessoa.setContaId(contaId);
+                pessoa.setNomeCodificado(nome);
+                pessoa.setCodinome(nome);
+                pessoa.setTipo("MULHER_APOLONIA");
+                Integer pessoaId = null;
+                try (PreparedStatement stmt = conn.prepareStatement(
+                        "SELECT ID, TIPO FROM PESSOA_ATENDIDA WHERE ID_CONTA = ?")) {
+                    stmt.setInt(1, contaId);
+                    try (ResultSet rs = stmt.executeQuery()) {
+                        if (rs.next()) {
+                            pessoaId = rs.getInt("ID");
+                            String tipo = rs.getString("TIPO");
+                            if (!("MULHER_APOLONIA".equals(tipo) || "MULHER".equals(tipo)) || rs.next())
+                                throw new br.com.tdbresponde.exception.ConflictException("Perfil da conta precisa de revisão pela equipe.");
+                        }
+                    }
+                }
+                if (pessoaId == null) {
+                    pessoaId = inserirPessoaAtendida(conn, pessoa, "MULHER_APOLONIA");
+                    inserirMulherApolonia(conn, pessoaId, pessoa);
+                } else if (!existeDetalheMulher(conn, pessoaId)) {
+                    // Não preenche perfil parcial existente a partir de dados presumidos.
+                    throw new br.com.tdbresponde.exception.ConflictException("Perfil da conta precisa de revisão pela equipe.");
+                }
+                pessoa.setId(pessoaId);
+                atendimento.setPessoaAtendida(pessoa);
+                atendimento.setPrioridade(null);
+                inserirAtendimento(conn, atendimento);
+                conn.commit();
+            } catch (SQLException | RuntimeException e) {
+                try { conn.rollback(); } catch (SQLException rollbackError) { e.addSuppressed(rollbackError); }
+                throw e;
+            } finally {
+                conn.setAutoCommit(autoCommit);
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException("Não foi possível enviar a solicitação.", e);
+        }
+    }
+
     public void relatarSituacao(PessoaAtendida pessoa, String tipo, Atendimento atendimento) {
         Connection conn = null;
 
@@ -193,7 +253,7 @@ public class AtendimentoDAO {
     }
 
     public List<Atendimento> buscarSolicitados() {
-        String sql = SELECT_BASE + " WHERE A.VOLUNTARIO_ID IS NULL OR UPPER(A.STATUS) = 'ABERTO' ORDER BY A.DATA_ABERTURA DESC, A.PRIORIDADE ASC";
+        String sql = SELECT_BASE + " WHERE A.VOLUNTARIO_ID IS NULL OR UPPER(A.STATUS) = 'ABERTO' ORDER BY A.DATA_ABERTURA DESC, A.PRIORIDADE ASC NULLS LAST";
 
         List<Atendimento> lista = new ArrayList<>();
 
@@ -299,7 +359,7 @@ public class AtendimentoDAO {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, atendimento.getPrioridade());
+            setInteger(stmt, 1, atendimento.getPrioridade());
             stmt.setString(2, atendimento.getStatus());
             stmt.setString(3, atendimento.getDescricao());
             stmt.setObject(4, atendimento.getDataAbertura());
@@ -355,7 +415,8 @@ public class AtendimentoDAO {
     private Atendimento mapearResultSet(ResultSet rs) throws SQLException {
         Atendimento a = new Atendimento();
         a.setId(rs.getInt("ID"));
-        a.setPrioridade(rs.getInt("PRIORIDADE"));
+        int prioridade = rs.getInt("PRIORIDADE");
+        a.setPrioridade(rs.wasNull() ? null : prioridade);
         a.setStatus(rs.getString("STATUS"));
         a.setDescricao(rs.getString("DESCRICAO"));
         a.setDataAbertura(rs.getObject("DATA_ABERTURA", LocalDate.class));
@@ -537,7 +598,7 @@ public class AtendimentoDAO {
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, mulher.getCodinome());
-            stmt.setInt(2, mulher.getNivelRisco());
+            setInteger(stmt, 2, mulher.getNivelRisco());
             stmt.setObject(3, mulher.getTemBoletimOcorrencia() == null ? null : (mulher.getTemBoletimOcorrencia() ? 1 : 0), Types.NUMERIC);
             stmt.setInt(4, mulher.isNecessitaSigiloAbsoluto() ? 1 : 0);
             stmt.setInt(5, pessoaId);
@@ -583,7 +644,7 @@ public class AtendimentoDAO {
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, pessoaId);
             stmt.setString(2, mulher.getCodinome());
-            stmt.setInt(3, mulher.getNivelRisco());
+            setInteger(stmt, 3, mulher.getNivelRisco());
             stmt.setObject(4, mulher.getTemBoletimOcorrencia() == null ? null : (mulher.getTemBoletimOcorrencia() ? 1 : 0), Types.NUMERIC);
             stmt.setInt(5, mulher.isNecessitaSigiloAbsoluto() ? 1 : 0);
             stmt.executeUpdate();
@@ -597,7 +658,7 @@ public class AtendimentoDAO {
 
         try (PreparedStatement stmt = conn.prepareStatement(sql, new String[]{"ID"})) {
             stmt.setInt(1, atendimento.getPessoaAtendida().getId());
-            stmt.setInt(2, atendimento.getPrioridade());
+            setInteger(stmt, 2, atendimento.getPrioridade());
             stmt.setString(3, atendimento.getDescricao());
             stmt.executeUpdate();
 
@@ -656,5 +717,9 @@ public class AtendimentoDAO {
             throw new DatabaseException("Erro ao listar atendimentos por status: " + e.getMessage(), e);
         }
         return lista;
+    }
+    private static void setInteger(PreparedStatement stmt, int index, Integer value) throws SQLException {
+        if (value == null) stmt.setNull(index, java.sql.Types.INTEGER);
+        else stmt.setInt(index, value);
     }
 }

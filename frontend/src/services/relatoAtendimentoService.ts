@@ -1,6 +1,6 @@
 import { apiClient } from './apiClient';
 import type { RelatarAtendimentoRequest, RelatarAtendimentoResponse } from '../types/AtendimentoApi';
 
-export async function relatarAtendimento(payload: RelatarAtendimentoRequest): Promise<RelatarAtendimentoResponse | undefined> {
+export async function relatarAtendimento(payload: Partial<RelatarAtendimentoRequest> & { descricao: string }): Promise<RelatarAtendimentoResponse | undefined> {
   return apiClient.post<RelatarAtendimentoResponse>('/atendimentos/relatar', payload);
 }

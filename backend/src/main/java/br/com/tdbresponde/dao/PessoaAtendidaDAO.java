@@ -103,8 +103,8 @@ public class PessoaAtendidaDAO {
             try (PreparedStatement stmt = conn.prepareStatement(sqlMulher)) {
                 stmt.setInt(1, pessoaId);
                 stmt.setString(2, mulher.getCodinome());
-                stmt.setInt(3, mulher.getNivelRisco());
-                stmt.setBoolean(4, mulher.isTemBoletimOcorrencia());
+                setInteger(stmt, 3, mulher.getNivelRisco());
+                stmt.setObject(4, mulher.getTemBoletimOcorrencia() == null ? null : (mulher.getTemBoletimOcorrencia() ? 1 : 0), java.sql.Types.NUMERIC);
                 stmt.setBoolean(5, mulher.isNecessitaSigiloAbsoluto());
                 stmt.executeUpdate();
             }
@@ -225,5 +225,9 @@ public class PessoaAtendidaDAO {
                 e.printStackTrace();
             }
         }
+    }
+    private static void setInteger(PreparedStatement stmt, int index, Integer value) throws SQLException {
+        if (value == null) stmt.setNull(index, java.sql.Types.INTEGER);
+        else stmt.setInt(index, value);
     }
 }

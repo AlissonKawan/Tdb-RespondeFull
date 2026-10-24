@@ -108,6 +108,10 @@ public class AtendimentoResource {
     @POST
     @Path("/relatar")
     public Response relatar(RelatarSituacaoRequest request) {
+        if (access.contaApolonia(identity)) {
+            return Response.status(Response.Status.CREATED)
+                    .entity(bo.relatarApolonia(access.contaId(identity), request)).build();
+        }
         access.vincularRelato(request, identity);
         return Response.status(Response.Status.CREATED)
                 .entity(bo.relatar(request))

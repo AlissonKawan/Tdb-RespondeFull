@@ -137,6 +137,31 @@ public class AtendimentoBO {
         return atendimento;
     }
 
+    /** Conta vem exclusivamente da identidade autenticada, nunca do payload. */
+    public RelatarSituacaoResponse relatarApolonia(int contaId, RelatarSituacaoRequest request) {
+        if (request == null || isBlank(request.descricao) || request.descricao.trim().length() < 15
+                || request.descricao.trim().length() > 4000) {
+            throw new BusinessException("Descreva a situação com 15 a 4000 caracteres.");
+        }
+        if ((request.idContaBeneficiario != null && request.idContaBeneficiario != contaId)
+                || (request.tipo != null && !"MULHER_APOLONIA".equals(request.tipo))
+                || request.prioridade != null || request.nivelRisco != null
+                || request.nomeCodificado != null || request.codinome != null
+                || request.telefone != null || request.email != null
+                || request.temBoletimOcorrencia != null || request.necessitaSigiloAbsoluto != null
+                || request.idade != null || request.nomeResponsavel != null || request.escola != null
+                || request.gravidadeBucal != null) {
+            throw new BusinessException("Envie somente a descrição para solicitar seu atendimento.");
+        }
+        Atendimento atendimento = new Atendimento();
+        atendimento.setDescricao(request.descricao.trim());
+        atendimento.setStatus("ABERTO");
+        atendimento.setDataAbertura(LocalDate.now());
+        atendimentoDAO.abrirApolonia(contaId, atendimento);
+        return new RelatarSituacaoResponse(atendimento.getId(), atendimento.getPessoaAtendida().getId(),
+                "ABERTO", "Solicitação enviada com sucesso.");
+    }
+
     public RelatarSituacaoResponse relatar(RelatarSituacaoRequest request) {
         validarRelato(request);
 
@@ -265,21 +290,19 @@ public class AtendimentoBO {
     // Metodo: Calcular prioridade automaticamente
     // Regra de negócio: quanto maior o risco da mulher, maior a prioridade
     // Prioridade 1 = urgente, 2 = alta, 3 = normal
-    public int calcularPrioridade(MulherApolonia mulher) {
+    public Integer calcularPrioridade(MulherApolonia mulher) {
         if (mulher == null) {
             throw new BusinessException("Mulher nao pode ser nula para calcular prioridade");
         }
 
-        int nivelRisco = mulher.getNivelRisco();
+        Integer nivelRisco = mulher.getNivelRisco();
+        if (nivelRisco == null) return null;
 
         if (nivelRisco >= 4) {
-            System.out.println("Prioridade URGENTE definida para: " + mulher.getCodinome());
             return 1; // urgente — risco alto (4 ou 5)
         } else if (nivelRisco == 3) {
-            System.out.println("Prioridade ALTA definida para: " + mulher.getCodinome());
             return 2; // alta — risco médio
         } else {
-            System.out.println("Prioridade NORMAL definida para: " + mulher.getCodinome());
             return 3; // normal — risco baixo (1 ou 2)
         }
     }
@@ -395,7 +418,7 @@ public class AtendimentoBO {
                 voluntario.setId(request.voluntarioId);
                 atendimento.setVoluntario(voluntario);
             }
-            if (atendimento.getPrioridade() <= 0 && atendimento.getPessoaAtendida() != null) {
+            if ((atendimento.getPrioridade() == null || atendimento.getPrioridade() <= 0) && atendimento.getPessoaAtendida() != null) {
                 atendimento.setPrioridade(calcularPrioridade(atendimento.getPessoaAtendida()));
             }
         }
@@ -412,7 +435,7 @@ public class AtendimentoBO {
         if (atendimento.getVoluntario() != null && atendimento.getVoluntario().getId() <= 0) {
             throw new BusinessException("ID do voluntario deve ser valido");
         }
-        if (atendimento.getPrioridade() < 1 || atendimento.getPrioridade() > 4) {
+        if (atendimento.getPrioridade() != null && (atendimento.getPrioridade() < 1 || atendimento.getPrioridade() > 4)) {
             throw new BusinessException("Prioridade deve estar entre 1 e 4");
         }
         String status = normalizarStatus(atendimento.getStatus());
@@ -436,7 +459,7 @@ public class AtendimentoBO {
         return 4;
     }
 
-    public int calcularPrioridade(PessoaAtendida pessoa) {
+    public Integer calcularPrioridade(PessoaAtendida pessoa) {
         PessoaAtendida pessoaCompleta = buscarPessoaCompleta(pessoa.getId());
         if (pessoaCompleta instanceof MulherApolonia mulher) {
             return calcularPrioridade(mulher);

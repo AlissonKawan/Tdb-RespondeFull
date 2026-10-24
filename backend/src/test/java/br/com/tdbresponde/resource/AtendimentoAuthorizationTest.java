@@ -34,6 +34,15 @@ class AtendimentoAuthorizationTest {
         when(contas.buscarVoluntarioIdDaConta(8)).thenReturn(80);
     }
 
+    @Test void apoloniaUsaSomenteAberturaPropriaMesmoNoEndpointAntigo() {
+        var conta = new ContaUsuario(); conta.setTipoBeneficiario("MULHER_APOLONIA");
+        when(contas.buscarPorId(7)).thenReturn(conta);
+        var relato = new RelatarSituacaoRequest(); relato.descricao = "Relato sintético de apoio.";
+        resource.relatar(relato);
+        verify(bo).relatarApolonia(7, relato);
+        verify(bo, never()).relatar(any());
+    }
+
     @Test void beneficiarioNaoConsultaCasoOuMensagensDeOutraConta() {
         assertThrows(ForbiddenException.class, () -> resource.buscarPorId(2));
         assertThrows(ForbiddenException.class, () -> resource.listarMensagens(2));

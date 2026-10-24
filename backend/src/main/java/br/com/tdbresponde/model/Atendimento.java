@@ -7,7 +7,7 @@ public class Atendimento {
     private int id;
     private PessoaAtendida pessoaAtendida; // pode ser criancaAdolescente ou MulherApolonia;
     private Voluntario voluntario;
-    private int prioridade; //1=crítico, 2=alto, 3=médio, 4=baixo
+    private Integer prioridade; //1=crítico, 2=alto, 3=médio, 4=baixo
     private String status; //"Aberto", "Em andamento", "Encerrado"
     private String descricao;
     private LocalDate dataAbertura;
@@ -69,11 +69,11 @@ public class Atendimento {
         this.pessoaAtendida = pessoaAtendida;
     }
 
-    public int getPrioridade() {
+    public Integer getPrioridade() {
         return prioridade;
     }
 
-    public void setPrioridade(int prioridade) {
+    public void setPrioridade(Integer prioridade) {
         this.prioridade = prioridade;
     }
 
