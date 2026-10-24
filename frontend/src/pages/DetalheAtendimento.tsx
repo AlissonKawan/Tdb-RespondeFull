@@ -922,7 +922,7 @@ function DetalheAtendimento() {
         <Button variant="secondary" onClick={() => void carregarDados()}>Tentar novamente</Button>
       </div>}
       {!loading && !erro && atendimento && (
-        <div className="atendimento-workspace" data-panel-open={painelAberto}>
+        <div className="atendimento-workspace" data-panel-open={podeAlterar && painelAberto}>
           <div className="flex min-h-0 min-w-0 flex-col gap-3">
             <header className="flex shrink-0 items-start gap-3">
               <button type="button" onClick={() => navigate(-1)} className="atendimento-icon-button" aria-label="Voltar"><AtendimentoIcon name="back" /></button>
@@ -934,7 +934,7 @@ function DetalheAtendimento() {
                 </div>
                 <p className="mt-1 hidden text-sm text-muted-foreground sm:block">Acompanhe a conversa e ajude no que for necessário.</p>
               </div>
-              <button ref={painelButtonRef} type="button" onClick={() => painelAberto ? fecharPainel() : setPainelAberto(true)} aria-expanded={painelAberto} aria-controls="detalhes-atendimento" aria-label={painelAberto ? 'Ocultar detalhes do atendimento' : 'Abrir detalhes do atendimento'} className="atendimento-icon-button"><AtendimentoIcon name="panel" /></button>
+              {podeAlterar && <button ref={painelButtonRef} type="button" onClick={() => painelAberto ? fecharPainel() : setPainelAberto(true)} aria-expanded={painelAberto} aria-controls="detalhes-atendimento" aria-label={painelAberto ? 'Ocultar detalhes do atendimento' : 'Abrir detalhes do atendimento'} className="atendimento-icon-button"><AtendimentoIcon name="panel" /></button>}
             </header>
 
             <div className="grid shrink-0 grid-cols-2 gap-x-4 gap-y-2 rounded-xl border border-border bg-surface px-4 py-3 text-xs sm:grid-cols-3 2xl:grid-cols-3">
@@ -1118,7 +1118,7 @@ function DetalheAtendimento() {
               </form>
             </Card>
           </div>
-          <AtendimentoPanel open={painelAberto} onClose={fecharPainel}>
+          {podeAlterar && <AtendimentoPanel open={painelAberto} onClose={fecharPainel}>
             {podeAlterar ? (
               <section className="atendimento-section space-y-3 p-3" aria-label="Status e prioridade">
                 <div className="grid grid-cols-[minmax(0,3fr)_minmax(0,2fr)] items-end gap-2">
@@ -1327,7 +1327,7 @@ function DetalheAtendimento() {
               </div>}
             </Dialog>}
             {confirmDialog}
-          </AtendimentoPanel>
+          </AtendimentoPanel>}
         </div>
       )}
     </PageShell>
