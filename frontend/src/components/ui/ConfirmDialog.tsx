@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, type ReactNode, type RefObject } from 'react';
 import Button from './Button';
 import QuickExitButton from './QuickExitButton';
+import { useQuickExitVisibility } from './useQuickExitVisibility';
 
 export interface ConfirmConfig {
   title: string;
@@ -60,6 +61,7 @@ export function Dialog({
   const onCloseRef = useRef(onClose);
   const titleId = useId();
   const descriptionId = useId();
+  const showQuickExit = useQuickExitVisibility();
 
   useEffect(() => {
     onCloseRef.current = onClose;
@@ -149,12 +151,12 @@ export function Dialog({
           </button>
         </div>
 
-        {variant !== 'compact' && <div className="flex shrink-0 justify-end px-6 py-2"><QuickExitButton /></div>}
+        {showQuickExit && variant !== 'compact' && <div className="flex shrink-0 justify-end px-6 py-2"><QuickExitButton /></div>}
         {children && <div className={`min-h-0 overflow-y-auto px-6 ${variant === 'form' ? 'pb-4 sm:px-8' : 'py-5'}`}>{children}</div>}
         {footer ? (
           <div className={`flex shrink-0 gap-3 border-t border-border px-6 py-4 ${variant === 'compact' ? 'flex-col-reverse items-stretch sm:flex-row sm:items-center sm:justify-between' : 'flex-col-reverse sm:flex-row sm:justify-end'} ${variant === 'form' ? 'bg-white sm:px-8' : 'bg-muted/30'}`}>
             {variant === 'compact' ? <>
-              <div className="flex justify-center sm:justify-start"><QuickExitButton /></div>
+              {showQuickExit && <div className="flex justify-center sm:justify-start"><QuickExitButton /></div>}
               <div className="grid grid-cols-2 gap-3 sm:ml-auto sm:flex">{footer}</div>
             </> : footer}
           </div>

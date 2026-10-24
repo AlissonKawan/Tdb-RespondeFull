@@ -2,9 +2,30 @@ import { cleanup, fireEvent, render, screen, within } from '@testing-library/rea
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import ConfirmDialog from './ConfirmDialog';
 import { quickExit } from '../../services/quickExit';
+import { AuthContext, type AuthContextType } from '../../context/authContextInstance';
+import type { AuthUser } from '../../types/auth';
 
 vi.mock('../../services/quickExit', () => ({ quickExit: vi.fn() }));
 afterEach(() => { cleanup(); vi.clearAllMocks(); });
+
+it.each([
+  ['VOLUNTARIO', undefined, false],
+  ['BENEFICIARIO', 'CRIANCA_ADOLESCENTE', false],
+  ['BENEFICIARIO', 'MULHER_APOLONIA', true],
+] as const)('respeita saída rápida para %s / %s sem faixa vazia no modal', (tipoUsuario, tipoBeneficiario, visible) => {
+  const user: AuthUser = { id: 1, nome: 'Pessoa teste', email: null, ativo: true, tipoUsuario, tipoBeneficiario };
+  const onConfirm = vi.fn();
+  render(<AuthContext.Provider value={{ user } as AuthContextType}>
+    <ConfirmDialog config={{ title: 'Excluir Tarefa', message: 'Deseja realmente excluir esta tarefa?',
+      tone: 'danger', confirmText: 'Excluir', onConfirm }} onClose={vi.fn()} />
+  </AuthContext.Provider>);
+  const dialog = screen.getByRole('alertdialog', { name: 'Excluir Tarefa' });
+  expect(dialog).toHaveAccessibleDescription('Deseja realmente excluir esta tarefa?');
+  expect(within(dialog).queryByRole('button', { name: 'Saída rápida para o YouTube' }) !== null).toBe(visible);
+  expect(dialog.querySelector('.justify-end.px-6.py-2') !== null).toBe(visible);
+  fireEvent.click(within(dialog).getByRole('button', { name: 'Excluir' }));
+  expect(onConfirm).toHaveBeenCalledOnce();
+});
 
 describe('Confirmação compacta de saída', () => {
   function abrir() {

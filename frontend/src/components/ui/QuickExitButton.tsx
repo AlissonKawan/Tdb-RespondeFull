@@ -1,8 +1,11 @@
 import { useId } from 'react';
 import { quickExit } from '../../services/quickExit';
+import { useQuickExitVisibility } from './useQuickExitVisibility';
 
 export default function QuickExitButton() {
   const historyNoticeId = useId();
+  const visible = useQuickExitVisibility();
+  if (!visible) return null;
   return (
     <>
       <button
