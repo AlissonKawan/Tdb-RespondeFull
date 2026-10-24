@@ -4,6 +4,7 @@ import br.com.tdbresponde.model.MulherApolonia;
 import br.com.tdbresponde.exception.DatabaseException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.time.LocalDate;
@@ -17,71 +18,60 @@ public class MulherApoloniaDAO {
     DataSource dataSource;
 
     // CREATE
+    @Transactional
     public void inserir(MulherApolonia mulher) {
-        Connection conn = null;
-        try {
-            conn = dataSource.getConnection();
-            conn.setAutoCommit(false);
-
-            // INSERIR NA PESSOA_ATENDIDA
-            String sqlPessoa = "INSERT INTO pessoa_atendida " +
-                    "(nome_codificado, data_cadastro, telefone, email, tipo, id_conta) " +
-                    "VALUES (?, ?, ?, ?, ?, ?)";
-
-            int pessoaId;
-            try (PreparedStatement stmt = conn.prepareStatement(sqlPessoa, new String[]{"id"})) {
-                stmt.setString(1, mulher.getCodinome());
-                stmt.setObject(2, mulher.getData());
-                stmt.setString(3, mulher.getTelefone());
-                stmt.setString(4, mulher.getEmail());
-                stmt.setString(5, "MULHER_APOLONIA");
-                if (mulher.getContaId() != null) {
-                    stmt.setInt(6, mulher.getContaId());
-                } else {
-                    stmt.setNull(6, Types.INTEGER);
-                }
-                stmt.executeUpdate();
-
-                try (ResultSet rs = stmt.getGeneratedKeys()) {
-                    if (rs.next()) {
-                        pessoaId = rs.getInt(1);
-                    } else {
-                        throw new SQLException("Falha ao obter ID gerado");
-                    }
-                }
-            }
-
-            // INSERIR NA MULHER_APOLONIA
-            String sqlMulher = "INSERT INTO mulher_apolonia " +
-                    "(pessoa_id, codinome, nivel_risco, tem_boletim_ocorrencia, " +
-                    "necessita_sigilo_absoluto) " +
-                    "VALUES (?, ?, ?, ?, ?)";
-
-            try (PreparedStatement stmt = conn.prepareStatement(sqlMulher)) {
-                stmt.setInt(1, pessoaId);
-                stmt.setString(2, mulher.getCodinome());
-                setInteger(stmt, 3, mulher.getNivelRisco());
-                stmt.setObject(4, mulher.getTemBoletimOcorrencia() == null ? null : (mulher.getTemBoletimOcorrencia() ? 1 : 0), Types.NUMERIC);
-                stmt.setBoolean(5, mulher.isNecessitaSigiloAbsoluto());
-                stmt.executeUpdate();
-            }
-
-            conn.commit();
-            mulher.setId(pessoaId);
-
+        try (Connection conn = dataSource.getConnection()) {
+            inserir(conn, mulher);
         } catch (SQLException e) {
-            if (conn != null) {
-                try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
-            }
             throw new DatabaseException("Erro ao inserir: " + e.getMessage(), e);
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                } catch (SQLException e) { e.printStackTrace(); }
+        }
+    }
+
+    public void inserir(Connection conn, MulherApolonia mulher) throws SQLException {
+        // INSERIR NA PESSOA_ATENDIDA
+        String sqlPessoa = "INSERT INTO pessoa_atendida " +
+                "(nome_codificado, data_cadastro, telefone, email, tipo, id_conta) " +
+                "VALUES (?, ?, ?, ?, ?, ?)";
+
+        int pessoaId;
+        try (PreparedStatement stmt = conn.prepareStatement(sqlPessoa, new String[]{"id"})) {
+            stmt.setString(1, mulher.getCodinome());
+            stmt.setObject(2, mulher.getData());
+            stmt.setString(3, mulher.getTelefone());
+            stmt.setString(4, mulher.getEmail());
+            stmt.setString(5, "MULHER_APOLONIA");
+            if (mulher.getContaId() != null) {
+                stmt.setInt(6, mulher.getContaId());
+            } else {
+                stmt.setNull(6, Types.INTEGER);
+            }
+            stmt.executeUpdate();
+
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    pessoaId = rs.getInt(1);
+                } else {
+                    throw new SQLException("Falha ao obter ID gerado");
+                }
             }
         }
+
+        // INSERIR NA MULHER_APOLONIA
+        String sqlMulher = "INSERT INTO mulher_apolonia " +
+                "(pessoa_id, codinome, nivel_risco, tem_boletim_ocorrencia, " +
+                "necessita_sigilo_absoluto) " +
+                "VALUES (?, ?, ?, ?, ?)";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sqlMulher)) {
+            stmt.setInt(1, pessoaId);
+            stmt.setString(2, mulher.getCodinome());
+            setInteger(stmt, 3, mulher.getNivelRisco());
+            stmt.setObject(4, mulher.getTemBoletimOcorrencia() == null ? null : (mulher.getTemBoletimOcorrencia() ? 1 : 0), Types.NUMERIC);
+            stmt.setBoolean(5, mulher.isNecessitaSigiloAbsoluto());
+            stmt.executeUpdate();
+        }
+
+        mulher.setId(pessoaId);
     }
 
     // READ por ID
