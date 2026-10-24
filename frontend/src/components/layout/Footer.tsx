@@ -2,7 +2,7 @@ import Container from '../ui/Container';
 
 function Footer() {
   const links = [
-    { name: 'GitHub', url: 'https://github.com/AlissonMarcoschalenge77' },
+    { name: 'GitHub', url: 'https://github.com/AlissonKawan/Tdb-RespondeFull/tree/Alisson' },
     {
       name: 'LinkedIn Alisson',
       url: 'https://www.linkedin.com/in/alisson-kawan-evangelista-silva-5a3355219/',
@@ -23,14 +23,14 @@ function Footer() {
     <footer className="border-t border-blue-950/20 bg-foreground pb-16 text-white">
       <Container className="grid gap-8 py-10 md:grid-cols-[1.2fr_0.8fr_0.8fr]">
         <div>
-          <div className="w-fit max-w-full rounded-2xl bg-white p-3">
+          <div className="w-fit max-w-full rounded-xl bg-white p-2.5 shadow-xs">
             <img
               src="/img/logo-completa.png"
               alt="TDB Responde — Plataforma de atendimento da Turma do Bem."
               width="840"
               height="672"
               loading="lazy"
-              className="h-auto w-56 max-w-full object-contain md:w-64"
+              className="h-auto w-32 max-w-full object-contain md:w-36"
             />
           </div>
           <p className="mt-4 max-w-md text-sm leading-6 text-slate-300">

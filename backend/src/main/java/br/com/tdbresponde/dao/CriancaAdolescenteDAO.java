@@ -34,7 +34,7 @@ public class CriancaAdolescenteDAO {
                 stmt.setObject(2, crianca.getData());
                 stmt.setString(3, crianca.getTelefone());
                 stmt.setString(4, crianca.getEmail());
-                stmt.setString(5, "CRIANCA");
+                stmt.setString(5, "CRIANCA_ADOLESCENTE");
                 if (crianca.getContaId() != null) {
                     stmt.setInt(6, crianca.getContaId());
                 } else {

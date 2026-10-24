@@ -186,7 +186,7 @@ describe('PortalVoluntario', () => {
     vi.mocked(voluntariosService.buscarPorId).mockResolvedValue(voluntario());
     vi.mocked(atendimentoService.listarSolicitados).mockResolvedValue([
       { id: 1, beneficiarioNome: 'Caso Urgente', prioridade: 'ALTA', status: 'ABERTO' },
-      { id: 2, beneficiarioNome: 'Caso Protegido', tipoPessoa: 'MULHER_APOLONIA', prioridade: 'MEDIA', status: 'ABERTO' },
+      { id: 2, codinome: 'Caso Protegido', tipoPessoa: 'MULHER_APOLONIA', prioridade: 'MEDIA', status: 'ABERTO' },
       { id: 3, beneficiarioNome: 'Caso Regular', prioridade: 'BAIXA', status: 'ABERTO' },
     ]);
 
@@ -239,12 +239,57 @@ describe('PortalVoluntario', () => {
     for (const [nome, label] of [
       ['Paciente urgente', 'Urgente'], ['Paciente alta', 'Alta'],
       ['Paciente média', 'Média'], ['Paciente baixa', 'Baixa'],
-      ['Paciente acompanhamento', 'Acompanhamento'], ['Paciente sem prioridade', 'Não informada'],
+      ['Paciente acompanhamento', 'Acompanhamento'], ['Paciente sem prioridade', 'Aguardando triagem'],
     ]) {
       const card = screen.getByRole('heading', { name: nome }).closest('article');
       expect(card).not.toBeNull();
       expect(within(card!).getByText(label)).toBeInTheDocument();
     }
+  });
+
+  it('mostra codinome, comentário completo e sigilo nas duas filas e na confirmação', async () => {
+    const user = userEvent.setup();
+    vi.mocked(useAuth).mockReturnValue(authContext());
+    vi.mocked(voluntariosService.buscarPorId).mockResolvedValue(voluntario());
+    const caso: AtendimentoApi = {
+      id: 201, tipoPessoa: 'MULHER_APOLONIA', codinome: 'Flor de teste',
+      pessoaAtendidaNome: 'Nome que não deve aparecer', necessitaSigiloAbsoluto: true,
+      titulo: 'Título genérico', descricao: 'Preciso de apoio odontológico.\nPrefiro conversar pela aplicação.',
+      status: 'ABERTO',
+    };
+    vi.mocked(atendimentoService.listarSolicitados).mockResolvedValue([caso]);
+    vi.mocked(atendimentoService.listarPorVoluntario).mockResolvedValue([caso]);
+    render(<BrowserRouter><PortalVoluntario /></BrowserRouter>);
+    await screen.findByRole('heading', { name: 'Flor de teste' });
+    expect(screen.queryByText('Nome que não deve aparecer')).not.toBeInTheDocument();
+    expect(screen.getByText('Mulher Apolônia · Atendimento sigiloso')).toBeInTheDocument();
+    expect(screen.getByText(/Sigilo absoluto solicitado/)).toBeInTheDocument();
+    expect(screen.getByText(/Preciso de apoio odontológico/)).toHaveClass('whitespace-pre-wrap');
+    expect(screen.queryByText(/Região:/)).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Assumir atendimento' }));
+    const dialog = screen.getByRole('alertdialog');
+    expect(within(dialog).getByText('Flor de teste')).toBeInTheDocument();
+    expect(within(dialog).getByText(/Preciso de apoio odontológico/)).toBeInTheDocument();
+    await user.click(within(dialog).getByRole('button', { name: 'Cancelar' }));
+    await user.click(screen.getByRole('button', { name: 'Meus atendimentos' }));
+    expect(screen.getByRole('heading', { name: 'Flor de teste' })).toBeInTheDocument();
+    expect(screen.getByText('Mulher Apolônia · Atendimento sigiloso')).toBeInTheDocument();
+  });
+
+  it('não usa nome da conta como codinome e trata dados ausentes sem inventar informações', async () => {
+    vi.mocked(useAuth).mockReturnValue(authContext());
+    vi.mocked(voluntariosService.buscarPorId).mockResolvedValue(voluntario());
+    vi.mocked(atendimentoService.listarSolicitados).mockResolvedValue([
+      { id: 202, tipoPessoa: 'MULHER_APOLONIA', beneficiarioNome: 'Nome privado', descricao: '  ', observacao: 'Comentário alternativo' },
+      { id: 203, tipoPessoa: 'MULHER_APOLONIA', pessoaAtendidaNome: 'Codinome legado' },
+    ]);
+    render(<BrowserRouter><PortalVoluntario /></BrowserRouter>);
+    expect(await screen.findByRole('heading', { name: 'Codinome não informado' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Codinome legado' })).toBeInTheDocument();
+    expect(screen.queryByText('Nome privado')).not.toBeInTheDocument();
+    expect(screen.getByText('Comentário alternativo')).toBeInTheDocument();
+    expect(screen.getByText('Comentário não informado')).toBeInTheDocument();
+    expect(screen.queryByText(/Sigilo absoluto solicitado/)).not.toBeInTheDocument();
   });
 
   it('deve mostrar Copiado por dois segundos ao copiar o link', async () => {

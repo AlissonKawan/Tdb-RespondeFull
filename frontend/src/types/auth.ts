@@ -8,6 +8,14 @@ export interface RegisterPayload {
   tipoUsuario: TipoUsuario;
   usuario?: string;
   modoIdentificacao?: 'NOME' | 'CODINOME' | 'GERADO';
+  telefone?: string;
+  idade?: number;
+  nomeResponsavel?: string;
+  escola?: string;
+  gravidadeBucal?: number;
+  codinome?: string;
+  nivelRisco?: number;
+  temBoletimOcorrencia?: boolean;
   especialidadeId?: number;
   motivoVoluntariado?: string;
   tipoPessoaAtendida?: TipoPessoaAtendida;
@@ -31,6 +39,11 @@ export interface AuthUser {
   usuario?: string;
   tipoBeneficiario?: TipoPessoaAtendida;
   modoIdentificacao?: 'NOME' | 'CODINOME' | 'GERADO';
+  telefone?: string | null;
+  idade?: number | null;
+  nomeResponsavel?: string | null;
+  escola?: string | null;
+  codinome?: string | null;
   tipoUsuario: TipoUsuario;
   ativo: boolean;
   dataCriacao?: string;

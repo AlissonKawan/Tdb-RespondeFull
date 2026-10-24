@@ -35,11 +35,7 @@ public class AuthResource {
     @Inject AtendimentoAccess access;
     @Context SecurityContext identity;
 
-    @POST
-    @Path("/register")
-    public Response registrar(RegisterRequest request) {
-        ContaUsuario conta = bo.registrar(request);
-
+    private AuthUserResponse montarUsuarioAutenticado(ContaUsuario conta) {
         Integer voluntarioId = null;
         Integer beneficiarioId = null;
         String statusCro = null;
@@ -56,6 +52,39 @@ public class AuthResource {
 
         AuthUserResponse authRes = AuthUserResponse.from(conta, voluntarioId, beneficiarioId);
         authRes.statusCro = statusCro;
+
+        if (conta.getTipoUsuario() == TipoUsuario.BENEFICIARIO) {
+            var crianca = bo.buscarCriancaPorContaId(conta.getId());
+            if (crianca != null) {
+                authRes.beneficiarioId = crianca.getId();
+                if (authRes.tipoBeneficiario == null) {
+                    authRes.tipoBeneficiario = "CRIANCA_ADOLESCENTE";
+                }
+                authRes.telefone = crianca.getTelefone();
+                authRes.idade = crianca.getIdade();
+                authRes.nomeResponsavel = crianca.getNomeResponsavel();
+                authRes.escola = crianca.getEscola();
+            } else {
+                var mulher = bo.buscarMulherPorContaId(conta.getId());
+                if (mulher != null) {
+                    authRes.beneficiarioId = mulher.getId();
+                    if (authRes.tipoBeneficiario == null) {
+                        authRes.tipoBeneficiario = "MULHER_APOLONIA";
+                    }
+                    authRes.telefone = mulher.getTelefone();
+                    authRes.codinome = mulher.getCodinome();
+                }
+            }
+        }
+
+        return authRes;
+    }
+
+    @POST
+    @Path("/register")
+    public Response registrar(RegisterRequest request) {
+        ContaUsuario conta = bo.registrar(request);
+        AuthUserResponse authRes = montarUsuarioAutenticado(conta);
 
         return Response.status(Response.Status.CREATED)
                 .entity(authRes)
@@ -66,23 +95,7 @@ public class AuthResource {
     @Path("/login")
     public Response login(LoginRequest request) {
         ContaUsuario conta = bo.login(request);
-
-        Integer voluntarioId = null;
-        Integer beneficiarioId = null;
-        String statusCro = null;
-
-        if (conta.getTipoUsuario() == TipoUsuario.VOLUNTARIO) {
-            br.com.tdbresponde.model.Voluntario voluntario = bo.buscarVoluntarioPorContaId(conta.getId());
-            if (voluntario != null) {
-                voluntarioId = voluntario.getId();
-                statusCro = voluntario.getStatusCro();
-            }
-        } else if (conta.getTipoUsuario() == TipoUsuario.BENEFICIARIO) {
-            beneficiarioId = bo.buscarBeneficiarioIdDaConta(conta.getId());
-        }
-
-        AuthUserResponse authRes = AuthUserResponse.from(conta, voluntarioId, beneficiarioId);
-        authRes.statusCro = statusCro;
+        AuthUserResponse authRes = montarUsuarioAutenticado(conta);
 
         SessionService.IssuedSession session = sessions.create(conta);
         return Response.ok(Map.of("user", authRes, "token", session.token(),
@@ -94,20 +107,7 @@ public class AuthResource {
     @Path("/me")
     public Response me() {
         ContaUsuario conta = bo.buscarPorId(Integer.parseInt(identity.getUserPrincipal().getName()));
-        Integer voluntarioId = null;
-        Integer beneficiarioId = null;
-        String statusCro = null;
-        if (conta.getTipoUsuario() == TipoUsuario.VOLUNTARIO) {
-            var voluntario = bo.buscarVoluntarioPorContaId(conta.getId());
-            if (voluntario != null) {
-                voluntarioId = voluntario.getId();
-                statusCro = voluntario.getStatusCro();
-            }
-        } else if (conta.getTipoUsuario() == TipoUsuario.BENEFICIARIO) {
-            beneficiarioId = bo.buscarBeneficiarioIdDaConta(conta.getId());
-        }
-        AuthUserResponse response = AuthUserResponse.from(conta, voluntarioId, beneficiarioId);
-        response.statusCro = statusCro;
+        AuthUserResponse response = montarUsuarioAutenticado(conta);
         return Response.ok(response).header("Cache-Control", "no-store").build();
     }
 

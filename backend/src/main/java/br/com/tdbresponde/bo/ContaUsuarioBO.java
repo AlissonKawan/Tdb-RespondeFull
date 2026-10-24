@@ -90,9 +90,18 @@ public class ContaUsuarioBO {
             if (voluntario.getId() <= 0) {
                 throw new BusinessException("Nao foi possivel vincular a conta ao cadastro de voluntario.");
             }
+        } else if (tipo == TipoUsuario.BENEFICIARIO && "CRIANCA_ADOLESCENTE".equalsIgnoreCase(request.tipoBeneficiario)) {
+            if (criancaDAO != null) {
+                criarBeneficiarioParaConta(conta, request);
+            }
         }
 
-        return dao.buscarPorId(conta.getId());
+        ContaUsuario contaSalva = dao.buscarPorId(conta.getId());
+        if (contaSalva != null && contaSalva.getTipoBeneficiario() == null
+                && "CRIANCA_ADOLESCENTE".equalsIgnoreCase(request.tipoBeneficiario)) {
+            contaSalva.setTipoBeneficiario("CRIANCA_ADOLESCENTE");
+        }
+        return contaSalva;
     }
 
     public ContaUsuario login(LoginRequest request) {
@@ -120,13 +129,21 @@ public class ContaUsuarioBO {
     }
 
     public Integer buscarBeneficiarioIdDaConta(int contaId) {
-        CriancaAdolescente crianca = criancaDAO.buscarPorContaId(contaId);
+        CriancaAdolescente crianca = buscarCriancaPorContaId(contaId);
         if (crianca != null) {
             return crianca.getId();
         }
 
-        MulherApolonia mulher = mulherDAO.buscarPorContaId(contaId);
+        MulherApolonia mulher = buscarMulherPorContaId(contaId);
         return mulher != null ? mulher.getId() : null;
+    }
+
+    public CriancaAdolescente buscarCriancaPorContaId(int contaId) {
+        return criancaDAO != null ? criancaDAO.buscarPorContaId(contaId) : null;
+    }
+
+    public MulherApolonia buscarMulherPorContaId(int contaId) {
+        return mulherDAO != null ? mulherDAO.buscarPorContaId(contaId) : null;
     }
 
     public List<ContaUsuario> listar() {
@@ -210,12 +227,12 @@ public class ContaUsuarioBO {
             crianca.setContaId(conta.getId());
             crianca.setNomeCodificado(conta.getNome());
             crianca.setData(LocalDate.now());
-            crianca.setTelefone(request.telefone);
+            crianca.setTelefone(request.telefone != null ? request.telefone.trim() : null);
             crianca.setEmail(conta.getEmail());
             crianca.setIdade(request.idade != null ? request.idade : 0);
-            crianca.setNomeResponsavel(request.nomeResponsavel);
-            crianca.setEscola(request.escola);
-            crianca.setGravidadeBucal(request.gravidadeBucal != null ? request.gravidadeBucal : 1);
+            crianca.setNomeResponsavel(request.nomeResponsavel != null ? request.nomeResponsavel.trim() : null);
+            crianca.setEscola(request.escola != null ? request.escola.trim() : null);
+            crianca.setGravidadeBucal(request.gravidadeBucal != null ? request.gravidadeBucal : 3);
             criancaDAO.inserir(crianca);
             return;
         }
@@ -323,8 +340,20 @@ public class ContaUsuarioBO {
     }
 
     private void validarBeneficiario(RegisterRequest request) {
-        // Cadastro do beneficiário cria apenas a conta.
-        // Os dados específicos serão coletados no fluxo de atendimento.
+        if ("CRIANCA_ADOLESCENTE".equalsIgnoreCase(request.tipoBeneficiario)) {
+            if (isBlank(request.telefone)) {
+                throw new BusinessException("Informe um telefone para contato.");
+            }
+            if (request.idade == null || request.idade < 0 || request.idade > 17) {
+                throw new BusinessException("Informe a idade da criança ou adolescente (0 a 17 anos).");
+            }
+            if (isBlank(request.nomeResponsavel)) {
+                throw new BusinessException("Informe o nome do responsável.");
+            }
+            if (isBlank(request.escola)) {
+                throw new BusinessException("Informe a escola.");
+            }
+        }
     }
 
     private void validarLogin(LoginRequest request) {

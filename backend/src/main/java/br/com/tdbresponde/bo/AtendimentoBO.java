@@ -163,6 +163,9 @@ public class AtendimentoBO {
     }
 
     public RelatarSituacaoResponse relatar(RelatarSituacaoRequest request) {
+        if (relatoSimplificadoPorConta(request)) {
+            return relatarPorContaBeneficiario(request);
+        }
         validarRelato(request);
 
         String tipo = normalizarTipoRelato(request.tipo);
@@ -184,6 +187,77 @@ public class AtendimentoBO {
                 "ABERTO",
                 "Situacao relatada com sucesso."
         );
+    }
+
+    private boolean relatoSimplificadoPorConta(RelatarSituacaoRequest request) {
+        return request != null
+                && request.idContaBeneficiario != null
+                && request.idContaBeneficiario > 0
+                && isBlank(request.tipo)
+                && isBlank(request.nomeCodificado);
+    }
+
+    private RelatarSituacaoResponse relatarPorContaBeneficiario(RelatarSituacaoRequest request) {
+        if (isBlank(request.descricao) || request.descricao.trim().length() < 15
+                || request.descricao.trim().length() > 4000) {
+            throw new BusinessException("Descreva a situação com 15 a 4000 caracteres.");
+        }
+        int contaId = request.idContaBeneficiario;
+        CriancaAdolescente crianca = criancaDAO != null ? criancaDAO.buscarPorContaId(contaId) : null;
+        if (crianca != null) {
+            Atendimento atendimento = new Atendimento();
+            atendimento.setPessoaAtendida(crianca);
+            atendimento.setVoluntario(null);
+            atendimento.setPrioridade(calcularPrioridade(crianca));
+            atendimento.setStatus("ABERTO");
+            atendimento.setDescricao(request.descricao.trim());
+            atendimento.setDataAbertura(LocalDate.now());
+            atendimentoDAO.inserir(atendimento);
+            return new RelatarSituacaoResponse(
+                    atendimento.getId(),
+                    crianca.getId(),
+                    "ABERTO",
+                    "Solicitação enviada com sucesso."
+            );
+        }
+
+        MulherApolonia mulher = mulherDAO != null ? mulherDAO.buscarPorContaId(contaId) : null;
+        if (mulher != null) {
+            Atendimento atendimento = new Atendimento();
+            atendimento.setPessoaAtendida(mulher);
+            atendimento.setVoluntario(null);
+            atendimento.setPrioridade(calcularPrioridade(mulher));
+            atendimento.setStatus("ABERTO");
+            atendimento.setDescricao(request.descricao.trim());
+            atendimento.setDataAbertura(LocalDate.now());
+            atendimentoDAO.inserir(atendimento);
+            return new RelatarSituacaoResponse(
+                    atendimento.getId(),
+                    mulher.getId(),
+                    "ABERTO",
+                    "Solicitação enviada com sucesso."
+            );
+        }
+
+        PessoaAtendida pessoa = pessoaAtendidaDAO != null ? pessoaAtendidaDAO.buscarPorContaId(contaId) : null;
+        if (pessoa != null) {
+            Atendimento atendimento = new Atendimento();
+            atendimento.setPessoaAtendida(pessoa);
+            atendimento.setVoluntario(null);
+            atendimento.setPrioridade(3);
+            atendimento.setStatus("ABERTO");
+            atendimento.setDescricao(request.descricao.trim());
+            atendimento.setDataAbertura(LocalDate.now());
+            atendimentoDAO.inserir(atendimento);
+            return new RelatarSituacaoResponse(
+                    atendimento.getId(),
+                    pessoa.getId(),
+                    "ABERTO",
+                    "Solicitação enviada com sucesso."
+            );
+        }
+
+        throw new BusinessException("Perfil do beneficiário não encontrado para esta conta.");
     }
 
     public Atendimento atualizar(int id, AtendimentoRequest request) {

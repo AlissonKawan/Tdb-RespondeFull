@@ -138,18 +138,22 @@ function getPessoa(atendimento: AtendimentoApi) {
     ?? 'Beneficiário não informado';
 }
 
-function BeneficiaryEmptyState({ onCreate }: { onCreate: () => void }) {
+function BeneficiaryEmptyState({ onCreate, isApolonia }: { onCreate: () => void; isApolonia: boolean }) {
   return (
-    <Card className="border-dashed bg-gradient-to-br from-slate-50 to-blue-50/60 p-8 text-center md:p-10">
-      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-blue-600 shadow-sm ring-1 ring-blue-100">
+    <Card className={`border-dashed p-8 text-center md:p-10 ${isApolonia ? 'border-rose-200 bg-gradient-to-br from-rose-50/70 to-white' : 'bg-gradient-to-br from-slate-50 to-blue-50/60'}`}>
+      <div className={`mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white shadow-sm ring-1 ${isApolonia ? 'text-rose-600 ring-rose-200' : 'text-blue-600 ring-blue-100'}`}>
         <svg className="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 21s-7-4.4-7-11a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 6.6-7 11-7 11Z" />
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v5m-2.5-2.5h5" />
         </svg>
       </div>
-      <h3 className="mt-4 text-lg font-bold text-slate-900">Seu espaço de cuidado começa aqui</h3>
+      <h3 className="mt-4 text-lg font-bold text-slate-900">
+        {isApolonia ? 'Seu espaço seguro de acolhimento começa aqui' : 'Seu espaço de cuidado começa aqui'}
+      </h3>
       <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-600">
-        Você ainda não possui atendimentos. Abra uma solicitação para que nossa equipe possa acolher o seu caso.
+        {isApolonia
+          ? 'Você ainda não possui solicitações abertas. Relate sua necessidade com tranquilidade e sigilo para que nossa equipe possa acolher você.'
+          : 'Você ainda não possui atendimentos. Abra uma solicitação para que nossa equipe de dentistas voluntários possa acolher o seu caso.'}
       </p>
       <Button className="mt-5" onClick={onCreate}>Solicitar primeiro atendimento</Button>
     </Card>
@@ -163,6 +167,9 @@ function PortalBeneficiario() {
   const [novasMensagens, setNovasMensagens] = useState<Record<number, boolean>>({});
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState('');
+
+  const isApolonia = user?.tipoBeneficiario === 'MULHER_APOLONIA'
+    || atendimentos.some((a) => a.tipoBeneficiario === 'MULHER_APOLONIA' || a.beneficiario?.tipo === 'MULHER_APOLONIA');
 
   useEffect(() => {
     async function carregarAtendimentos() {
@@ -210,39 +217,98 @@ function PortalBeneficiario() {
     <PageShell>
       <PageHeader
         variant="compact"
-        eyebrow="Portal"
-        title={`Olá, ${user?.nome ?? 'beneficiário'}`}
-        description="Solicite atendimentos, acompanhe status e converse com voluntários pelo chat do atendimento."
+        eyebrow={isApolonia ? 'Portal Apolônias do Bem' : 'Portal Dentista do Bem'}
+        title={`Olá, ${user?.nome ?? (isApolonia ? 'beneficiária' : 'beneficiário')}`}
+        description={
+          isApolonia
+            ? 'Espaço seguro e sigiloso para solicitar acolhimento odontológico, acompanhar seu atendimento e conversar com a equipe pela aplicação.'
+            : 'Acompanhe o cuidado odontológico da criança ou adolescente, verifique o status da triagem e converse com o dentista voluntário pelo chat.'
+        }
       />
 
       <Section tone="white">
-        <Card className="mb-6 flex flex-col gap-5 p-4 md:p-6 md:flex-row md:items-center md:justify-between">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-primary">Pessoa atendida</p>
-            <h2 className="mt-2 text-2xl font-bold text-foreground">Meus atendimentos</h2>
-            <p className="mt-1 text-muted-foreground">
-              Veja aqui os pedidos vinculados ao seu cadastro.
-            </p>
+        <Card className={`mb-6 flex flex-col gap-5 p-4 md:p-6 ${isApolonia ? 'border-rose-200 bg-gradient-to-br from-rose-50/70 via-white to-rose-50/30' : 'border-blue-100 bg-gradient-to-br from-blue-50/55 via-white to-slate-50'}`}>
+          <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge tone={isApolonia ? 'danger' : 'info'}>
+                  {isApolonia ? 'Programa Apolônias do Bem' : 'Programa Dentista do Bem — Criança e Adolescente'}
+                </Badge>
+                {isApolonia && <Badge tone="neutral">Sigilo protegido</Badge>}
+              </div>
+              <h2 className="mt-3 text-2xl font-bold text-foreground">
+                {isApolonia ? 'Acolhimento e solicitações sigilosas' : 'Meus atendimentos odontológicos'}
+              </h2>
+              <p className="mt-1 text-muted-foreground">
+                {isApolonia
+                  ? 'Suas preferências de apresentação e privacidade já estão salvas na sua conta.'
+                  : 'Os dados do perfil da criança ou adolescente já estão vinculados à sua conta.'}
+              </p>
+            </div>
+            <Button onClick={() => navigate('/beneficiario/solicitar-atendimento')} size="large">
+              Solicitar atendimento
+            </Button>
           </div>
-          <Button onClick={() => navigate('/beneficiario/solicitar-atendimento')} size="large">
-            Solicitar atendimento
-          </Button>
+
+          <div className={`grid gap-3 rounded-xl border p-4 text-sm sm:grid-cols-3 ${isApolonia ? 'border-rose-200/80 bg-white/85' : 'border-blue-100 bg-white/85'}`}>
+            {isApolonia ? (
+              <>
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wide text-rose-700">Como você é apresentada</p>
+                  <p className="mt-1 font-semibold text-foreground">{user?.nome ?? 'Identificação protegida'}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wide text-rose-700">Acesso da conta</p>
+                  <p className="mt-1 font-semibold text-foreground">{user?.usuario ?? user?.email ?? 'Acesso pela aplicação'}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wide text-rose-700">Canal de retorno</p>
+                  <p className="mt-1 font-semibold text-foreground">Exclusivo pela aplicação</p>
+                </div>
+              </>
+            ) : (
+              <>
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wide text-primary">Pessoa atendida</p>
+                  <p className="mt-1 font-semibold text-foreground">
+                    {user?.nome ?? 'Beneficiário'}{user?.idade != null ? ` (${user.idade} anos)` : ''}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wide text-primary">Responsável e escola</p>
+                  <p className="mt-1 font-semibold text-foreground">
+                    {[user?.nomeResponsavel, user?.escola].filter(Boolean).join(' • ') || 'Perfil vinculado à conta'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wide text-primary">Contato cadastrado</p>
+                  <p className="mt-1 font-semibold text-foreground">
+                    {[user?.telefone, user?.email].filter(Boolean).join(' • ') || 'Pela aplicação'}
+                  </p>
+                </div>
+              </>
+            )}
+          </div>
         </Card>
 
         <SectionHeader
           title="Acompanhamento"
-          description="Acompanhe o andamento dos seus atendimentos e fale com o responsável quando necessário."
+          description={
+            isApolonia
+              ? 'Acompanhe o andamento das suas solicitações com privacidade e converse com a profissional responsável.'
+              : 'Acompanhe o andamento dos atendimentos da criança ou adolescente e fale com o dentista responsável.'
+          }
         />
 
         {loading && <LoadingState title="Carregando seus atendimentos..." count={3} />}
         {erro && <ErrorState title="Erro ao carregar dados" description={erro} />}
         {!loading && !erro && atendimentos.length === 0 && (
-          <BeneficiaryEmptyState onCreate={() => navigate('/beneficiario/solicitar-atendimento')} />
+          <BeneficiaryEmptyState isApolonia={isApolonia} onCreate={() => navigate('/beneficiario/solicitar-atendimento')} />
         )}
 
         <div className="grid gap-4">
           {!loading && !erro && atendimentos.map((atendimento) => (
-            <Card key={atendimento.id} className="p-5 transition-[border-color,transform] duration-fast hover:-translate-y-0.5 hover:border-blue-200 motion-reduce:transform-none motion-reduce:transition-none md:p-6">
+            <Card key={atendimento.id} className={`p-5 transition-[border-color,transform] duration-fast hover:-translate-y-0.5 motion-reduce:transform-none motion-reduce:transition-none md:p-6 ${isApolonia ? 'hover:border-rose-200' : 'hover:border-blue-200'}`}>
               <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">

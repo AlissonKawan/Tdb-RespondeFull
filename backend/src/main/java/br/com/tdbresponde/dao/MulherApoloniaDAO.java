@@ -34,7 +34,7 @@ public class MulherApoloniaDAO {
                 stmt.setObject(2, mulher.getData());
                 stmt.setString(3, mulher.getTelefone());
                 stmt.setString(4, mulher.getEmail());
-                stmt.setString(5, "MULHER");
+                stmt.setString(5, "MULHER_APOLONIA");
                 if (mulher.getContaId() != null) {
                     stmt.setInt(6, mulher.getContaId());
                 } else {

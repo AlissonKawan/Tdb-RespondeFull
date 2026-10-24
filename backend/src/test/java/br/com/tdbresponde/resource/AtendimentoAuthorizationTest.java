@@ -172,6 +172,38 @@ class AtendimentoAuthorizationTest {
         }
     }
 
+    @Test void filaApoloniaCompartilhaCodinomeERelatoSemContatosOuIdsPessoais() {
+        resource.identity = new TestIdentity(8, "VOLUNTARIO");
+        // A listagem usa PessoaAtendidaBase; o detalhe também pode trazer o subtipo.
+        for (var pessoa : List.of(new PessoaAtendidaBase(), new MulherApolonia())) {
+            pessoa.setTipo("MULHER_APOLONIA"); pessoa.setNomeCodificado("Flor de teste");
+            pessoa.setId(10); pessoa.setContaId(70);
+            pessoa.setEmail("fixture@example.invalid"); pessoa.setTelefone("contato privado");
+            if (pessoa instanceof MulherApolonia mulher) {
+                mulher.setCodinome("Lua de teste"); mulher.setNecessitaSigiloAbsoluto(true);
+            }
+            var a = atendimento(3, 70, 800); a.setPessoaAtendida(pessoa);
+            a.setVoluntario(null); a.setStatus("ABERTO"); a.setPrioridade(null);
+            a.setDescricao("Comentário de teste para acolhimento.");
+            when(bo.listarSolicitados()).thenReturn(List.of(a));
+            when(bo.listarConsultaveisPorVoluntario(80)).thenReturn(List.of(a));
+            when(bo.buscarPorId(3)).thenReturn(a);
+            var fila = (List<?>) resource.listarSolicitados().getEntity();
+            var geral = (List<?>) resource.listar().getEntity();
+            var detalhe = (AtendimentoResponse) resource.buscarPorId(3).getEntity();
+            for (var dto : List.of((AtendimentoResponse) fila.get(0), (AtendimentoResponse) geral.get(0), detalhe)) {
+                assertEquals("MULHER_APOLONIA", dto.tipoPessoa);
+                assertEquals(pessoa instanceof MulherApolonia ? "Lua de teste" : "Flor de teste", dto.codinome);
+                assertEquals(dto.codinome, dto.pessoaAtendidaNome);
+                assertEquals(a.getDescricao(), dto.descricao);
+                assertNull(dto.pessoaAtendidaTelefone); assertNull(dto.pessoaAtendidaEmail);
+                assertNull(dto.pessoaAtendidaId); assertNull(dto.beneficiarioId);
+                assertNull(dto.gravidade); assertNull(dto.prioridade);
+                assertEquals(pessoa instanceof MulherApolonia ? Boolean.TRUE : null, dto.necessitaSigiloAbsoluto);
+            }
+        }
+    }
+
     @Test void voluntarioAtribuidoEAdminMantemDetalhesNecessarios() {
         var a = atendimento(1, 7, 80); a.setDescricao("Relato sintetico reservado");
         a.setPrioridade(1); when(bo.buscarPorId(1)).thenReturn(a);

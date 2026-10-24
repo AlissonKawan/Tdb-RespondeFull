@@ -12,9 +12,26 @@ import { ApiError } from '../services/apiClient';
 interface FormData {
   nome: string;
   email: string;
+  telefone: string;
+  idade: string;
+  nomeResponsavel: string;
+  escola: string;
   senha: string;
   confirmarSenha: string;
   usuario: string;
+}
+
+function formatPhone(value: string) {
+  const digits = value.replace(/\D/g, '').slice(0, 11);
+  if (!digits) return '';
+  if (digits.length <= 2) return `(${digits}`;
+
+  const areaCode = digits.slice(0, 2);
+  const subscriber = digits.slice(2);
+  if (subscriber.length <= 4) return `(${areaCode}) ${subscriber}`;
+
+  const prefixLength = subscriber.length <= 8 ? 4 : 5;
+  return `(${areaCode}) ${subscriber.slice(0, prefixLength)}-${subscriber.slice(prefixLength)}`;
 }
 
 const BENEFITS = [
@@ -100,17 +117,29 @@ function CadastroBeneficiario() {
         tipoBeneficiario: 'MULHER_APOLONIA' as const,
         usuario: data.usuario.trim().toLowerCase(),
         modoIdentificacao: identificacao as RegisterRequest['modoIdentificacao'],
-      } : {}),
+      } : {
+        tipoBeneficiario: 'CRIANCA_ADOLESCENTE' as const,
+        telefone: data.telefone.trim(),
+        idade: Number(data.idade),
+        nomeResponsavel: data.nomeResponsavel.trim(),
+        escola: data.escola.trim(),
+      }),
     };
     confirm({
       title: 'Criar sua conta',
       message: 'Confirma a criação da conta com estas escolhas?',
       confirmText: 'Confirmar cadastro',
-      details: [
-        { label: 'Programa', value: apolonia ? 'Apolônias do Bem' : 'Atendimento geral' },
-        { label: 'Como você será apresentada', value: identificacao === 'GERADO' && apolonia ? 'Nome gerado pelo sistema' : payload.nome },
-        { label: 'Acesso', value: apolonia ? payload.usuario! : payload.email },
+      details: apolonia ? [
+        { label: 'Programa', value: 'Apolônias do Bem' },
+        { label: 'Como você será apresentada', value: identificacao === 'GERADO' ? 'Nome gerado pelo sistema' : payload.nome },
+        { label: 'Acesso', value: payload.usuario! },
         { label: 'E-mail informado', value: payload.email || 'Nenhum. Acompanhe pela aplicação.' },
+      ] : [
+        { label: 'Programa', value: 'Criança e Adolescente (Dentista do Bem)' },
+        { label: 'Pessoa atendida', value: `${payload.nome} (${payload.idade} anos)` },
+        { label: 'Responsável', value: payload.nomeResponsavel! },
+        { label: 'Escola', value: payload.escola! },
+        { label: 'Contato', value: `${payload.telefone} / ${payload.email}` },
       ],
       onConfirm: () => { void salvar(payload); },
     });
@@ -152,13 +181,15 @@ function CadastroBeneficiario() {
                   <Select value={apolonia ? 'apolonia' : 'geral'} onChange={event => {
                     setApolonia(event.target.value === 'apolonia'); setIdentificacao(''); setErro('');
                     setValue('nome', ''); setValue('email', '');
+                    setValue('telefone', ''); setValue('idade', '');
+                    setValue('nomeResponsavel', ''); setValue('escola', '');
                   }}>
-                    <option value="geral">Atendimento geral</option>
+                    <option value="geral">Criança e Adolescente (Dentista do Bem)</option>
                     <option value="apolonia">Apolônias do Bem</option>
                   </Select>
                 </Field>
                 {apolonia && (
-                  <div className="space-y-4 rounded-ui border border-border bg-muted p-4">
+                  <div className="space-y-4 rounded-ui border border-rose-200 bg-rose-50/60 p-4">
                     <p className="text-sm text-foreground">Você escolhe como se apresentar. O nome escolhido será usado no portal e poderá ser visto pela equipe de voluntários na fila de atendimento. Informe apenas o que for seguro compartilhar.</p>
                     <Field label="Como deseja se apresentar?">
                       <Select value={identificacao} onChange={event => { setIdentificacao(event.target.value); setValue('nome', ''); }}>
@@ -193,6 +224,63 @@ function CadastroBeneficiario() {
                     />
                   </Field>
                 </div>
+
+                {!apolonia && (
+                  <div className="space-y-4 rounded-ui border border-blue-100 bg-blue-50/50 p-4">
+                    <p className="text-sm font-medium text-slate-700">
+                      Configure já os dados da criança ou adolescente. Assim, ao precisar de atendimento, você só precisará relatar o que está acontecendo.
+                    </p>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <Field label="Telefone" error={errors.telefone?.message}>
+                        <Input
+                          type="tel"
+                          inputMode="tel"
+                          autoComplete="tel"
+                          maxLength={15}
+                          placeholder="(11) 99999-9999"
+                          {...register('telefone', {
+                            required: 'Informe um telefone para contato',
+                            onChange: (event) => {
+                              event.target.value = formatPhone(event.target.value);
+                            },
+                          })}
+                        />
+                      </Field>
+                      <Field label="Idade" error={errors.idade?.message}>
+                        <Input
+                          type="number"
+                          min={0}
+                          max={17}
+                          placeholder="Ex.: 12"
+                          {...register('idade', {
+                            required: 'Informe a idade da criança ou adolescente',
+                            validate: (value) => {
+                              const num = Number(value);
+                              if (Number.isNaN(num) || num < 0 || num > 17) return 'A idade deve estar entre 0 e 17 anos';
+                              return true;
+                            },
+                          })}
+                        />
+                      </Field>
+                      <Field label="Nome do responsável" error={errors.nomeResponsavel?.message}>
+                        <Input
+                          placeholder="Nome de quem acompanha"
+                          {...register('nomeResponsavel', {
+                            required: 'Informe o nome do responsável',
+                          })}
+                        />
+                      </Field>
+                      <Field label="Escola" error={errors.escola?.message}>
+                        <Input
+                          placeholder="Nome da escola"
+                          {...register('escola', {
+                            required: 'Informe a escola',
+                          })}
+                        />
+                      </Field>
+                    </div>
+                  </div>
+                )}
 
                 <div className="grid gap-5 sm:grid-cols-2">
                   <div>

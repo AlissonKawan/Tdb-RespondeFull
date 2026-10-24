@@ -47,6 +47,8 @@ export interface AtendimentoApi {
   statusCheckin?: StatusCheckin;
   horarioEnvioCheckin?: string;
   tipoPessoa?: TipoPessoaRelato;
+  codinome?: string | null;
+  necessitaSigiloAbsoluto?: boolean | null;
   gravidade?: number;
 }
 

@@ -74,7 +74,7 @@ class AtendimentoResponseIaTest {
         // Assert
         assertNotNull(response);
         assertEquals("OUTRO", response.tipoPessoa);
-        assertEquals(3, response.gravidade);
+        assertNull(response.gravidade);
     }
 
     @Test

@@ -31,6 +31,8 @@ public class AtendimentoResponse {
     public String statusCheckin;
     public LocalDateTime horarioEnvioCheckin;
     public String tipoPessoa;
+    public String codinome;
+    public Boolean necessitaSigiloAbsoluto;
     @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
     public Integer gravidade;
 
@@ -72,7 +74,22 @@ public class AtendimentoResponse {
         response.ultimaMensagemDoBeneficiario = atendimento.getUltimaMensagemDoBeneficiario();
         response.statusCheckin = atendimento.getStatusCheckin();
         response.horarioEnvioCheckin = atendimento.getHorarioEnvioCheckin();
+        preencherIdentificacaoApolonia(response, atendimento);
         return response;
+    }
+
+    private static void preencherIdentificacaoApolonia(AtendimentoResponse response, Atendimento atendimento) {
+        if (!"MULHER_APOLONIA".equals(response.tipoPessoa)) return;
+        var pessoa = atendimento.getPessoaAtendida();
+        String codinome = pessoa.getNomeCodificado();
+        if (pessoa instanceof MulherApolonia mulher) {
+            if (mulher.getCodinome() != null && !mulher.getCodinome().isBlank()) {
+                codinome = mulher.getCodinome();
+            }
+            response.necessitaSigiloAbsoluto = mulher.isNecessitaSigiloAbsoluto();
+        }
+        response.codinome = codinome;
+        response.pessoaAtendidaNome = codinome;
     }
 
     /** Dados de acompanhamento, sem classificacoes internas nem cadastro completo do voluntario. */
@@ -87,7 +104,7 @@ public class AtendimentoResponse {
         return response;
     }
 
-    /** Lista positiva: a fila nao recebe identidade, contatos ou relato antes da atribuicao. */
+    /** A fila Apolonia compartilha apenas codinome e relato; contatos e IDs pessoais continuam restritos. */
     public static AtendimentoResponse resumoFila(Atendimento atendimento) {
         AtendimentoResponse response = new AtendimentoResponse();
         response.id = atendimento.getId();
@@ -100,6 +117,10 @@ public class AtendimentoResponse {
             response.tipoPessoa = "CRIANCA_ADOLESCENTE";
         } else if (atendimento.getPessoaAtendida() != null) {
             response.tipoPessoa = atendimento.getPessoaAtendida().getTipo();
+        }
+        if ("MULHER_APOLONIA".equals(response.tipoPessoa)) {
+            preencherIdentificacaoApolonia(response, atendimento);
+            response.descricao = atendimento.getDescricao();
         }
         return response;
     }

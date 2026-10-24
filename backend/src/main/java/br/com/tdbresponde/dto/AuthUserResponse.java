@@ -19,6 +19,11 @@ public class AuthUserResponse {
     public Integer voluntarioId;
     public Integer beneficiarioId;
     public String statusCro;
+    public String telefone;
+    public Integer idade;
+    public String nomeResponsavel;
+    public String escola;
+    public String codinome;
 
     public static AuthUserResponse from(ContaUsuario conta) {
         AuthUserResponse response = new AuthUserResponse();

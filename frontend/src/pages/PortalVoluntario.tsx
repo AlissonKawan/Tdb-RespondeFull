@@ -79,6 +79,9 @@ function QueueHeading({ mine = false }: { mine?: boolean }) {
 }
 
 function getPessoa(atendimento: AtendimentoApi) {
+  if (atendimento.tipoPessoa === 'MULHER_APOLONIA') {
+    return atendimento.codinome?.trim() || atendimento.pessoaAtendidaNome?.trim() || 'Codinome não informado';
+  }
   return atendimento.pessoaAtendidaNome
     ?? atendimento.beneficiarioNome
     ?? atendimento.pacienteNome
@@ -89,10 +92,10 @@ function getPessoa(atendimento: AtendimentoApi) {
 }
 
 function getAtendimentoDescricaoContexto(atendimento: AtendimentoApi) {
-  return atendimento.titulo
-    ?? atendimento.descricao
-    ?? atendimento.observacao
-    ?? 'Atendimento sem descrição';
+  return atendimento.descricao?.trim()
+    || atendimento.observacao?.trim()
+    || atendimento.titulo?.trim()
+    || 'Comentário não informado';
 }
 
 function statusTone(status?: string): BadgeTone {
@@ -148,7 +151,8 @@ function AtendimentoCard({ atendimento, onAssumir, assumindo, assumirBloqueado, 
   const navigate = useNavigate();
   const aguardandoAcolhimento = ['ABERTO', 'Aberto'].includes(atendimento.status ?? 'ABERTO');
   const prioridadeUrgente = isUrgente(atendimento);
-  const prioridadeLabel = PRIORIDADE_LABELS[String(atendimento.prioridade)] ?? 'Não informada';
+  const prioridadeLabel = PRIORIDADE_LABELS[String(atendimento.prioridade)] ?? 'Aguardando triagem';
+  const isApolonia = atendimento.tipoPessoa === 'MULHER_APOLONIA';
 
   return (
     <article className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm transition-shadow hover:shadow-md motion-reduce:transition-none">
@@ -162,17 +166,23 @@ function AtendimentoCard({ atendimento, onAssumir, assumindo, assumirBloqueado, 
                 {aguardandoAcolhimento ? 'Aguardando acolhimento' : formatStatusLabel(atendimento.status)}
               </Badge>
               {hasNovaMensagem && <Badge tone="danger">Nova Mensagem</Badge>}
+              {isApolonia && <Badge tone="warning">Mulher Apolônia · Atendimento sigiloso</Badge>}
             </div>
             <h3 className="mt-2 break-words text-lg font-bold text-slate-900">{getPessoa(atendimento)}</h3>
+            {isApolonia && (
+              <p className="mt-2 break-words rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm leading-6 text-amber-900">
+                {atendimento.necessitaSigiloAbsoluto ? 'Sigilo absoluto solicitado. ' : ''}
+                Identificação por codinome. Preserve o sigilo da beneficiária e das informações deste atendimento.
+              </p>
+            )}
             <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs leading-6 text-slate-600 sm:text-sm">
               <span>Especialidade: Clínica geral</span><span aria-hidden="true">•</span>
-              <span>Região: Não informada</span><span aria-hidden="true">•</span>
               <span className="inline-flex items-center gap-1.5">Prioridade:
                 <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${prioridadeUrgente ? 'bg-rose-50 text-rose-700' : 'bg-emerald-50 text-emerald-700'}`}>{prioridadeLabel}</span>
               </span>
             </div>
             <div className="mt-2 space-y-1 text-xs leading-5 text-slate-500">
-              <p><strong className="text-foreground">Contexto:</strong> <span className="line-clamp-1">{getAtendimentoDescricaoContexto(atendimento)}</span></p>
+              <p><strong className="text-foreground">Comentário da solicitação:</strong> <span className="block whitespace-pre-wrap break-words">{getAtendimentoDescricaoContexto(atendimento)}</span></p>
               {(atendimento.dataAtualizacao || atendimento.dataCriacao || atendimento.dataAbertura) && (
                 <p><strong className="text-foreground">Última Atividade:</strong> {formatDate(atendimento.dataAtualizacao ?? atendimento.dataCriacao ?? atendimento.dataAbertura)}</p>
               )}

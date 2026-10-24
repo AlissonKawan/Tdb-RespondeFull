@@ -61,7 +61,7 @@ public class PessoaAtendidaDAO {
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
 
-            int pessoaId = inserirPessoaAtendida(conn, crianca, "CRIANCA");
+            int pessoaId = inserirPessoaAtendida(conn, crianca, "CRIANCA_ADOLESCENTE");
 
             String sqlCrianca = "INSERT INTO crianca_adolescente " +
                     "(pessoa_id, idade, nome_responsavel, escola, gravidade_bucal) " +
@@ -94,7 +94,7 @@ public class PessoaAtendidaDAO {
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
 
-            int pessoaId = inserirPessoaAtendida(conn, mulher, "MULHER");
+            int pessoaId = inserirPessoaAtendida(conn, mulher, "MULHER_APOLONIA");
 
             String sqlMulher = "INSERT INTO mulher_apolonia " +
                     "(pessoa_id, codinome, nivel_risco, tem_boletim_ocorrencia, necessita_sigilo_absoluto) " +
