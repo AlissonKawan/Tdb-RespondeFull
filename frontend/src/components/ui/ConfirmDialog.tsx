@@ -152,10 +152,10 @@ export function Dialog({
         {variant !== 'compact' && <div className="flex shrink-0 justify-end px-6 py-2"><QuickExitButton /></div>}
         {children && <div className={`min-h-0 overflow-y-auto px-6 ${variant === 'form' ? 'pb-4 sm:px-8' : 'py-5'}`}>{children}</div>}
         {footer ? (
-          <div className={`flex shrink-0 gap-3 border-t border-border px-6 py-4 ${variant === 'compact' ? 'flex-wrap items-center justify-between' : 'flex-col-reverse sm:flex-row sm:justify-end'} ${variant === 'form' ? 'bg-white sm:px-8' : 'bg-muted/30'}`}>
+          <div className={`flex shrink-0 gap-3 border-t border-border px-6 py-4 ${variant === 'compact' ? 'flex-col-reverse items-stretch sm:flex-row sm:items-center sm:justify-between' : 'flex-col-reverse sm:flex-row sm:justify-end'} ${variant === 'form' ? 'bg-white sm:px-8' : 'bg-muted/30'}`}>
             {variant === 'compact' ? <>
-              <QuickExitButton />
-              <div className="ml-auto flex gap-3">{footer}</div>
+              <div className="flex justify-center sm:justify-start"><QuickExitButton /></div>
+              <div className="grid grid-cols-2 gap-3 sm:ml-auto sm:flex">{footer}</div>
             </> : footer}
           </div>
         ) : null}
@@ -173,21 +173,21 @@ export default function ConfirmDialog({ config, onClose }: ConfirmDialogProps) {
 
   const icon = (
     <div className={`${config.compact ? '' : 'mb-5'} flex h-12 w-12 items-center justify-center rounded-ui ring-1 ${iconStyles}`}>
-        {config.tone === 'danger' ? (
-          <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v4m0 4h.01M10.3 3.8 2.2 18a2 2 0 0 0 1.7 3h16.2a2 2 0 0 0 1.7-3L13.7 3.8a2 2 0 0 0-3.4 0Z" />
-          </svg>
-        ) : config.tone === 'success' ? (
-          <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" d="m5 12 4 4L19 6" />
-          </svg>
-        ) : (
-          <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
-            <path strokeLinecap="round" strokeLinejoin="round" d="m9 12 2 2 4-4" />
-          </svg>
-        )}
-      </div>
+      {config.tone === 'danger' ? (
+        <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v4m0 4h.01M10.3 3.8 2.2 18a2 2 0 0 0 1.7 3h16.2a2 2 0 0 0 1.7-3L13.7 3.8a2 2 0 0 0-3.4 0Z" />
+        </svg>
+      ) : config.tone === 'success' ? (
+        <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" d="m5 12 4 4L19 6" />
+        </svg>
+      ) : (
+        <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="m9 12 2 2 4-4" />
+        </svg>
+      )}
+    </div>
   );
 
   return (
@@ -214,27 +214,27 @@ export default function ConfirmDialog({ config, onClose }: ConfirmDialogProps) {
       )}
     >
       {config.compact && !config.details?.length ? null : <>
-      {!config.compact && icon}
+        {!config.compact && icon}
 
-      {config.details && config.details.length > 0 ? (
-        <dl className="overflow-hidden rounded-ui border border-border bg-muted/55">
-          {config.details.map((detail, index) => {
-            const valueTone = detail.tone === 'danger'
-              ? 'text-danger'
-              : detail.tone === 'success'
-                ? 'text-success'
-                : detail.tone === 'primary'
-                  ? 'text-primary'
-                  : 'text-foreground';
-            return (
-              <div key={`${detail.label}-${index}`} className="flex items-start justify-between gap-4 border-b border-border px-4 py-3 last:border-b-0">
-                <dt className="text-sm font-medium text-muted-foreground">{detail.label}</dt>
-                <dd className={`break-words text-right text-sm font-semibold ${valueTone}`}>{detail.value}</dd>
-              </div>
-            );
-          })}
-        </dl>
-      ) : null}
+        {config.details && config.details.length > 0 ? (
+          <dl className="overflow-hidden rounded-ui border border-border bg-muted/55">
+            {config.details.map((detail, index) => {
+              const valueTone = detail.tone === 'danger'
+                ? 'text-danger'
+                : detail.tone === 'success'
+                  ? 'text-success'
+                  : detail.tone === 'primary'
+                    ? 'text-primary'
+                    : 'text-foreground';
+              return (
+                <div key={`${detail.label}-${index}`} className="flex items-start justify-between gap-4 border-b border-border px-4 py-3 last:border-b-0">
+                  <dt className="text-sm font-medium text-muted-foreground">{detail.label}</dt>
+                  <dd className={`break-words text-right text-sm font-semibold ${valueTone}`}>{detail.value}</dd>
+                </div>
+              );
+            })}
+          </dl>
+        ) : null}
       </>}
     </Dialog>
   );
