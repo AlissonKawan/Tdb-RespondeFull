@@ -5,7 +5,7 @@ import { voluntariosService, type Voluntario } from '../services/voluntariosServ
 import { atendimentoService } from '../services/atendimentoService';
 import { usuarioService } from '../services/usuarioService';
 import { formatStatusLabel, formatDate } from '../utils/formatters';
-import type { VoluntarioApi, VoluntarioRequestApi } from '../types/api';
+import type { VoluntarioApi } from '../types/api';
 import type { AtendimentoApi, AtendimentoStatus } from '../types/AtendimentoApi';
 import type { AuthUser } from '../types/auth';
 import Badge from '../components/ui/Badge';
@@ -54,6 +54,9 @@ export default function DashboardAdmin() {
   
   // States de Edicao Admin
   const [editingVoluntario, setEditingVoluntario] = useState<VoluntarioApi | null>(null);
+  const [salvandoVoluntario, setSalvandoVoluntario] = useState(false);
+  const [erroVoluntario, setErroVoluntario] = useState('');
+  const voluntarioSaveRef = useRef(false);
   const [editingBeneficiario, setEditingBeneficiario] = useState<AuthUser | null>(null);
   const primeiroInputVoluntarioRef = useRef<HTMLInputElement>(null);
   const primeiroInputBeneficiarioRef = useRef<HTMLInputElement>(null);
@@ -105,6 +108,18 @@ export default function DashboardAdmin() {
   const beneficiariosFiltrados = beneficiarios.filter((beneficiario) =>
     normalizeSearch(`${beneficiario.nome} ${beneficiario.email || ''}`).includes(termoBeneficiarios),
   );
+  const voluntarioOriginal = voluntarios.find(voluntario => voluntario.id === editingVoluntario?.id);
+  const alteracoesVoluntario = editingVoluntario && voluntarioOriginal ? [
+    { label: 'Nome', antes: voluntarioOriginal.nome, depois: editingVoluntario.nome },
+    { label: 'CRO', antes: voluntarioOriginal.cro || 'Não informado', depois: editingVoluntario.cro || 'Não informado' },
+    { label: 'UF do CRO', antes: voluntarioOriginal.ufCro || 'Não informada', depois: editingVoluntario.ufCro || 'Não informada' },
+    { label: 'Disponível', antes: voluntarioOriginal.disponivel ? 'Sim' : 'Não', depois: editingVoluntario.disponivel ? 'Sim' : 'Não' },
+    {
+      label: 'Atendimento de casos sigilosos',
+      antes: voluntarioOriginal.acessoSigilo ? 'Autorizado' : 'Não autorizado',
+      depois: editingVoluntario.acessoSigilo ? 'Autorizado' : 'Não autorizado',
+    },
+  ].filter(campo => campo.antes !== campo.depois) : [];
 
   const mudarStatusAtendimento = async (id: number, novoStatus: AtendimentoStatus) => {
     if (statusSaveRef.current) return;
@@ -122,24 +137,32 @@ export default function DashboardAdmin() {
   };
 
   const handleSaveVoluntario = async () => {
-    if(!editingVoluntario) return;
+    if (!editingVoluntario || voluntarioSaveRef.current) return;
+    voluntarioSaveRef.current = true;
+    setSalvandoVoluntario(true);
+    setErroVoluntario('');
     try {
       const atualizacao = {
         nome: editingVoluntario.nome,
-        especialidadeId: editingVoluntario.especialidade?.id,
+        usuario: editingVoluntario.usuario,
+        senha: '',
+        acessoSigilo: Boolean(editingVoluntario.acessoSigilo),
         cro: editingVoluntario.cro,
         ufCro: editingVoluntario.ufCro,
         disponivel: editingVoluntario.disponivel
       };
       await voluntariosService.atualizar(
         editingVoluntario.id,
-        atualizacao as unknown as VoluntarioRequestApi,
+        atualizacao,
       );
       setFeedback({ message: 'Voluntário atualizado com sucesso!', tone: 'success' });
       setEditingVoluntario(null);
       await carregarDados();
     } catch {
-      setFeedback({ message: 'Erro ao atualizar voluntário. Tente novamente.', tone: 'danger' });
+      setErroVoluntario('Não foi possível salvar as alterações. Os dados preenchidos foram mantidos. Tente novamente.');
+    } finally {
+      voluntarioSaveRef.current = false;
+      setSalvandoVoluntario(false);
     }
   };
 
@@ -329,7 +352,7 @@ export default function DashboardAdmin() {
                             <Badge tone={vol.disponivel ? 'success' : 'danger'}>{vol.disponivel ? 'Sim' : 'Não'}</Badge>
                           </td>
                           <td className="px-4 py-3 text-right">
-                            <Button size="sm" variant="secondary" onClick={() => setEditingVoluntario(vol)}>Editar</Button>
+                            <Button size="sm" variant="secondary" onClick={() => { setErroVoluntario(''); setEditingVoluntario(vol); }}>Editar</Button>
                           </td>
                         </tr>
                       ))}
@@ -449,22 +472,27 @@ export default function DashboardAdmin() {
       {editingVoluntario && (
         <Dialog
           title="Editar Voluntário"
-          description="Atualize os dados profissionais e a disponibilidade."
-          onClose={() => setEditingVoluntario(null)}
+          description="Atualize os dados profissionais, a disponibilidade e a autorização para casos sigilosos."
+          onClose={() => { if (!voluntarioSaveRef.current && !confirmDialog) setEditingVoluntario(null); }}
           initialFocusRef={primeiroInputVoluntarioRef}
           footer={(
             <>
-              <Button variant="secondary" onClick={() => setEditingVoluntario(null)}>Cancelar</Button>
-              <Button onClick={() => confirm({
-                title: 'Confirmar Alterações',
-                message: 'Você tem certeza de que deseja forçar estas alterações neste voluntário?',
+              <Button variant="secondary" disabled={salvandoVoluntario || Boolean(confirmDialog)} onClick={() => setEditingVoluntario(null)}>Cancelar</Button>
+              <Button disabled={salvandoVoluntario || Boolean(confirmDialog) || alteracoesVoluntario.length === 0} onClick={() => confirm({
+                title: 'Confirmar alterações do voluntário',
+                message: 'Deseja salvar as alterações abaixo? A autorização de sigilo define se o voluntário pode assumir novos casos sigilosos.',
+                details: [
+                  { label: 'Voluntário', value: voluntarioOriginal?.nome || editingVoluntario.nome },
+                  ...alteracoesVoluntario.map(campo => ({ label: campo.label, value: `${campo.antes} → ${campo.depois}` })),
+                ],
                 onConfirm: handleSaveVoluntario,
                 confirmText: 'Salvar'
-              })}>Salvar Alterações</Button>
+              })}>{salvandoVoluntario ? 'Salvando...' : 'Salvar Alterações'}</Button>
             </>
           )}
         >
-          <div className="grid gap-4">
+          {erroVoluntario && <p role="alert" className="mb-4 text-sm text-danger">{erroVoluntario}</p>}
+          <fieldset disabled={salvandoVoluntario || Boolean(confirmDialog)} className="grid min-w-0 gap-4">
             <Field label="Nome">
               <Input ref={primeiroInputVoluntarioRef} value={editingVoluntario.nome} onChange={e => setEditingVoluntario({...editingVoluntario, nome: e.target.value})} />
             </Field>
@@ -480,7 +508,20 @@ export default function DashboardAdmin() {
                 <option value="false">Não</option>
               </Select>
             </Field>
-          </div>
+            <Field label="Autorizar atendimento de casos sigilosos">
+              <Select
+                value={editingVoluntario.acessoSigilo ? 'true' : 'false'}
+                onChange={event => setEditingVoluntario({ ...editingVoluntario, acessoSigilo: event.target.value === 'true' })}
+                aria-describedby="permissao-sigilo-ajuda"
+              >
+                <option value="false">Não autorizado</option>
+                <option value="true">Autorizado</option>
+              </Select>
+            </Field>
+            <p id="permissao-sigilo-ajuda" className="text-sm text-muted-foreground">
+              Permite assumir novos casos que exigem sigilo. Não altera os atendimentos já atribuídos.
+            </p>
+          </fieldset>
         </Dialog>
       )}
 

@@ -59,6 +59,24 @@ public class VoluntarioBO {
         Voluntario atual = buscarPorId(id);
         Voluntario voluntario = toModel(request);
         voluntario.setId(id);
+        if (request != null && request.acessoSigilo == null) {
+            voluntario.setAcessoSigilo(atual.getAcessoSigilo());
+        }
+        if (request != null) {
+            voluntario.setCro(request.cro != null ? request.cro : atual.getCro());
+            voluntario.setUfCro(request.ufCro != null ? request.ufCro : atual.getUfCro());
+            if (request.especialidadeId == null && request.especialidadeIds == null) {
+                voluntario.setEspecialidades(atual.getEspecialidades());
+                voluntario.setEspecialidade(atual.getEspecialidade());
+            }
+        }
+        voluntario.setStatusCro(atual.getStatusCro());
+        voluntario.setCodigoIndicacao(atual.getCodigoIndicacao());
+        voluntario.setPontosIndicacao(atual.getPontosIndicacao());
+        voluntario.setIdVoluntarioIndicador(atual.getIdVoluntarioIndicador());
+        if (isBlank(voluntario.getUsuario())) {
+            voluntario.setUsuario(atual.getUsuario());
+        }
         voluntario.setStatusAprovacao(atual.getStatusAprovacao());
         if (isBlank(voluntario.getSenha())) {
             voluntario.setSenha(atual.getSenha());

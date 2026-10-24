@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -203,5 +203,104 @@ describe('DashboardAdmin', () => {
     await user.selectOptions(status, 'EM_ATENDIMENTO');
     await user.click(await screen.findByRole('button', { name: 'Confirmar' }));
     await waitFor(() => expect(atendimentoService.atualizarStatusPrioridade).toHaveBeenCalledWith(777, { status: 'EM_ATENDIMENTO' }));
+  });
+});
+
+describe('Permissão de casos sigilosos no painel administrativo', () => {
+  const voluntario = {
+    id: 80, nome: 'Voluntária sintética', usuario: 'voluntaria.sintetica',
+    disponivel: true, acessoSigilo: false, cro: '12345', ufCro: 'SP',
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(useAuthHook.useAuth).mockReturnValue({
+      user: { id: 3, nome: 'Admin', email: '', tipoUsuario: 'ADMIN', ativo: true },
+      isVoluntario: false, isBeneficiario: false, isAdmin: true, isAuthenticated: true,
+      isLoading: false, authError: '', logout: vi.fn(), login: vi.fn(), register: vi.fn(),
+    });
+    vi.mocked(atendimentoService.listarTodos).mockResolvedValue([]);
+    vi.mocked(usuarioService.listar).mockResolvedValue([]);
+    vi.mocked(voluntariosService.listar).mockResolvedValue([voluntario]);
+    vi.mocked(voluntariosService.listarPendentes).mockResolvedValue([]);
+    vi.mocked(voluntariosService.atualizar).mockResolvedValue(voluntario);
+  });
+
+  async function abrirEdicao() {
+    const user = userEvent.setup();
+    render(<MemoryRouter><DashboardAdmin /></MemoryRouter>);
+    await user.click(await screen.findByRole('button', { name: 'Voluntários' }));
+    await user.click(screen.getByRole('button', { name: 'Editar' }));
+    return user;
+  }
+
+  it.each([
+    [false, 'true', 'Não autorizado → Autorizado', true],
+    [true, 'false', 'Autorizado → Não autorizado', false],
+  ] as const)('confirma a alteração de acesso %s para %s antes de persistir', async (antes, opcao, resumo, depois) => {
+    vi.mocked(voluntariosService.listar).mockResolvedValue([{ ...voluntario, acessoSigilo: antes }]);
+    const user = await abrirEdicao();
+    const salvar = screen.getByRole('button', { name: 'Salvar Alterações' });
+    expect(salvar).toBeDisabled();
+    await user.selectOptions(screen.getByLabelText('Autorizar atendimento de casos sigilosos'), opcao);
+    await user.click(salvar);
+    const confirmacao = screen.getByRole('alertdialog', { name: 'Confirmar alterações do voluntário' });
+    expect(within(confirmacao).getByText(resumo)).toBeInTheDocument();
+    expect(within(confirmacao).getByText(voluntario.nome)).toBeInTheDocument();
+    expect(voluntariosService.atualizar).not.toHaveBeenCalled();
+    await user.click(within(confirmacao).getByRole('button', { name: 'Salvar' }));
+    await waitFor(() => expect(voluntariosService.atualizar).toHaveBeenCalledExactlyOnceWith(80, {
+      nome: voluntario.nome, usuario: voluntario.usuario, senha: '', acessoSigilo: depois,
+      cro: '12345', ufCro: 'SP', disponivel: true,
+    }));
+    expect(await screen.findByText('Voluntário atualizado com sucesso!')).toBeInTheDocument();
+  });
+
+  it('cancelar a confirmação mantém os campos sem enviar requisição', async () => {
+    const user = await abrirEdicao();
+    const nome = screen.getByLabelText('Nome');
+    await user.clear(nome);
+    await user.type(nome, 'Nome sintético alterado');
+    await user.selectOptions(screen.getByLabelText('Autorizar atendimento de casos sigilosos'), 'true');
+    await user.click(screen.getByRole('button', { name: 'Salvar Alterações' }));
+    const confirmacao = screen.getByRole('alertdialog');
+    expect(within(confirmacao).getByText('Voluntária sintética → Nome sintético alterado')).toBeInTheDocument();
+    await user.click(within(confirmacao).getByRole('button', { name: 'Cancelar' }));
+    expect(nome).toHaveValue('Nome sintético alterado');
+    expect(screen.getByLabelText('Autorizar atendimento de casos sigilosos')).toHaveValue('true');
+    expect(voluntariosService.atualizar).not.toHaveBeenCalled();
+  });
+
+  it('preserva a edição após erro e permite tentar novamente', async () => {
+    vi.mocked(voluntariosService.atualizar).mockRejectedValueOnce(new Error('Falha sintética'));
+    const user = await abrirEdicao();
+    await user.selectOptions(screen.getByLabelText('Autorizar atendimento de casos sigilosos'), 'true');
+    await user.click(screen.getByRole('button', { name: 'Salvar Alterações' }));
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Salvar' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Os dados preenchidos foram mantidos');
+    expect(screen.getByLabelText('Autorizar atendimento de casos sigilosos')).toHaveValue('true');
+    expect(screen.getByRole('button', { name: 'Salvar Alterações' })).toBeEnabled();
+    await user.click(screen.getByRole('button', { name: 'Salvar Alterações' }));
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Salvar' }));
+    await waitFor(() => expect(voluntariosService.atualizar).toHaveBeenCalledTimes(2));
+    expect(await screen.findByText('Voluntário atualizado com sucesso!')).toBeInTheDocument();
+  });
+
+  it('bloqueia novo envio, edição e fechamento durante o salvamento', async () => {
+    let concluir!: () => void;
+    vi.mocked(voluntariosService.atualizar).mockReturnValueOnce(new Promise(resolve => {
+      concluir = () => resolve({ ...voluntario, acessoSigilo: true });
+    }));
+    const user = await abrirEdicao();
+    await user.selectOptions(screen.getByLabelText('Autorizar atendimento de casos sigilosos'), 'true');
+    await user.click(screen.getByRole('button', { name: 'Salvar Alterações' }));
+    await user.dblClick(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Salvar' }));
+    expect(screen.getByRole('button', { name: 'Salvando...' })).toBeDisabled();
+    expect(screen.getByLabelText('Autorizar atendimento de casos sigilosos')).toBeDisabled();
+    await user.click(screen.getByRole('button', { name: 'Fechar Editar Voluntário' }));
+    expect(screen.getByRole('dialog', { name: 'Editar Voluntário' })).toBeInTheDocument();
+    expect(voluntariosService.atualizar).toHaveBeenCalledTimes(1);
+    await act(async () => concluir());
+    expect(await screen.findByText('Voluntário atualizado com sucesso!')).toBeInTheDocument();
   });
 });
